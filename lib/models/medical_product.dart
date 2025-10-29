@@ -156,14 +156,16 @@ class MedicalProduct {
       activeIngredient: json['activeIngredient'] as String?,
       manufacturer: json['manufacturer'] as String?,
       form: json['form'] as String?,
-      dosage: json['dosage'] as double?,
+      // ✅ robustesse: accepter int ou double
+      dosage: (json['dosage'] as num?)?.toDouble(),
       dosageUnit: json['dosageUnit'] as String?,
       withdrawalPeriodMeat: json['withdrawalPeriodMeat'] as int,
       withdrawalPeriodMilk: json['withdrawalPeriodMilk'] as int,
       currentStock: (json['currentStock'] as num).toDouble(),
       minStock: (json['minStock'] as num).toDouble(),
       stockUnit: json['stockUnit'] as String,
-      unitPrice: json['unitPrice'] as double?,
+      // ✅ robustesse: accepter int ou double
+      unitPrice: (json['unitPrice'] as num?)?.toDouble(),
       currency: json['currency'] as String?,
       batchNumber: json['batchNumber'] as String?,
       expiryDate: json['expiryDate'] != null

@@ -1,7 +1,12 @@
+// lib/providers/sync_provider.dart
 import 'package:flutter/material.dart';
 import 'dart:async';
 
 class SyncProvider extends ChangeNotifier {
+  // ===== Constantes (clés i18n) =====
+  static const String kErrNetworkUnreachable = 'err.sync.network_unreachable';
+  static const String kErrSyncGeneric = 'err.sync.generic';
+
   bool _isOnline = false;
   bool _isSyncing = false;
   DateTime? _lastSyncDate;
@@ -51,9 +56,10 @@ class SyncProvider extends ChangeNotifier {
       // Simulate network delay
       await Future.delayed(const Duration(seconds: 2));
 
-      // Simulate random failure (10% chance)
+      // Simulate random failure (10% chance) quand offline
       if (!_isOnline && DateTime.now().millisecond % 10 == 0) {
-        throw Exception('Network error: Unable to reach server');
+        // ❌ Remplace le texte en dur par une clé i18n
+        throw Exception(kErrNetworkUnreachable);
       }
 
       // Success
@@ -64,7 +70,13 @@ class SyncProvider extends ChangeNotifier {
 
       return true;
     } catch (e) {
-      _syncError = e.toString();
+      // Normalise le message d'erreur en clé i18n
+      final msg = e.toString();
+      if (msg.contains(kErrNetworkUnreachable)) {
+        _syncError = kErrNetworkUnreachable;
+      } else {
+        _syncError = kErrSyncGeneric;
+      }
       _isSyncing = false;
       notifyListeners();
 

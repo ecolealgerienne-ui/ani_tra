@@ -10,6 +10,27 @@ import '../models/batch.dart';
 /// - Traitement groupé
 /// - Autres actions de masse
 class BatchProvider with ChangeNotifier {
+  // ==================== Constantes (clés de messages / logs) ====================
+  static const String kLogBatchCreated = 'log.batch.created';
+  static const String kLogBatchNoActive = 'log.batch.no_active';
+  static const String kLogBatchAnimalAlreadyIn = 'log.batch.animal_already_in';
+  static const String kLogBatchAnimalAdded = 'log.batch.animal_added';
+  static const String kLogBatchAnimalRemoved = 'log.batch.animal_removed';
+  static const String kLogBatchNotFound = 'log.batch.not_found';
+  static const String kLogBatchCompleted = 'log.batch.completed';
+  static const String kLogBatchDeleted = 'log.batch.deleted';
+  static const String kLogBatchActiveReset = 'log.batch.active_reset';
+  static const String kLogBatchActivated = 'log.batch.activated';
+  static const String kLogBatchLoading = 'log.batch.loading';
+  static const String kLogBatchSaving = 'log.batch.saving';
+  static const String kLogBatchMockLoaded = 'log.batch.mock_loaded';
+  static const String kLogBatchReset = 'log.batch.reset';
+
+  // Pour exceptions (clés d’erreur)
+  static const String kErrBatchNotFound = 'err.batch.not_found';
+  static const String kErrCannotReactivateCompleted =
+      'err.batch.cannot_reactivate_completed';
+
   // ==================== État ====================
 
   /// Liste de tous les lots (actifs et complétés)
@@ -69,7 +90,8 @@ class BatchProvider with ChangeNotifier {
 
     notifyListeners();
 
-    debugPrint('📦 Lot créé: $name (${purpose.toString().split('.').last})');
+    // Logs via clés (multi-langue gérée au-dessus si besoin)
+    debugPrint('$kLogBatchCreated|name=$name|purpose=${purpose.name}');
 
     return batch;
   }
@@ -81,13 +103,13 @@ class BatchProvider with ChangeNotifier {
   /// Retourne true si ajouté avec succès, false si doublon
   bool addAnimalToBatch(String animalId) {
     if (_activeBatch == null) {
-      debugPrint('⚠️ Aucun lot actif');
+      debugPrint(kLogBatchNoActive);
       return false;
     }
 
     // Vérifier doublon
     if (_activeBatch!.animalIds.contains(animalId)) {
-      debugPrint('⚠️ Animal $animalId déjà dans le lot');
+      debugPrint('$kLogBatchAnimalAlreadyIn|animalId=$animalId');
       return false;
     }
 
@@ -113,7 +135,7 @@ class BatchProvider with ChangeNotifier {
     notifyListeners();
 
     debugPrint(
-        '✅ Animal $animalId ajouté au lot (${updatedBatch.animalCount} animaux)');
+        '$kLogBatchAnimalAdded|animalId=$animalId|count=${updatedBatch.animalCount}');
 
     return true;
   }
@@ -125,12 +147,12 @@ class BatchProvider with ChangeNotifier {
   /// Retourne true si retiré avec succès
   bool removeAnimalFromBatch(String animalId) {
     if (_activeBatch == null) {
-      debugPrint('⚠️ Aucun lot actif');
+      debugPrint(kLogBatchNoActive);
       return false;
     }
 
     if (!_activeBatch!.animalIds.contains(animalId)) {
-      debugPrint('⚠️ Animal $animalId pas dans le lot');
+      debugPrint('$kLogBatchAnimalAlreadyIn|not_present|animalId=$animalId');
       return false;
     }
 
@@ -159,7 +181,7 @@ class BatchProvider with ChangeNotifier {
     notifyListeners();
 
     debugPrint(
-        '➖ Animal $animalId retiré du lot (${updatedBatch.animalCount} animaux)');
+        '$kLogBatchAnimalRemoved|animalId=$animalId|count=${updatedBatch.animalCount}');
 
     return true;
   }
@@ -181,7 +203,7 @@ class BatchProvider with ChangeNotifier {
     final index = _batches.indexWhere((b) => b.id == batchId);
 
     if (index == -1) {
-      debugPrint('⚠️ Lot $batchId non trouvé');
+      debugPrint('$kLogBatchNotFound|id=$batchId');
       return;
     }
 
@@ -207,7 +229,7 @@ class BatchProvider with ChangeNotifier {
 
     notifyListeners();
 
-    debugPrint('✅ Lot complété: ${batch.name}');
+    debugPrint('$kLogBatchCompleted|name=${batch.name}');
   }
 
   /// Supprimer un lot
@@ -217,7 +239,7 @@ class BatchProvider with ChangeNotifier {
     final index = _batches.indexWhere((b) => b.id == batchId);
 
     if (index == -1) {
-      debugPrint('⚠️ Lot $batchId non trouvé');
+      debugPrint('$kLogBatchNotFound|id=$batchId');
       return;
     }
 
@@ -232,13 +254,13 @@ class BatchProvider with ChangeNotifier {
 
     notifyListeners();
 
-    debugPrint('🗑️ Lot supprimé: ${batch.name}');
+    debugPrint('$kLogBatchDeleted|name=${batch.name}');
   }
 
   /// Réinitialiser le lot actif (abandon de création)
   void clearActiveBatch() {
     if (_activeBatch != null) {
-      debugPrint('🔄 Lot actif réinitialisé: ${_activeBatch!.name}');
+      debugPrint('$kLogBatchActiveReset|name=${_activeBatch!.name}');
       _activeBatch = null;
       notifyListeners();
     }
@@ -250,18 +272,19 @@ class BatchProvider with ChangeNotifier {
   void setActiveBatch(String batchId) {
     final batch = _batches.firstWhere(
       (b) => b.id == batchId,
-      orElse: () => throw Exception('Lot $batchId non trouvé'),
+      orElse: () => throw Exception(kErrBatchNotFound),
     );
 
     if (batch.completed) {
-      debugPrint('⚠️ Impossible de réactiver un lot complété');
+      // On garde un log neutre (clé), et on ne réactive pas
+      debugPrint(kErrCannotReactivateCompleted);
       return;
     }
 
     _activeBatch = batch;
     notifyListeners();
 
-    debugPrint('📦 Lot activé: ${batch.name}');
+    debugPrint('$kLogBatchActivated|name=${batch.name}');
   }
 
   /// Obtenir un lot par son ID
@@ -296,7 +319,7 @@ class BatchProvider with ChangeNotifier {
   /// À implémenter avec la base de données SQLite
   Future<void> loadBatches() async {
     // TODO: Implémenter chargement depuis SQLite
-    debugPrint('📂 Chargement des lots...');
+    debugPrint(kLogBatchLoading);
 
     // Pour l'instant, on garde les données en mémoire
     notifyListeners();
@@ -307,7 +330,7 @@ class BatchProvider with ChangeNotifier {
   /// À implémenter avec la base de données SQLite
   Future<void> saveBatches() async {
     // TODO: Implémenter sauvegarde vers SQLite
-    debugPrint('💾 Sauvegarde des lots...');
+    debugPrint(kLogBatchSaving);
   }
 
   /// Initialiser avec des données de test (mock)
@@ -315,7 +338,7 @@ class BatchProvider with ChangeNotifier {
     _batches = mockBatches;
     notifyListeners();
 
-    debugPrint('🧪 ${mockBatches.length} lots de test chargés');
+    debugPrint('$kLogBatchMockLoaded|count=${mockBatches.length}');
   }
 
   // ==================== Méthodes Privées ====================
@@ -358,6 +381,6 @@ class BatchProvider with ChangeNotifier {
     _batches.clear();
     _activeBatch = null;
     notifyListeners();
-    debugPrint('🔄 BatchProvider réinitialisé');
+    debugPrint(kLogBatchReset);
   }
 }

@@ -20,7 +20,7 @@ class MedicalProductProvider with ChangeNotifier {
   List<MedicalProduct> get expiringSoonProducts =>
       _products.where((p) => p.isExpiringSoon && p.isActive).toList();
 
-  // Statistiques
+  // Statistiques (clés internes — pas de texte UI ici)
   Map<String, int> get stats {
     return {
       'total': _products.where((p) => p.isActive).length,
@@ -44,7 +44,7 @@ class MedicalProductProvider with ChangeNotifier {
     _loadMockData();
   }
 
-  // Charger des données de démonstration
+  // Charger des données de démonstration (données techniques, pas de messages UI)
   void _loadMockData() {
     _products.addAll([
       MedicalProduct(

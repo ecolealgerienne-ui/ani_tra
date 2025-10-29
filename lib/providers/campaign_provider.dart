@@ -1,22 +1,25 @@
 // lib/providers/campaign_provider.dart
-// Artefact 15 : CampaignProvider étendu avec vétérinaire
-// Version : 1.2
-
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
+
 import '../models/campaign.dart';
 import '../models/product.dart';
 import '../models/treatment.dart';
 
 const uuid = Uuid();
 
-class CampaignProvider with ChangeNotifier {
+/// Provider de gestion des campagnes.
+/// Aucune chaîne destinée à l'utilisateur n'est émise ici (multi-langue côté UI).
+class CampaignProvider extends ChangeNotifier {
   List<Campaign> _campaigns = [];
   Campaign? _activeCampaign;
 
   // ==================== Getters ====================
 
-  List<Campaign> get campaigns => _campaigns;
+  List<Campaign> get campaigns => List.unmodifiable(_campaigns);
+
+  List<Campaign> get completedCampaigns =>
+      _campaigns.where((c) => c.completed).toList();
 
   List<Campaign> get activeCampaigns =>
       _campaigns.where((c) => !c.completed).toList();
@@ -25,18 +28,14 @@ class CampaignProvider with ChangeNotifier {
 
   // ==================== Campaign Management ====================
 
-  /// Créer une nouvelle campagne
-  /// MODIFIÉ v1.2 : Ajout veterinarianId et veterinarianName
+  /// Crée une nouvelle campagne
   Campaign createCampaign({
     required String name,
     required Product product,
     required DateTime treatmentDate,
-    String? veterinarianId, // ← NOUVEAU
-    String? veterinarianName, // ← NOUVEAU
   }) {
-    final withdrawalEnd = treatmentDate.add(
-      Duration(days: product.withdrawalDaysMeat),
-    );
+    final withdrawalEnd =
+        treatmentDate.add(Duration(days: product.withdrawalDaysMeat));
 
     final campaign = Campaign(
       id: uuid.v4(),
@@ -45,156 +44,158 @@ class CampaignProvider with ChangeNotifier {
       productName: product.name,
       campaignDate: treatmentDate,
       withdrawalEndDate: withdrawalEnd,
-      veterinarianId: veterinarianId, // ← NOUVEAU
-      veterinarianName: veterinarianName, // ← NOUVEAU
-      animalIds: [],
+      animalIds: const [],
       completed: false,
-      synced: false,
-      createdAt: DateTime.now(),
+      createdAt: DateTime.now(), // requis par ton modèle
     );
 
     _campaigns.add(campaign);
+    _activeCampaign = campaign;
     notifyListeners();
 
     return campaign;
   }
 
-  /// Définir la campagne active
+  /// Définit la campagne active
   void setActiveCampaign(Campaign campaign) {
     _activeCampaign = campaign;
     notifyListeners();
   }
 
-  /// Ajouter un animal à la campagne active
+  /// Ajoute un animal à la campagne active
   bool addAnimalToActiveCampaign(String animalId) {
-    if (_activeCampaign == null) return false;
+    final current = _activeCampaign;
+    if (current == null) return false;
 
-    // Vérifier doublon
-    if (_activeCampaign!.animalIds.contains(animalId)) {
-      return false; // Animal déjà dans la campagne
+    if (current.animalIds.contains(animalId)) {
+      return false; // déjà présent
     }
 
-    // Ajouter l'animal
-    final updatedIds = [..._activeCampaign!.animalIds, animalId];
-    final updatedCampaign = _activeCampaign!.copyWith(
-      animalIds: updatedIds,
-      synced: false,
-    );
+    final updatedIds = [...current.animalIds, animalId];
+    final updatedCampaign = current.copyWith(animalIds: updatedIds);
 
-    // Mettre à jour dans la liste
-    final index = _campaigns.indexWhere((c) => c.id == _activeCampaign!.id);
+    final index = _campaigns.indexWhere((c) => c.id == current.id);
     if (index != -1) {
       _campaigns[index] = updatedCampaign;
       _activeCampaign = updatedCampaign;
       notifyListeners();
       return true;
     }
-
     return false;
   }
 
-  /// Vérifier si un animal est dans la campagne active
-  bool isAnimalInActiveCampaign(String animalId) {
-    if (_activeCampaign == null) return false;
-    return _activeCampaign!.animalIds.contains(animalId);
-  }
+  /// Retire un animal de la campagne active
+  bool removeAnimalFromActiveCampaign(String animalId) {
+    final current = _activeCampaign;
+    if (current == null) return false;
 
-  /// Compléter la campagne active
-  void completeActiveCampaign() {
-    if (_activeCampaign == null) return;
+    if (!current.animalIds.contains(animalId)) {
+      return false; // pas présent
+    }
 
-    final updatedCampaign = _activeCampaign!.copyWith(
-      completed: true,
-      synced: false,
-    );
+    final updatedIds = current.animalIds.where((id) => id != animalId).toList();
+    final updatedCampaign = current.copyWith(animalIds: updatedIds);
 
-    final index = _campaigns.indexWhere((c) => c.id == _activeCampaign!.id);
+    final index = _campaigns.indexWhere((c) => c.id == current.id);
     if (index != -1) {
       _campaigns[index] = updatedCampaign;
+      _activeCampaign = updatedCampaign;
+      notifyListeners();
+      return true;
+    }
+    return false;
+  }
+
+  /// Marque la campagne active comme complétée
+  void completeActiveCampaign() {
+    final current = _activeCampaign;
+    if (current == null) return;
+
+    final updated = current.copyWith(completed: true);
+
+    final index = _campaigns.indexWhere((c) => c.id == current.id);
+    if (index != -1) {
+      _campaigns[index] = updated;
     }
 
     _activeCampaign = null;
     notifyListeners();
   }
 
-  /// Annuler la campagne active
+  /// Annule la campagne active
   void cancelActiveCampaign() {
-    if (_activeCampaign == null) return;
+    final current = _activeCampaign;
+    if (current == null) return;
 
-    // Supprimer la campagne si aucun animal scanné
-    if (_activeCampaign!.animalIds.isEmpty) {
-      _campaigns.removeWhere((c) => c.id == _activeCampaign!.id);
+    // Si aucun animal scanné, supprimer la campagne
+    if (current.animalIds.isEmpty) {
+      _campaigns.removeWhere((c) => c.id == current.id);
     }
 
     _activeCampaign = null;
     notifyListeners();
   }
 
-  /// Supprimer une campagne
+  /// Supprime une campagne par ID
   void deleteCampaign(String campaignId) {
     _campaigns.removeWhere((c) => c.id == campaignId);
-
     if (_activeCampaign?.id == campaignId) {
       _activeCampaign = null;
     }
-
     notifyListeners();
   }
 
-  /// Récupérer une campagne par ID
+  /// Récupère une campagne par ID
   Campaign? getCampaignById(String id) {
     try {
       return _campaigns.firstWhere((c) => c.id == id);
-    } catch (e) {
+    } catch (_) {
       return null;
     }
   }
 
-  // ==================== Treatments Generation ====================
+  /// Met à jour une campagne existante
+  void updateCampaign(Campaign updated) {
+    final index = _campaigns.indexWhere((c) => c.id == updated.id);
+    if (index != -1) {
+      _campaigns[index] = updated;
+      if (_activeCampaign?.id == updated.id) {
+        _activeCampaign = _campaigns[index];
+      }
+      notifyListeners();
+    }
+  }
 
-  /// Générer les traitements pour tous les animaux d'une campagne
-  /// MODIFIÉ v1.2 : Inclure veterinarianId et veterinarianName
-  List<Treatment> generateTreatmentsFromCampaign(Campaign campaign) {
+  /// API conservée pour compatibilité (pas de champ `synced` dans le model)
+  void markCampaignAsSynced(String campaignId) {
+    if (_campaigns.any((c) => c.id == campaignId)) {
+      notifyListeners(); // no-op pour ne pas casser les appels existants
+    }
+  }
+
+  /// Convertit une campagne en traitements individuels
+  List<Treatment> expandCampaignToTreatments(Campaign campaign) {
     return campaign.animalIds.map((animalId) {
       return Treatment(
         id: uuid.v4(),
         animalId: animalId,
-        productName: campaign.productName,
         productId: campaign.productId,
-        dose: 0.0, // À définir selon le produit et poids animal
+        productName: campaign.productName,
+        dose: 0.0, // valeur par défaut — ajuste si besoin
         treatmentDate: campaign.campaignDate,
         withdrawalEndDate: campaign.withdrawalEndDate,
-        veterinarianId: campaign.veterinarianId, // ← NOUVEAU
-        veterinarianName: campaign.veterinarianName, // ← NOUVEAU
-        campaignId: campaign.id,
-        synced: false,
-        createdAt: DateTime.now(),
+        notes: null,
       );
     }).toList();
   }
 
-  // ==================== Statistics ====================
+  // ==================== Mock / Reset ====================
 
-  /// Nombre total de campagnes
-  int get totalCampaigns => _campaigns.length;
-
-  /// Nombre de campagnes actives (non complétées)
-  int get activeCampaignCount => activeCampaigns.length;
-
-  /// Nombre total d'animaux traités dans toutes les campagnes
-  int get totalAnimalsInCampaigns {
-    return _campaigns.fold(0, (sum, campaign) => sum + campaign.animalCount);
-  }
-
-  // ==================== Mock Data ====================
-
-  /// Initialiser avec des données de test
   void loadMockCampaigns(List<Campaign> mockCampaigns) {
     _campaigns = mockCampaigns;
     notifyListeners();
   }
 
-  /// Réinitialiser toutes les campagnes
   void clearAllCampaigns() {
     _campaigns.clear();
     _activeCampaign = null;

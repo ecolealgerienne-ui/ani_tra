@@ -23,6 +23,10 @@ class Campaign {
   final bool synced;
   final DateTime createdAt;
 
+  // ==================== AJOUT CHIRURGICAL ====================
+  /// Date de dernière mise à jour (optionnelle) pour compatibilité provider.
+  final DateTime? updatedAt;
+
   Campaign({
     required this.id,
     required this.name,
@@ -36,6 +40,7 @@ class Campaign {
     this.completed = false,
     this.synced = false,
     required this.createdAt,
+    this.updatedAt, // ← AJOUTÉ
   });
 
   /// Nombre d'animaux dans la campagne
@@ -55,6 +60,7 @@ class Campaign {
     bool? completed,
     bool? synced,
     DateTime? createdAt,
+    DateTime? updatedAt, // ← AJOUTÉ
   }) {
     return Campaign(
       id: id ?? this.id,
@@ -69,6 +75,7 @@ class Campaign {
       completed: completed ?? this.completed,
       synced: synced ?? this.synced,
       createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt, // ← AJOUTÉ
     );
   }
 
@@ -87,6 +94,7 @@ class Campaign {
       'completed': completed,
       'synced': synced,
       'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(), // ← AJOUTÉ
     };
   }
 
@@ -105,6 +113,9 @@ class Campaign {
       completed: json['completed'] ?? false,
       synced: json['synced'] ?? false,
       createdAt: DateTime.parse(json['createdAt']),
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'])
+          : null, // ← AJOUTÉ
     );
   }
 
