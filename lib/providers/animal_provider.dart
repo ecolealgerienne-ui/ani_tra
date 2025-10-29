@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import '../models/animal.dart';
 import '../models/treatment.dart';
 import '../models/movement.dart';
+import '../models/product.dart';
 import '../data/mock_data.dart';
 
 class AnimalProvider extends ChangeNotifier {
+  List<Product> _products = [];
   List<Animal> _animals = [];
   List<Treatment> _treatments = [];
   List<Movement> _movements = [];
@@ -12,8 +14,37 @@ class AnimalProvider extends ChangeNotifier {
   String _searchQuery = '';
   AnimalStatus? _statusFilter;
 
-  AnimalProvider() {
-    _loadMockData();
+  // (Optionnel) expose un getter en lecture seule si besoin
+  // List<Product> get products => List.unmodifiable(_products);
+  // List<Animal> get animals => List.unmodifiable(_animals);
+  // List<Treatment> get treatments => List.unmodifiable(_treatments);
+  // List<Movement> get movements => List.unmodifiable(_movements);
+
+  // AnimalProvider() {
+  //   _loadMockData();
+  // }
+
+  // 👉 Nouvelle méthode demandée par main.dart
+  void initializeWithMockData(
+    List<Animal> animals,
+    List<Product> products,
+    List<Treatment> treatments,
+    List<Movement> movements,
+  ) {
+    _animals
+      ..clear()
+      ..addAll(animals);
+    _products
+      ..clear()
+      ..addAll(products);
+    _treatments
+      ..clear()
+      ..addAll(treatments);
+    _movements
+      ..clear()
+      ..addAll(movements);
+
+    notifyListeners();
   }
 
   // Getters
