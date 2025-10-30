@@ -246,11 +246,11 @@ class CampaignDetailScreen extends StatelessWidget {
                       color: statusColor,
                     ),
                   ),
-                  if (isCompleted && campaign.completedAt != null)
+                  if (isCompleted && campaign.updatedAt != null)
                     Text(
-                      'Le ${_formatDate(campaign.completedAt!)}',
+                      'Le ${_formatDate(campaign.updatedAt!)}',
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 12,
                         color: Colors.grey.shade600,
                       ),
                     ),
@@ -265,6 +265,10 @@ class CampaignDetailScreen extends StatelessWidget {
 
   /// Widget: Section produit
   Widget _buildProductSection(BuildContext context, Campaign campaign) {
+    // Calculer les jours de rémanence
+    final withdrawalDays =
+        campaign.withdrawalEndDate.difference(campaign.campaignDate).inDays;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Card(
@@ -273,83 +277,45 @@ class CampaignDetailScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.medication, size: 20),
-                  SizedBox(width: 8),
-                  Text(
-                    'Produit Utilisé',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  Icon(Icons.medication, color: Colors.purple.shade700),
+                  const SizedBox(width: 12),
+                  const Text(
+                    'Produit',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
-              const Divider(height: 24),
-
-              // Nom du produit
+              const SizedBox(height: 16),
               _buildInfoRow(
-                'Produit',
+                'Nom du produit',
                 campaign.productName,
                 Icons.label,
               ),
               const SizedBox(height: 12),
-
-              // Dose
               _buildInfoRow(
-                'Dose par animal',
-                '${campaign.dosePerAnimal.toStringAsFixed(1)} ml',
-                Icons.water_drop,
+                'Délai d\'attente',
+                '$withdrawalDays jours',
+                Icons.schedule,
               ),
               const SizedBox(height: 12),
-
-              // Rémanence
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.orange.shade50,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.orange.shade200),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.warning_amber,
-                      color: Colors.orange.shade700,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Délai de rémanence',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Colors.grey.shade700,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Jusqu\'au ${_formatDate(campaign.withdrawalEndDate)}',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.orange.shade900,
-                            ),
-                          ),
-                          Text(
-                            '${campaign.withdrawalDays} jours',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.orange.shade800,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+              _buildInfoRow(
+                'Fin de rémanence',
+                _formatDate(campaign.withdrawalEndDate),
+                Icons.event,
               ),
+              if (campaign.veterinarianName != null) ...[
+                const SizedBox(height: 12),
+                _buildInfoRow(
+                  'Vétérinaire',
+                  campaign.veterinarianName!,
+                  Icons.person,
+                ),
+              ],
             ],
           ),
         ),
@@ -359,13 +325,9 @@ class CampaignDetailScreen extends StatelessWidget {
 
   /// Widget: Section statistiques
   Widget _buildStatisticsSection(
-    BuildContext context,
-    Campaign campaign,
-    List<Animal> animals,
-  ) {
+      BuildContext context, Campaign campaign, List<Animal> animals) {
     final maleCount = animals.where((a) => a.sex == AnimalSex.male).length;
     final femaleCount = animals.where((a) => a.sex == AnimalSex.female).length;
-    final totalDose = campaign.dosePerAnimal * campaign.animalCount;
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -375,23 +337,26 @@ class CampaignDetailScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.analytics, size: 20),
-                  SizedBox(width: 8),
-                  Text(
+                  Icon(Icons.bar_chart, color: Colors.green.shade700),
+                  const SizedBox(width: 12),
+                  const Text(
                     'Statistiques',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
-              const Divider(height: 24),
+              const SizedBox(height: 16),
               Row(
                 children: [
                   Expanded(
                     child: _buildStatCard(
-                      'Total Animaux',
-                      '${campaign.animalCount}',
+                      'Total',
+                      campaign.animalCount.toString(),
                       Icons.pets,
                       Colors.blue,
                     ),
@@ -399,21 +364,8 @@ class CampaignDetailScreen extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildStatCard(
-                      'Dose Totale',
-                      '${totalDose.toStringAsFixed(1)} ml',
-                      Icons.science,
-                      Colors.purple,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildStatCard(
                       'Mâles',
-                      '$maleCount',
+                      maleCount.toString(),
                       Icons.male,
                       Colors.blue,
                     ),
@@ -422,7 +374,7 @@ class CampaignDetailScreen extends StatelessWidget {
                   Expanded(
                     child: _buildStatCard(
                       'Femelles',
-                      '$femaleCount',
+                      femaleCount.toString(),
                       Icons.female,
                       Colors.pink,
                     ),
@@ -440,36 +392,29 @@ class CampaignDetailScreen extends StatelessWidget {
   Widget _buildStatCard(
       String label, String value, IconData icon, Color color) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(icon, size: 16, color: color),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Colors.grey.shade700,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
+          Icon(icon, color: color, size: 32),
+          const SizedBox(height: 8),
           Text(
             value,
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
               color: color,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey.shade700,
             ),
           ),
         ],
@@ -477,14 +422,35 @@ class CampaignDetailScreen extends StatelessWidget {
     );
   }
 
-  /// Widget: Section liste des animaux
+  /// Widget: Section animaux
   Widget _buildAnimalsSection(
-    BuildContext context,
-    Campaign campaign,
-    List<Animal> animals,
-  ) {
+      BuildContext context, Campaign campaign, List<Animal> animals) {
+    if (animals.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(16),
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              children: [
+                Icon(Icons.pets, size: 48, color: Colors.grey.shade400),
+                const SizedBox(height: 16),
+                Text(
+                  'Aucun animal traité',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(16),
       child: Card(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -493,10 +459,10 @@ class CampaignDetailScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  const Icon(Icons.list, size: 20),
-                  const SizedBox(width: 8),
+                  Icon(Icons.pets, color: Colors.orange.shade700),
+                  const SizedBox(width: 12),
                   Text(
-                    'Animaux traités (${animals.length})',
+                    'Animaux traités (${campaign.animalCount})',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -506,36 +472,15 @@ class CampaignDetailScreen extends StatelessWidget {
               ),
             ),
             const Divider(height: 1),
-            if (animals.isEmpty)
-              Padding(
-                padding: const EdgeInsets.all(32),
-                child: Center(
-                  child: Column(
-                    children: [
-                      Icon(Icons.inbox, size: 48, color: Colors.grey.shade400),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Aucun animal traité',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            else
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: animals.length,
-                separatorBuilder: (_, __) => const Divider(height: 1),
-                itemBuilder: (context, index) {
-                  final animal = animals[index];
-                  return _buildAnimalTile(animal);
-                },
-              ),
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: animals.length,
+              separatorBuilder: (context, index) => const Divider(height: 1),
+              itemBuilder: (context, index) {
+                return _buildAnimalTile(animals[index]);
+              },
+            ),
           ],
         ),
       ),
@@ -708,14 +653,13 @@ class CampaignDetailScreen extends StatelessWidget {
       final syncProvider = context.read<SyncProvider>();
 
       // Générer les traitements
-      final treatments =
-          campaignProvider.generateTreatmentsFromCampaign(campaign);
+      final treatments = campaignProvider.expandCampaignToTreatments(campaign);
       for (final treatment in treatments) {
         animalProvider.addTreatment(treatment);
       }
 
       // Compléter la campagne
-      campaignProvider.completeCampaign(campaign.id);
+      campaignProvider.completeActiveCampaign();
       syncProvider.addPendingData(treatments.length + 1);
 
       if (context.mounted) {

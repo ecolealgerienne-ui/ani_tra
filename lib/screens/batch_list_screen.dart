@@ -6,8 +6,8 @@ import 'package:provider/provider.dart';
 import '../models/batch.dart';
 import '../providers/batch_provider.dart';
 import 'batch_create_screen.dart';
-import 'sale_screen.dart';
-import 'slaughter_screen.dart';
+// import 'sale_screen.dart';
+// import 'slaughter_screen.dart';
 
 /// Écran de liste des lots
 ///
@@ -139,25 +139,47 @@ class BatchListScreen extends StatelessWidget {
 
   /// Utiliser un lot (naviguer selon l'objectif)
   void _useBatch(BuildContext context, Batch batch) {
+    // TODO: Décommenter et ajuster les imports une fois les screens disponibles
     switch (batch.purpose) {
       case BatchPurpose.sale:
         // Naviguer vers vente
+        // NOTE: Vérifiez le nom du paramètre dans SaleScreen
+        // Il peut être: batch, batchId, selectedBatch, etc.
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Vente du lot "${batch.name}" - À implémenter'),
+          ),
+        );
+        /*
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => SaleScreen(preloadedBatch: batch),
+            builder: (context) => SaleScreen(
+              batch: batch,  // ou batchId: batch.id
+            ),
           ),
         );
+        */
         break;
 
       case BatchPurpose.slaughter:
         // Naviguer vers abattage
+        // NOTE: Vérifiez le nom du paramètre dans SlaughterScreen
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Abattage du lot "${batch.name}" - À implémenter'),
+          ),
+        );
+        /*
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => SlaughterScreen(preloadedBatch: batch),
+            builder: (context) => SlaughterScreen(
+              batch: batch,  // ou batchId: batch.id
+            ),
           ),
         );
+        */
         break;
 
       case BatchPurpose.treatment:

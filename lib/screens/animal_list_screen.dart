@@ -243,65 +243,65 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: '🔍 Rechercher EID ou N°...',
-                prefixIcon: Icon(Icons.search),
+                hintText: 'Rechercher EID ou n° officiel...',
+                prefixIcon: const Icon(Icons.search),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                        icon: Icon(Icons.clear),
+                        icon: const Icon(Icons.clear),
                         onPressed: () {
-                          setState(() => _searchController.clear());
+                          setState(() {
+                            _searchController.clear();
+                          });
                         },
                       )
                     : null,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                filled: true,
-                fillColor: Colors.grey.shade100,
               ),
-              onChanged: (_) => setState(() {}),
+              onChanged: (value) => setState(() {}),
             ),
           ),
 
-          // Barre d'outils (Filtres + Group By)
+          // Filtres et Group By
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
                 // Bouton Filtres
-                OutlinedButton.icon(
-                  onPressed: _showFiltersDrawer,
-                  icon: Icon(Icons.filter_list),
-                  label: Text(_activeFilterCount > 0
-                      ? 'Filtres ($_activeFilterCount)'
-                      : 'Filtres'),
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor:
-                        _activeFilterCount > 0 ? Colors.blue.shade50 : null,
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: _showFiltersDrawer,
+                    icon: Badge(
+                      isLabelVisible: _activeFilterCount > 0,
+                      label: Text('$_activeFilterCount'),
+                      child: const Icon(Icons.filter_list),
+                    ),
+                    label: const Text('Filtres'),
                   ),
                 ),
-                SizedBox(width: 12),
-
+                const SizedBox(width: 12),
                 // Dropdown Group By
                 Expanded(
                   child: DropdownButtonFormField<GroupByOption>(
                     value: _groupBy,
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.group_work),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                    decoration: const InputDecoration(
+                      labelText: 'Grouper par',
+                      border: OutlineInputBorder(),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     ),
-                    items: GroupByOption.values.map((option) {
-                      return DropdownMenuItem(
-                        value: option,
-                        child: Text(option.label),
-                      );
-                    }).toList(),
+                    items: GroupByOption.values
+                        .map((option) => DropdownMenuItem(
+                              value: option,
+                              child: Text(option.label),
+                            ))
+                        .toList(),
                     onChanged: (value) {
                       if (value != null) {
-                        setState(() => _groupBy = value);
+                        setState(() {
+                          _groupBy = value;
+                        });
                       }
                     },
                   ),
@@ -310,17 +310,18 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
             ),
           ),
 
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
 
-          // Liste
+          // Liste des animaux
           Expanded(
             child: filteredAnimals.isEmpty
                 ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.pets, size: 64, color: Colors.grey),
-                        SizedBox(height: 16),
+                        Icon(Icons.search_off,
+                            size: 64, color: Colors.grey.shade400),
+                        const SizedBox(height: 16),
                         Text(
                           'Aucun animal trouvé',
                           style: TextStyle(
@@ -335,191 +336,119 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                     ? ListView.builder(
                         itemCount: filteredAnimals.length,
                         itemBuilder: (context, index) {
-                          return _AnimalTile(
-                            animal: filteredAnimals[index],
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => ScanScreen(
-                                    preloadedAnimal: filteredAnimals[index],
-                                  ),
-                                ),
-                              );
-                            },
-                          );
+                          final animal = filteredAnimals[index];
+                          return _buildAnimalCard(context, animal);
                         },
                       )
                     : ListView.builder(
-                        itemCount: groupedAnimals.keys.length,
+                        itemCount: groupedAnimals.length,
                         itemBuilder: (context, index) {
                           final groupKey = groupedAnimals.keys.elementAt(index);
-                          final animals = groupedAnimals[groupKey]!;
+                          final groupAnimals = groupedAnimals[groupKey]!;
 
-                          return _GroupExpansionTile(
-                            title: groupKey,
-                            count: animals.length,
-                            animals: animals,
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Header du groupe
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                                color: Colors.grey.shade200,
+                                child: Text(
+                                  '$groupKey (${groupAnimals.length})',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              // Animaux du groupe
+                              ...groupAnimals
+                                  .map((animal) =>
+                                      _buildAnimalCard(context, animal))
+                                  .toList(),
+                            ],
                           );
                         },
                       ),
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ScanScreen()),
+          );
+        },
+        child: const Icon(Icons.qr_code_scanner),
+      ),
     );
   }
-}
 
-// ==================== Widgets ====================
-
-class _AnimalTile extends StatelessWidget {
-  final Animal animal;
-  final VoidCallback onTap;
-
-  const _AnimalTile({
-    required this.animal,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildAnimalCard(BuildContext context, Animal animal) {
     final animalProvider = context.read<AnimalProvider>();
     final hasWithdrawal = animalProvider.hasActiveWithdrawal(animal.id);
 
-    return ListTile(
-      leading: CircleAvatar(
-        backgroundColor: animal.sex == AnimalSex.male
-            ? Colors.blue.shade100
-            : Colors.pink.shade100,
-        child: Icon(
-          animal.sex == AnimalSex.male ? Icons.male : Icons.female,
-          color: animal.sex == AnimalSex.male
-              ? Colors.blue.shade700
-              : Colors.pink.shade700,
-        ),
-      ),
-      title: Text(
-        animal.officialNumber ?? animal.eid,
-        style: TextStyle(fontWeight: FontWeight.w600),
-      ),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('${animal.ageFormatted}'),
-          Row(
-            children: [
-              _StatusBadge(status: animal.status),
-              if (hasWithdrawal) ...[
-                SizedBox(width: 8),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.shade100,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    '⚠️ Rémanence',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.orange.shade900,
-                    ),
-                  ),
-                ),
-              ],
-            ],
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: animal.sex == AnimalSex.male
+              ? Colors.blue.shade100
+              : Colors.pink.shade100,
+          child: Text(
+            animal.sex == AnimalSex.male ? '♂️' : '♀️',
+            style: const TextStyle(fontSize: 20),
           ),
-        ],
+        ),
+        title: Text(
+          animal.officialNumber ?? animal.eid,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (animal.officialNumber != null)
+              Text('EID: ${animal.eid}', style: const TextStyle(fontSize: 12)),
+            Text(
+                '${animal.ageInMonths} mois • ${_getStatusLabel(animal.status)}'),
+            if (hasWithdrawal)
+              const Text(
+                '⚠️ Rémanence active',
+                style: TextStyle(
+                    color: Colors.orange, fontWeight: FontWeight.w600),
+              ),
+          ],
+        ),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Ouvrir détail: ${animal.eid}')),
+          );
+        },
       ),
-      trailing: Icon(Icons.chevron_right),
-      onTap: onTap,
     );
   }
-}
 
-class _StatusBadge extends StatelessWidget {
-  final AnimalStatus status;
-
-  const _StatusBadge({required this.status});
-
-  @override
-  Widget build(BuildContext context) {
-    Color color;
-    String label;
-
+  String _getStatusLabel(AnimalStatus status) {
     switch (status) {
       case AnimalStatus.alive:
-        color = Colors.green;
-        label = 'Vivant';
-        break;
+        return 'Vivant';
       case AnimalStatus.sold:
-        color = Colors.orange;
-        label = 'Vendu';
-        break;
+        return 'Vendu';
       case AnimalStatus.dead:
-        color = Colors.red;
-        label = 'Mort';
-        break;
+        return 'Mort';
       case AnimalStatus.slaughtered:
-        color = Colors.grey;
-        label = 'Abattu';
-        break;
+        return 'Abattu';
     }
-
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: color),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 11,
-          color: color.shade900,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
   }
 }
 
-class _GroupExpansionTile extends StatelessWidget {
-  final String title;
-  final int count;
-  final List<Animal> animals;
-
-  const _GroupExpansionTile({
-    required this.title,
-    required this.count,
-    required this.animals,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ExpansionTile(
-      leading: Icon(Icons.folder_open),
-      title: Text(
-        title,
-        style: TextStyle(fontWeight: FontWeight.w600),
-      ),
-      subtitle: Text('$count animal${count > 1 ? 'aux' : ''}'),
-      children: animals.map((animal) {
-        return _AnimalTile(
-          animal: animal,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => ScanScreen(preloadedAnimal: animal),
-              ),
-            );
-          },
-        );
-      }).toList(),
-    );
-  }
-}
+// ==================== Widget Filtres ====================
 
 class _FiltersDrawer extends StatefulWidget {
   final Set<AnimalStatus> selectedStatuses;
@@ -527,13 +456,8 @@ class _FiltersDrawer extends StatefulWidget {
   final Set<String> selectedAgeRanges;
   final bool? hasActiveWithdrawal;
   final String? motherEidFilter;
-  final Function(
-    Set<AnimalStatus>,
-    Set<AnimalSex>,
-    Set<String>,
-    bool?,
-    String?,
-  ) onApply;
+  final Function(Set<AnimalStatus>, Set<AnimalSex>, Set<String>, bool?, String?)
+      onApply;
   final VoidCallback onReset;
 
   const _FiltersDrawer({
@@ -582,7 +506,7 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
       maxChildSize: 0.9,
       builder: (context, scrollController) {
         return Container(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -590,7 +514,7 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
+                  const Text(
                     'Filtres',
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
@@ -599,18 +523,18 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                       widget.onReset();
                       Navigator.pop(context);
                     },
-                    child: Text('Réinitialiser'),
+                    child: const Text('Réinitialiser'),
                   ),
                 ],
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               Expanded(
                 child: ListView(
                   controller: scrollController,
                   children: [
                     // Statut
-                    Text('Statut',
+                    const Text('Statut',
                         style: TextStyle(fontWeight: FontWeight.w600)),
                     ...AnimalStatus.values.map((status) {
                       return CheckboxListTile(
@@ -626,14 +550,15 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                           });
                         },
                       );
-                    }).toList(),
+                    }),
 
-                    Divider(),
+                    const Divider(),
 
                     // Sexe
-                    Text('Sexe', style: TextStyle(fontWeight: FontWeight.w600)),
+                    const Text('Sexe',
+                        style: TextStyle(fontWeight: FontWeight.w600)),
                     CheckboxListTile(
-                      title: Text('♂️ Mâle'),
+                      title: const Text('♂️ Mâle'),
                       value: _sexes.contains(AnimalSex.male),
                       onChanged: (checked) {
                         setState(() {
@@ -646,7 +571,7 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                       },
                     ),
                     CheckboxListTile(
-                      title: Text('♀️ Femelle'),
+                      title: const Text('♀️ Femelle'),
                       value: _sexes.contains(AnimalSex.female),
                       onChanged: (checked) {
                         setState(() {
@@ -659,10 +584,11 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                       },
                     ),
 
-                    Divider(),
+                    const Divider(),
 
                     // Âge
-                    Text('Âge', style: TextStyle(fontWeight: FontWeight.w600)),
+                    const Text('Âge',
+                        style: TextStyle(fontWeight: FontWeight.w600)),
                     ...['< 6m', '6-12m', '1-2 ans', '> 2 ans'].map((range) {
                       return CheckboxListTile(
                         title: Text(range),
@@ -677,42 +603,43 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                           });
                         },
                       );
-                    }).toList(),
+                    }),
 
-                    Divider(),
+                    const Divider(),
 
                     // Rémanence
-                    Text('Rémanence',
+                    const Text('Rémanence',
                         style: TextStyle(fontWeight: FontWeight.w600)),
                     RadioListTile<bool?>(
-                      title: Text('Tous'),
+                      title: const Text('Tous'),
                       value: null,
                       groupValue: _withdrawal,
                       onChanged: (value) => setState(() => _withdrawal = value),
                     ),
                     RadioListTile<bool?>(
-                      title: Text('Active'),
+                      title: const Text('Active'),
                       value: true,
                       groupValue: _withdrawal,
                       onChanged: (value) => setState(() => _withdrawal = value),
                     ),
                     RadioListTile<bool?>(
-                      title: Text('Inactive'),
+                      title: const Text('Inactive'),
                       value: false,
                       groupValue: _withdrawal,
                       onChanged: (value) => setState(() => _withdrawal = value),
                     ),
 
-                    Divider(),
+                    const Divider(),
 
                     // Mère
-                    Text('Mère', style: TextStyle(fontWeight: FontWeight.w600)),
+                    const Text('Mère',
+                        style: TextStyle(fontWeight: FontWeight.w600)),
                     Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
                       child: TextField(
                         controller: _motherController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: 'EID de la mère',
                           border: OutlineInputBorder(),
                         ),
@@ -728,10 +655,10 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () => Navigator.pop(context),
-                      child: Text('Annuler'),
+                      child: const Text('Annuler'),
                     ),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
@@ -746,7 +673,7 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                         );
                         Navigator.pop(context);
                       },
-                      child: Text('Appliquer'),
+                      child: const Text('Appliquer'),
                     ),
                   ),
                 ],

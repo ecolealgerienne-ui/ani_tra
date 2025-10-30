@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../models/animal.dart';
 import '../models/movement.dart';
 import '../providers/animal_provider.dart';

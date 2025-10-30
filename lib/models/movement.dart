@@ -1,6 +1,6 @@
 import 'package:uuid/uuid.dart';
 
-enum MovementType { birth, purchase, sale, death }
+enum MovementType { birth, purchase, sale, death, slaughter }
 
 class Movement {
   final String id;

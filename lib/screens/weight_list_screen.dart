@@ -423,7 +423,7 @@ class _WeightListScreenState extends State<WeightListScreen> {
 
     if (shouldDelete == true && mounted) {
       final weightProvider = context.read<WeightProvider>();
-      weightProvider.deleteWeight(weight.id);
+      weightProvider.removeWeight(weight.id);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

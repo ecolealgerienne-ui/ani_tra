@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'dart:math';
 import '../providers/campaign_provider.dart';
 import '../providers/animal_provider.dart';
 import '../providers/sync_provider.dart';
@@ -18,6 +19,7 @@ class CampaignScanScreen extends StatefulWidget {
 class _CampaignScanScreenState extends State<CampaignScanScreen> {
   bool _isScanning = false;
   String? _lastScanResult;
+  final _random = Random();
 
   Future<void> _simulateScan() async {
     final campaignProvider = context.read<CampaignProvider>();
@@ -37,7 +39,20 @@ class _CampaignScanScreenState extends State<CampaignScanScreen> {
     await Future.delayed(const Duration(milliseconds: 500));
 
     try {
-      final animal = animalProvider.simulateScan();
+      // Obtenir un animal aléatoire de la liste
+      final animals = animalProvider.animals;
+
+      if (animals.isEmpty) {
+        if (!mounted) return;
+        setState(() {
+          _lastScanResult = 'error';
+          _isScanning = false;
+        });
+        return;
+      }
+
+      // Sélectionner un animal aléatoire
+      final animal = animals[_random.nextInt(animals.length)];
 
       // Check if already scanned
       final isDuplicate =
@@ -91,6 +106,8 @@ class _CampaignScanScreenState extends State<CampaignScanScreen> {
 
     // Add to sync queue
     syncProvider.addPendingData(treatments.length + 1);
+
+    if (!mounted) return;
 
     // Show success and go back
     ScaffoldMessenger.of(context).showSnackBar(

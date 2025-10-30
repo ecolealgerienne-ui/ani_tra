@@ -183,21 +183,21 @@ class _InfoTab extends StatelessWidget {
       children: [
         // Alertes
         if (product.isExpired)
-          _AlertCard(
+          const _AlertCard(
             icon: Icons.error,
             title: 'Produit expiré',
             message: 'Ce produit a dépassé sa date d\'expiration',
             color: Colors.red,
           ),
         if (product.isExpiringSoon && !product.isExpired)
-          _AlertCard(
+          const _AlertCard(
             icon: Icons.schedule,
             title: 'Expire bientôt',
             message: 'Ce produit expire dans moins de 30 jours',
             color: Colors.orange,
           ),
         if (product.isLowStock)
-          _AlertCard(
+          const _AlertCard(
             icon: Icons.inventory_2,
             title: 'Stock faible',
             message: 'Le stock est en dessous du minimum recommandé',
@@ -205,7 +205,7 @@ class _InfoTab extends StatelessWidget {
           ),
 
         // Informations générales
-        _SectionTitle('Informations générales'),
+        const _SectionTitle('Informations générales'),
         _InfoCard(
           children: [
             _InfoRow('Nom générique', product.name),
@@ -225,7 +225,7 @@ class _InfoTab extends StatelessWidget {
         const SizedBox(height: 16),
 
         // Délais d'attente
-        _SectionTitle('Délais d\'attente'),
+        const _SectionTitle('Délais d\'attente'),
         _InfoCard(
           children: [
             _InfoRow(
@@ -248,7 +248,7 @@ class _InfoTab extends StatelessWidget {
         const SizedBox(height: 16),
 
         // Stock et prix
-        _SectionTitle('Stock et prix'),
+        const _SectionTitle('Stock et prix'),
         _InfoCard(
           children: [
             _InfoRow(
@@ -283,7 +283,7 @@ class _InfoTab extends StatelessWidget {
         const SizedBox(height: 16),
 
         // Lot et expiration
-        _SectionTitle('Lot et péremption'),
+        const _SectionTitle('Lot et péremption'),
         _InfoCard(
           children: [
             if (product.batchNumber != null)
@@ -308,7 +308,7 @@ class _InfoTab extends StatelessWidget {
         const SizedBox(height: 16),
 
         // Prescription et notes
-        _SectionTitle('Informations complémentaires'),
+        const _SectionTitle('Informations complémentaires'),
         _InfoCard(
           children: [
             if (product.prescription != null)
@@ -323,7 +323,7 @@ class _InfoTab extends StatelessWidget {
         const SizedBox(height: 16),
 
         // Métadonnées
-        _SectionTitle('Métadonnées'),
+        const _SectionTitle('Métadonnées'),
         _InfoCard(
           children: [
             _InfoRow(
@@ -589,8 +589,8 @@ class _StockTabState extends State<_StockTab> {
           child: ListTile(
             leading: CircleAvatar(
               backgroundColor: isAdd
-                  ? Colors.green.withOpacity(0.1)
-                  : Colors.orange.withOpacity(0.1),
+                  ? Colors.green.withValues(alpha: 0.1)
+                  : Colors.orange.withValues(alpha: 0.1),
               child: Icon(
                 isAdd ? Icons.add : Icons.remove,
                 color: isAdd ? Colors.green : Colors.orange,
@@ -633,8 +633,8 @@ class _StockTabState extends State<_StockTab> {
               ),
             ),
             const SizedBox(height: 12),
-            TextField(
-              decoration: const InputDecoration(
+            const TextField(
+              decoration: InputDecoration(
                 labelText: 'Motif (optionnel)',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.notes),
@@ -800,13 +800,13 @@ class _HistoryTab extends StatelessWidget {
                       icon: Icons.medication,
                       color: Colors.blue,
                     ),
-                    _StatColumn(
+                    const _StatColumn(
                       label: 'Animaux traités',
                       value: '4',
                       icon: Icons.pets,
                       color: Colors.green,
                     ),
-                    _StatColumn(
+                    const _StatColumn(
                       label: 'Traitements',
                       value: '4',
                       icon: Icons.healing,
@@ -842,7 +842,7 @@ class _HistoryTab extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: Colors.blue.withOpacity(0.1),
+                            color: Colors.blue.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Icon(
@@ -880,7 +880,7 @@ class _HistoryTab extends StatelessWidget {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.orange.withOpacity(0.1),
+                            color: Colors.orange.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
@@ -1072,7 +1072,7 @@ class _AlertCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: color.withOpacity(0.1),
+      color: color.withValues(alpha: 0.1),
       margin: const EdgeInsets.only(bottom: 16),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -1097,7 +1097,7 @@ class _AlertCard extends StatelessWidget {
                     message,
                     style: TextStyle(
                       fontSize: 13,
-                      color: color.withOpacity(0.8),
+                      color: color.withValues(alpha: 0.8),
                     ),
                   ),
                 ],

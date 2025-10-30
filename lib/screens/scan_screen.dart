@@ -3,13 +3,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
+import 'dart:math';
 import '../models/animal.dart';
 import '../models/treatment.dart';
 import '../models/weight_record.dart';
 import '../providers/animal_provider.dart';
 import '../providers/weight_provider.dart';
 import '../providers/sync_provider.dart';
-import '../providers/qr_provider.dart';
 import '../data/mock_data.dart';
 import 'death_screen.dart';
 
@@ -28,6 +28,7 @@ class ScanScreen extends StatefulWidget {
 class _ScanScreenState extends State<ScanScreen> {
   Animal? _scannedAnimal;
   final _uuid = const Uuid();
+  final _random = Random();
 
   @override
   void initState() {
@@ -39,8 +40,20 @@ class _ScanScreenState extends State<ScanScreen> {
 
   void _simulateScan() {
     final animalProvider = context.read<AnimalProvider>();
+    final animals = animalProvider.animals;
+
+    if (animals.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Aucun animal disponible'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
     setState(() {
-      _scannedAnimal = animalProvider.simulateScan();
+      _scannedAnimal = animals[_random.nextInt(animals.length)];
     });
   }
 
@@ -107,6 +120,16 @@ class _AnimalHeader extends StatelessWidget {
 
   const _AnimalHeader({required this.animal});
 
+  String _getAgeFormatted() {
+    final ageMonths = animal.ageInMonths;
+    if (ageMonths < 12) {
+      return '$ageMonths mois';
+    }
+    final years = ageMonths ~/ 12;
+    final months = ageMonths % 12;
+    return months > 0 ? '$years ans $months mois' : '$years ans';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -130,7 +153,7 @@ class _AnimalHeader extends StatelessWidget {
                       fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  '${animal.sex == AnimalSex.male ? '♂️ Mâle' : '♀️ Femelle'} · ${animal.ageFormatted}',
+                  '${animal.sex == AnimalSex.male ? '♂️ Mâle' : '♀️ Femelle'} · ${_getAgeFormatted()}',
                   style: TextStyle(color: Colors.grey[700]),
                 ),
               ],
@@ -240,11 +263,27 @@ class _InfosTab extends StatelessWidget {
     );
   }
 
+  String _getAgeFormatted() {
+    final ageMonths = animal.ageInMonths;
+    if (ageMonths < 12) {
+      return '$ageMonths mois';
+    }
+    final years = ageMonths ~/ 12;
+    final months = ageMonths % 12;
+    return months > 0 ? '$years ans $months mois' : '$years ans';
+  }
+
   @override
   Widget build(BuildContext context) {
     final animalProvider = context.watch<AnimalProvider>();
     final weightProvider = context.watch<WeightProvider>();
-    final latestWeight = weightProvider.getLatestWeight(animal.id);
+
+    // Obtenir le dernier poids
+    final allWeights =
+        weightProvider.weights.where((w) => w.animalId == animal.id).toList();
+    allWeights.sort((a, b) => b.recordedAt.compareTo(a.recordedAt));
+    final latestWeight = allWeights.isNotEmpty ? allWeights.first : null;
+
     final treatments = animalProvider.getAnimalTreatments(animal.id);
 
     bool hasActiveWithdrawal = false;
@@ -271,11 +310,10 @@ class _InfosTab extends StatelessWidget {
                   value:
                       animal.sex == AnimalSex.male ? '♂️ Mâle' : '♀️ Femelle'),
               _InfoRow(label: 'Statut', value: _getStatusLabel(animal.status)),
-              if (animal.birthDate != null)
-                _InfoRow(
-                    label: 'Date de naissance',
-                    value: _formatDate(animal.birthDate!)),
-              _InfoRow(label: 'Âge', value: animal.ageFormatted),
+              _InfoRow(
+                  label: 'Date de naissance',
+                  value: _formatDate(animal.birthDate)),
+              _InfoRow(label: 'Âge', value: _getAgeFormatted()),
             ],
           ),
           const SizedBox(height: 16),
@@ -362,8 +400,7 @@ class _InfosTab extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (context) => DeathScreen(animal: animal)),
+                MaterialPageRoute(builder: (context) => const DeathScreen()),
               );
             },
             icon: const Icon(Icons.dangerous),
@@ -469,8 +506,31 @@ class _TreatmentCard extends StatelessWidget {
 
   const _TreatmentCard({required this.treatment});
 
+  Color _getWithdrawalBadgeColor() {
+    if (!treatment.isWithdrawalActive) {
+      return Colors.green;
+    }
+
+    final daysRemaining =
+        treatment.withdrawalEndDate.difference(DateTime.now()).inDays;
+
+    if (daysRemaining <= 7) {
+      return Colors.red;
+    } else if (daysRemaining <= 14) {
+      return Colors.orange;
+    }
+    return Colors.blue;
+  }
+
+  int _getDaysUntilWithdrawalEnd() {
+    return treatment.withdrawalEndDate.difference(DateTime.now()).inDays;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final withdrawalColor = _getWithdrawalBadgeColor();
+    final daysRemaining = _getDaysUntilWithdrawalEnd();
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
@@ -513,16 +573,16 @@ class _TreatmentCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: treatment.withdrawalBadgeColor.withOpacity(0.2),
+                color: withdrawalColor.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: treatment.withdrawalBadgeColor),
+                border: Border.all(color: withdrawalColor),
               ),
               child: Text(
                 treatment.isWithdrawalActive
-                    ? 'Rémanence : ${_formatDate(treatment.withdrawalEndDate)} (${treatment.daysUntilWithdrawalEnd}j)'
+                    ? 'Rémanence : ${_formatDate(treatment.withdrawalEndDate)} (${daysRemaining}j)'
                     : '✅ Pas de rémanence',
                 style: TextStyle(
-                  color: treatment.withdrawalBadgeColor,
+                  color: withdrawalColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -543,13 +603,26 @@ class _GenealogieTab extends StatelessWidget {
 
   const _GenealogieTab({required this.animal});
 
+  String _getAgeFormatted(Animal animal) {
+    final ageMonths = animal.ageInMonths;
+    if (ageMonths < 12) {
+      return '$ageMonths mois';
+    }
+    final years = ageMonths ~/ 12;
+    final months = ageMonths % 12;
+    return months > 0 ? '$years ans $months mois' : '$years ans';
+  }
+
   @override
   Widget build(BuildContext context) {
     final animalProvider = context.watch<AnimalProvider>();
     final mother = animal.motherId != null
         ? animalProvider.getAnimalById(animal.motherId!)
         : null;
-    final children = animalProvider.getChildren(animal.id);
+
+    // Obtenir les enfants (seulement via motherId car fatherId n'existe pas dans le modèle)
+    final children =
+        animalProvider.animals.where((a) => a.motherId == animal.id).toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -563,7 +636,7 @@ class _GenealogieTab extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.family_restroom, color: Colors.pink),
               title: Text(mother.officialNumber ?? mother.eid),
-              subtitle: Text('${mother.ageFormatted}'),
+              subtitle: Text(_getAgeFormatted(mother)),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () {
                 Navigator.push(
@@ -597,7 +670,7 @@ class _GenealogieTab extends StatelessWidget {
                           : Colors.pink,
                     ),
                     title: Text(child.officialNumber ?? child.eid),
-                    subtitle: Text('${child.ageFormatted}'),
+                    subtitle: Text(_getAgeFormatted(child)),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                     onTap: () {
                       Navigator.push(
@@ -714,9 +787,9 @@ class _AddTreatmentDialogState extends State<_AddTreatmentDialog> {
       builder: (context) => _VeterinarianSearchDialog(
         onSelect: (vet) {
           setState(() {
-            _selectedVetId = vet['id'];
-            _selectedVetName = vet['name'];
-            _selectedVetOrg = vet['org'];
+            _selectedVetId = vet.id;
+            _selectedVetName = vet.fullName;
+            _selectedVetOrg = vet.clinic ?? 'Non spécifié';
           });
           Navigator.pop(context);
         },
@@ -725,17 +798,27 @@ class _AddTreatmentDialogState extends State<_AddTreatmentDialog> {
   }
 
   Future<void> _scanVeterinarianQR() async {
-    final qrProvider = context.read<QRProvider>();
-    final mockQR = qrProvider.generateMockQR('vet');
-    await qrProvider.scanQRCode(mockQR);
+    // TODO: Implémenter le vrai scan QR
+    // Pour l'instant, simulation simplifiée
+    final vets = MockData.generateVeterinarians();
+    if (vets.isEmpty) return;
 
-    if (qrProvider.validatedUser != null) {
-      setState(() {
-        _selectedVetId = qrProvider.validatedUser!['id'];
-        _selectedVetName = qrProvider.validatedUser!['name'];
-        _selectedVetOrg = qrProvider.validatedUser!['org'];
-      });
-    }
+    final selectedVet = vets.first;
+
+    setState(() {
+      _selectedVetId = selectedVet.id;
+      _selectedVetName = selectedVet.fullName;
+      _selectedVetOrg = selectedVet.clinic ?? 'Non spécifié';
+    });
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('✅ ${selectedVet.fullName} validé'),
+        backgroundColor: Colors.green,
+      ),
+    );
   }
 
   void _saveTreatment() {
@@ -750,12 +833,12 @@ class _AddTreatmentDialogState extends State<_AddTreatmentDialog> {
     final treatment = Treatment(
       id: _uuid.v4(),
       animalId: widget.animalId,
-      productName: _selectedProduct['name'],
-      productId: _selectedProduct['id'],
+      productName: _selectedProduct.name,
+      productId: _selectedProduct.id,
       dose: double.parse(_doseController.text),
       treatmentDate: _selectedDate,
-      withdrawalEndDate:
-          _selectedDate.add(Duration(days: _selectedProduct['withdrawalDays'])),
+      withdrawalEndDate: _selectedDate
+          .add(Duration(days: _selectedProduct.withdrawalDaysMeat)),
       veterinarianId: _selectedVetId,
       veterinarianName: _selectedVetName,
       synced: false,
@@ -772,7 +855,7 @@ class _AddTreatmentDialogState extends State<_AddTreatmentDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final products = mockProducts;
+    final products = MockData.generateProducts();
 
     return AlertDialog(
       title: const Text('Ajouter un Soin'),
@@ -784,8 +867,7 @@ class _AddTreatmentDialogState extends State<_AddTreatmentDialog> {
             DropdownButtonFormField(
               decoration: const InputDecoration(labelText: 'Produit *'),
               items: products
-                  .map(
-                      (p) => DropdownMenuItem(value: p, child: Text(p['name'])))
+                  .map((p) => DropdownMenuItem(value: p, child: Text(p.name)))
                   .toList(),
               onChanged: (value) => setState(() => _selectedProduct = value),
             ),
@@ -889,12 +971,12 @@ class _AddTreatmentDialogState extends State<_AddTreatmentDialog> {
                         style: TextStyle(fontWeight: FontWeight.bold)),
                     Text(
                       _formatDate(_selectedDate.add(
-                          Duration(days: _selectedProduct['withdrawalDays']))),
+                          Duration(days: _selectedProduct.withdrawalDaysMeat))),
                       style:
                           const TextStyle(fontSize: 16, color: Colors.orange),
                     ),
                     Text(
-                        '(${_selectedProduct['withdrawalDays']} jours d\'attente)'),
+                        '(${_selectedProduct.withdrawalDaysMeat} jours d\'attente)'),
                   ],
                 ),
               ),
@@ -918,7 +1000,7 @@ class _AddTreatmentDialogState extends State<_AddTreatmentDialog> {
 }
 
 class _VeterinarianSearchDialog extends StatefulWidget {
-  final Function(Map<String, dynamic>) onSelect;
+  final Function(dynamic) onSelect;
 
   const _VeterinarianSearchDialog({required this.onSelect});
 
@@ -929,12 +1011,12 @@ class _VeterinarianSearchDialog extends StatefulWidget {
 
 class _VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
   final _searchController = TextEditingController();
-  List<Map<String, dynamic>> _filteredVets = [];
+  List<dynamic> _filteredVets = [];
 
   @override
   void initState() {
     super.initState();
-    _filteredVets = mockVeterinarians;
+    _filteredVets = MockData.generateVeterinarians();
   }
 
   @override
@@ -944,13 +1026,15 @@ class _VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
   }
 
   void _filterVets(String query) {
+    final allVets = MockData.generateVeterinarians();
     setState(() {
       if (query.isEmpty) {
-        _filteredVets = mockVeterinarians;
+        _filteredVets = allVets;
       } else {
-        _filteredVets = mockVeterinarians.where((vet) {
-          return vet['name'].toLowerCase().contains(query.toLowerCase()) ||
-              vet['org'].toLowerCase().contains(query.toLowerCase());
+        _filteredVets = allVets.where((vet) {
+          return vet.fullName.toLowerCase().contains(query.toLowerCase()) ||
+              (vet.clinic?.toLowerCase().contains(query.toLowerCase()) ??
+                  false);
         }).toList();
       }
     });
@@ -982,8 +1066,8 @@ class _VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
                   final vet = _filteredVets[index];
                   return ListTile(
                     leading: const CircleAvatar(child: Icon(Icons.person)),
-                    title: Text(vet['name']),
-                    subtitle: Text(vet['org']),
+                    title: Text(vet.fullName),
+                    subtitle: Text(vet.clinic ?? 'Non spécifié'),
                     onTap: () => widget.onSelect(vet),
                   );
                 },

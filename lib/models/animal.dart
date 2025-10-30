@@ -1,8 +1,9 @@
+// lib/models/animal.dart
 import 'package:uuid/uuid.dart';
 
 enum AnimalSex { male, female }
 
-enum AnimalStatus { alive, sold, dead }
+enum AnimalStatus { alive, sold, dead, slaughtered }
 
 class Animal {
   final String id;
@@ -15,6 +16,9 @@ class Animal {
   final DateTime createdAt;
   final DateTime updatedAt;
 
+  // Ajout chirurgical pour compatibilité mock_data.dart
+  final int? days;
+
   Animal({
     String? id,
     required this.eid,
@@ -25,6 +29,7 @@ class Animal {
     this.status = AnimalStatus.alive,
     DateTime? createdAt,
     DateTime? updatedAt,
+    this.days, // ← AJOUTÉ
   })  : id = id ?? const Uuid().v4(),
         createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now();
@@ -37,6 +42,7 @@ class Animal {
     String? motherId,
     AnimalStatus? status,
     DateTime? updatedAt,
+    int? days, // ← AJOUTÉ
   }) {
     return Animal(
       id: id,
@@ -48,6 +54,7 @@ class Animal {
       status: status ?? this.status,
       createdAt: createdAt,
       updatedAt: updatedAt ?? DateTime.now(),
+      days: days ?? this.days, // ← AJOUTÉ
     );
   }
 
@@ -62,6 +69,7 @@ class Animal {
       'status': status.name,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
+      'days': days, // ← AJOUTÉ
     };
   }
 
@@ -76,6 +84,7 @@ class Animal {
       status: AnimalStatus.values.firstWhere((e) => e.name == json['status']),
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
+      days: json['days'] as int?, // ← AJOUTÉ
     );
   }
 

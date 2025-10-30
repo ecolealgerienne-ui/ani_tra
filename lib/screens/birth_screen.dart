@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'dart:math';
 import '../providers/animal_provider.dart';
 import '../providers/sync_provider.dart';
 import '../models/animal.dart';
@@ -21,6 +22,7 @@ class _BirthScreenState extends State<BirthScreen> {
   Animal? _scannedMother;
   bool _isScanning = false;
   String _scanStep = 'lamb'; // 'lamb' or 'mother'
+  final _random = Random();
 
   Future<void> _simulateScan() async {
     setState(() => _isScanning = true);
@@ -31,7 +33,23 @@ class _BirthScreenState extends State<BirthScreen> {
     final animalProvider = context.read<AnimalProvider>();
 
     try {
-      final animal = animalProvider.simulateScan();
+      // Obtenir un animal aléatoire de la liste
+      final animals = animalProvider.animals;
+
+      if (animals.isEmpty) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('⚠️ Aucun animal disponible dans le troupeau'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        setState(() => _isScanning = false);
+        return;
+      }
+
+      // Sélectionner un animal aléatoire
+      final animal = animals[_random.nextInt(animals.length)];
 
       if (_scanStep == 'lamb') {
         setState(() {
@@ -80,17 +98,23 @@ class _BirthScreenState extends State<BirthScreen> {
 
     // Update lamb with mother ID
     final updatedLamb = _scannedLamb!.copyWith(motherId: _scannedMother!.id);
+    animalProvider.updateAnimal(updatedLamb);
 
     // Add movement
     final movement = Movement(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
       animalId: updatedLamb.id,
       type: MovementType.birth,
       movementDate: updatedLamb.birthDate,
       notes: 'Mère: ${_scannedMother!.officialNumber ?? _scannedMother!.eid}',
+      synced: false,
+      createdAt: DateTime.now(),
     );
 
     animalProvider.addMovement(movement);
     syncProvider.incrementPendingData();
+
+    if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(

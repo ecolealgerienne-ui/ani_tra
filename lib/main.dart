@@ -100,7 +100,7 @@ class MyApp extends StatelessWidget {
             final provider = WeightProvider();
 
             // Charger les pesées de test
-            provider.initializeWithMockData(
+            provider.setWeights(
               MockData.generateWeightRecords(),
             );
 

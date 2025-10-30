@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:math';
 
 import '../models/batch.dart';
 import '../models/animal.dart';
@@ -29,6 +30,7 @@ class BatchScanScreen extends StatefulWidget {
 class _BatchScanScreenState extends State<BatchScanScreen> {
   int _scannedCount = 0;
   List<Animal> _scannedAnimals = [];
+  final _random = Random();
 
   @override
   void initState() {
@@ -66,8 +68,22 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
     // Simuler un délai de scan
     await Future.delayed(const Duration(milliseconds: 300));
 
-    // Obtenir un animal aléatoire
-    final animal = animalProvider.simulateScan();
+    // Obtenir un animal aléatoire de la liste
+    final animals = animalProvider.animals;
+
+    if (animals.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('⚠️ Aucun animal disponible dans le troupeau'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    // Sélectionner un animal aléatoire
+    final animal = animals[_random.nextInt(animals.length)];
 
     // Vérifier doublon
     final isDuplicate = batchProvider.isAnimalInActiveBatch(animal.id);
@@ -173,6 +189,8 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
     // Incrémenter données en attente
     syncProvider.incrementPendingData();
 
+    if (!mounted) return;
+
     // Feedback
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -257,7 +275,7 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
                   Container(
                     width: 100,
                     height: 100,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.deepPurple,
                       shape: BoxShape.circle,
                     ),

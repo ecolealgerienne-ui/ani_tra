@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'dart:math';
 import '../providers/animal_provider.dart';
 import '../providers/sync_provider.dart';
 import '../models/animal.dart';
@@ -21,6 +22,7 @@ class _DeathScreenState extends State<DeathScreen> {
   final _notesController = TextEditingController();
   DateTime _deathDate = DateTime.now();
   bool _isScanning = false;
+  final _random = Random();
 
   @override
   void dispose() {
@@ -37,7 +39,25 @@ class _DeathScreenState extends State<DeathScreen> {
     final animalProvider = context.read<AnimalProvider>();
 
     try {
-      final animal = animalProvider.simulateScan();
+      // Obtenir la liste des animaux vivants (non décédés)
+      final animals = animalProvider.animals
+          .where((a) => a.status != AnimalStatus.dead)
+          .toList();
+
+      if (animals.isEmpty) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Aucun animal disponible à scanner'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        setState(() => _isScanning = false);
+        return;
+      }
+
+      // Sélectionner un animal aléatoire
+      final animal = animals[_random.nextInt(animals.length)];
 
       setState(() {
         _scannedAnimal = animal;
@@ -58,16 +78,20 @@ class _DeathScreenState extends State<DeathScreen> {
 
     // Create death movement
     final movement = Movement(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
       animalId: _scannedAnimal!.id,
       type: MovementType.death,
       movementDate: _deathDate,
       notes: _notesController.text.isEmpty
           ? 'Cause non spécifiée'
           : _notesController.text,
+      createdAt: DateTime.now(),
     );
 
     animalProvider.addMovement(movement);
     syncProvider.incrementPendingData();
+
+    if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(

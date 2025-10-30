@@ -34,6 +34,11 @@ class StatusBadge extends StatelessWidget {
         label = 'Mort';
         icon = Icons.cancel;
         break;
+      case AnimalStatus.slaughtered:
+        color = Colors.red;
+        label = 'Abattu';
+        icon = Icons.restaurant;
+        break;
     }
 
     if (!showLabel) {

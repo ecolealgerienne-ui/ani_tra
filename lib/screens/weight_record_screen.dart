@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'dart:math';
 
 import '../models/animal.dart';
 import '../models/weight_record.dart';
@@ -33,6 +34,7 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _weightController = TextEditingController();
   final _notesController = TextEditingController();
+  final _random = Random();
 
   Animal? _selectedAnimal;
   WeightSource _selectedSource = WeightSource.manual;
@@ -62,7 +64,25 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
     final animalProvider = context.read<AnimalProvider>();
 
     try {
-      final animal = animalProvider.simulateScan();
+      // Obtenir la liste des animaux vivants
+      final animals = animalProvider.animals
+          .where((a) => a.status == AnimalStatus.alive)
+          .toList();
+
+      if (animals.isEmpty) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Aucun animal disponible'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        setState(() => _isScanning = false);
+        return;
+      }
+
+      // Sélectionner un animal aléatoire
+      final animal = animals[_random.nextInt(animals.length)];
 
       setState(() {
         _selectedAnimal = animal;
@@ -70,6 +90,8 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
       });
 
       HapticFeedback.heavyImpact();
+
+      if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -81,6 +103,8 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
       );
     } catch (e) {
       setState(() => _isScanning = false);
+
+      if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

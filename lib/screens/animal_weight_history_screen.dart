@@ -45,7 +45,12 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
       ),
       body: Consumer<WeightProvider>(
         builder: (context, weightProvider, child) {
-          final weights = weightProvider.getAnimalWeights(animal.id);
+          // Récupérer tous les poids et filtrer par animal
+          final weights = weightProvider.weights
+              .where((w) => w.animalId == animal.id)
+              .toList()
+            ..sort((a, b) =>
+                b.recordedAt.compareTo(a.recordedAt)); // Tri décroissant
 
           if (weights.isEmpty) {
             return _buildEmptyState(context);
@@ -57,7 +62,7 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
               _buildAnimalHeader(context),
 
               // Statistiques
-              _buildStatisticsSection(context, weightProvider, weights),
+              _buildStatisticsSection(context, weights),
 
               // Graphique simple (placeholder)
               _buildChartSection(context, weights),
@@ -179,13 +184,28 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
   /// Widget: Section statistiques
   Widget _buildStatisticsSection(
     BuildContext context,
-    WeightProvider provider,
     List<WeightRecord> weights,
   ) {
-    final latest = provider.getLatestWeight(animal.id);
-    final average = provider.getAverageWeight(animal.id);
-    final gain = provider.getWeightGain(animal.id);
-    final dailyGain = provider.getDailyWeightGain(animal.id);
+    // Calculer les statistiques localement
+    final latest = weights.isNotEmpty ? weights.first : null;
+
+    double? average;
+    if (weights.isNotEmpty) {
+      final sum = weights.fold<double>(0.0, (acc, w) => acc + w.weight);
+      average = sum / weights.length;
+    }
+
+    double? gain;
+    double? dailyGain;
+    if (weights.length >= 2) {
+      final oldest = weights.last;
+      gain = latest!.weight - oldest.weight;
+
+      final daysDiff = latest.recordedAt.difference(oldest.recordedAt).inDays;
+      if (daysDiff > 0) {
+        dailyGain = gain / daysDiff;
+      }
+    }
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -246,26 +266,22 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                   Expanded(
                     child: _buildStatItem(
                       'Gain Total',
-                      gain != null
-                          ? '${gain > 0 ? '+' : ''}${gain.toStringAsFixed(1)} kg'
-                          : 'N/A',
-                      gain != null && gain > 0
-                          ? Icons.trending_up
-                          : Icons.trending_down,
-                      gain != null && gain > 0 ? Colors.green : Colors.red,
+                      gain != null ? '${gain.toStringAsFixed(1)} kg' : 'N/A',
+                      Icons.trending_up,
+                      Colors.purple,
                     ),
                   ),
                 ],
               ),
-              if (dailyGain != null) ...[
-                const SizedBox(height: 12),
-                _buildStatItem(
-                  'GMQ (Gain Moyen Quotidien)',
-                  '${dailyGain.toStringAsFixed(0)} g/jour',
-                  Icons.speed,
-                  Colors.purple,
-                ),
-              ],
+              const SizedBox(height: 12),
+              _buildStatItem(
+                'GMQ (Gain Moyen Quotidien)',
+                dailyGain != null
+                    ? '${(dailyGain * 1000).toStringAsFixed(0)} g/jour'
+                    : 'N/A',
+                Icons.speed,
+                Colors.teal,
+              ),
             ],
           ),
         ),
@@ -282,31 +298,31 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Icon(icon, size: 16, color: color),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
+          Icon(icon, size: 20, color: color),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
                   label,
                   style: TextStyle(
                     fontSize: 11,
-                    color: Colors.grey.shade700,
+                    color: Colors.grey.shade600,
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: color,
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -314,10 +330,10 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
     );
   }
 
-  /// Widget: Graphique (placeholder)
+  /// Widget: Section graphique
   Widget _buildChartSection(BuildContext context, List<WeightRecord> weights) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(16),
       child: Card(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -335,19 +351,14 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-
-              // Graphique simple (placeholder)
               SizedBox(
-                height: 200,
+                height: 180,
                 child: CustomPaint(
                   painter: _WeightChartPainter(weights),
                   child: Container(),
                 ),
               ),
-
               const SizedBox(height: 8),
-
-              // Légende
               Center(
                 child: Text(
                   'Évolution sur ${weights.length} pesées',
@@ -507,10 +518,8 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
 
   /// Obtenir l'âge de l'animal
   String _getAnimalAge() {
-    if (animal.birthDate == null) return 'Âge inconnu';
-
     final now = DateTime.now();
-    final age = now.difference(animal.birthDate!);
+    final age = now.difference(animal.birthDate);
     final months = (age.inDays / 30).floor();
     final years = (months / 12).floor();
 

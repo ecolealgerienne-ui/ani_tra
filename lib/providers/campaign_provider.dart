@@ -26,6 +26,15 @@ class CampaignProvider extends ChangeNotifier {
 
   Campaign? get activeCampaign => _activeCampaign;
 
+  /// Nombre de campagnes actives
+  int get activeCampaignsCount => activeCampaigns.length;
+
+  /// Nombre de campagnes terminées
+  int get completedCampaignsCount => completedCampaigns.length;
+
+  /// Nombre total de campagnes
+  int get campaignsCount => _campaigns.length;
+
   // ==================== Campaign Management ====================
 
   /// Crée une nouvelle campagne
@@ -33,6 +42,8 @@ class CampaignProvider extends ChangeNotifier {
     required String name,
     required Product product,
     required DateTime treatmentDate,
+    String? veterinarianId,
+    String? veterinarianName,
   }) {
     final withdrawalEnd =
         treatmentDate.add(Duration(days: product.withdrawalDaysMeat));
@@ -44,9 +55,12 @@ class CampaignProvider extends ChangeNotifier {
       productName: product.name,
       campaignDate: treatmentDate,
       withdrawalEndDate: withdrawalEnd,
+      veterinarianId: veterinarianId,
+      veterinarianName: veterinarianName,
       animalIds: const [],
       completed: false,
-      createdAt: DateTime.now(), // requis par ton modèle
+      synced: false,
+      createdAt: DateTime.now(),
     );
 
     _campaigns.add(campaign);
@@ -84,6 +98,18 @@ class CampaignProvider extends ChangeNotifier {
     return false;
   }
 
+  /// Alias pour addAnimalToActiveCampaign (compatibilité)
+  void addScannedAnimal(String animalId) {
+    addAnimalToActiveCampaign(animalId);
+  }
+
+  /// Vérifie si un animal est déjà dans la campagne active
+  bool isAnimalScannedInActiveCampaign(String animalId) {
+    final current = _activeCampaign;
+    if (current == null) return false;
+    return current.animalIds.contains(animalId);
+  }
+
   /// Retire un animal de la campagne active
   bool removeAnimalFromActiveCampaign(String animalId) {
     final current = _activeCampaign;
@@ -111,7 +137,10 @@ class CampaignProvider extends ChangeNotifier {
     final current = _activeCampaign;
     if (current == null) return;
 
-    final updated = current.copyWith(completed: true);
+    final updated = current.copyWith(
+      completed: true,
+      updatedAt: DateTime.now(),
+    );
 
     final index = _campaigns.indexWhere((c) => c.id == current.id);
     if (index != -1) {
@@ -120,6 +149,27 @@ class CampaignProvider extends ChangeNotifier {
 
     _activeCampaign = null;
     notifyListeners();
+  }
+
+  /// Alias pour completeActiveCampaign avec ID (compatibilité)
+  void completeCampaign(String campaignId) {
+    // Si c'est la campagne active, utiliser completeActiveCampaign
+    if (_activeCampaign?.id == campaignId) {
+      completeActiveCampaign();
+      return;
+    }
+
+    // Sinon, compléter la campagne par ID
+    final index = _campaigns.indexWhere((c) => c.id == campaignId);
+    if (index != -1) {
+      final campaign = _campaigns[index];
+      final updated = campaign.copyWith(
+        completed: true,
+        updatedAt: DateTime.now(),
+      );
+      _campaigns[index] = updated;
+      notifyListeners();
+    }
   }
 
   /// Annule la campagne active
@@ -185,8 +235,14 @@ class CampaignProvider extends ChangeNotifier {
         treatmentDate: campaign.campaignDate,
         withdrawalEndDate: campaign.withdrawalEndDate,
         notes: null,
+        createdAt: DateTime.now(), // ← requis par le modèle Treatment
       );
     }).toList();
+  }
+
+  /// Alias pour expandCampaignToTreatments (compatibilité)
+  List<Treatment> generateTreatmentsFromCampaign(Campaign campaign) {
+    return expandCampaignToTreatments(campaign);
   }
 
   // ==================== Mock / Reset ====================

@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 
 import '../models/animal.dart';
 import '../models/movement.dart';
@@ -23,9 +24,10 @@ class AddAnimalScreen extends StatefulWidget {
 
 class _AddAnimalScreenState extends State<AddAnimalScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _uuid = const Uuid();
 
   // Controllers
-  final _eidController = TextEditingController();
+  final _primaryIdController = TextEditingController();
   final _officialNumberController = TextEditingController();
   final _provenanceController = TextEditingController();
   final _priceController = TextEditingController();
@@ -49,7 +51,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
 
   @override
   void dispose() {
-    _eidController.dispose();
+    _primaryIdController.dispose();
     _officialNumberController.dispose();
     _provenanceController.dispose();
     _priceController.dispose();
@@ -57,18 +59,22 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
     super.dispose();
   }
 
+  /// Générer un ID unique
+  String _generateId() => _uuid.v4();
+
   /// Simuler le scan d'un EID
   void _simulateScan() {
-    final animalProvider = context.read<AnimalProvider>();
-    final mockAnimal = animalProvider.simulateScan();
+    // Génération d'un EID simulé au format FR + 13 chiffres
+    final random = DateTime.now().millisecondsSinceEpoch % 10000000000000;
+    final mockEid = 'FR${random.toString().padLeft(13, '0')}';
 
     setState(() {
-      _eidController.text = mockAnimal.eid;
+      _primaryIdController.text = mockEid;
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('✅ EID scanné: ${mockAnimal.eid}'),
+        content: Text('✅ EID scanné: $mockEid'),
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 1),
       ),
@@ -78,18 +84,22 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
   /// Sélectionner la mère via scan (simulation)
   void _scanMother() {
     final animalProvider = context.read<AnimalProvider>();
-    final mockMother = animalProvider.simulateScan();
 
-    // Vérifier que c'est une femelle
-    if (mockMother.sex != AnimalSex.female) {
+    // Pour simuler, on prend une femelle aléatoire du troupeau
+    final females =
+        animalProvider.animals.where((a) => a.sex == AnimalSex.female).toList();
+
+    if (females.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('⚠️ La mère doit être une femelle'),
+          content: Text('⚠️ Aucune femelle disponible dans le troupeau'),
           backgroundColor: Colors.orange,
         ),
       );
       return;
     }
+
+    final mockMother = females.first;
 
     setState(() {
       _selectedMotherId = mockMother.id;
@@ -133,22 +143,12 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
 
     // Vérifications supplémentaires
     if (_selectedSex == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('⚠️ Veuillez sélectionner le sexe'),
-          backgroundColor: Colors.orange,
-        ),
-      );
+      _showError('⚠️ Veuillez sélectionner le sexe');
       return;
     }
 
     if (_selectedBirthDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('⚠️ Veuillez sélectionner la date de naissance'),
-          backgroundColor: Colors.orange,
-        ),
-      );
+      _showError('⚠️ Veuillez sélectionner la date de naissance');
       return;
     }
 
@@ -158,22 +158,12 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
       final mother = animalProvider.getAnimalById(_selectedMotherId!);
 
       if (mother == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('⚠️ Mère introuvable'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        _showError('⚠️ Mère introuvable', isError: true);
         return;
       }
 
       if (mother.sex != AnimalSex.female) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('⚠️ La mère doit être une femelle'),
-            backgroundColor: Colors.orange,
-          ),
-        );
+        _showError('⚠️ La mère doit être une femelle');
         return;
       }
     }
@@ -189,18 +179,16 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
       // 1. Créer l'animal
       final animal = Animal(
         id: _generateId(),
-        primaryId: _eidController.text.trim(),
-        idType: IdentificationType.rfid,
+        eid: _primaryIdController.text.trim(),
+        sex: _selectedSex!,
+        status: AnimalStatus.alive,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
         officialNumber: _officialNumberController.text.trim().isNotEmpty
             ? _officialNumberController.text.trim()
             : null,
-        birthDate: _selectedBirthDate,
-        sex: _selectedSex!,
+        birthDate: _selectedBirthDate ?? DateTime.now(),
         motherId: _selectedMotherId,
-        status: AnimalStatus.alive,
-        synced: false,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
       );
 
       animalProvider.addAnimal(animal);
@@ -241,34 +229,31 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
       }
 
       if (movement != null) {
-        animalProvider.addMovement(movement);
+        // Note: Les mouvements sont gérés via MovementProvider
+        // Pour l'instant, on les ignore dans cet écran simplifié
+        // TODO: Ajouter la gestion des mouvements si nécessaire
       }
 
       // 3. Incrémenter les données en attente de sync
       syncProvider.incrementPendingData();
 
-      // 4. Feedback et retour
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              '✅ Animal ${animal.officialNumber ?? animal.eid} ajouté avec succès',
-            ),
-            backgroundColor: Colors.green,
-          ),
-        );
+      if (!mounted) return;
 
-        Navigator.pop(context);
-      }
+      // 4. Message de succès
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('✅ Animal enregistré avec succès'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+      // 5. Retour à l'écran précédent
+      Navigator.pop(context, animal);
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('❌ Erreur: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      if (!mounted) return;
+
+      _showError('❌ Erreur: ${e.toString()}', isError: true);
     } finally {
       if (mounted) {
         setState(() {
@@ -278,52 +263,49 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
     }
   }
 
-  /// Générer un ID unique
-  String _generateId() {
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final random = (timestamp % 10000).toString().padLeft(4, '0');
-    return 'animal_${timestamp}_$random';
+  /// Afficher un message d'erreur
+  void _showError(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? Colors.red : Colors.orange,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ajouter un Animal'),
+        title: const Text('Ajouter un animal'),
+        backgroundColor: Colors.green,
+        foregroundColor: Colors.white,
       ),
       body: Form(
         key: _formKey,
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            // Section Identification
-            _buildSectionHeader('Identification'),
+            // === Section : Identification ===
+            _buildSectionHeader('📋 Identification'),
             const SizedBox(height: 16),
 
-            // EID
+            // EID / Numéro principal
             TextFormField(
-              controller: _eidController,
+              controller: _primaryIdController,
               decoration: InputDecoration(
-                labelText: 'EID (15 chiffres) *',
-                hintText: '250001234567890',
-                prefixIcon: const Icon(Icons.tag),
+                labelText: 'EID (Numéro électronique) *',
+                hintText: 'FR1234567890123',
+                prefixIcon: const Icon(Icons.qr_code),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.qr_code_scanner),
                   tooltip: 'Scanner',
                   onPressed: _simulateScan,
                 ),
               ),
-              keyboardType: TextInputType.number,
-              maxLength: 15,
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-              ],
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return 'EID requis';
-                }
-                if (value.trim().length != 15) {
-                  return 'EID doit contenir exactement 15 chiffres';
+                  return 'EID obligatoire';
                 }
                 return null;
               },
@@ -331,26 +313,22 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
 
             const SizedBox(height: 16),
 
-            // N° Officiel
+            // Numéro officiel
             TextFormField(
               controller: _officialNumberController,
               decoration: const InputDecoration(
-                labelText: 'N° Officiel',
-                hintText: 'FR-2025-0001',
+                labelText: 'Numéro officiel (optionnel)',
+                hintText: 'Ex: 123456',
                 prefixIcon: Icon(Icons.numbers),
               ),
             ),
 
-            const SizedBox(height: 24),
-
-            // Section Informations de Base
-            _buildSectionHeader('Informations de Base'),
             const SizedBox(height: 16),
 
             // Date de naissance
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.calendar_today),
+              leading: const Icon(Icons.cake),
               title: const Text('Date de naissance *'),
               subtitle: Text(
                 _selectedBirthDate != null
@@ -361,14 +339,20 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                       _selectedBirthDate != null ? Colors.black87 : Colors.grey,
                 ),
               ),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: _selectBirthDate,
+              trailing: IconButton(
+                icon: const Icon(Icons.calendar_today),
+                onPressed: _selectBirthDate,
+              ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
                 side: BorderSide(color: Colors.grey.shade300),
               ),
             ),
 
+            const SizedBox(height: 24),
+
+            // === Section : Caractéristiques ===
+            _buildSectionHeader('🐄 Caractéristiques'),
             const SizedBox(height: 16),
 
             // Sexe

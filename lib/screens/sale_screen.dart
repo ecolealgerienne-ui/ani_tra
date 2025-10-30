@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'dart:math';
 import '../providers/animal_provider.dart';
-import '../providers/qr_provider.dart';
 import '../providers/sync_provider.dart';
 import '../models/animal.dart';
 import '../models/movement.dart';
@@ -19,11 +19,16 @@ class SaleScreen extends StatefulWidget {
 class _SaleScreenState extends State<SaleScreen> {
   Animal? _scannedAnimal;
   final _priceController = TextEditingController();
+  final _buyerNameController = TextEditingController();
+  final _buyerIdController = TextEditingController();
   bool _isScanning = false;
+  final _random = Random();
 
   @override
   void dispose() {
     _priceController.dispose();
+    _buyerNameController.dispose();
+    _buyerIdController.dispose();
     super.dispose();
   }
 
@@ -36,9 +41,27 @@ class _SaleScreenState extends State<SaleScreen> {
     final animalProvider = context.read<AnimalProvider>();
 
     try {
-      final animal = animalProvider.simulateScan();
+      // Obtenir les animaux vendables (vivants, pas de délai de rémanence)
+      final animals = animalProvider.animals
+          .where((a) => a.status == AnimalStatus.alive)
+          .toList();
 
-      // Check if animal can be sold
+      if (animals.isEmpty) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Aucun animal disponible à vendre'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        setState(() => _isScanning = false);
+        return;
+      }
+
+      // Sélectionner un animal aléatoire
+      final animal = animals[_random.nextInt(animals.length)];
+
+      // Check if animal can be sold (vérifier délai de rémanence)
       final treatments = animalProvider.getAnimalTreatments(animal.id);
       final hasActiveWithdrawal = treatments.any((t) => t.isWithdrawalActive);
 
@@ -68,29 +91,26 @@ class _SaleScreenState extends State<SaleScreen> {
     }
   }
 
-  Future<void> _simulateScanQR() async {
-    final qrProvider = context.read<QRProvider>();
-
-    setState(() => _isScanning = true);
-
-    HapticFeedback.mediumImpact();
-
-    // Simulate QR scan
-    final mockQR = qrProvider.generateMockQR('buyer');
-    await qrProvider.scanQRCode(mockQR);
-
-    setState(() => _isScanning = false);
-
-    if (qrProvider.validatedUser != null) {
-      HapticFeedback.heavyImpact();
-    }
-  }
-
   void _confirmSale() {
-    final qrProvider = context.read<QRProvider>();
-    final buyer = qrProvider.validatedUser;
+    if (_scannedAnimal == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Veuillez scanner un animal'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
 
-    if (_scannedAnimal == null || buyer == null) return;
+    if (_buyerNameController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Veuillez entrer le nom de l\'acheteur'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
 
     final price = double.tryParse(_priceController.text);
     if (price == null || price <= 0) {
@@ -108,17 +128,21 @@ class _SaleScreenState extends State<SaleScreen> {
 
     // Create sale movement
     final movement = Movement(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
       animalId: _scannedAnimal!.id,
       type: MovementType.sale,
       movementDate: DateTime.now(),
       price: price,
-      toFarmId: buyer['id'],
-      buyerQrSignature: qrProvider.lastScannedQR,
-      notes: 'Acheteur: ${buyer['name']}',
+      toFarmId:
+          _buyerIdController.text.isNotEmpty ? _buyerIdController.text : null,
+      notes: 'Acheteur: ${_buyerNameController.text}',
+      createdAt: DateTime.now(),
     );
 
     animalProvider.addMovement(movement);
     syncProvider.incrementPendingData();
+
+    if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -133,8 +157,6 @@ class _SaleScreenState extends State<SaleScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final qrProvider = context.watch<QRProvider>();
-    final buyer = qrProvider.validatedUser;
 
     return Scaffold(
       appBar: AppBar(
@@ -194,74 +216,38 @@ class _SaleScreenState extends State<SaleScreen> {
 
           const SizedBox(height: 24),
 
-          // Step 2: Scan Buyer QR
+          // Step 2: Buyer Information
           if (_scannedAnimal != null) ...[
             Text(
-              'Étape 2: Scanner QR Code Acheteur',
+              'Étape 2: Informations Acheteur',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
             ),
             const SizedBox(height: 12),
-            if (buyer == null)
-              SizedBox(
-                height: 100,
-                child: ElevatedButton(
-                  onPressed: _isScanning ? null : _simulateScanQR,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: _isScanning
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.qr_code_scanner, size: 36),
-                            SizedBox(height: 8),
-                            Text('Scanner QR Acheteur',
-                                style: TextStyle(fontSize: 16)),
-                          ],
-                        ),
-                ),
-              )
-            else
-              Card(
-                color: Colors.blue.shade50,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.verified_user, color: Colors.blue),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'Acheteur Validé',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          const Spacer(),
-                          IconButton(
-                            icon: const Icon(Icons.close),
-                            onPressed: () {
-                              qrProvider.clearValidation();
-                            },
-                          ),
-                        ],
-                      ),
-                      const Divider(),
-                      Text('Nom: ${buyer['name']}'),
-                      Text('Organisation: ${buyer['organization']}'),
-                    ],
-                  ),
-                ),
-              ),
-            const SizedBox(height: 24),
-          ],
 
-          // Step 3: Enter Price
-          if (buyer != null) ...[
+            TextField(
+              controller: _buyerNameController,
+              decoration: const InputDecoration(
+                labelText: 'Nom de l\'acheteur *',
+                prefixIcon: Icon(Icons.person),
+                hintText: 'Ex: Jean Dupont',
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            TextField(
+              controller: _buyerIdController,
+              decoration: const InputDecoration(
+                labelText: 'N° Exploitation acheteur (optionnel)',
+                prefixIcon: Icon(Icons.badge),
+                hintText: 'Ex: FR123456789',
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Step 3: Enter Price
             Text(
               'Étape 3: Prix de vente',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -274,7 +260,7 @@ class _SaleScreenState extends State<SaleScreen> {
               controller: _priceController,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(
-                labelText: 'Prix (€)',
+                labelText: 'Prix (€) *',
                 prefixIcon: Icon(Icons.euro),
                 hintText: '120.00',
               ),

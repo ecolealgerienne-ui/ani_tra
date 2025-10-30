@@ -7,8 +7,8 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../providers/campaign_provider.dart';
 import '../providers/sync_provider.dart';
-import '../providers/qr_provider.dart';
 import '../models/product.dart';
+import '../models/veterinarian.dart';
 import '../data/mock_data.dart';
 import '../i18n/app_localizations.dart';
 import 'campaign_scan_screen.dart';
@@ -44,12 +44,12 @@ class _CampaignCreateScreenState extends State<CampaignCreateScreen> {
     showDialog(
       context: context,
       builder: (context) => _VeterinarianSearchDialog(
-        veterinarians: MockData().mockVeterinarians,
+        veterinarians: MockData.generateVeterinarians(),
         onSelect: (vet) {
           setState(() {
-            _selectedVetId = vet['id'];
-            _selectedVetName = vet['name'];
-            _selectedVetOrg = vet['org'];
+            _selectedVetId = vet.id;
+            _selectedVetName = vet.fullName;
+            _selectedVetOrg = vet.clinic ?? 'Non spécifié';
           });
           Navigator.pop(context);
         },
@@ -57,33 +57,30 @@ class _CampaignCreateScreenState extends State<CampaignCreateScreen> {
     );
   }
 
-  /// Scanner le QR Code d'un vétérinaire
+  /// Scanner le QR Code d'un vétérinaire (simulation)
   Future<void> _scanVeterinarianQR() async {
-    final qrProvider = context.read<QRProvider>();
+    // TODO: Implémenter le scan QR réel avec qr_code_scanner
+    // Pour l'instant, on simule en sélectionnant un vétérinaire aléatoire
+    final vets = MockData.generateVeterinarians();
+    if (vets.isEmpty) return;
 
-    // Générer un QR Code mock pour simulation
-    final mockQR = qrProvider.generateMockQR('vet');
+    final selectedVet = vets.first; // Simulation: prendre le premier
 
-    // Valider le QR Code (simulation)
-    await qrProvider.scanQRCode(mockQR);
+    setState(() {
+      _selectedVetId = selectedVet.id;
+      _selectedVetName = selectedVet.fullName;
+      _selectedVetOrg = selectedVet.clinic ?? 'Non spécifié';
+    });
 
-    if (qrProvider.validatedUser != null) {
-      setState(() {
-        _selectedVetId = qrProvider.validatedUser!['id'];
-        _selectedVetName = qrProvider.validatedUser!['name'];
-        _selectedVetOrg = qrProvider.validatedUser!['org'];
-      });
+    if (!mounted) return;
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('✅ ${qrProvider.validatedUser!['name']} validé'),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
-          ),
-        );
-      }
-    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('✅ ${selectedVet.fullName} validé'),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   /// Retirer le vétérinaire sélectionné
@@ -111,13 +108,13 @@ class _CampaignCreateScreenState extends State<CampaignCreateScreen> {
     final campaignProvider = context.read<CampaignProvider>();
     final syncProvider = context.read<SyncProvider>();
 
-    // MODIFIÉ : Inclure veterinarianId et veterinarianName
+    // Créer la campagne avec les informations du vétérinaire
     final campaign = campaignProvider.createCampaign(
       name: _nameController.text,
       product: _selectedProduct!,
       treatmentDate: _selectedDate,
-      veterinarianId: _selectedVetId, // ← NOUVEAU
-      veterinarianName: _selectedVetName, // ← NOUVEAU
+      veterinarianId: _selectedVetId,
+      veterinarianName: _selectedVetName,
     );
 
     // Set as active campaign
@@ -205,7 +202,7 @@ class _CampaignCreateScreenState extends State<CampaignCreateScreen> {
                 labelText: l10n.translate('select_product'),
                 prefixIcon: const Icon(Icons.medication),
               ),
-              items: MockData.products.map((product) {
+              items: MockData.generateProducts().map((product) {
                 return DropdownMenuItem(
                   value: product,
                   child: Column(
@@ -243,22 +240,17 @@ class _CampaignCreateScreenState extends State<CampaignCreateScreen> {
 
             // Treatment Date
             ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: Colors.grey.shade400),
-              ),
-              tileColor: Colors.white,
+              contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.calendar_today),
               title: Text(l10n.translate('treatment_date')),
               subtitle: Text(dateFormat.format(_selectedDate)),
-              trailing: const Icon(Icons.chevron_right),
+              trailing: const Icon(Icons.edit),
               onTap: () async {
                 final date = await showDatePicker(
                   context: context,
                   initialDate: _selectedDate,
-                  firstDate: DateTime.now().subtract(const Duration(days: 30)),
-                  lastDate: DateTime.now().add(const Duration(days: 7)),
+                  firstDate: DateTime.now().subtract(const Duration(days: 365)),
+                  lastDate: DateTime.now().add(const Duration(days: 365)),
                 );
                 if (date != null) {
                   setState(() {
@@ -267,77 +259,110 @@ class _CampaignCreateScreenState extends State<CampaignCreateScreen> {
                 }
               },
             ),
+            const Divider(),
             const SizedBox(height: 24),
 
-            // ==================== NOUVEAU v1.2 : Section Vétérinaire ====================
+            // ==================== Section Vétérinaire (NOUVEAU v1.2) ====================
 
-            // Titre section
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Row(
-                children: [
-                  Icon(Icons.person_outline, color: Colors.grey.shade700),
-                  SizedBox(width: 8),
-                  Text(
-                    'Vétérinaire (optionnel)',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey.shade800,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Boutons de sélection
             Row(
               children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: _searchVeterinarian,
-                    icon: Icon(Icons.search),
-                    label: Text('Rechercher'),
-                    style: OutlinedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 12),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: _scanVeterinarianQR,
-                    icon: Icon(Icons.qr_code_scanner),
-                    label: Text('Scanner QR'),
-                    style: OutlinedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                    ),
+                Icon(Icons.medical_services, color: Colors.blue.shade700),
+                const SizedBox(width: 8),
+                Text(
+                  'Vétérinaire prescripteur (optionnel)',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey.shade800,
                   ),
                 ),
               ],
             ),
+            const SizedBox(height: 12),
 
-            // Affichage vétérinaire sélectionné
-            if (_selectedVetName != null) ...[
-              SizedBox(height: 12),
+            // Si aucun vétérinaire sélectionné
+            if (_selectedVetId == null) ...[
               Container(
-                padding: EdgeInsets.all(12),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.person_search,
+                      size: 48,
+                      color: Colors.grey.shade400,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Aucun vétérinaire sélectionné',
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: _searchVeterinarian,
+                            icon: const Icon(Icons.search),
+                            label: const Text('Rechercher'),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: _scanVeterinarianQR,
+                            icon: const Icon(Icons.qr_code_scanner),
+                            label: const Text('Scanner QR'),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+
+            // Si vétérinaire sélectionné
+            if (_selectedVetId != null) ...[
+              Container(
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.green.shade50,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.green),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.green.shade300, width: 2),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.check_circle, color: Colors.green),
-                    SizedBox(width: 8),
+                    CircleAvatar(
+                      backgroundColor: Colors.green.shade100,
+                      radius: 24,
+                      child: Icon(
+                        Icons.verified_user,
+                        color: Colors.green.shade700,
+                        size: 28,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             _selectedVetName!,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
                             ),
@@ -354,7 +379,7 @@ class _CampaignCreateScreenState extends State<CampaignCreateScreen> {
                       ),
                     ),
                     IconButton(
-                      icon: Icon(Icons.close),
+                      icon: const Icon(Icons.close),
                       onPressed: _removeVeterinarian,
                       tooltip: 'Retirer',
                     ),
@@ -442,8 +467,8 @@ class _CampaignCreateScreenState extends State<CampaignCreateScreen> {
 // ==================== NOUVEAU v1.2 : Dialog Recherche Vétérinaire ====================
 
 class _VeterinarianSearchDialog extends StatefulWidget {
-  final List<Map<String, dynamic>> veterinarians;
-  final Function(Map<String, dynamic>) onSelect;
+  final List<Veterinarian> veterinarians;
+  final Function(Veterinarian) onSelect;
 
   const _VeterinarianSearchDialog({
     required this.veterinarians,
@@ -457,7 +482,7 @@ class _VeterinarianSearchDialog extends StatefulWidget {
 
 class __VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
   final _searchController = TextEditingController();
-  List<Map<String, dynamic>> _filteredVets = [];
+  List<Veterinarian> _filteredVets = [];
 
   @override
   void initState() {
@@ -478,8 +503,9 @@ class __VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
       } else {
         _filteredVets = widget.veterinarians
             .where((vet) =>
-                vet['name'].toLowerCase().contains(query.toLowerCase()) ||
-                vet['org'].toLowerCase().contains(query.toLowerCase()))
+                vet.fullName.toLowerCase().contains(query.toLowerCase()) ||
+                (vet.clinic?.toLowerCase().contains(query.toLowerCase()) ??
+                    false))
             .toList();
       }
     });
@@ -488,11 +514,11 @@ class __VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Rechercher un Vétérinaire'),
-      contentPadding: EdgeInsets.fromLTRB(24, 20, 24, 0),
+      title: const Text('Rechercher un Vétérinaire'),
+      contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       content: Container(
         width: double.maxFinite,
-        constraints: BoxConstraints(maxHeight: 500),
+        constraints: const BoxConstraints(maxHeight: 500),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -501,7 +527,7 @@ class __VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
               controller: _searchController,
               decoration: InputDecoration(
                 hintText: 'Nom ou établissement...',
-                prefixIcon: Icon(Icons.search),
+                prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -511,11 +537,11 @@ class __VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
               onChanged: _filterVets,
               autofocus: true,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
 
             // Résultats
             if (_filteredVets.isEmpty)
-              Padding(
+              const Padding(
                 padding: EdgeInsets.all(32),
                 child: Column(
                   children: [
@@ -523,7 +549,7 @@ class __VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
                     SizedBox(height: 16),
                     Text(
                       'Aucun vétérinaire trouvé',
-                      style: TextStyle(color: Colors.grey.shade600),
+                      style: TextStyle(color: Colors.grey),
                     ),
                   ],
                 ),
@@ -541,16 +567,16 @@ class __VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
                         child: Icon(Icons.person, color: Colors.blue.shade700),
                       ),
                       title: Text(
-                        vet['name'],
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                        vet.fullName,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(vet['org']),
-                          SizedBox(height: 4),
+                          Text(vet.clinic ?? 'Non spécifié'),
+                          const SizedBox(height: 4),
                           Text(
-                            vet['license'],
+                            vet.licenseNumber,
                             style: TextStyle(
                               fontSize: 11,
                               color: Colors.grey.shade600,
@@ -569,7 +595,7 @@ class __VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text('Annuler'),
+          child: const Text('Annuler'),
         ),
       ],
     );

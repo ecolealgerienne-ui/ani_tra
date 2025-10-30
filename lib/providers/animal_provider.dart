@@ -4,7 +4,6 @@ import '../models/animal.dart';
 import '../models/treatment.dart';
 import '../models/movement.dart';
 import '../models/product.dart';
-import '../data/mock_data.dart';
 
 class AnimalProvider extends ChangeNotifier {
   // Données principales
@@ -41,7 +40,7 @@ class AnimalProvider extends ChangeNotifier {
       final q = _searchQuery.toLowerCase();
       list = list.where((a) {
         // Aucun texte UI ici (multi-langue côté interface)
-        final eid = a.eid?.toLowerCase() ?? '';
+        final eid = a.eid.toLowerCase();
         final off = a.officialNumber?.toLowerCase() ?? '';
         final sex = a.sex.name.toLowerCase();
         final status = a.status.name.toLowerCase();
@@ -121,6 +120,33 @@ class AnimalProvider extends ChangeNotifier {
       return _animals.firstWhere((a) => a.id == id);
     } catch (_) {
       return null;
+    }
+  }
+
+  /// 🆕 MÉTHODE AJOUTÉE : Recherche par EID ou N° officiel
+  ///
+  /// Recherche un animal dont l'EID ou le N° officiel contient la query.
+  /// Retourne le premier animal correspondant ou null si aucun match.
+  Animal? findByEIDOrNumber(String query) {
+    if (query.trim().isEmpty) return null;
+
+    final q = query.toLowerCase().trim();
+
+    try {
+      // Chercher par EID (contient la query)
+      return _animals.firstWhere(
+        (a) => a.eid.toLowerCase().contains(q),
+      );
+    } catch (_) {
+      // Si pas trouvé par EID, chercher par N° officiel
+      try {
+        return _animals.firstWhere(
+          (a) => (a.officialNumber?.toLowerCase() ?? '').contains(q),
+        );
+      } catch (_) {
+        // Aucun match
+        return null;
+      }
     }
   }
 
@@ -239,4 +265,32 @@ class AnimalProvider extends ChangeNotifier {
   int get totalAnimals => _animals.length;
   int get totalTreatments => _treatments.length;
   int get totalMovements => _movements.length;
+
+  /// Retourne tous les traitements avec rémanence active
+  List<Treatment> getActiveWithdrawalTreatments() {
+    return _treatments.where((t) => t.isWithdrawalActive).toList();
+  }
+
+  /// Statistiques du troupeau
+  Map<String, int> get stats {
+    return {
+      'total': _animals.length,
+      'alive': _animals.where((a) => a.status == AnimalStatus.alive).length,
+      'male': _animals.where((a) => a.sex == AnimalSex.male).length,
+      'female': _animals.where((a) => a.sex == AnimalSex.female).length,
+      'sold': _animals.where((a) => a.status == AnimalStatus.sold).length,
+      'dead': _animals.where((a) => a.status == AnimalStatus.dead).length,
+      'slaughtered':
+          _animals.where((a) => a.status == AnimalStatus.slaughtered).length,
+    };
+  }
+
+  /// Met à jour le statut d'un animal
+  void updateAnimalStatus(String animalId, AnimalStatus newStatus) {
+    final animal = getAnimalById(animalId);
+    if (animal != null) {
+      final updated = animal.copyWith(status: newStatus);
+      updateAnimal(updated);
+    }
+  }
 }

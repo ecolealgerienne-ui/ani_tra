@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
+import 'dart:math';
 import '../models/animal.dart';
 import '../models/batch.dart';
 import '../models/slaughter.dart';
@@ -33,6 +34,7 @@ class SlaughterScreen extends StatefulWidget {
 class _SlaughterScreenState extends State<SlaughterScreen> {
   final _uuid = const Uuid();
   final _notesController = TextEditingController();
+  final _random = Random();
 
   List<String> _selectedAnimalIds = [];
   List<Animal> _blockedAnimals = [];
@@ -58,6 +60,17 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
   void dispose() {
     _notesController.dispose();
     super.dispose();
+  }
+
+  /// Helper: Formater l'âge d'un animal
+  String _getAgeFormatted(Animal animal) {
+    final ageMonths = animal.ageInMonths;
+    if (ageMonths < 12) {
+      return '$ageMonths mois';
+    }
+    final years = ageMonths ~/ 12;
+    final months = ageMonths % 12;
+    return months > 0 ? '$years ans $months mois' : '$years ans';
   }
 
   /// Vérifie les périodes de rémanence pour tous les animaux sélectionnés
@@ -123,26 +136,28 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
     final qrProvider = context.read<QRProvider>();
 
     // Simulation : générer un QR mock pour abattoir
-    final mockQR = qrProvider.generateMockQR('slaughterhouse');
+    final mockQR = qrProvider.generateDummyQR('OTHER'); // Simule abattoir
 
-    // Valider le QR Code
-    await qrProvider.scanQRCode(mockQR);
+    // Simuler les données d'un abattoir
+    final mockSlaughterhouse = {
+      'id': 'ABT_${_random.nextInt(9999)}',
+      'name': 'Abattoir Municipal ${_random.nextInt(100)}',
+      'type': 'SLAUGHTERHOUSE',
+    };
 
-    if (qrProvider.validatedUser != null) {
-      setState(() {
-        _slaughterhouse = qrProvider.validatedUser;
-      });
+    setState(() {
+      _slaughterhouse = mockSlaughterhouse;
+    });
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              '✅ ${qrProvider.validatedUser!['name']} validé',
-            ),
-            backgroundColor: Colors.green,
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '✅ ${mockSlaughterhouse['name']} validé',
           ),
-        );
-      }
+          backgroundColor: Colors.green,
+        ),
+      );
     }
   }
 
@@ -253,255 +268,249 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final animalProvider = context.watch<AnimalProvider>();
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Abattage'),
-        centerTitle: true,
+        title: widget.preloadedBatch != null
+            ? Text('Abattage - Lot ${widget.preloadedBatch!.name}')
+            : const Text('Enregistrer Abattage'),
+        actions: [
+          if (_blockedAnimals.isNotEmpty)
+            IconButton(
+              icon: const Icon(Icons.delete_sweep),
+              tooltip: 'Retirer animaux non abattables',
+              onPressed: _removeBlockedAnimals,
+            ),
+        ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Section animaux sélectionnés
-            _buildAnimalsList(animalProvider),
+      body: Column(
+        children: [
+          // Bannière d'avertissement si animaux bloqués
+          if (_blockedAnimals.isNotEmpty)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              color: Colors.red[100],
+              child: Row(
+                children: [
+                  const Icon(Icons.warning, color: Colors.red),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      '⚠️ ${_blockedAnimals.length} animaux en rémanence active',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: _removeBlockedAnimals,
+                    child: const Text('RETIRER'),
+                  ),
+                ],
+              ),
+            ),
 
-            const SizedBox(height: 24),
-
-            // Alerte si animaux bloqués
-            if (_blockedAnimals.isNotEmpty) ...[
-              _buildBlockedAlert(),
-              const SizedBox(height: 24),
-            ],
-
-            // Informations abattage
-            _buildSlaughterInfo(),
-
-            const SizedBox(height: 32),
-
-            // Boutons d'action
-            _buildActionButtons(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// Construit la liste des animaux sélectionnés
-  Widget _buildAnimalsList(AnimalProvider animalProvider) {
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+          // Corps principal
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(16),
               children: [
-                const Icon(Icons.pets, color: Colors.blue),
-                const SizedBox(width: 8),
-                Text(
-                  'Animaux sélectionnés (${_selectedAnimalIds.length})',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                // Étape 1: Sélection Animaux
+                _buildSectionTitle('Animaux sélectionnés'),
+                _buildAnimalsList(),
+                const SizedBox(height: 24),
+
+                // Étape 2: Informations abattage
+                _buildSectionTitle('Informations abattage'),
+                _buildSlaughterInfo(),
+                const SizedBox(height: 24),
+
+                // Étape 3: Notes
+                _buildSectionTitle('Notes (optionnel)'),
+                TextField(
+                  controller: _notesController,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    hintText: 'Informations complémentaires...',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Bouton de confirmation
+                ElevatedButton(
+                  onPressed:
+                      _selectedAnimalIds.isEmpty || _blockedAnimals.isNotEmpty
+                          ? null
+                          : _confirmSlaughter,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  child: Text(
+                    'Confirmer abattage (${_selectedAnimalIds.length} animaux)',
+                    style: const TextStyle(fontSize: 16),
                   ),
                 ),
               ],
             ),
-            const Divider(height: 24),
-            if (_selectedAnimalIds.isEmpty)
-              const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Center(
-                  child: Text(
-                    'Aucun animal sélectionné',
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              )
-            else
-              ...(_selectedAnimalIds.map((animalId) {
-                final animal = animalProvider.getAnimalById(animalId);
-                if (animal == null) return const SizedBox.shrink();
-
-                final isBlocked = _blockedAnimals.any((a) => a.id == animalId);
-                final treatments = animalProvider.getAnimalTreatments(animalId);
-
-                bool hasActiveWithdrawal = false;
-                for (final treatment in treatments) {
-                  if (treatment.isWithdrawalActive) {
-                    hasActiveWithdrawal = true;
-                    break;
-                  }
-                }
-
-                return ListTile(
-                  leading: Icon(
-                    isBlocked ? Icons.warning : Icons.check_circle,
-                    color: isBlocked ? Colors.red : Colors.green,
-                  ),
-                  title: Text(
-                    animal.officialNumber ?? animal.eid,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      decoration: isBlocked ? TextDecoration.lineThrough : null,
-                    ),
-                  ),
-                  subtitle: Text(
-                    '${animal.sex == AnimalSex.male ? '♂️ Mâle' : '♀️ Femelle'} · '
-                    '${animal.ageFormatted}'
-                    '${hasActiveWithdrawal ? ' · ⚠️ Rémanence active' : ''}',
-                    style: TextStyle(
-                      color:
-                          hasActiveWithdrawal ? Colors.red : Colors.grey[600],
-                    ),
-                  ),
-                  trailing: isBlocked
-                      ? Text(
-                          'Fin: ${_getEarliestWithdrawalEnd(animalId)}',
-                          style: const TextStyle(
-                            color: Colors.red,
-                            fontSize: 12,
-                          ),
-                        )
-                      : null,
-                );
-              })),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// Construit l'alerte pour les animaux bloqués
-  Widget _buildBlockedAlert() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.red[50],
-        border: Border.all(color: Colors.red, width: 2),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.error, color: Colors.red, size: 28),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'ATTENTION : ${_blockedAnimals.length} animal(aux) non abattable(s)',
-                  style: const TextStyle(
-                    color: Colors.red,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          const Text(
-            'Les animaux suivants sont en période de rémanence active :',
-            style: TextStyle(fontSize: 14),
-          ),
-          const SizedBox(height: 8),
-          ..._blockedAnimals.map((animal) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Row(
-                  children: [
-                    const Icon(Icons.warning, color: Colors.red, size: 16),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        '${animal.officialNumber ?? animal.eid} - '
-                        'Fin rémanence: ${_getEarliestWithdrawalEnd(animal.id)}',
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                    ),
-                  ],
-                ),
-              )),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton.icon(
-                onPressed: _removeBlockedAnimals,
-                icon: const Icon(Icons.remove_circle_outline),
-                label: const Text('Retirer ces animaux'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  foregroundColor: Colors.white,
-                ),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Annuler l\'abattage'),
-              ),
-            ],
           ),
         ],
       ),
     );
   }
 
-  /// Construit la section informations d'abattage
-  Widget _buildSlaughterInfo() {
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Informations Abattage',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const Divider(height: 24),
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
 
-            // Section abattoir
-            const Text(
-              'Abattoir',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Row(
+  Widget _buildAnimalsList() {
+    if (_selectedAnimalIds.isEmpty) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Center(
+            child: Column(
               children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: _searchSlaughterhouse,
-                    icon: const Icon(Icons.search),
-                    label: const Text('Rechercher'),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _scanSlaughterhouseQR,
-                    icon: const Icon(Icons.qr_code_scanner),
-                    label: const Text('Scanner QR'),
-                  ),
+                Icon(Icons.pets, size: 64, color: Colors.grey[400]),
+                const SizedBox(height: 16),
+                Text(
+                  'Aucun animal sélectionné',
+                  style: TextStyle(color: Colors.grey[600]),
                 ),
               ],
             ),
+          ),
+        ),
+      );
+    }
 
-            if (_slaughterhouse != null) ...[
-              const SizedBox(height: 12),
+    final animalProvider = context.watch<AnimalProvider>();
+
+    return Card(
+      child: ListView.separated(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: _selectedAnimalIds.length,
+        separatorBuilder: (context, index) => const Divider(height: 1),
+        itemBuilder: (context, index) {
+          final animalId = _selectedAnimalIds[index];
+          final animal = animalProvider.getAnimalById(animalId);
+
+          if (animal == null) {
+            return const ListTile(
+              title: Text('Animal introuvable'),
+            );
+          }
+
+          final treatments = animalProvider.getAnimalTreatments(animalId);
+          final hasActiveWithdrawal =
+              treatments.any((t) => t.isWithdrawalActive);
+          final isBlocked = _blockedAnimals.any((a) => a.id == animalId);
+
+          return ListTile(
+            leading: Icon(
+              animal.sex == AnimalSex.male ? Icons.male : Icons.female,
+              color: isBlocked
+                  ? Colors.red
+                  : (animal.sex == AnimalSex.male ? Colors.blue : Colors.pink),
+            ),
+            title: Text(
+              animal.officialNumber ?? animal.eid,
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                decoration: isBlocked ? TextDecoration.lineThrough : null,
+              ),
+            ),
+            subtitle: Text(
+              '${animal.sex == AnimalSex.male ? '♂️ Mâle' : '♀️ Femelle'} · '
+              '${_getAgeFormatted(animal)}'
+              '${hasActiveWithdrawal ? ' · ⚠️ Rémanence active' : ''}',
+              style: TextStyle(
+                color: hasActiveWithdrawal ? Colors.red : Colors.grey[600],
+              ),
+            ),
+            trailing: isBlocked
+                ? Text(
+                    'Fin: ${_getEarliestWithdrawalEnd(animalId)}',
+                    style: const TextStyle(
+                      color: Colors.red,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                : null,
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildSlaughterInfo() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Date d'abattage
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.calendar_today),
+              title: const Text('Date d\'abattage'),
+              subtitle: Text(
+                '${_selectedDate.day.toString().padLeft(2, '0')}/'
+                '${_selectedDate.month.toString().padLeft(2, '0')}/'
+                '${_selectedDate.year}',
+              ),
+              trailing: const Icon(Icons.edit),
+              onTap: () async {
+                final picked = await showDatePicker(
+                  context: context,
+                  initialDate: _selectedDate,
+                  firstDate: DateTime.now().subtract(const Duration(days: 7)),
+                  lastDate: DateTime.now(),
+                );
+                if (picked != null) {
+                  setState(() => _selectedDate = picked);
+                }
+              },
+            ),
+            const Divider(),
+
+            // Abattoir
+            if (_slaughterhouse == null)
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _searchSlaughterhouse,
+                      icon: const Icon(Icons.search),
+                      label: const Text('Rechercher'),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: _scanSlaughterhouseQR,
+                      icon: const Icon(Icons.qr_code_scanner),
+                      label: const Text('Scanner QR'),
+                    ),
+                  ),
+                ],
+              )
+            else
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -517,138 +526,34 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          const Text(
+                            'Abattoir validé',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
                           Text(
                             _slaughterhouse!['name'],
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          if (_slaughterhouse!['org'] != null)
-                            Text(
-                              _slaughterhouse!['org'],
-                              style: TextStyle(
-                                color: Colors.grey[700],
-                                fontSize: 14,
-                              ),
-                            ),
-                          const Text(
-                            '(Scan QR validé)',
-                            style: TextStyle(
-                              color: Colors.green,
-                              fontSize: 12,
-                              fontStyle: FontStyle.italic,
                             ),
                           ),
                         ],
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => setState(() => _slaughterhouse = null),
+                      icon: const Icon(Icons.close, size: 20),
+                      onPressed: () {
+                        setState(() => _slaughterhouse = null);
+                      },
                     ),
                   ],
                 ),
               ),
-            ],
-
-            const SizedBox(height: 24),
-
-            // Date d'abattage
-            const Text(
-              'Date d\'abattage',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 8),
-            ListTile(
-              leading: const Icon(Icons.calendar_today, color: Colors.blue),
-              title: Text(
-                '${_selectedDate.day.toString().padLeft(2, '0')}/'
-                '${_selectedDate.month.toString().padLeft(2, '0')}/'
-                '${_selectedDate.year}',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              trailing: const Icon(Icons.arrow_drop_down),
-              onTap: () async {
-                final picked = await showDatePicker(
-                  context: context,
-                  initialDate: _selectedDate,
-                  firstDate: DateTime.now().subtract(const Duration(days: 7)),
-                  lastDate: DateTime.now().add(const Duration(days: 30)),
-                );
-                if (picked != null) {
-                  setState(() => _selectedDate = picked);
-                }
-              },
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-                side: BorderSide(color: Colors.grey[300]!),
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Notes
-            const Text(
-              'Notes (optionnel)',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _notesController,
-              maxLines: 3,
-              decoration: InputDecoration(
-                hintText: 'Observations...',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                contentPadding: const EdgeInsets.all(12),
-              ),
-            ),
           ],
         ),
       ),
-    );
-  }
-
-  /// Construit les boutons d'action
-  Widget _buildActionButtons() {
-    final hasBlockedAnimals = _blockedAnimals.isNotEmpty;
-
-    return Row(
-      children: [
-        Expanded(
-          child: OutlinedButton(
-            onPressed: () => Navigator.pop(context),
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-            ),
-            child: const Text('Annuler'),
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: ElevatedButton.icon(
-            onPressed: hasBlockedAnimals ? null : _confirmSlaughter,
-            icon: const Icon(Icons.factory),
-            label: const Text('Confirmer'),
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              backgroundColor: hasBlockedAnimals ? Colors.grey : Colors.red,
-              foregroundColor: Colors.white,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }
