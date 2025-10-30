@@ -9,7 +9,12 @@ class AppLocalizations {
   AppLocalizations(this.locale);
 
   static AppLocalizations of(BuildContext context) {
-    return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+    final localizations =
+        Localizations.of<AppLocalizations>(context, AppLocalizations);
+    if (localizations == null) {
+      throw FlutterError('AppLocalizations not found in context');
+    }
+    return localizations;
   }
 
   static const LocalizationsDelegate<AppLocalizations> delegate =

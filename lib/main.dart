@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'i18n/app_localizations.dart';
 
 // Providers
 import 'providers/animal_provider.dart';
@@ -120,6 +121,7 @@ class MyApp extends StatelessWidget {
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
+              AppLocalizations.delegate,
             ],
             supportedLocales: const [
               Locale('fr', 'FR'), // Français

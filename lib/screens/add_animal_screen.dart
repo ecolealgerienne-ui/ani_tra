@@ -64,53 +64,29 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
 
   /// Simuler le scan d'un EID
   void _simulateScan() {
-    // Génération d'un EID simulé au format FR + 13 chiffres
-    final random = DateTime.now().millisecondsSinceEpoch % 10000000000000;
-    final mockEid = 'FR${random.toString().padLeft(13, '0')}';
-
-    setState(() {
-      _primaryIdController.text = mockEid;
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('✅ EID scanné: $mockEid'),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 1),
+    showDialog(
+      context: context,
+      builder: (context) => _ScanEIDDialog(
+        onEIDScanned: (eid) {
+          setState(() {
+            _primaryIdController.text = eid;
+          });
+        },
       ),
     );
   }
 
   /// Sélectionner la mère via scan (simulation)
   void _scanMother() {
-    final animalProvider = context.read<AnimalProvider>();
-
-    // Pour simuler, on prend une femelle aléatoire du troupeau
-    final females =
-        animalProvider.animals.where((a) => a.sex == AnimalSex.female).toList();
-
-    if (females.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('⚠️ Aucune femelle disponible dans le troupeau'),
-          backgroundColor: Colors.orange,
-        ),
-      );
-      return;
-    }
-
-    final mockMother = females.first;
-
-    setState(() {
-      _selectedMotherId = mockMother.id;
-      _selectedMotherDisplay = mockMother.officialNumber ?? mockMother.eid;
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('✅ Mère: $_selectedMotherDisplay'),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 1),
+    showDialog(
+      context: context,
+      builder: (context) => _ScanMotherDialog(
+        onMotherSelected: (motherId, motherDisplay) {
+          setState(() {
+            _selectedMotherId = motherId;
+            _selectedMotherDisplay = motherDisplay;
+          });
+        },
       ),
     );
   }
@@ -600,5 +576,426 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
     return '${date.day.toString().padLeft(2, '0')}/'
         '${date.month.toString().padLeft(2, '0')}/'
         '${date.year}';
+  }
+}
+
+/// Widget de dialogue pour scanner la mère
+class _ScanMotherDialog extends StatefulWidget {
+  final Function(String motherId, String motherDisplay) onMotherSelected;
+
+  const _ScanMotherDialog({
+    required this.onMotherSelected,
+  });
+
+  @override
+  State<_ScanMotherDialog> createState() => _ScanMotherDialogState();
+}
+
+class _ScanMotherDialogState extends State<_ScanMotherDialog> {
+  final _eidController = TextEditingController();
+  Animal? _scannedMother;
+  bool _isScanning = false;
+  String? _errorMessage;
+
+  @override
+  void dispose() {
+    _eidController.dispose();
+    super.dispose();
+  }
+
+  /// Simuler le scan d'une mère
+  void _simulateScan() {
+    setState(() {
+      _isScanning = true;
+      _errorMessage = null;
+      _scannedMother = null;
+    });
+
+    // Simulation d'un délai de scan
+    Future.delayed(const Duration(milliseconds: 500), () {
+      final animalProvider = context.read<AnimalProvider>();
+
+      // Chercher une femelle dans le troupeau
+      final females = animalProvider.animals
+          .where((a) =>
+              a.sex == AnimalSex.female && a.status == AnimalStatus.alive)
+          .toList();
+
+      if (females.isEmpty) {
+        setState(() {
+          _isScanning = false;
+          _errorMessage = 'Aucune femelle disponible dans le troupeau';
+        });
+        return;
+      }
+
+      // Prendre une femelle aléatoirement pour simuler
+      final mockMother = (females..shuffle()).first;
+
+      setState(() {
+        _isScanning = false;
+        _scannedMother = mockMother;
+        _eidController.text = mockMother.eid;
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Row(
+        children: [
+          Icon(Icons.qr_code_scanner, color: Colors.green),
+          SizedBox(width: 8),
+          Text('Scanner la mère'),
+        ],
+      ),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Champ EID
+            TextField(
+              controller: _eidController,
+              decoration: const InputDecoration(
+                labelText: 'EID de la mère',
+                hintText: 'FRxxxxxxxxxxxx',
+                prefixIcon: Icon(Icons.tag),
+                border: OutlineInputBorder(),
+              ),
+              enabled: !_isScanning,
+              readOnly: true,
+            ),
+
+            const SizedBox(height: 16),
+
+            // Bouton Scanner
+            ElevatedButton.icon(
+              onPressed: _isScanning ? null : _simulateScan,
+              icon: _isScanning
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : const Icon(Icons.qr_code_scanner),
+              label: Text(_isScanning ? 'Scan en cours...' : 'Scanner'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
+
+            // Message d'erreur
+            if (_errorMessage != null) ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.orange.shade200),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.warning,
+                        color: Colors.orange.shade700, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _errorMessage!,
+                        style: TextStyle(
+                          color: Colors.orange.shade900,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+
+            // Informations de la mère scannée
+            if (_scannedMother != null) ...[
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.green.shade200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.check_circle,
+                            color: Colors.green.shade700, size: 20),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'Mère détectée',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'EID: ${_scannedMother!.eid}',
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                    if (_scannedMother!.officialNumber != null)
+                      Text(
+                        'N° officiel: ${_scannedMother!.officialNumber}',
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                    Text(
+                      'Âge: ${_scannedMother!.ageInMonths} mois',
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Annuler'),
+        ),
+        ElevatedButton(
+          onPressed: _scannedMother == null
+              ? null
+              : () {
+                  widget.onMotherSelected(
+                    _scannedMother!.id,
+                    _scannedMother!.officialNumber ?? _scannedMother!.eid,
+                  );
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        '✅ Mère ajoutée: ${_scannedMother!.officialNumber ?? _scannedMother!.eid}',
+                      ),
+                      backgroundColor: Colors.green,
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green,
+            foregroundColor: Colors.white,
+          ),
+          child: const Text('Ajouter'),
+        ),
+      ],
+    );
+  }
+}
+
+/// Widget de dialogue pour scanner l'EID de l'animal
+class _ScanEIDDialog extends StatefulWidget {
+  final Function(String eid) onEIDScanned;
+
+  const _ScanEIDDialog({
+    required this.onEIDScanned,
+  });
+
+  @override
+  State<_ScanEIDDialog> createState() => _ScanEIDDialogState();
+}
+
+class _ScanEIDDialogState extends State<_ScanEIDDialog> {
+  final _eidController = TextEditingController();
+  String? _scannedEID;
+  bool _isScanning = false;
+
+  @override
+  void dispose() {
+    _eidController.dispose();
+    super.dispose();
+  }
+
+  /// Simuler le scan d'un EID
+  void _simulateScan() {
+    setState(() {
+      _isScanning = true;
+      _scannedEID = null;
+    });
+
+    // Simulation d'un délai de scan
+    Future.delayed(const Duration(milliseconds: 800), () {
+      // Génération d'un EID simulé au format FR + 13 chiffres
+      final random = DateTime.now().millisecondsSinceEpoch % 10000000000000;
+      final mockEid = 'FR${random.toString().padLeft(13, '0')}';
+
+      setState(() {
+        _isScanning = false;
+        _scannedEID = mockEid;
+        _eidController.text = mockEid;
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Row(
+        children: [
+          Icon(Icons.qr_code_scanner, color: Colors.blue),
+          SizedBox(width: 8),
+          Text('Scanner l\'EID'),
+        ],
+      ),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'Placez le lecteur RFID près de l\'animal pour scanner son EID électronique.',
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey,
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Champ EID
+            TextField(
+              controller: _eidController,
+              decoration: const InputDecoration(
+                labelText: 'EID détecté',
+                hintText: 'FR1234567890123',
+                prefixIcon: Icon(Icons.tag),
+                border: OutlineInputBorder(),
+              ),
+              enabled: !_isScanning,
+              readOnly: true,
+            ),
+
+            const SizedBox(height: 16),
+
+            // Bouton Scanner
+            ElevatedButton.icon(
+              onPressed: _isScanning ? null : _simulateScan,
+              icon: _isScanning
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : const Icon(Icons.qr_code_scanner),
+              label: Text(_isScanning ? 'Scan en cours...' : 'Scanner'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
+
+            // Résultat du scan
+            if (_scannedEID != null) ...[
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.green.shade200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.check_circle,
+                            color: Colors.green.shade700, size: 20),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'EID détecté avec succès',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _scannedEID!,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'monospace',
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _formatEID(_scannedEID!),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Annuler'),
+        ),
+        ElevatedButton(
+          onPressed: _scannedEID == null
+              ? null
+              : () {
+                  widget.onEIDScanned(_scannedEID!);
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('✅ EID scanné: $_scannedEID'),
+                      backgroundColor: Colors.green,
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
+          ),
+          child: const Text('Ajouter'),
+        ),
+      ],
+    );
+  }
+
+  /// Formater l'EID en groupes de 3 chiffres
+  String _formatEID(String eid) {
+    if (eid.length == 15) {
+      return '${eid.substring(0, 3)} ${eid.substring(3, 6)} ${eid.substring(6, 9)} ${eid.substring(9, 12)} ${eid.substring(12)}';
+    }
+    return eid;
   }
 }

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/animal_provider.dart';
 import '../models/animal.dart';
-import '../i18n/app_localizations.dart';
+//import '../i18n/app_localizations.dart';
 import 'scan_screen.dart';
 
 class AnimalListScreen extends StatefulWidget {
@@ -426,8 +426,14 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
         ),
         trailing: const Icon(Icons.chevron_right),
         onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Ouvrir détail: ${animal.eid}')),
+          // Navigation vers l'écran de détail avec l'animal préchargé
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ScanScreen(
+                preloadedAnimal: animal,
+              ),
+            ),
           );
         },
       ),
