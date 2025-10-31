@@ -1,13 +1,16 @@
 // lib/screens/animal_list_screen.dart
 // Artefact 16 : Liste Animaux Avancée avec Filtres et Group By
-// Version : 1.2
+// Version : 1.3 - Ajout recherche par scan
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'dart:math';
 import '../providers/animal_provider.dart';
 import '../models/animal.dart';
-//import '../i18n/app_localizations.dart';
+import '../i18n/app_localizations.dart';
 import 'scan_screen.dart';
+import 'add_animal_screen.dart';
 
 class AnimalListScreen extends StatefulWidget {
   const AnimalListScreen({super.key});
@@ -224,6 +227,14 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     );
   }
 
+  /// 🆕 NOUVEAU : Afficher le dialogue de scan et recherche
+  void _showScanAndSearchDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => const _ScanAndSearchDialog(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final animalProvider = context.watch<AnimalProvider>();
@@ -234,6 +245,14 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Animaux (${filteredAnimals.length})'),
+        actions: [
+          // 🆕 NOUVEAU : Bouton Scanner
+          IconButton(
+            icon: const Icon(Icons.search),
+            tooltip: AppLocalizations.of(context).translate('scan_to_search'),
+            onPressed: _showScanAndSearchDialog,
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -272,38 +291,34 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: _showFiltersDrawer,
-                    icon: Badge(
-                      isLabelVisible: _activeFilterCount > 0,
-                      label: Text('$_activeFilterCount'),
-                      child: const Icon(Icons.filter_list),
-                    ),
+                    icon: _activeFilterCount > 0
+                        ? Badge(
+                            label: Text('$_activeFilterCount'),
+                            child: const Icon(Icons.filter_list),
+                          )
+                        : const Icon(Icons.filter_list),
                     label: const Text('Filtres'),
                   ),
                 ),
                 const SizedBox(width: 12),
-                // Dropdown Group By
+
+                // Bouton Group By
                 Expanded(
-                  child: DropdownButtonFormField<GroupByOption>(
-                    value: _groupBy,
-                    decoration: const InputDecoration(
-                      labelText: 'Grouper par',
-                      border: OutlineInputBorder(),
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    ),
-                    items: GroupByOption.values
-                        .map((option) => DropdownMenuItem(
-                              value: option,
-                              child: Text(option.label),
-                            ))
-                        .toList(),
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() {
-                          _groupBy = value;
-                        });
-                      }
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) => _GroupBySheet(
+                          currentValue: _groupBy,
+                          onSelected: (value) {
+                            setState(() => _groupBy = value);
+                            Navigator.pop(context);
+                          },
+                        ),
+                      );
                     },
+                    icon: const Icon(Icons.group_work),
+                    label: Text(_groupBy.label),
                   ),
                 ),
               ],
@@ -314,130 +329,582 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
 
           // Liste des animaux
           Expanded(
-            child: filteredAnimals.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+            child: groupedAnimals.isEmpty
+                ? _buildEmptyState()
+                : _groupBy == GroupByOption.none
+                    ? _buildAnimalList(groupedAnimals['all']!)
+                    : _buildGroupedList(groupedAnimals),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AddAnimalScreen()),
+          );
+        },
+        icon: const Icon(Icons.add),
+        label: const Text('Ajouter'),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.pets, size: 64, color: Colors.grey.shade400),
+          const SizedBox(height: 16),
+          Text(
+            'Aucun animal trouvé',
+            style: TextStyle(fontSize: 18, color: Colors.grey.shade600),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAnimalList(List<Animal> animals) {
+    return ListView.builder(
+      padding: const EdgeInsets.only(bottom: 80),
+      itemCount: animals.length,
+      itemBuilder: (context, index) {
+        return _AnimalCard(animal: animals[index]);
+      },
+    );
+  }
+
+  Widget _buildGroupedList(Map<String, List<Animal>> groups) {
+    final sortedKeys = groups.keys.toList();
+    return ListView.builder(
+      padding: const EdgeInsets.only(bottom: 80),
+      itemCount: sortedKeys.length,
+      itemBuilder: (context, groupIndex) {
+        final groupName = sortedKeys[groupIndex];
+        final groupAnimals = groups[groupName]!;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // En-tête de groupe
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              color: Colors.grey.shade100,
+              child: Row(
+                children: [
+                  Text(
+                    groupName,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '${groupAnimals.length}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Animaux du groupe
+            ...groupAnimals.map((animal) => _AnimalCard(animal: animal)),
+          ],
+        );
+      },
+    );
+  }
+}
+
+// ==================== NOUVEAU DIALOGUE ====================
+
+/// 🆕 Dialogue de scan et recherche
+class _ScanAndSearchDialog extends StatefulWidget {
+  const _ScanAndSearchDialog();
+
+  @override
+  State<_ScanAndSearchDialog> createState() => _ScanAndSearchDialogState();
+}
+
+class _ScanAndSearchDialogState extends State<_ScanAndSearchDialog> {
+  bool _isScanning = false;
+  String? _scannedEID;
+  Animal? _foundAnimal;
+  final _random = Random();
+
+  /// Simuler le scan d'un EID
+  Future<void> _simulateScan() async {
+    setState(() {
+      _isScanning = true;
+      _scannedEID = null;
+      _foundAnimal = null;
+    });
+
+    // Feedback haptique
+    HapticFeedback.mediumImpact();
+
+    // Simuler délai de scan
+    await Future.delayed(const Duration(milliseconds: 800));
+
+    final animalProvider = context.read<AnimalProvider>();
+    final animals = animalProvider.animals;
+
+    if (animals.isEmpty) {
+      if (!mounted) return;
+      setState(() {
+        _isScanning = false;
+      });
+      return;
+    }
+
+    // Générer un EID "scanné" (prendre un animal aléatoire)
+    final randomAnimal = animals[_random.nextInt(animals.length)];
+    final scannedEID = randomAnimal.eid;
+
+    // Rechercher l'animal
+    final foundAnimal = animalProvider.findByEIDOrNumber(scannedEID);
+
+    // Feedback haptique selon résultat
+    if (foundAnimal != null) {
+      HapticFeedback.heavyImpact(); // Succès
+    } else {
+      HapticFeedback.heavyImpact();
+      await Future.delayed(const Duration(milliseconds: 100));
+      HapticFeedback.heavyImpact(); // Double vibration pour "non trouvé"
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _isScanning = false;
+      _scannedEID = scannedEID;
+      _foundAnimal = foundAnimal;
+    });
+  }
+
+  /// Naviguer vers l'écran de détail de l'animal
+  void _viewAnimalDetails() {
+    if (_foundAnimal == null) return;
+
+    Navigator.pop(context); // Fermer le dialogue
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ScanScreen(preloadedAnimal: _foundAnimal),
+      ),
+    );
+  }
+
+  /// Proposer d'ajouter l'animal non trouvé
+  void _addAnimal() {
+    if (_scannedEID == null) return;
+
+    Navigator.pop(context); // Fermer le dialogue de scan
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AddAnimalScreen(scannedEID: _scannedEID),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return AlertDialog(
+      title: Row(
+        children: [
+          const Icon(Icons.qr_code_scanner, color: Colors.blue),
+          const SizedBox(width: 8),
+          Text(l10n.translate('scan_to_search')),
+        ],
+      ),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Bouton Scanner
+            SizedBox(
+              width: double.infinity,
+              height: 120,
+              child: ElevatedButton(
+                onPressed: _isScanning ? null : _simulateScan,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).primaryColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: _isScanning
+                    ? Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const CircularProgressIndicator(color: Colors.white),
+                          const SizedBox(height: 12),
+                          Text(l10n.translate('scanning')),
+                        ],
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.nfc, size: 48),
+                          const SizedBox(height: 8),
+                          Text(
+                            l10n.translate('scan_animal'),
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
+              ),
+            ),
+
+            // Résultat du scan
+            if (_scannedEID != null) ...[
+              const SizedBox(height: 20),
+
+              // EID scanné
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.tag, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.translate('eid_scanned'),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          Text(
+                            _scannedEID!,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Animal trouvé
+              if (_foundAnimal != null)
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.green.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.green.shade200, width: 2),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.check_circle,
+                              color: Colors.green.shade700, size: 28),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              l10n.translate('animal_found'),
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green.shade900,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      const Divider(),
+                      const SizedBox(height: 8),
+                      _buildAnimalInfoRow(
+                        Icons.tag,
+                        'EID',
+                        _foundAnimal!.eid,
+                      ),
+                      if (_foundAnimal!.officialNumber != null)
+                        _buildAnimalInfoRow(
+                          Icons.badge,
+                          l10n.translate('official_number'),
+                          _foundAnimal!.officialNumber!,
+                        ),
+                      _buildAnimalInfoRow(
+                        _foundAnimal!.sex == AnimalSex.male
+                            ? Icons.male
+                            : Icons.female,
+                        l10n.translate('sex'),
+                        l10n.translate(_foundAnimal!.sex == AnimalSex.male
+                            ? 'male'
+                            : 'female'),
+                      ),
+                      _buildAnimalInfoRow(
+                        Icons.cake,
+                        'Âge',
+                        '${_foundAnimal!.ageInMonths} mois',
+                      ),
+                    ],
+                  ),
+                )
+              // Animal non trouvé
+              else
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.orange.shade200, width: 2),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.warning,
+                              color: Colors.orange.shade700, size: 28),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              l10n.translate('animal_not_found'),
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.orange.shade900,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        l10n.translate('animal_not_found_message'),
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.orange.shade900,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        l10n.translate('add_this_animal'),
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.orange.shade900,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ],
+        ),
+      ),
+      actions: [
+        // Bouton Annuler / Scanner un autre
+        TextButton(
+          onPressed: _scannedEID == null
+              ? () => Navigator.pop(context)
+              : () => setState(() {
+                    _scannedEID = null;
+                    _foundAnimal = null;
+                  }),
+          child: Text(
+            _scannedEID == null
+                ? l10n.translate('cancel')
+                : l10n.translate('scan_another'),
+          ),
+        ),
+
+        // Bouton Voir détails / Ajouter
+        if (_scannedEID != null)
+          ElevatedButton(
+            onPressed: _foundAnimal != null ? _viewAnimalDetails : _addAnimal,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _foundAnimal != null
+                  ? Colors.green
+                  : Theme.of(context).primaryColor,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(
+              _foundAnimal != null
+                  ? l10n.translate('view_details')
+                  : l10n.translate('add_animal'),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildAnimalInfoRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: Colors.grey.shade600),
+          const SizedBox(width: 8),
+          Text(
+            '$label: ',
+            style: const TextStyle(fontSize: 13, color: Colors.grey),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ==================== WIDGETS EXISTANTS ====================
+
+class _AnimalCard extends StatelessWidget {
+  final Animal animal;
+
+  const _AnimalCard({required this.animal});
+
+  @override
+  Widget build(BuildContext context) {
+    final sexColor = animal.sex == AnimalSex.male ? Colors.blue : Colors.pink;
+    final sexIcon = animal.sex == AnimalSex.male ? Icons.male : Icons.female;
+
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: InkWell(
+        onTap: () {
+          final animalProvider = context.read<AnimalProvider>();
+          animalProvider.setCurrentAnimal(animal);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ScanScreen(preloadedAnimal: animal),
+            ),
+          );
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              // Avatar
+              CircleAvatar(
+                backgroundColor: sexColor.withOpacity(0.1),
+                radius: 24,
+                child: Icon(sexIcon, color: sexColor),
+              ),
+              const SizedBox(width: 12),
+
+              // Infos
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      animal.officialNumber ?? animal.eid,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      animal.eid,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
                       children: [
-                        Icon(Icons.search_off,
-                            size: 64, color: Colors.grey.shade400),
-                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _getStatusColor(animal.status),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            _getStatusLabel(animal.status),
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
                         Text(
-                          'Aucun animal trouvé',
+                          '${animal.ageInMonths} mois',
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 12,
                             color: Colors.grey.shade600,
                           ),
                         ),
                       ],
                     ),
-                  )
-                : _groupBy == GroupByOption.none
-                    ? ListView.builder(
-                        itemCount: filteredAnimals.length,
-                        itemBuilder: (context, index) {
-                          final animal = filteredAnimals[index];
-                          return _buildAnimalCard(context, animal);
-                        },
-                      )
-                    : ListView.builder(
-                        itemCount: groupedAnimals.length,
-                        itemBuilder: (context, index) {
-                          final groupKey = groupedAnimals.keys.elementAt(index);
-                          final groupAnimals = groupedAnimals[groupKey]!;
+                  ],
+                ),
+              ),
 
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Header du groupe
-                              Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 12,
-                                ),
-                                color: Colors.grey.shade200,
-                                child: Text(
-                                  '$groupKey (${groupAnimals.length})',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              // Animaux du groupe
-                              ...groupAnimals
-                                  .map((animal) =>
-                                      _buildAnimalCard(context, animal))
-                                  .toList(),
-                            ],
-                          );
-                        },
-                      ),
+              // Flèche
+              Icon(Icons.chevron_right, color: Colors.grey.shade400),
+            ],
           ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const ScanScreen()),
-          );
-        },
-        child: const Icon(Icons.qr_code_scanner),
+        ),
       ),
     );
   }
 
-  Widget _buildAnimalCard(BuildContext context, Animal animal) {
-    final animalProvider = context.read<AnimalProvider>();
-    final hasWithdrawal = animalProvider.hasActiveWithdrawal(animal.id);
-
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: animal.sex == AnimalSex.male
-              ? Colors.blue.shade100
-              : Colors.pink.shade100,
-          child: Text(
-            animal.sex == AnimalSex.male ? '♂️' : '♀️',
-            style: const TextStyle(fontSize: 20),
-          ),
-        ),
-        title: Text(
-          animal.officialNumber ?? animal.eid,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (animal.officialNumber != null)
-              Text('EID: ${animal.eid}', style: const TextStyle(fontSize: 12)),
-            Text(
-                '${animal.ageInMonths} mois • ${_getStatusLabel(animal.status)}'),
-            if (hasWithdrawal)
-              const Text(
-                '⚠️ Rémanence active',
-                style: TextStyle(
-                    color: Colors.orange, fontWeight: FontWeight.w600),
-              ),
-          ],
-        ),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: () {
-          // Navigation vers l'écran de détail avec l'animal préchargé
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ScanScreen(
-                preloadedAnimal: animal,
-              ),
-            ),
-          );
-        },
-      ),
-    );
+  Color _getStatusColor(AnimalStatus status) {
+    switch (status) {
+      case AnimalStatus.alive:
+        return Colors.green;
+      case AnimalStatus.sold:
+        return Colors.orange;
+      case AnimalStatus.dead:
+        return Colors.red;
+      case AnimalStatus.slaughtered:
+        return Colors.grey;
+    }
   }
 
   String _getStatusLabel(AnimalStatus status) {
@@ -454,7 +921,43 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
   }
 }
 
-// ==================== Widget Filtres ====================
+class _GroupBySheet extends StatelessWidget {
+  final GroupByOption currentValue;
+  final ValueChanged<GroupByOption> onSelected;
+
+  const _GroupBySheet({
+    required this.currentValue,
+    required this.onSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Grouper par',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          ...GroupByOption.values.map((option) {
+            return RadioListTile<GroupByOption>(
+              title: Text(option.label),
+              value: option,
+              groupValue: currentValue,
+              onChanged: (value) {
+                if (value != null) onSelected(value);
+              },
+            );
+          }),
+        ],
+      ),
+    );
+  }
+}
 
 class _FiltersDrawer extends StatefulWidget {
   final Set<AnimalStatus> selectedStatuses;

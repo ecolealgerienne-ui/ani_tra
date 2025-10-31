@@ -16,7 +16,7 @@ import 'campaign_scan_screen.dart';
 /// - Informations complètes de la campagne
 /// - Liste des animaux traités
 /// - Statistiques
-/// - Actions (modifier, supprimer, reprendre)
+/// - Actions (modifier, supprimer, reprendre, ajouter/retirer animaux)
 class CampaignDetailScreen extends StatelessWidget {
   final Campaign campaign;
 
@@ -31,6 +31,20 @@ class CampaignDetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Détails de la Campagne'),
         actions: [
+          // Bouton Ajouter un animal
+          if (!campaign.completed)
+            IconButton(
+              icon: const Icon(Icons.add),
+              tooltip: 'Ajouter un animal',
+              onPressed: () => _showAddAnimalDialog(context),
+            ),
+          // Bouton Retirer des animaux
+          if (!campaign.completed && campaign.animalCount > 0)
+            IconButton(
+              icon: const Icon(Icons.remove),
+              tooltip: 'Retirer des animaux',
+              onPressed: () => _showRemoveAnimalDialog(context),
+            ),
           PopupMenuButton<String>(
             onSelected: (value) => _handleMenuAction(context, value),
             itemBuilder: (context) => [
@@ -265,10 +279,6 @@ class CampaignDetailScreen extends StatelessWidget {
 
   /// Widget: Section produit
   Widget _buildProductSection(BuildContext context, Campaign campaign) {
-    // Calculer les jours de rémanence
-    final withdrawalDays =
-        campaign.withdrawalEndDate.difference(campaign.campaignDate).inDays;
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Card(
@@ -279,10 +289,10 @@ class CampaignDetailScreen extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(Icons.medication, color: Colors.purple.shade700),
+                  Icon(Icons.medication, color: Colors.blue.shade700),
                   const SizedBox(width: 12),
                   const Text(
-                    'Produit',
+                    'Produit utilisé',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -291,30 +301,20 @@ class CampaignDetailScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              _buildInfoRow(
-                'Nom du produit',
-                campaign.productName,
-                Icons.label,
-              ),
+              _buildInfoRow('Nom', campaign.productName, Icons.label),
               const SizedBox(height: 12),
-              _buildInfoRow(
-                'Délai d\'attente',
-                '$withdrawalDays jours',
-                Icons.schedule,
-              ),
+              _buildInfoRow('Date de traitement',
+                  _formatDate(campaign.campaignDate), Icons.calendar_today),
               const SizedBox(height: 12),
               _buildInfoRow(
                 'Fin de rémanence',
                 _formatDate(campaign.withdrawalEndDate),
-                Icons.event,
+                Icons.warning_amber,
               ),
               if (campaign.veterinarianName != null) ...[
                 const SizedBox(height: 12),
-                _buildInfoRow(
-                  'Vétérinaire',
-                  campaign.veterinarianName!,
-                  Icons.person,
-                ),
+                _buildInfoRow('Vétérinaire', campaign.veterinarianName!,
+                    Icons.medical_services),
               ],
             ],
           ),
@@ -339,7 +339,7 @@ class CampaignDetailScreen extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(Icons.bar_chart, color: Colors.green.shade700),
+                  Icon(Icons.bar_chart, color: Colors.purple.shade700),
                   const SizedBox(width: 12),
                   const Text(
                     'Statistiques',
@@ -354,29 +354,29 @@ class CampaignDetailScreen extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildStatCard(
-                      'Total',
-                      campaign.animalCount.toString(),
-                      Icons.pets,
-                      Colors.blue,
+                    child: _StatCard(
+                      label: 'Total',
+                      value: campaign.animalCount.toString(),
+                      icon: Icons.pets,
+                      color: Colors.blue,
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: _buildStatCard(
-                      'Mâles',
-                      maleCount.toString(),
-                      Icons.male,
-                      Colors.blue,
+                    child: _StatCard(
+                      label: 'Mâles',
+                      value: maleCount.toString(),
+                      icon: Icons.male,
+                      color: Colors.indigo,
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: _buildStatCard(
-                      'Femelles',
-                      femaleCount.toString(),
-                      Icons.female,
-                      Colors.pink,
+                    child: _StatCard(
+                      label: 'Femelles',
+                      value: femaleCount.toString(),
+                      icon: Icons.female,
+                      color: Colors.pink,
                     ),
                   ),
                 ],
@@ -384,40 +384,6 @@ class CampaignDetailScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  /// Widget: Carte de statistique
-  Widget _buildStatCard(
-      String label, String value, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 32),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey.shade700,
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -442,6 +408,17 @@ class CampaignDetailScreen extends StatelessWidget {
                     color: Colors.grey.shade600,
                   ),
                 ),
+                const SizedBox(height: 16),
+                if (!campaign.completed)
+                  ElevatedButton.icon(
+                    onPressed: () => _showAddAnimalDialog(context),
+                    icon: const Icon(Icons.add),
+                    label: const Text('Ajouter un animal'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
               ],
             ),
           ),
@@ -478,7 +455,7 @@ class CampaignDetailScreen extends StatelessWidget {
               itemCount: animals.length,
               separatorBuilder: (context, index) => const Divider(height: 1),
               itemBuilder: (context, index) {
-                return _buildAnimalTile(animals[index]);
+                return _buildAnimalTile(context, campaign, animals[index]);
               },
             ),
           ],
@@ -487,8 +464,9 @@ class CampaignDetailScreen extends StatelessWidget {
     );
   }
 
-  /// Widget: Tuile d'animal
-  Widget _buildAnimalTile(Animal animal) {
+  /// Widget: Tuile d'animal avec bouton supprimer
+  Widget _buildAnimalTile(
+      BuildContext context, Campaign campaign, Animal animal) {
     final sexColor = animal.sex == AnimalSex.male ? Colors.blue : Colors.pink;
     final sexIcon = animal.sex == AnimalSex.male ? Icons.male : Icons.female;
 
@@ -508,8 +486,13 @@ class CampaignDetailScreen extends StatelessWidget {
         animal.eid,
         style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
       ),
-      trailing:
-          Icon(Icons.check_circle, color: Colors.green.shade600, size: 20),
+      trailing: campaign.completed
+          ? Icon(Icons.check_circle, color: Colors.green.shade600, size: 20)
+          : IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+              tooltip: 'Retirer cet animal',
+              onPressed: () => _confirmRemoveAnimal(context, campaign, animal),
+            ),
     );
   }
 
@@ -583,6 +566,66 @@ class CampaignDetailScreen extends StatelessWidget {
   }
 
   // ==================== Actions ====================
+
+  /// Afficher le dialogue d'ajout d'animal
+  void _showAddAnimalDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => _AddAnimalDialog(campaign: campaign),
+    );
+  }
+
+  /// Afficher le dialogue de retrait d'animal
+  void _showRemoveAnimalDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => _RemoveAnimalDialog(campaign: campaign),
+    );
+  }
+
+  /// Confirmer le retrait d'un animal (bouton direct)
+  Future<void> _confirmRemoveAnimal(
+      BuildContext context, Campaign campaign, Animal animal) async {
+    final shouldRemove = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Retirer cet animal ?'),
+        content: Text(
+          'Voulez-vous retirer "${animal.officialNumber ?? animal.eid}" de la campagne ?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Annuler'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Retirer'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldRemove == true && context.mounted) {
+      final campaignProvider = context.read<CampaignProvider>();
+      campaignProvider.setActiveCampaign(campaign);
+
+      final success =
+          campaignProvider.removeAnimalFromActiveCampaign(animal.id);
+
+      if (success && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '✅ Animal retiré: ${animal.officialNumber ?? animal.eid}',
+            ),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    }
+  }
 
   /// Gérer les actions du menu
   void _handleMenuAction(BuildContext context, String action) {
@@ -734,5 +777,623 @@ class CampaignDetailScreen extends StatelessWidget {
     return '${date.day.toString().padLeft(2, '0')}/'
         '${date.month.toString().padLeft(2, '0')}/'
         '${date.year}';
+  }
+}
+
+// ==================== Widgets Utilitaires ====================
+
+/// Widget de carte statistique
+class _StatCard extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color color;
+
+  const _StatCard({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 24),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey.shade700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ==================== DIALOGUES ====================
+
+/// Dialogue pour ajouter un animal à la campagne
+class _AddAnimalDialog extends StatefulWidget {
+  final Campaign campaign;
+
+  const _AddAnimalDialog({required this.campaign});
+
+  @override
+  State<_AddAnimalDialog> createState() => _AddAnimalDialogState();
+}
+
+class _AddAnimalDialogState extends State<_AddAnimalDialog> {
+  final _eidController = TextEditingController();
+  Animal? _scannedAnimal;
+  bool _isScanning = false;
+  String? _errorMessage;
+
+  @override
+  void dispose() {
+    _eidController.dispose();
+    super.dispose();
+  }
+
+  /// Simuler le scan d'un animal
+  void _simulateScan() {
+    setState(() {
+      _isScanning = true;
+      _errorMessage = null;
+      _scannedAnimal = null;
+    });
+
+    Future.delayed(const Duration(milliseconds: 500), () {
+      final animalProvider = context.read<AnimalProvider>();
+      final campaignProvider = context.read<CampaignProvider>();
+
+      // Chercher un animal vivant qui n'est pas déjà dans la campagne
+      final availableAnimals = animalProvider.animals
+          .where((a) =>
+              a.status == AnimalStatus.alive &&
+              !widget.campaign.animalIds.contains(a.id))
+          .toList();
+
+      if (availableAnimals.isEmpty) {
+        setState(() {
+          _isScanning = false;
+          _errorMessage =
+              'Aucun animal disponible (tous déjà dans la campagne ou pas d\'animaux vivants)';
+        });
+        return;
+      }
+
+      // Prendre un animal aléatoirement pour simuler
+      final mockAnimal = (availableAnimals..shuffle()).first;
+
+      setState(() {
+        _isScanning = false;
+        _scannedAnimal = mockAnimal;
+        _eidController.text = mockAnimal.eid;
+      });
+    });
+  }
+
+  /// Rechercher un animal par EID saisi manuellement
+  void _searchByEID(String eid) {
+    if (eid.trim().isEmpty) return;
+
+    final animalProvider = context.read<AnimalProvider>();
+    final animal = animalProvider.animals.firstWhere(
+      (a) => a.eid.toLowerCase() == eid.trim().toLowerCase(),
+      orElse: () => animalProvider.animals.firstWhere(
+        (a) =>
+            (a.officialNumber?.toLowerCase() ?? '') == eid.trim().toLowerCase(),
+        orElse: () => throw Exception('Animal non trouvé'),
+      ),
+    );
+
+    // Vérifier si déjà dans la campagne
+    if (widget.campaign.animalIds.contains(animal.id)) {
+      setState(() {
+        _errorMessage = 'Cet animal est déjà dans la campagne';
+        _scannedAnimal = null;
+      });
+      return;
+    }
+
+    setState(() {
+      _scannedAnimal = animal;
+      _errorMessage = null;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Row(
+        children: [
+          Icon(Icons.add_circle, color: Colors.green),
+          SizedBox(width: 8),
+          Text('Ajouter un animal'),
+        ],
+      ),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Champ EID
+            TextField(
+              controller: _eidController,
+              decoration: const InputDecoration(
+                labelText: 'EID de l\'animal',
+                hintText: 'FRxxxxxxxxxxxx',
+                prefixIcon: Icon(Icons.tag),
+                border: OutlineInputBorder(),
+              ),
+              enabled: !_isScanning,
+              onSubmitted: _searchByEID,
+            ),
+
+            const SizedBox(height: 16),
+
+            // Boutons Scanner et Rechercher
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: _isScanning ? null : _simulateScan,
+                    icon: _isScanning
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                        : const Icon(Icons.qr_code_scanner, size: 20),
+                    label: Text(_isScanning ? 'Scan...' : 'Scanner'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: _isScanning
+                        ? null
+                        : () => _searchByEID(_eidController.text),
+                    icon: const Icon(Icons.search, size: 20),
+                    label: const Text('Rechercher'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            // Message d'erreur
+            if (_errorMessage != null) ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.orange.shade200),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.warning,
+                        color: Colors.orange.shade700, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _errorMessage!,
+                        style: TextStyle(
+                          color: Colors.orange.shade900,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+
+            // Informations de l'animal scanné
+            if (_scannedAnimal != null) ...[
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.green.shade200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.check_circle,
+                            color: Colors.green.shade700, size: 20),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'Animal détecté',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'EID: ${_scannedAnimal!.eid}',
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                    if (_scannedAnimal!.officialNumber != null)
+                      Text(
+                        'N° officiel: ${_scannedAnimal!.officialNumber}',
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                    Text(
+                      'Sexe: ${_scannedAnimal!.sex == AnimalSex.male ? "Mâle" : "Femelle"}',
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                    Text(
+                      'Âge: ${_scannedAnimal!.ageInMonths} mois',
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Annuler'),
+        ),
+        ElevatedButton(
+          onPressed: _scannedAnimal == null
+              ? null
+              : () {
+                  final campaignProvider = context.read<CampaignProvider>();
+                  campaignProvider.setActiveCampaign(widget.campaign);
+
+                  final success = campaignProvider
+                      .addAnimalToActiveCampaign(_scannedAnimal!.id);
+
+                  Navigator.pop(context);
+
+                  if (success) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          '✅ Animal ajouté: ${_scannedAnimal!.officialNumber ?? _scannedAnimal!.eid}',
+                        ),
+                        backgroundColor: Colors.green,
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  }
+                },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green,
+            foregroundColor: Colors.white,
+          ),
+          child: const Text('Ajouter'),
+        ),
+      ],
+    );
+  }
+}
+
+/// Dialogue pour retirer un animal de la campagne
+class _RemoveAnimalDialog extends StatefulWidget {
+  final Campaign campaign;
+
+  const _RemoveAnimalDialog({required this.campaign});
+
+  @override
+  State<_RemoveAnimalDialog> createState() => _RemoveAnimalDialogState();
+}
+
+class _RemoveAnimalDialogState extends State<_RemoveAnimalDialog> {
+  final _eidController = TextEditingController();
+  Animal? _scannedAnimal;
+  bool _isScanning = false;
+  String? _errorMessage;
+
+  @override
+  void dispose() {
+    _eidController.dispose();
+    super.dispose();
+  }
+
+  /// Simuler le scan d'un animal à retirer
+  void _simulateScan() {
+    setState(() {
+      _isScanning = true;
+      _errorMessage = null;
+      _scannedAnimal = null;
+    });
+
+    Future.delayed(const Duration(milliseconds: 500), () {
+      final animalProvider = context.read<AnimalProvider>();
+
+      // Chercher un animal qui EST dans la campagne
+      final campaignAnimals = animalProvider.animals
+          .where((a) => widget.campaign.animalIds.contains(a.id))
+          .toList();
+
+      if (campaignAnimals.isEmpty) {
+        setState(() {
+          _isScanning = false;
+          _errorMessage = 'Aucun animal dans la campagne';
+        });
+        return;
+      }
+
+      // Prendre un animal aléatoirement pour simuler
+      final mockAnimal = (campaignAnimals..shuffle()).first;
+
+      setState(() {
+        _isScanning = false;
+        _scannedAnimal = mockAnimal;
+        _eidController.text = mockAnimal.eid;
+      });
+    });
+  }
+
+  /// Rechercher un animal par EID saisi manuellement
+  void _searchByEID(String eid) {
+    if (eid.trim().isEmpty) return;
+
+    final animalProvider = context.read<AnimalProvider>();
+
+    try {
+      final animal = animalProvider.animals.firstWhere(
+        (a) =>
+            a.eid.toLowerCase() == eid.trim().toLowerCase() ||
+            (a.officialNumber?.toLowerCase() ?? '') == eid.trim().toLowerCase(),
+      );
+
+      // Vérifier si dans la campagne
+      if (!widget.campaign.animalIds.contains(animal.id)) {
+        setState(() {
+          _errorMessage = 'Cet animal n\'est pas dans la campagne';
+          _scannedAnimal = null;
+        });
+        return;
+      }
+
+      setState(() {
+        _scannedAnimal = animal;
+        _errorMessage = null;
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Animal non trouvé';
+        _scannedAnimal = null;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Row(
+        children: [
+          Icon(Icons.remove_circle, color: Colors.red),
+          SizedBox(width: 8),
+          Text('Retirer un animal'),
+        ],
+      ),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'Scannez ou saisissez l\'EID de l\'animal à retirer de la campagne.',
+              style: TextStyle(fontSize: 13, color: Colors.grey),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Champ EID
+            TextField(
+              controller: _eidController,
+              decoration: const InputDecoration(
+                labelText: 'EID de l\'animal',
+                hintText: 'FRxxxxxxxxxxxx',
+                prefixIcon: Icon(Icons.tag),
+                border: OutlineInputBorder(),
+              ),
+              enabled: !_isScanning,
+              onSubmitted: _searchByEID,
+            ),
+
+            const SizedBox(height: 16),
+
+            // Boutons Scanner et Rechercher
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: _isScanning ? null : _simulateScan,
+                    icon: _isScanning
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                        : const Icon(Icons.qr_code_scanner, size: 20),
+                    label: Text(_isScanning ? 'Scan...' : 'Scanner'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: _isScanning
+                        ? null
+                        : () => _searchByEID(_eidController.text),
+                    icon: const Icon(Icons.search, size: 20),
+                    label: const Text('Rechercher'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.red,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            // Message d'erreur
+            if (_errorMessage != null) ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.red.shade200),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.error, color: Colors.red.shade700, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _errorMessage!,
+                        style: TextStyle(
+                          color: Colors.red.shade900,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+
+            // Informations de l'animal scanné
+            if (_scannedAnimal != null) ...[
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.orange.shade200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.warning,
+                            color: Colors.orange.shade700, size: 20),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'Animal à retirer',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'EID: ${_scannedAnimal!.eid}',
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                    if (_scannedAnimal!.officialNumber != null)
+                      Text(
+                        'N° officiel: ${_scannedAnimal!.officialNumber}',
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Annuler'),
+        ),
+        ElevatedButton(
+          onPressed: _scannedAnimal == null
+              ? null
+              : () {
+                  final campaignProvider = context.read<CampaignProvider>();
+                  campaignProvider.setActiveCampaign(widget.campaign);
+
+                  final success = campaignProvider
+                      .removeAnimalFromActiveCampaign(_scannedAnimal!.id);
+
+                  Navigator.pop(context);
+
+                  if (success) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          '✅ Animal retiré: ${_scannedAnimal!.officialNumber ?? _scannedAnimal!.eid}',
+                        ),
+                        backgroundColor: Colors.orange,
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  }
+                },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red,
+            foregroundColor: Colors.white,
+          ),
+          child: const Text('Retirer'),
+        ),
+      ],
+    );
   }
 }

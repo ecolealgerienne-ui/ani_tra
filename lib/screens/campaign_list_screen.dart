@@ -7,6 +7,7 @@ import '../models/campaign.dart';
 import '../i18n/app_localizations.dart';
 import 'campaign_create_screen.dart';
 import 'campaign_scan_screen.dart';
+import 'campaign_detail_screen.dart';
 
 class CampaignListScreen extends StatelessWidget {
   const CampaignListScreen({super.key});
@@ -101,17 +102,15 @@ class _CampaignCard extends StatelessWidget {
 
     return Card(
       child: InkWell(
-        onTap: campaign.completed
-            ? null
-            : () {
-                campaignProvider.setActiveCampaign(campaign);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const CampaignScanScreen(),
-                  ),
-                );
-              },
+        onTap: () {
+          // Navigation vers l'écran de détail
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => CampaignDetailScreen(campaign: campaign),
+            ),
+          );
+        },
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),

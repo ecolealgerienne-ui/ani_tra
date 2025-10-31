@@ -7,15 +7,14 @@ import '../providers/animal_provider.dart';
 import '../providers/campaign_provider.dart';
 import '../providers/sync_provider.dart';
 import '../providers/batch_provider.dart';
-
-// 🆕 IMPORT AJOUTÉ : AnimalStatus enum
-import '../models/animal.dart';
+import '../providers/lot_provider.dart'; // 🆕 Phase 2
 
 import 'scan_screen.dart';
 import 'campaign_list_screen.dart';
 import 'animal_list_screen.dart';
 import 'add_animal_screen.dart';
 import 'batch_create_screen.dart';
+import 'lot_list_screen.dart'; // 🆕 Phase 2
 import 'settings_screen.dart';
 
 /// Écran d'accueil (Dashboard)
@@ -111,6 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
               // 🆕 Bannière Mode Hors Ligne (si applicable)
               Consumer<SyncProvider>(
                 builder: (context, syncProvider, child) {
+                  // TODO: Implémenter la détection offline réelle
                   final isOffline = false; // Placeholder
 
                   if (!isOffline) return const SizedBox.shrink();
@@ -231,9 +231,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
           final treatments = animalProvider.getAnimalTreatments(animal.id);
           for (final treatment in treatments) {
-            // ✅ CORRECTION : daysUntilWithdrawalEnd → daysUntilWithdrawalEnds
             if (treatment.isWithdrawalActive &&
-                treatment.daysUntilWithdrawalEnds < 7) {
+                treatment.daysUntilWithdrawalEnd < 7) {
               withdrawalAlerts++;
               break; // Un seul comptage par animal
             }
@@ -296,20 +295,20 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         const SizedBox(height: 16),
 
-        // Grille d'actions
+        // Grille 2x3
         GridView.count(
-          crossAxisCount: 3,
+          crossAxisCount: 2,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          crossAxisSpacing: 12,
           mainAxisSpacing: 12,
-          childAspectRatio: 0.95,
+          crossAxisSpacing: 12,
+          childAspectRatio: 1.5,
           children: [
             // Scanner un Animal
             _QuickActionCard(
               icon: Icons.qr_code_scanner,
-              label: 'Scanner',
-              color: Colors.blue,
+              label: 'Scanner un Animal',
+              color: Colors.green,
               onTap: () {
                 Navigator.push(
                   context,
@@ -323,8 +322,8 @@ class _HomeScreenState extends State<HomeScreen> {
             // Nouvelle Campagne
             _QuickActionCard(
               icon: Icons.medical_services,
-              label: 'Campagne',
-              color: Colors.purple,
+              label: 'Nouvelle Campagne',
+              color: Colors.blue,
               onTap: () {
                 Navigator.push(
                   context,
@@ -335,11 +334,11 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
 
-            // Liste Animaux
+            // Animaux (liste)
             _QuickActionCard(
               icon: Icons.list,
               label: 'Animaux',
-              color: Colors.indigo,
+              color: Colors.purple,
               onTap: () {
                 Navigator.push(
                   context,
@@ -365,16 +364,16 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
 
-            // 🆕 Préparer un Lot
+            // 🆕 Mes Lots (Phase 2)
             _QuickActionCard(
-              icon: Icons.inventory,
-              label: 'Préparer un Lot',
+              icon: Icons.inventory_2,
+              label: 'Mes Lots',
               color: Colors.deepPurple,
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const BatchCreateScreen(),
+                    builder: (context) => const LotListScreen(),
                   ),
                 );
               },
@@ -461,6 +460,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: Colors.grey.shade400,
                   ),
                   onTap: () {
+                    // TODO: Naviguer vers détail campagne
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Campagne: ${campaign.productName}'),

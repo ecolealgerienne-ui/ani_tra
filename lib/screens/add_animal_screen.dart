@@ -16,7 +16,9 @@ import '../providers/sync_provider.dart';
 /// Gère à la fois les naissances et les achats
 /// Crée automatiquement l'animal + le mouvement correspondant
 class AddAnimalScreen extends StatefulWidget {
-  const AddAnimalScreen({super.key});
+  final String? scannedEID;
+
+  const AddAnimalScreen({super.key, this.scannedEID});
 
   @override
   State<AddAnimalScreen> createState() => _AddAnimalScreenState();
@@ -47,6 +49,10 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
     super.initState();
     // Date par défaut : aujourd'hui
     _selectedBirthDate = DateTime.now();
+    // Pré-remplir EID si fourni
+    if (widget.scannedEID != null) {
+      _primaryIdController.text = widget.scannedEID!;
+    }
   }
 
   @override
