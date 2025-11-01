@@ -44,7 +44,7 @@ class _CampaignCreateScreenState extends State<CampaignCreateScreen> {
     showDialog(
       context: context,
       builder: (context) => _VeterinarianSearchDialog(
-        veterinarians: MockData.generateVeterinarians(),
+        veterinarians: MockData.veterinarians,
         onSelect: (vet) {
           setState(() {
             _selectedVetId = vet.id;
@@ -61,7 +61,7 @@ class _CampaignCreateScreenState extends State<CampaignCreateScreen> {
   Future<void> _scanVeterinarianQR() async {
     // TODO: Implémenter le scan QR réel avec qr_code_scanner
     // Pour l'instant, on simule en sélectionnant un vétérinaire aléatoire
-    final vets = MockData.generateVeterinarians();
+    final vets = MockData.veterinarians;
     if (vets.isEmpty) return;
 
     final selectedVet = vets.first; // Simulation: prendre le premier
@@ -202,7 +202,7 @@ class _CampaignCreateScreenState extends State<CampaignCreateScreen> {
                 labelText: l10n.translate('select_product'),
                 prefixIcon: const Icon(Icons.medication),
               ),
-              items: MockData.generateProducts().map((product) {
+              items: MockData.products.map((product) {
                 return DropdownMenuItem(
                   value: product,
                   child: Column(

@@ -38,7 +38,7 @@ class Treatment {
   bool get isWithdrawalActive => DateTime.now().isBefore(withdrawalEndDate);
 
   /// Nombre de jours restant avant la fin de retrait (0 si terminé).
-  int get daysUntilWithdrawalEnds {
+  int get daysUntilWithdrawalEnd {
     final diff = withdrawalEndDate.difference(DateTime.now()).inDays;
     return diff < 0 ? 0 : diff;
   }

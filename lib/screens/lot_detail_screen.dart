@@ -477,7 +477,7 @@ class LotDetailScreen extends StatelessWidget {
                 onPressed: () {
                   context
                       .read<LotProvider>()
-                      .removeAnimalFromActiveLot(animal.id);
+                      .removeAnimalFromLot(lot.id, animal.id);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Animal retiré'),
@@ -524,18 +524,9 @@ class LotDetailScreen extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: OutlinedButton.icon(
-              onPressed: () {
-                context.read<LotProvider>().cancelActiveLot();
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Lot annulé'),
-                    backgroundColor: Colors.orange,
-                  ),
-                );
-              },
-              icon: const Icon(Icons.cancel),
-              label: const Text('Annuler'),
+              onPressed: () => Navigator.pop(context),
+              icon: const Icon(Icons.close),
+              label: const Text('Fermer'),
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),

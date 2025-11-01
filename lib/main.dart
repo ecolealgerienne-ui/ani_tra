@@ -1,12 +1,16 @@
 // lib/main.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'providers/animal_provider.dart';
 import 'providers/sync_provider.dart';
 import 'providers/qr_provider.dart';
 import 'providers/locale_provider.dart';
+import 'providers/batch_provider.dart';
+import 'providers/campaign_provider.dart';
 import 'providers/lot_provider.dart';
+import 'i18n/app_localizations.dart';
 import 'screens/home_screen.dart';
 import 'screens/scan_screen.dart';
 import 'screens/animal_list_screen.dart';
@@ -24,42 +28,44 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // Provider de base (pas de dépendances)
+        // Providers de base (pas de dépendances)
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => QRProvider()),
         ChangeNotifierProvider(create: (_) => SyncProvider()),
-        
+
         // Provider avec données mock
         ChangeNotifierProvider(
           create: (_) {
             final provider = AnimalProvider();
             // Charger les données mock
-            for (final animal in mockAnimals) {
-              provider.addAnimal(animal);
-            }
-            for (final product in mockProducts) {
-              provider.addProduct(product);
-            }
-            for (final treatment in mockTreatments) {
-              provider.addTreatment(treatment);
-            }
-            for (final movement in mockMovements) {
-              provider.addMovement(movement);
-            }
+            provider.initializeWithMockData(
+              MockData.generateAnimals(),
+              MockData.generateProducts(),
+              MockData.generateTreatments(),
+              MockData.generateMovements(),
+            );
             return provider;
           },
         ),
-        
-        // Provider de lots (nouveau)
+
+        // Provider de lots/batches
         ChangeNotifierProvider(
           create: (_) {
-            final provider = LotProvider();
+            final provider = BatchProvider();
             // Charger les lots mock
-            for (final lot in mockLots) {
-              provider.lots.add(lot);
-            }
+            provider.initializeWithMockData(MockData.generateBatches());
             return provider;
           },
+        ),
+
+        // Provider de lots (nouveau système unifié)
+        ChangeNotifierProvider(
+          create: (_) => LotProvider(),
+        ),
+
+        // Provider de campagnes
+        ChangeNotifierProvider(
+          create: (_) => CampaignProvider(),
         ),
       ],
       child: Consumer<LocaleProvider>(
@@ -75,7 +81,7 @@ class MyApp extends StatelessWidget {
                 foregroundColor: Colors.white,
                 elevation: 0,
               ),
-              cardTheme: CardTheme(
+              cardTheme: CardThemeData(
                 elevation: 2,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -90,6 +96,18 @@ class MyApp extends StatelessWidget {
               ),
             ),
             locale: localeProvider.locale,
+            // ✅ AJOUT CRITIQUE : Delegates de localisation
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('fr', ''),
+              Locale('en', ''),
+              Locale('ar', ''),
+            ],
             home: const MainNavigation(),
           );
         },

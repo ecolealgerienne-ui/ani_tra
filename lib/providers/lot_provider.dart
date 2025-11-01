@@ -115,6 +115,19 @@ class LotProvider extends ChangeNotifier {
     return true;
   }
 
+  // ✅ AJOUT: Retire un animal d'un lot spécifique (par ID)
+  bool removeAnimalFromLot(String lotId, String animalId) {
+    final lot = getLotById(lotId);
+    if (lot == null || lot.completed) return false;
+
+    if (!lot.animalIds.contains(animalId)) return false;
+
+    final updatedIds = lot.animalIds.where((id) => id != animalId).toList();
+    final updated = lot.copyWith(animalIds: updatedIds);
+    updateLot(updated);
+    return true;
+  }
+
   /// Vérifie si un animal est dans le lot actif
   bool isAnimalInActiveLot(String animalId) {
     return _activeLot?.animalIds.contains(animalId) ?? false;

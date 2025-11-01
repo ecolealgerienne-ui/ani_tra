@@ -800,7 +800,7 @@ class _AddTreatmentDialogState extends State<_AddTreatmentDialog> {
   Future<void> _scanVeterinarianQR() async {
     // TODO: Implémenter le vrai scan QR
     // Pour l'instant, simulation simplifiée
-    final vets = MockData.generateVeterinarians();
+    final vets = MockData.veterinarians;
     if (vets.isEmpty) return;
 
     final selectedVet = vets.first;
@@ -855,7 +855,7 @@ class _AddTreatmentDialogState extends State<_AddTreatmentDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final products = MockData.generateProducts();
+    final products = MockData.products;
 
     return AlertDialog(
       title: const Text('Ajouter un Soin'),
@@ -1016,7 +1016,7 @@ class _VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
   @override
   void initState() {
     super.initState();
-    _filteredVets = MockData.generateVeterinarians();
+    _filteredVets = MockData.veterinarians;
   }
 
   @override
@@ -1026,7 +1026,7 @@ class _VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
   }
 
   void _filterVets(String query) {
-    final allVets = MockData.generateVeterinarians();
+    final allVets = MockData.veterinarians;
     setState(() {
       if (query.isEmpty) {
         _filteredVets = allVets;

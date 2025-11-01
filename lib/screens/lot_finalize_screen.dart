@@ -8,7 +8,10 @@ import '../providers/animal_provider.dart';
 import '../providers/sync_provider.dart';
 import '../models/lot.dart';
 import '../models/product.dart';
+import '../models/animal.dart';
 import '../i18n/app_localizations.dart';
+import '../models/veterinarian.dart';
+import '../data/mock_data.dart';
 
 class LotFinalizeScreen extends StatefulWidget {
   final String lotId;
@@ -29,7 +32,11 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
   // Traitement
   Product? _selectedProduct;
   DateTime _treatmentDate = DateTime.now();
-  final _veterinarianController = TextEditingController();
+
+  // Vétérinaire (v1.2)
+  String? _selectedVetId;
+  String? _selectedVetName;
+  String? _selectedVetOrg;
 
   // Vente
   final _buyerNameController = TextEditingController();
@@ -45,9 +52,58 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
   // Notes
   final _notesController = TextEditingController();
 
+  // ==================== Méthodes Vétérinaire ====================
+
+  void _searchVeterinarian() {
+    showDialog(
+      context: context,
+      builder: (context) => _VeterinarianSearchDialog(
+        veterinarians: MockData.veterinarians,
+        onSelect: (vet) {
+          setState(() {
+            _selectedVetId = vet.id;
+            _selectedVetName = vet.fullName;
+            _selectedVetOrg = vet.clinic ?? 'Non spécifié';
+          });
+          Navigator.pop(context);
+        },
+      ),
+    );
+  }
+
+  Future<void> _scanVeterinarianQR() async {
+    final vets = MockData.veterinarians;
+    if (vets.isEmpty) return;
+
+    final selectedVet = vets.first;
+
+    setState(() {
+      _selectedVetId = selectedVet.id;
+      _selectedVetName = selectedVet.fullName;
+      _selectedVetOrg = selectedVet.clinic ?? 'Non spécifié';
+    });
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('✅ ${selectedVet.fullName} validé'),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _removeVeterinarian() {
+    setState(() {
+      _selectedVetId = null;
+      _selectedVetName = null;
+      _selectedVetOrg = null;
+    });
+  }
+
   @override
   void dispose() {
-    _veterinarianController.dispose();
     _buyerNameController.dispose();
     _buyerFarmIdController.dispose();
     _pricePerAnimalController.dispose();
@@ -93,9 +149,8 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
           productName: _selectedProduct!.name,
           treatmentDate: _treatmentDate,
           withdrawalEndDate: withdrawalEnd,
-          veterinarianName: _veterinarianController.text.isEmpty
-              ? null
-              : _veterinarianController.text,
+          veterinarianId: _selectedVetId,
+          veterinarianName: _selectedVetName,
           notes: _notesController.text.isEmpty ? null : _notesController.text,
         );
 
@@ -481,15 +536,130 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
         ),
         const SizedBox(height: 16),
 
-        // Vétérinaire
-        TextField(
-          controller: _veterinarianController,
-          decoration: const InputDecoration(
-            labelText: 'Vétérinaire (optionnel)',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.person),
-          ),
+        // ==================== Section Vétérinaire ====================
+        Row(
+          children: [
+            Icon(Icons.medical_services, color: Colors.blue.shade700),
+            const SizedBox(width: 8),
+            Text(
+              'Vétérinaire prescripteur (optionnel)',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey.shade800,
+              ),
+            ),
+          ],
         ),
+        const SizedBox(height: 12),
+
+        // Si aucun vétérinaire sélectionné
+        if (_selectedVetId == null) ...[
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.person_search,
+                  size: 48,
+                  color: Colors.grey.shade400,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Aucun vétérinaire sélectionné',
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: _searchVeterinarian,
+                        icon: const Icon(Icons.search),
+                        label: const Text('Rechercher'),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: _scanVeterinarianQR,
+                        icon: const Icon(Icons.qr_code_scanner),
+                        label: const Text('Scanner QR'),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+
+        // Si vétérinaire sélectionné
+        if (_selectedVetId != null) ...[
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.green.shade50,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.green.shade300, width: 2),
+            ),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: Colors.green.shade100,
+                  radius: 24,
+                  child: Icon(
+                    Icons.verified_user,
+                    color: Colors.green.shade700,
+                    size: 28,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _selectedVetName ?? '',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _selectedVetOrg ?? '',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  onPressed: _removeVeterinarian,
+                  icon: const Icon(Icons.close, color: Colors.red),
+                  tooltip: 'Retirer',
+                ),
+              ],
+            ),
+          ),
+        ],
         const SizedBox(height: 16),
 
         // Info rémanence
@@ -665,5 +835,143 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
       case null:
         return Colors.orange;
     }
+  }
+}
+
+// ==================== Dialog Recherche Vétérinaire ====================
+
+class _VeterinarianSearchDialog extends StatefulWidget {
+  final List<Veterinarian> veterinarians;
+  final Function(Veterinarian) onSelect;
+
+  const _VeterinarianSearchDialog({
+    required this.veterinarians,
+    required this.onSelect,
+  });
+
+  @override
+  State<_VeterinarianSearchDialog> createState() =>
+      __VeterinarianSearchDialogState();
+}
+
+class __VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
+  final _searchController = TextEditingController();
+  List<Veterinarian> _filteredVets = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _filteredVets = widget.veterinarians;
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _filterVets(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredVets = widget.veterinarians;
+      } else {
+        _filteredVets = widget.veterinarians
+            .where((vet) =>
+                vet.fullName.toLowerCase().contains(query.toLowerCase()) ||
+                (vet.clinic?.toLowerCase().contains(query.toLowerCase()) ??
+                    false))
+            .toList();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Rechercher un Vétérinaire'),
+      contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      content: Container(
+        width: double.maxFinite,
+        constraints: const BoxConstraints(maxHeight: 500),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Champ de recherche
+            TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Nom ou établissement...',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                filled: true,
+                fillColor: Colors.grey.shade100,
+              ),
+              onChanged: _filterVets,
+              autofocus: true,
+            ),
+            const SizedBox(height: 16),
+
+            // Résultats
+            if (_filteredVets.isEmpty)
+              const Padding(
+                padding: EdgeInsets.all(32),
+                child: Column(
+                  children: [
+                    Icon(Icons.search_off, size: 48, color: Colors.grey),
+                    SizedBox(height: 16),
+                    Text(
+                      'Aucun vétérinaire trouvé',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ],
+                ),
+              )
+            else
+              Expanded(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _filteredVets.length,
+                  itemBuilder: (context, index) {
+                    final vet = _filteredVets[index];
+                    return ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.blue.shade100,
+                        child: Icon(Icons.person, color: Colors.blue.shade700),
+                      ),
+                      title: Text(
+                        vet.fullName,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(vet.clinic ?? 'Non spécifié'),
+                          const SizedBox(height: 4),
+                          Text(
+                            vet.licenseNumber,
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      onTap: () => widget.onSelect(vet),
+                    );
+                  },
+                ),
+              ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Annuler'),
+        ),
+      ],
+    );
   }
 }

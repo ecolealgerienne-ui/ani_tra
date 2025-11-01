@@ -7,14 +7,14 @@ import '../providers/animal_provider.dart';
 import '../providers/campaign_provider.dart';
 import '../providers/sync_provider.dart';
 import '../providers/batch_provider.dart';
-import '../providers/lot_provider.dart'; // 🆕 Phase 2
+import '../models/animal.dart'; // 🆕 Import pour AnimalStatus
+import '../models/treatment.dart'; // 🆕 Import pour Treatment
 
 import 'scan_screen.dart';
 import 'campaign_list_screen.dart';
 import 'animal_list_screen.dart';
 import 'add_animal_screen.dart';
-import 'batch_create_screen.dart';
-import 'lot_list_screen.dart'; // 🆕 Phase 2
+import 'lot_list_screen.dart'; // ✅ Changement: Import LotListScreen au lieu de BatchCreateScreen
 import 'settings_screen.dart';
 
 /// Écran d'accueil (Dashboard)
@@ -261,19 +261,19 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: _StatCard(
-                icon: Icons.sync,
-                label: 'En attente',
-                value: pendingSync.toString(),
-                color: pendingSync > 0 ? Colors.orange : Colors.grey,
+                icon: Icons.warning,
+                label: 'Alertes',
+                value: withdrawalAlerts.toString(),
+                color: withdrawalAlerts > 0 ? Colors.red : Colors.grey,
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: _StatCard(
-                icon: Icons.warning,
-                label: 'Alertes',
-                value: withdrawalAlerts.toString(),
-                color: withdrawalAlerts > 0 ? Colors.red : Colors.grey,
+                icon: Icons.sync,
+                label: 'À Sync',
+                value: pendingSync.toString(),
+                color: pendingSync > 0 ? Colors.orange : Colors.grey,
               ),
             ),
           ],
@@ -282,7 +282,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Widget : Actions rapides
+  /// Widget : Actions rapides (grille 3x2)
   Widget _buildQuickActions(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -294,21 +294,19 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
         ),
         const SizedBox(height: 16),
-
-        // Grille 2x3
         GridView.count(
-          crossAxisCount: 2,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: 3,
           mainAxisSpacing: 12,
           crossAxisSpacing: 12,
-          childAspectRatio: 1.5,
+          childAspectRatio: 1.0,
           children: [
             // Scanner un Animal
             _QuickActionCard(
               icon: Icons.qr_code_scanner,
-              label: 'Scanner un Animal',
-              color: Colors.green,
+              label: 'Scanner',
+              color: Colors.blue,
               onTap: () {
                 Navigator.push(
                   context,
@@ -319,11 +317,11 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
 
-            // Nouvelle Campagne
+            // Campagnes
             _QuickActionCard(
               icon: Icons.medical_services,
-              label: 'Nouvelle Campagne',
-              color: Colors.blue,
+              label: 'Campagnes',
+              color: Colors.green,
               onTap: () {
                 Navigator.push(
                   context,
@@ -334,11 +332,11 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
 
-            // Animaux (liste)
+            // Liste Animaux
             _QuickActionCard(
-              icon: Icons.list,
+              icon: Icons.pets,
               label: 'Animaux',
-              color: Colors.purple,
+              color: Colors.orange,
               onTap: () {
                 Navigator.push(
                   context,
@@ -364,9 +362,10 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
 
-            // 🆕 Mes Lots (Phase 2)
+            // ✅ MODIFICATION: Navigation vers LotListScreen au lieu de BatchCreateScreen
+            // ✅ MODIFICATION: Label changé de "Préparer un Lot" à "Mes Lots"
             _QuickActionCard(
-              icon: Icons.inventory_2,
+              icon: Icons.inventory,
               label: 'Mes Lots',
               color: Colors.deepPurple,
               onTap: () {

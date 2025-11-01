@@ -1,131 +1,136 @@
+// lib/i18n/strings_fr.dart
+
 const Map<String, String> stringsFr = {
-  // App
+  // ==================== GÉNÉRAL ====================
   'app_name': 'RFID Troupeau',
+  'ok': 'OK',
+  'cancel': 'Annuler',
+  'save': 'Enregistrer',
+  'delete': 'Supprimer',
+  'edit': 'Modifier',
+  'close': 'Fermer',
+  'confirm': 'Confirmer',
+  'yes': 'Oui',
+  'no': 'Non',
+  'search': 'Rechercher',
+  'filter': 'Filtrer',
+  'refresh': 'Actualiser',
+  'loading': 'Chargement...',
+  'no_data': 'Aucune donnée',
+  'error': 'Erreur',
+  'success': 'Succès',
 
-  // Auth sandbox / PIN
-  'auth_sandbox_title': 'Verrou PIN (Sandbox)',
-  'auth_sandbox_unlocked_title': 'Sandbox déverrouillé',
-  'auth_access_granted_mock': '✅ Accès accordé (mode mock)',
-  'auth_mock_enabled': 'Mode MOCK activé',
-  'auth_mock_disabled': 'Mode MOCK désactivé',
-  'auth_mock_hint_with_default': 'Entrez le PIN mock (défaut : {pin})',
-  'auth_mock_hint_disabled': 'L’authentification mock est désactivée',
-  'auth_pin_label': 'PIN',
-  'auth_pin_hint': 'Saisissez votre code PIN',
-  'auth_pin_invalid': 'PIN invalide',
-  'auth_unlock': 'Déverrouiller',
-  'auth_verifying': 'Vérification…',
-  'auth_no_impact_note': 'Aucun impact sur l’app : ce sandbox est compilé seul',
+  // ==================== LOTS ====================
+  // Liste des lots
+  'my_lots': 'Mes Lots',
+  'open_lots': 'Ouverts',
+  'closed_lots': 'Fermés',
+  'create_lot': 'Créer un lot',
+  'new_lot': 'Nouveau Lot',
+  'lot_name': 'Nom du lot',
+  'lot_created': 'Lot créé avec succès',
+  'lot_updated': 'Lot mis à jour',
+  'lot_deleted': 'Lot supprimé',
+  'lot_duplicated': 'Lot dupliqué avec succès',
 
-  // Navigation
-  'home': 'Accueil',
-  'scan': 'Scanner',
+  // États du lot
+  'lot_open': 'Ouvert',
+  'lot_closed': 'Fermé',
+  'type_not_defined': 'Type non défini',
+
+  // Types de lots
+  'lot_type_treatment': 'Traitement',
+  'lot_type_sale': 'Vente',
+  'lot_type_slaughter': 'Abattage',
+
+  // Actions sur les lots
+  'duplicate_lot': 'Dupliquer le lot',
+  'delete_lot': 'Supprimer le lot',
+  'new_lot_name': 'Nouveau nom',
+  'keep_animals': 'Conserver les animaux',
+  'keep_type': 'Conserver le type',
+
+  // Informations du lot
+  'animals_count': 'animaux',
+  'created_on': 'Créé le',
+  'completed_on': 'Finalisé le',
+
+  // Messages vides
+  'no_open_lots': 'Aucun lot ouvert',
+  'no_closed_lots': 'Aucun lot fermé',
+  'create_first_lot': 'Créez votre premier lot pour commencer',
+
+  // ==================== ANIMAUX ====================
   'animals': 'Animaux',
-  'campaigns': 'Campagnes',
-  'sync': 'Synchronisation',
-  'settings': 'Paramètres',
-
-  // Dashboard
-  'dashboard_title': 'Tableau de bord',
-  'total_animals': 'Nombre total d’animaux',
-  'pending_sync': 'En attente de synchronisation',
-  'active_campaigns': 'Campagnes actives',
-  'withdrawal_alerts': 'Alertes de rémanence',
-
-  // Scan
+  'animal': 'Animal',
+  'add_animal': 'Ajouter un animal',
   'scan_animal': 'Scanner un animal',
-  'simulate_scan': 'Simuler un scan',
+  'animal_details': 'Détails de l\'animal',
   'eid': 'EID',
-  'official_number': 'N° officiel',
+  'official_number': 'N° Officiel',
   'birth_date': 'Date de naissance',
   'sex': 'Sexe',
-  'mother': 'Mère',
   'status': 'Statut',
   'male': 'Mâle',
   'female': 'Femelle',
   'alive': 'Vivant',
   'sold': 'Vendu',
   'dead': 'Mort',
+  'slaughtered': 'Abattu',
 
-  // Campaign
-  'new_campaign': 'Nouvelle campagne',
+  // ==================== CAMPAGNES ====================
+  'campaigns': 'Campagnes',
+  'campaign': 'Campagne',
+  'active_campaigns': 'Campagnes Actives',
+  'create_campaign': 'Créer une campagne',
   'campaign_name': 'Nom de la campagne',
-  'select_product': 'Sélectionner un produit',
-  'treatment_date': 'Date du traitement',
-  'withdrawal_end': 'Fin de rémanence',
-  'start_scanning': 'Passer au scan',
-  'animals_scanned': 'Animaux scannés',
-  'already_scanned': 'Déjà scanné',
-  'save_campaign': 'Enregistrer la campagne',
 
-  // Birth
-  'record_birth': 'Enregistrer une naissance',
-  'scan_lamb': 'Scanner l’agneau',
-  'scan_mother': 'Scanner la mère',
-  'lamb_eid': 'EID de l’agneau',
-  'mother_eid': 'EID de la mère',
-  'confirm_birth': 'Confirmer la naissance',
+  // ==================== TRAITEMENTS ====================
+  'treatments': 'Traitements',
+  'treatment': 'Traitement',
+  'product': 'Produit',
+  'dose': 'Dose',
+  'treatment_date': 'Date de traitement',
+  'withdrawal_period': 'Période de retrait',
+  'veterinarian': 'Vétérinaire',
 
-  // Movements
+  // ==================== MOUVEMENTS ====================
   'movements': 'Mouvements',
-  'record_sale': 'Enregistrer une vente',
-  'record_death': 'Enregistrer une mortalité',
-  'scan_qr_buyer': 'Scanner le QR de l’acheteur',
-  'buyer_name': 'Nom de l’acheteur',
-  'sale_price': 'Prix de vente',
-  'death_cause': 'Cause de mortalité',
-  'confirm_sale': 'Confirmer la vente',
-  'confirm_death': 'Confirmer la mortalité',
+  'movement': 'Mouvement',
+  'movement_type': 'Type de mouvement',
+  'birth': 'Naissance',
+  'purchase': 'Achat',
+  'sale': 'Vente',
+  'death': 'Mort',
+  'slaughter': 'Abattage',
 
-  // Sync
-  'sync_status': 'Statut de synchronisation',
-  'last_sync': 'Dernière synchronisation',
-  'pending_data': 'Données en attente',
-  'sync_now': 'Synchroniser maintenant',
-  'sync_success': 'Synchronisation réussie',
-  'offline_mode': 'Mode hors ligne',
+  // ==================== SYNCHRONISATION ====================
+  'sync': 'Synchronisation',
+  'synced': 'Synchronisé',
+  'pending_sync': 'En attente de sync',
+  'sync_in_progress': 'Synchronisation en cours...',
+  'sync_complete': 'Synchronisation terminée',
+  'sync_error': 'Erreur de synchronisation',
 
-  // Common
-  'confirm': 'Confirmer',
-  'cancel': 'Annuler',
-  'save': 'Enregistrer',
-  'delete': 'Supprimer',
-  'edit': 'Modifier',
-  'search': 'Rechercher',
-  'filter': 'Filtrer',
-  'date': 'Date',
-  'actions': 'Actions',
-  'error': 'Erreur',
-  'success': 'Succès',
-  'loading': 'Chargement…',
-  'no_data': 'Aucune donnée',
+  // ==================== PARAMÈTRES ====================
+  'settings': 'Paramètres',
+  'language': 'Langue',
+  'french': 'Français',
+  'english': 'Anglais',
+  'arabic': 'Arabe',
 
-  // Lots
-  'my_lots': 'Mes lots',
-  'create_lot': 'Créer un lot',
-  'lot_name': 'Nom du lot',
-  'lot_type': 'Type de lot',
-  'open_lots': 'Ouverts',
-  'closed_lots': 'Terminés',
-  'lot_open': 'Ouvert',
-  'lot_closed': 'Terminé',
-  'type_not_defined': 'Non défini',
-  'finalize_lot': 'Finaliser le lot',
-  'duplicate_lot': 'Dupliquer',
-  'rename_lot': 'Renommer',
-  'delete_lot': 'Supprimer le lot',
-  'lot_created': 'Lot créé',
-  'lot_finalized': 'Lot finalisé',
-  'lot_duplicated': 'Lot dupliqué',
-  'treatment_lot': 'Traitement',
-  'sale_lot': 'Vente',
-  'slaughter_lot': 'Abattage',
-  'choose_lot_type': 'Choisissez le type de lot',
-  'keep_type': 'Conserver le type',
-  'keep_animals': 'Conserver les animaux',
-  'new_lot_name': 'Nouveau nom',
-  'buyer_farm_id': 'N° d’exploitation de l’acheteur',
-  'price_per_animal': 'Prix par animal',
-  'slaughterhouse_name': 'Nom de l’abattoir',
-  'slaughterhouse_id': 'N° d’abattoir',
+  // ==================== ACCUEIL ====================
+  'dashboard': 'Tableau de Bord',
+  'quick_actions': 'Actions Rapides',
+  'statistics': 'Statistiques',
+  'total': 'Total',
+  'alerts': 'Alertes',
+  'offline_mode': 'Mode Hors Ligne',
+
+  // ==================== MESSAGES ====================
+  'confirm_delete': 'Voulez-vous vraiment supprimer ?',
+  'operation_success': 'Opération réussie',
+  'operation_failed': 'Opération échouée',
+  'invalid_data': 'Données invalides',
+  'required_field': 'Champ requis',
 };
