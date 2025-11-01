@@ -10,6 +10,7 @@ import 'providers/locale_provider.dart';
 import 'providers/batch_provider.dart';
 import 'providers/campaign_provider.dart';
 import 'providers/lot_provider.dart';
+import 'providers/weight_provider.dart';
 import 'i18n/app_localizations.dart';
 import 'screens/home_screen.dart';
 import 'screens/scan_screen.dart';
@@ -66,6 +67,16 @@ class MyApp extends StatelessWidget {
         // Provider de campagnes
         ChangeNotifierProvider(
           create: (_) => CampaignProvider(),
+        ),
+
+        // Provider de pesées
+        ChangeNotifierProvider(
+          create: (_) {
+            final provider = WeightProvider();
+            // Charger les pesées mock
+            provider.setWeights(MockData.generateWeights());
+            return provider;
+          },
         ),
       ],
       child: Consumer<LocaleProvider>(
