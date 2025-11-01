@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/locale_provider.dart';
 import '../providers/sync_provider.dart';
+import '../widgets/farm_preferences_section.dart';
 import '../i18n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -105,6 +106,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showChangePasswordDialog(context),
           ),
+
+          const Divider(),
+
+          // Farm Preferences Section (ÉTAPE 4)
+          const FarmPreferencesSection(),
 
           const Divider(),
 

@@ -7,10 +7,14 @@ import 'dart:math';
 import '../models/animal.dart';
 import '../models/treatment.dart';
 import '../models/weight_record.dart';
+import '../models/animal_extensions.dart';
+import '../models/eid_change.dart';
 import '../providers/animal_provider.dart';
 import '../providers/weight_provider.dart';
 import '../providers/sync_provider.dart';
 import '../data/mock_data.dart';
+import '../widgets/change_eid_dialog.dart';
+import '../widgets/eid_history_card.dart';
 import 'death_screen.dart';
 
 class ScanScreen extends StatefulWidget {
@@ -87,7 +91,8 @@ class _ScanScreenState extends State<ScanScreen> {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(_scannedAnimal!.officialNumber ?? _scannedAnimal!.eid),
+          title: Text(
+              _scannedAnimal!.officialNumber ?? _scannedAnimal!.currentEid),
           bottom: const TabBar(
             tabs: [
               Tab(icon: Icon(Icons.info), text: 'Infos'),
@@ -148,7 +153,7 @@ class _AnimalHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  animal.officialNumber ?? animal.eid,
+                  animal.officialNumber ?? animal.currentEid,
                   style: const TextStyle(
                       fontSize: 18, fontWeight: FontWeight.bold),
                 ),
@@ -156,6 +161,19 @@ class _AnimalHeader extends StatelessWidget {
                   '${animal.sex == AnimalSex.male ? '♂️ Mâle' : '♀️ Femelle'} · ${_getAgeFormatted()}',
                   style: TextStyle(color: Colors.grey[700]),
                 ),
+                // ÉTAPE 7 : Afficher Type et Race
+                if (animal.hasSpecies)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      animal.fullDisplayFr, // "🐑 Ovin - Mérinos"
+                      style: TextStyle(
+                        color: Colors.blue[700],
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -263,6 +281,15 @@ class _InfosTab extends StatelessWidget {
     );
   }
 
+  void _showChangeEidDialog(BuildContext context, Animal animal) {
+    showDialog(
+      context: context,
+      builder: (context) => ChangeEidDialog(animal: animal),
+    );
+    // Note: Pas besoin de setState car le Provider notifiera
+    // automatiquement les changements et rebuild les widgets
+  }
+
   String _getAgeFormatted() {
     final ageMonths = animal.ageInMonths;
     if (ageMonths < 12) {
@@ -278,13 +305,17 @@ class _InfosTab extends StatelessWidget {
     final animalProvider = context.watch<AnimalProvider>();
     final weightProvider = context.watch<WeightProvider>();
 
+    // Récupérer l'animal à jour depuis le Provider (au cas où il a changé)
+    final currentAnimal = animalProvider.getAnimalById(animal.id) ?? animal;
+
     // Obtenir le dernier poids
-    final allWeights =
-        weightProvider.weights.where((w) => w.animalId == animal.id).toList();
+    final allWeights = weightProvider.weights
+        .where((w) => w.animalId == currentAnimal.id)
+        .toList();
     allWeights.sort((a, b) => b.recordedAt.compareTo(a.recordedAt));
     final latestWeight = allWeights.isNotEmpty ? allWeights.first : null;
 
-    final treatments = animalProvider.getAnimalTreatments(animal.id);
+    final treatments = animalProvider.getAnimalTreatments(currentAnimal.id);
 
     bool hasActiveWithdrawal = false;
     for (final treatment in treatments) {
@@ -302,21 +333,107 @@ class _InfosTab extends StatelessWidget {
           _InfoCard(
             title: 'Informations de base',
             children: [
-              _InfoRow(label: 'EID', value: _formatEID(animal.eid)),
-              if (animal.officialNumber != null)
-                _InfoRow(label: 'N° Officiel', value: animal.officialNumber!),
+              _InfoRow(
+                  label: 'EID', value: _formatEID(currentAnimal.currentEid)),
+              if (currentAnimal.officialNumber != null)
+                _InfoRow(
+                    label: 'N° Officiel', value: currentAnimal.officialNumber!),
               _InfoRow(
                   label: 'Sexe',
-                  value:
-                      animal.sex == AnimalSex.male ? '♂️ Mâle' : '♀️ Femelle'),
-              _InfoRow(label: 'Statut', value: _getStatusLabel(animal.status)),
+                  value: currentAnimal.sex == AnimalSex.male
+                      ? '♂️ Mâle'
+                      : '♀️ Femelle'),
+              _InfoRow(
+                  label: 'Statut',
+                  value: _getStatusLabel(currentAnimal.status)),
               _InfoRow(
                   label: 'Date de naissance',
-                  value: _formatDate(animal.birthDate)),
+                  value: _formatDate(currentAnimal.birthDate)),
               _InfoRow(label: 'Âge', value: _getAgeFormatted()),
             ],
           ),
           const SizedBox(height: 16),
+
+          // ÉTAPE 7 : Section Type et Race
+          if (currentAnimal.hasSpecies)
+            _InfoCard(
+              title: '🐑 Type et Race',
+              children: [
+                _InfoRow(
+                  label: 'Type',
+                  value: currentAnimal.speciesNameFr,
+                  icon: currentAnimal.speciesIcon,
+                ),
+                if (currentAnimal.hasBreed)
+                  _InfoRow(
+                    label: 'Race',
+                    value: currentAnimal.breedNameFr,
+                  )
+                else
+                  _InfoRow(
+                    label: 'Race',
+                    value: 'Non définie',
+                    valueStyle: TextStyle(
+                      color: Colors.grey[600],
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+              ],
+            ),
+
+          if (currentAnimal.hasSpecies) const SizedBox(height: 16),
+
+          // NOUVEAU : Section Identification RFID
+          _InfoCard(
+            title: '🏷️ Identification RFID',
+            trailing: IconButton(
+              icon: const Icon(Icons.edit),
+              tooltip: 'Changer l\'EID',
+              onPressed: () => _showChangeEidDialog(context, currentAnimal),
+            ),
+            children: [
+              _InfoRow(
+                label: 'EID actuel',
+                value: currentAnimal.currentEid,
+              ),
+              if (currentAnimal.eidHistory != null &&
+                  currentAnimal.eidHistory!.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.history,
+                            size: 16, color: Colors.blue.shade700),
+                        const SizedBox(width: 8),
+                        Text(
+                          '${currentAnimal.eidHistory!.length} changement(s) enregistré(s)',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.blue.shade900,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
+          // Historique des changements d'EID (si existant)
+          if (currentAnimal.eidHistory != null &&
+              currentAnimal.eidHistory!.isNotEmpty) ...[
+            EidHistoryCard(history: currentAnimal.eidHistory!),
+            const SizedBox(height: 16),
+          ],
+
           _InfoCard(
             title: 'Poids',
             trailing: IconButton(
@@ -389,7 +506,7 @@ class _InfosTab extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           ElevatedButton.icon(
-            onPressed: () => _showAddTreatmentDialog(context, animal.id),
+            onPressed: () => _showAddTreatmentDialog(context, currentAnimal.id),
             icon: const Icon(Icons.medical_services),
             label: const Text('Ajouter un soin'),
             style: ElevatedButton.styleFrom(
@@ -635,7 +752,7 @@ class _GenealogieTab extends StatelessWidget {
           if (mother != null)
             ListTile(
               leading: const Icon(Icons.family_restroom, color: Colors.pink),
-              title: Text(mother.officialNumber ?? mother.eid),
+              title: Text(mother.officialNumber ?? mother.currentEid),
               subtitle: Text(_getAgeFormatted(mother)),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () {
@@ -669,7 +786,7 @@ class _GenealogieTab extends StatelessWidget {
                           ? Colors.blue
                           : Colors.pink,
                     ),
-                    title: Text(child.officialNumber ?? child.eid),
+                    title: Text(child.officialNumber ?? child.currentEid),
                     subtitle: Text(_getAgeFormatted(child)),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                     onTap: () {
@@ -733,8 +850,15 @@ class _InfoCard extends StatelessWidget {
 class _InfoRow extends StatelessWidget {
   final String label;
   final String value;
+  final String? icon; // ÉTAPE 7 : Support icône
+  final TextStyle? valueStyle; // ÉTAPE 7 : Style personnalisé
 
-  const _InfoRow({required this.label, required this.value});
+  const _InfoRow({
+    required this.label,
+    required this.value,
+    this.icon,
+    this.valueStyle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -748,8 +872,24 @@ class _InfoRow extends StatelessWidget {
             child: Text(label, style: TextStyle(color: Colors.grey[600])),
           ),
           Expanded(
-            child: Text(value,
-                style: const TextStyle(fontWeight: FontWeight.w500)),
+            child: Row(
+              children: [
+                if (icon != null) ...[
+                  Text(
+                    icon!,
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                  const SizedBox(width: 6),
+                ],
+                Expanded(
+                  child: Text(
+                    value,
+                    style: valueStyle ??
+                        const TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

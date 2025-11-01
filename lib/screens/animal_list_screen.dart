@@ -8,7 +8,11 @@ import 'package:provider/provider.dart';
 import 'dart:math';
 import '../providers/animal_provider.dart';
 import '../models/animal.dart';
+import '../models/animal_extensions.dart';
+import '../models/breed.dart';
+import '../data/animal_config.dart';
 import '../i18n/app_localizations.dart';
+import '../widgets/animal_card.dart';
 import 'scan_screen.dart';
 import 'add_animal_screen.dart';
 
@@ -30,6 +34,10 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
   String? _motherEidFilter;
   String? _batchIdFilter;
 
+  // ÉTAPE 6 : Filtres Type et Race
+  Set<String> _selectedSpecies = {};
+  Set<String> _selectedBreeds = {};
+
   // Group By
   GroupByOption _groupBy = GroupByOption.none;
 
@@ -42,6 +50,9 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     if (_hasActiveWithdrawal != null) count++;
     if (_motherEidFilter != null && _motherEidFilter!.isNotEmpty) count++;
     if (_batchIdFilter != null) count++;
+    // ÉTAPE 6 : Filtres Type et Race
+    if (_selectedSpecies.isNotEmpty) count++;
+    if (_selectedBreeds.isNotEmpty) count++;
     return count;
   }
 
@@ -108,6 +119,20 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                 .toLowerCase()
                 .contains(_motherEidFilter!.toLowerCase()) ??
             false;
+      }).toList();
+    }
+
+    // ÉTAPE 6 : Filtre Type
+    if (_selectedSpecies.isNotEmpty) {
+      filtered = filtered.where((a) {
+        return a.speciesId != null && _selectedSpecies.contains(a.speciesId);
+      }).toList();
+    }
+
+    // ÉTAPE 6 : Filtre Race
+    if (_selectedBreeds.isNotEmpty) {
+      filtered = filtered.where((a) {
+        return a.breedId != null && _selectedBreeds.contains(a.breedId);
       }).toList();
     }
 
@@ -190,6 +215,30 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
           }
         }
         break;
+
+      // ÉTAPE 6 : Group By Type
+      case GroupByOption.species:
+        for (final animal in animals) {
+          if (animal.speciesId == null) {
+            groups.putIfAbsent('❓ Type non défini', () => []).add(animal);
+          } else {
+            final key = animal.fullDisplayFr.split(' - ').first; // "🐑 Ovin"
+            groups.putIfAbsent(key, () => []).add(animal);
+          }
+        }
+        break;
+
+      // ÉTAPE 6 : Group By Race
+      case GroupByOption.breed:
+        for (final animal in animals) {
+          if (animal.breedId == null) {
+            groups.putIfAbsent('❓ Race non définie', () => []).add(animal);
+          } else {
+            final key = animal.breedNameFr;
+            groups.putIfAbsent(key, () => []).add(animal);
+          }
+        }
+        break;
     }
 
     return groups;
@@ -205,13 +254,19 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
         selectedAgeRanges: _selectedAgeRanges,
         hasActiveWithdrawal: _hasActiveWithdrawal,
         motherEidFilter: _motherEidFilter,
-        onApply: (statuses, sexes, ageRanges, withdrawal, mother) {
+        selectedSpecies: _selectedSpecies, // NOUVEAU
+        selectedBreeds: _selectedBreeds, // NOUVEAU
+        onApply:
+            (statuses, sexes, ageRanges, withdrawal, mother, species, breeds) {
+          // MODIFIÉ
           setState(() {
             _selectedStatuses = statuses;
             _selectedSexes = sexes;
             _selectedAgeRanges = ageRanges;
             _hasActiveWithdrawal = withdrawal;
             _motherEidFilter = mother;
+            _selectedSpecies = species; // NOUVEAU
+            _selectedBreeds = breeds; // NOUVEAU
           });
         },
         onReset: () {
@@ -221,6 +276,8 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
             _selectedAgeRanges = {};
             _hasActiveWithdrawal = null;
             _motherEidFilter = null;
+            _selectedSpecies = {}; // NOUVEAU
+            _selectedBreeds = {}; // NOUVEAU
           });
         },
       ),
@@ -371,7 +428,20 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       padding: const EdgeInsets.only(bottom: 80),
       itemCount: animals.length,
       itemBuilder: (context, index) {
-        return _AnimalCard(animal: animals[index]);
+        final animal = animals[index];
+        return AnimalCard(
+          animal: animal,
+          onTap: () {
+            final animalProvider = context.read<AnimalProvider>();
+            animalProvider.setCurrentAnimal(animal);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ScanScreen(preloadedAnimal: animal),
+              ),
+            );
+          },
+        );
       },
     );
   }
@@ -425,7 +495,19 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
             ),
 
             // Animaux du groupe
-            ...groupAnimals.map((animal) => _AnimalCard(animal: animal)),
+            ...groupAnimals.map((animal) => AnimalCard(
+                  animal: animal,
+                  onTap: () {
+                    final animalProvider = context.read<AnimalProvider>();
+                    animalProvider.setCurrentAnimal(animal);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ScanScreen(preloadedAnimal: animal),
+                      ),
+                    );
+                  },
+                )),
           ],
         );
       },
@@ -792,135 +874,7 @@ class _ScanAndSearchDialogState extends State<_ScanAndSearchDialog> {
   }
 }
 
-// ==================== WIDGETS EXISTANTS ====================
-
-class _AnimalCard extends StatelessWidget {
-  final Animal animal;
-
-  const _AnimalCard({required this.animal});
-
-  @override
-  Widget build(BuildContext context) {
-    final sexColor = animal.sex == AnimalSex.male ? Colors.blue : Colors.pink;
-    final sexIcon = animal.sex == AnimalSex.male ? Icons.male : Icons.female;
-
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: InkWell(
-        onTap: () {
-          final animalProvider = context.read<AnimalProvider>();
-          animalProvider.setCurrentAnimal(animal);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => ScanScreen(preloadedAnimal: animal),
-            ),
-          );
-        },
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            children: [
-              // Avatar
-              CircleAvatar(
-                backgroundColor: sexColor.withOpacity(0.1),
-                radius: 24,
-                child: Icon(sexIcon, color: sexColor),
-              ),
-              const SizedBox(width: 12),
-
-              // Infos
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      animal.officialNumber ?? animal.eid,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      animal.eid,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: _getStatusColor(animal.status),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            _getStatusLabel(animal.status),
-                            style: const TextStyle(
-                              fontSize: 11,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          '${animal.ageInMonths} mois',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              // Flèche
-              Icon(Icons.chevron_right, color: Colors.grey.shade400),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Color _getStatusColor(AnimalStatus status) {
-    switch (status) {
-      case AnimalStatus.alive:
-        return Colors.green;
-      case AnimalStatus.sold:
-        return Colors.orange;
-      case AnimalStatus.dead:
-        return Colors.red;
-      case AnimalStatus.slaughtered:
-        return Colors.grey;
-    }
-  }
-
-  String _getStatusLabel(AnimalStatus status) {
-    switch (status) {
-      case AnimalStatus.alive:
-        return 'Vivant';
-      case AnimalStatus.sold:
-        return 'Vendu';
-      case AnimalStatus.dead:
-        return 'Mort';
-      case AnimalStatus.slaughtered:
-        return 'Abattu';
-    }
-  }
-}
-
+// ==================== FILTRES DRAWER ====================
 class _GroupBySheet extends StatelessWidget {
   final GroupByOption currentValue;
   final ValueChanged<GroupByOption> onSelected;
@@ -965,8 +919,10 @@ class _FiltersDrawer extends StatefulWidget {
   final Set<String> selectedAgeRanges;
   final bool? hasActiveWithdrawal;
   final String? motherEidFilter;
-  final Function(Set<AnimalStatus>, Set<AnimalSex>, Set<String>, bool?, String?)
-      onApply;
+  final Set<String> selectedSpecies; // NOUVEAU
+  final Set<String> selectedBreeds; // NOUVEAU
+  final Function(Set<AnimalStatus>, Set<AnimalSex>, Set<String>, bool?, String?,
+      Set<String>, Set<String>) onApply; // MODIFIÉ
   final VoidCallback onReset;
 
   const _FiltersDrawer({
@@ -975,6 +931,8 @@ class _FiltersDrawer extends StatefulWidget {
     required this.selectedAgeRanges,
     required this.hasActiveWithdrawal,
     required this.motherEidFilter,
+    required this.selectedSpecies, // NOUVEAU
+    required this.selectedBreeds, // NOUVEAU
     required this.onApply,
     required this.onReset,
   });
@@ -989,6 +947,8 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
   late Set<String> _ageRanges;
   late bool? _withdrawal;
   late TextEditingController _motherController;
+  late Set<String> _species; // NOUVEAU
+  late Set<String> _breeds; // NOUVEAU
 
   @override
   void initState() {
@@ -999,6 +959,8 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
     _withdrawal = widget.hasActiveWithdrawal;
     _motherController =
         TextEditingController(text: widget.motherEidFilter ?? '');
+    _species = Set.from(widget.selectedSpecies); // NOUVEAU
+    _breeds = Set.from(widget.selectedBreeds); // NOUVEAU
   }
 
   @override
@@ -1116,6 +1078,80 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
 
                     const Divider(),
 
+                    // NOUVEAU : Type d'animal
+                    const Text('Type d\'animal',
+                        style: TextStyle(fontWeight: FontWeight.w600)),
+                    ...AnimalConfig.availableSpecies.map((species) {
+                      return CheckboxListTile(
+                        title: Text('${species.icon} ${species.nameFr}'),
+                        value: _species.contains(species.id),
+                        onChanged: (checked) {
+                          setState(() {
+                            if (checked == true) {
+                              _species.add(species.id);
+                            } else {
+                              _species.remove(species.id);
+                              // Retirer les races de ce type
+                              final breedsToRemove =
+                                  AnimalConfig.getBreedsBySpecies(species.id)
+                                      .map((b) => b.id)
+                                      .toSet();
+                              _breeds.removeAll(breedsToRemove);
+                            }
+                          });
+                        },
+                      );
+                    }),
+
+                    const Divider(),
+
+                    // NOUVEAU : Race
+                    const Text('Race',
+                        style: TextStyle(fontWeight: FontWeight.w600)),
+                    if (_species.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Text(
+                          'Sélectionnez d\'abord un type',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      )
+                    else
+                      ...() {
+                        // Obtenir toutes les races des types sélectionnés
+                        final availableBreeds = <Breed>[];
+                        for (final speciesId in _species) {
+                          availableBreeds.addAll(
+                              AnimalConfig.getBreedsBySpecies(speciesId));
+                        }
+                        return availableBreeds.map((breed) {
+                          return CheckboxListTile(
+                            title: Text(breed.nameFr),
+                            subtitle: breed.description != null
+                                ? Text(
+                                    breed.description!,
+                                    style: const TextStyle(fontSize: 11),
+                                  )
+                                : null,
+                            value: _breeds.contains(breed.id),
+                            onChanged: (checked) {
+                              setState(() {
+                                if (checked == true) {
+                                  _breeds.add(breed.id);
+                                } else {
+                                  _breeds.remove(breed.id);
+                                }
+                              });
+                            },
+                          );
+                        });
+                      }(),
+
+                    const Divider(),
+
                     // Rémanence
                     const Text('Rémanence',
                         style: TextStyle(fontWeight: FontWeight.w600)),
@@ -1179,6 +1215,8 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                           _motherController.text.isEmpty
                               ? null
                               : _motherController.text,
+                          _species, // NOUVEAU
+                          _breeds, // NOUVEAU
                         );
                         Navigator.pop(context);
                       },
@@ -1217,6 +1255,8 @@ enum GroupByOption {
   status,
   withdrawal,
   mother,
+  species, // ÉTAPE 6
+  breed, // ÉTAPE 6
 }
 
 extension GroupByOptionExt on GroupByOption {
@@ -1234,6 +1274,10 @@ extension GroupByOptionExt on GroupByOption {
         return 'Par Rémanence';
       case GroupByOption.mother:
         return 'Par Mère';
+      case GroupByOption.species:
+        return 'Par Type';
+      case GroupByOption.breed:
+        return 'Par Race';
     }
   }
 }

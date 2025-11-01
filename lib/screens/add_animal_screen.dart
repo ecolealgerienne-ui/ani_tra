@@ -7,8 +7,12 @@ import 'package:uuid/uuid.dart';
 
 import '../models/animal.dart';
 import '../models/movement.dart';
+import '../models/animal_species.dart';
+import '../models/breed.dart';
 import '../providers/animal_provider.dart';
 import '../providers/sync_provider.dart';
+import '../providers/settings_provider.dart';
+import '../data/animal_config.dart';
 
 /// Écran d'ajout rapide d'un animal
 ///
@@ -42,6 +46,10 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
   String? _selectedMotherId;
   String? _selectedMotherDisplay;
 
+  // ÉTAPE 5 : Type et Race
+  String? _selectedSpeciesId;
+  String? _selectedBreedId;
+
   bool _isLoading = false;
 
   @override
@@ -53,6 +61,15 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
     if (widget.scannedEID != null) {
       _primaryIdController.text = widget.scannedEID!;
     }
+
+    // ÉTAPE 5 : Charger les valeurs par défaut du SettingsProvider
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final settings = context.read<SettingsProvider>();
+      setState(() {
+        _selectedSpeciesId = settings.defaultSpeciesId;
+        _selectedBreedId = settings.defaultBreedId;
+      });
+    });
   }
 
   @override
@@ -161,7 +178,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
       // 1. Créer l'animal
       final animal = Animal(
         id: _generateId(),
-        eid: _primaryIdController.text.trim(),
+        currentEid: _primaryIdController.text.trim(),
         sex: _selectedSex!,
         status: AnimalStatus.alive,
         createdAt: DateTime.now(),
@@ -171,6 +188,9 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
             : null,
         birthDate: _selectedBirthDate ?? DateTime.now(),
         motherId: _selectedMotherId,
+        // ÉTAPE 5 : Ajouter type et race
+        speciesId: _selectedSpeciesId,
+        breedId: _selectedBreedId,
       );
 
       animalProvider.addAnimal(animal);
@@ -303,6 +323,92 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                 hintText: 'Ex: 123456',
                 prefixIcon: Icon(Icons.numbers),
               ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // === ÉTAPE 5 : Section Type et Race ===
+            _buildSectionHeader('🐑 Type et Race'),
+            const SizedBox(height: 16),
+
+            // Dropdown Type d'animal
+            DropdownButtonFormField<String>(
+              value: _selectedSpeciesId,
+              decoration: InputDecoration(
+                labelText: 'Type d\'animal *',
+                prefixIcon: Icon(
+                  Icons.pets,
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+              items: AnimalConfig.availableSpecies.map((species) {
+                return DropdownMenuItem(
+                  value: species.id,
+                  child: Text('${species.icon} ${species.nameFr}'),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedSpeciesId = value;
+                  // Réinitialiser la race si on change de type
+                  if (value != null) {
+                    final breeds = AnimalConfig.getBreedsBySpecies(value);
+                    if (breeds.isNotEmpty &&
+                        (breeds.every((b) => b.id != _selectedBreedId))) {
+                      _selectedBreedId = breeds.first.id;
+                    }
+                  } else {
+                    _selectedBreedId = null;
+                  }
+                });
+              },
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Type d\'animal obligatoire';
+                }
+                return null;
+              },
+            ),
+
+            const SizedBox(height: 16),
+
+            // Dropdown Race
+            DropdownButtonFormField<String>(
+              value: _selectedBreedId,
+              decoration: InputDecoration(
+                labelText: 'Race (optionnelle)',
+                prefixIcon: Icon(
+                  Icons.category,
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+              items: _selectedSpeciesId != null
+                  ? [
+                      const DropdownMenuItem(
+                        value: null,
+                        child: Text('-- Aucune race --'),
+                      ),
+                      ...AnimalConfig.getBreedsBySpecies(_selectedSpeciesId!)
+                          .map((breed) {
+                        return DropdownMenuItem(
+                          value: breed.id,
+                          child: Text(breed.nameFr),
+                        );
+                      }),
+                    ]
+                  : [
+                      const DropdownMenuItem(
+                        value: null,
+                        child: Text('Sélectionnez d\'abord un type'),
+                      ),
+                    ],
+              onChanged: _selectedSpeciesId != null
+                  ? (value) {
+                      setState(() {
+                        _selectedBreedId = value;
+                      });
+                    }
+                  : null,
             ),
 
             const SizedBox(height: 16),

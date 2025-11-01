@@ -11,6 +11,7 @@ import 'providers/batch_provider.dart';
 import 'providers/campaign_provider.dart';
 import 'providers/lot_provider.dart';
 import 'providers/weight_provider.dart';
+import 'providers/settings_provider.dart';
 import 'i18n/app_localizations.dart';
 import 'screens/home_screen.dart';
 import 'screens/scan_screen.dart';
@@ -33,6 +34,15 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => QRProvider()),
         ChangeNotifierProvider(create: (_) => SyncProvider()),
+
+        // Provider de paramètres (ÉTAPE 4)
+        ChangeNotifierProvider(
+          create: (_) {
+            final provider = SettingsProvider();
+            provider.initializeWithDefaults();
+            return provider;
+          },
+        ),
 
         // Provider avec données mock
         ChangeNotifierProvider(
