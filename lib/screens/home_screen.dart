@@ -1,29 +1,28 @@
-// screens/home_screen.dart
+// lib/screens/home_screen.dart
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/animal_provider.dart';
-import '../providers/campaign_provider.dart';
-import '../providers/sync_provider.dart';
 import '../providers/batch_provider.dart';
-import '../models/animal.dart'; // 🆕 Import pour AnimalStatus
-import '../models/treatment.dart'; // 🆕 Import pour Treatment
+import '../providers/sync_provider.dart';
+import '../providers/alert_provider.dart';
+import '../models/animal.dart';
 
 import 'scan_screen.dart';
-import 'campaign_list_screen.dart';
 import 'animal_list_screen.dart';
-import 'add_animal_screen.dart';
-import 'lot_list_screen.dart'; // ✅ Changement: Import LotListScreen au lieu de BatchCreateScreen
+import 'lot_list_screen.dart';
 import 'settings_screen.dart';
+import 'alerts_screen.dart';
 
-/// Écran d'accueil (Dashboard)
+/// Écran d'accueil simplifié
 ///
 /// Affiche :
-/// - Recherche rapide (EID ou N° officiel)
-/// - Statistiques clés (effectif, alertes, sync)
-/// - Actions rapides (Scanner, Campagne, Animaux, Ajouter, Lots)
-/// - Campagnes actives
+/// - 🆕 Bannière d'alerte rouge (si urgence)
+/// - Barre de recherche rapide
+/// - Statistiques clés (3 cartes compactes)
+/// - 2 Actions Rapides principales (Animaux + Lots)
+/// - FAB Scanner
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -42,28 +41,20 @@ class _HomeScreenState extends State<HomeScreen> {
 
   /// Rechercher un animal par EID ou N° officiel
   void _searchAnimal(BuildContext context, String query) {
-    if (query.trim().isEmpty) {
-      return;
-    }
+    if (query.trim().isEmpty) return;
 
     final animalProvider = context.read<AnimalProvider>();
     final animal = animalProvider.findByEIDOrNumber(query.trim());
 
     if (animal != null) {
-      // Animal trouvé → Naviguer vers le détail
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ScanScreen(
-            preloadedAnimal: animal,
-          ),
+          builder: (context) => ScanScreen(preloadedAnimal: animal),
         ),
       );
-
-      // Vider le champ de recherche
       _searchController.clear();
     } else {
-      // Animal non trouvé
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('❌ Animal "$query" non trouvé'),
@@ -80,89 +71,220 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('Tableau de Bord'),
         actions: [
-          // 🆕 Bouton Paramètres
+          // 🆕 Bouton Alertes avec badge
+          Consumer<AlertProvider>(
+            builder: (context, alertProvider, child) {
+              final alertCount = alertProvider.alertCount;
+              return Stack(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.notifications),
+                    tooltip: 'Alertes',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AlertsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  if (alertCount > 0)
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Text(
+                          alertCount > 9 ? '9+' : '$alertCount',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             tooltip: 'Paramètres',
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const SettingsScreen(),
-                ),
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
               );
             },
           ),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          // Simuler un refresh
-          await Future.delayed(const Duration(seconds: 1));
-          if (mounted) setState(() {});
-        },
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // 🆕 Bannière Mode Hors Ligne (si applicable)
-              Consumer<SyncProvider>(
-                builder: (context, syncProvider, child) {
-                  // TODO: Implémenter la détection offline réelle
-                  final isOffline = false; // Placeholder
+      body: Column(
+        children: [
+          // 🆕 Bannière d'alerte urgente (si présente)
+          _buildUrgentAlertBanner(context),
 
-                  if (!isOffline) return const SizedBox.shrink();
+          // Contenu principal
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: () async {
+                await Future.delayed(const Duration(seconds: 1));
+                if (mounted) {
+                  // Forcer le recalcul des alertes
+                  context.read<AlertProvider>().refresh();
+                  setState(() {});
+                }
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Barre de recherche
+                    _buildSearchBar(context),
 
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.shade100,
-                      border: Border.all(color: Colors.orange),
-                      borderRadius: BorderRadius.circular(8),
+                    const SizedBox(height: 24),
+
+                    // Statistiques (3 cartes compactes)
+                    _buildStatsCards(context),
+
+                    const SizedBox(height: 32),
+
+                    // Titre section
+                    const Text(
+                      'Actions Rapides',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.cloud_off, color: Colors.orange.shade800),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'Mode Hors Ligne',
-                            style: TextStyle(
-                              color: Colors.orange.shade900,
-                              fontWeight: FontWeight.bold,
-                            ),
+
+                    const SizedBox(height: 16),
+
+                    // 🆕 CARTE 1 : ANIMAUX (grosse carte)
+                    _buildMainActionCard(
+                      context: context,
+                      icon: Icons.pets,
+                      iconColor: Colors.blue,
+                      title: 'Animaux',
+                      subtitle: 'Gérer mon troupeau',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AnimalListScreen(),
                           ),
-                        ),
-                      ],
+                        );
+                      },
                     ),
-                  );
-                },
+
+                    const SizedBox(height: 16),
+
+                    // 🆕 CARTE 2 : LOTS (grosse carte)
+                    _buildMainActionCard(
+                      context: context,
+                      icon: Icons.inventory_2,
+                      iconColor: Colors.orange,
+                      title: 'Mes Lots',
+                      subtitle: 'Campagnes & groupes',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LotListScreen(),
+                          ),
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 24),
+                  ],
+                ),
               ),
-
-              // 🆕 Barre de Recherche Rapide
-              _buildSearchBar(context),
-
-              const SizedBox(height: 24),
-
-              // Statistiques
-              _buildStatsCards(context),
-
-              const SizedBox(height: 24),
-
-              // Actions Rapides
-              _buildQuickActions(context),
-
-              const SizedBox(height: 24),
-
-              // Campagnes Actives
-              _buildActiveCampaigns(context),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
+      // FAB Scanner
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ScanScreen()),
+          );
+        },
+        icon: const Icon(Icons.qr_code_scanner),
+        label: const Text('Scanner'),
+      ),
+    );
+  }
+
+  /// 🆕 Widget : Bannière d'alerte urgente
+  Widget _buildUrgentAlertBanner(BuildContext context) {
+    return Consumer<AlertProvider>(
+      builder: (context, alertProvider, child) {
+        if (!alertProvider.hasUrgentAlerts) {
+          return const SizedBox.shrink();
+        }
+
+        final message = alertProvider.getUrgentBannerMessage();
+
+        return Material(
+          color: Colors.red.shade700,
+          child: InkWell(
+            onTap: () {
+              // Naviguer vers l'écran de détails des alertes
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const AlertsScreen(),
+                ),
+              );
+            },
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.warning_rounded,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      message ?? 'Alertes urgentes',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const Icon(
+                    Icons.chevron_right,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -214,66 +336,57 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Widget : Cartes de statistiques
+  /// Widget : Cartes de statistiques (3 cartes compactes)
+  /// 🆕 Utilise maintenant AlertProvider pour les alertes
   Widget _buildStatsCards(BuildContext context) {
-    return Consumer3<AnimalProvider, SyncProvider, BatchProvider>(
-      builder: (context, animalProvider, syncProvider, batchProvider, child) {
-        final totalAnimals = animalProvider.animals.length;
+    return Consumer4<AnimalProvider, SyncProvider, BatchProvider,
+        AlertProvider>(
+      builder: (context, animalProvider, syncProvider, batchProvider,
+          alertProvider, child) {
         final aliveAnimals = animalProvider.animals
             .where((a) => a.status == AnimalStatus.alive)
             .length;
-        final pendingSync = syncProvider.pendingDataCount;
 
-        // Compter les alertes de rémanence
-        int withdrawalAlerts = 0;
-        for (final animal in animalProvider.animals) {
-          if (animal.status != AnimalStatus.alive) continue;
+        // Compter les lots actifs
+        final activeLots = batchProvider.batches.length;
 
-          final treatments = animalProvider.getAnimalTreatments(animal.id);
-          for (final treatment in treatments) {
-            if (treatment.isWithdrawalActive &&
-                treatment.daysUntilWithdrawalEnd < 7) {
-              withdrawalAlerts++;
-              break; // Un seul comptage par animal
-            }
-          }
-        }
+        // 🆕 Utiliser AlertProvider pour les alertes urgentes
+        final urgentAlerts = alertProvider.urgentAlertCount;
 
         return Row(
           children: [
+            // Stat 1 : Total animaux
             Expanded(
               child: _StatCard(
                 icon: Icons.pets,
-                label: 'Total',
-                value: totalAnimals.toString(),
+                label: 'Animaux',
+                value: '$aliveAnimals',
+                subtitle: 'vivants',
                 color: Colors.blue,
               ),
             ),
             const SizedBox(width: 12),
+
+            // Stat 2 : Lots actifs
             Expanded(
               child: _StatCard(
-                icon: Icons.check_circle,
-                label: 'Vivants',
-                value: aliveAnimals.toString(),
-                color: Colors.green,
+                icon: Icons.inventory_2,
+                label: 'Lots',
+                value: '$activeLots',
+                subtitle: 'actifs',
+                color: Colors.orange,
               ),
             ),
             const SizedBox(width: 12),
+
+            // Stat 3 : Alertes urgentes (depuis AlertProvider)
             Expanded(
               child: _StatCard(
                 icon: Icons.warning,
                 label: 'Alertes',
-                value: withdrawalAlerts.toString(),
-                color: withdrawalAlerts > 0 ? Colors.red : Colors.grey,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _StatCard(
-                icon: Icons.sync,
-                label: 'À Sync',
-                value: pendingSync.toString(),
-                color: pendingSync > 0 ? Colors.orange : Colors.grey,
+                value: '$urgentAlerts',
+                subtitle: 'urgentes',
+                color: urgentAlerts > 0 ? Colors.red : Colors.green,
               ),
             ),
           ],
@@ -282,218 +395,107 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Widget : Actions rapides (grille 3x2)
-  Widget _buildQuickActions(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Actions Rapides',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-        ),
-        const SizedBox(height: 16),
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 3,
-          mainAxisSpacing: 12,
-          crossAxisSpacing: 12,
-          childAspectRatio: 1.0,
-          children: [
-            // Scanner un Animal
-            _QuickActionCard(
-              icon: Icons.qr_code_scanner,
-              label: 'Scanner',
-              color: Colors.blue,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ScanScreen(),
-                  ),
-                );
-              },
-            ),
-
-            // Campagnes
-            _QuickActionCard(
-              icon: Icons.medical_services,
-              label: 'Campagnes',
-              color: Colors.green,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CampaignListScreen(),
-                  ),
-                );
-              },
-            ),
-
-            // Liste Animaux
-            _QuickActionCard(
-              icon: Icons.pets,
-              label: 'Animaux',
-              color: Colors.orange,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AnimalListScreen(),
-                  ),
-                );
-              },
-            ),
-
-            // 🆕 Ajouter Animal
-            _QuickActionCard(
-              icon: Icons.add,
-              label: 'Ajouter Animal',
-              color: Colors.teal,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AddAnimalScreen(),
-                  ),
-                );
-              },
-            ),
-
-            // ✅ MODIFICATION: Navigation vers LotListScreen au lieu de BatchCreateScreen
-            // ✅ MODIFICATION: Label changé de "Préparer un Lot" à "Mes Lots"
-            _QuickActionCard(
-              icon: Icons.inventory,
-              label: 'Mes Lots',
-              color: Colors.deepPurple,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const LotListScreen(),
-                  ),
-                );
-              },
-            ),
-
-            // Placeholder pour future action
-            _QuickActionCard(
-              icon: Icons.more_horiz,
-              label: 'Plus',
-              color: Colors.grey,
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Fonctionnalité à venir'),
-                  ),
-                );
-              },
+  /// Widget : Grande carte d'action principale
+  Widget _buildMainActionCard({
+    required BuildContext context,
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 15,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
-      ],
-    );
-  }
-
-  /// Widget : Campagnes actives
-  Widget _buildActiveCampaigns(BuildContext context) {
-    return Consumer<CampaignProvider>(
-      builder: (context, campaignProvider, child) {
-        final activeCampaigns = campaignProvider.activeCampaigns;
-
-        if (activeCampaigns.isEmpty) {
-          return const SizedBox.shrink();
-        }
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            Text(
-              'Campagnes Actives',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+            // Icône
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: iconColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                size: 32,
+                color: iconColor,
+              ),
             ),
-            const SizedBox(height: 16),
 
-            // Liste des campagnes
-            ...activeCampaigns.map((campaign) {
-              return Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.blue.shade200),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 5,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.blue.shade100,
-                    child: Icon(
-                      Icons.medical_services,
-                      color: Colors.blue.shade700,
-                    ),
-                  ),
-                  title: Text(
-                    campaign.productName,
+            const SizedBox(width: 20),
+
+            // Textes
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
                     style: const TextStyle(
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  subtitle: Text(
-                    '${campaign.animalCount} animaux',
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
                     style: TextStyle(
-                      color: Colors.grey.shade600,
+                      fontSize: 14,
+                      color: Colors.grey[600],
                     ),
                   ),
-                  trailing: Icon(
-                    Icons.chevron_right,
-                    color: Colors.grey.shade400,
-                  ),
-                  onTap: () {
-                    // TODO: Naviguer vers détail campagne
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Campagne: ${campaign.productName}'),
-                      ),
-                    );
-                  },
-                ),
-              );
-            }).toList(),
+                ],
+              ),
+            ),
+
+            // Flèche
+            Icon(
+              Icons.arrow_forward_ios,
+              size: 20,
+              color: Colors.grey[400],
+            ),
           ],
-        );
-      },
+        ),
+      ),
     );
   }
 }
 
-/// Widget : Carte de statistique
+/// Widget : Carte de statistique compacte
 class _StatCard extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
+  final String? subtitle;
   final Color color;
 
   const _StatCard({
     required this.icon,
     required this.label,
     required this.value,
+    this.subtitle,
     required this.color,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -506,18 +508,13 @@ class _StatCard extends StatelessWidget {
         ],
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            color: color,
-            size: 28,
-          ),
+          Icon(icon, color: color, size: 28),
           const SizedBox(height: 8),
           Text(
             value,
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
               color: color,
             ),
@@ -526,80 +523,21 @@ class _StatCard extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              fontSize: 11,
-              color: Colors.grey.shade600,
+              fontSize: 12,
+              color: Colors.grey[700],
+              fontWeight: FontWeight.w500,
             ),
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Widget : Carte d'action rapide
-class _QuickActionCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _QuickActionCard({
-    required this.icon,
-    required this.label,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.3)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                icon,
-                color: color,
-                size: 32,
-              ),
-            ),
-            const SizedBox(height: 12),
+          if (subtitle != null) ...[
             Text(
-              label,
+              subtitle!,
               style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey.shade800,
+                fontSize: 10,
+                color: Colors.grey[500],
               ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
             ),
           ],
-        ),
+        ],
       ),
     );
   }

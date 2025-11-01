@@ -1,14 +1,18 @@
 // lib/screens/animal_list_screen.dart
-// Artefact 16 : Liste Animaux Avancée avec Filtres et Group By
-// Version : 1.3 - Ajout recherche par scan
+// Version 2.0 - Intégration complète des alertes
+// PHASE 1+2 : Alertes prioritaires + Groupes collapsibles
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'dart:math';
 import '../providers/animal_provider.dart';
+import '../providers/alert_provider.dart';
 import '../models/animal.dart';
 import '../models/animal_extensions.dart';
+import '../models/alert.dart';
+import '../models/alert_type.dart';
+import '../models/alert_category.dart';
 import '../models/breed.dart';
 import '../data/animal_config.dart';
 import '../i18n/app_localizations.dart';
@@ -17,7 +21,17 @@ import 'scan_screen.dart';
 import 'add_animal_screen.dart';
 
 class AnimalListScreen extends StatefulWidget {
-  const AnimalListScreen({super.key});
+  /// Liste d'IDs à afficher uniquement (pour filtrer depuis une alerte)
+  final List<String>? filterAnimalIds;
+
+  /// Titre personnalisé si on vient d'une alerte
+  final String? customTitle;
+
+  const AnimalListScreen({
+    super.key,
+    this.filterAnimalIds,
+    this.customTitle,
+  });
 
   @override
   State<AnimalListScreen> createState() => _AnimalListScreenState();
@@ -33,13 +47,32 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
   bool? _hasActiveWithdrawal;
   String? _motherEidFilter;
   String? _batchIdFilter;
-
-  // ÉTAPE 6 : Filtres Type et Race
   Set<String> _selectedSpecies = {};
   Set<String> _selectedBreeds = {};
 
-  // Group By
-  GroupByOption _groupBy = GroupByOption.none;
+  // 🆕 Filtre alertes
+  bool _showOnlyWithAlerts = false;
+
+  // Group By - Initialisation intelligente
+  late GroupByOption _groupBy;
+
+  @override
+  void initState() {
+    super.initState();
+    // Si on vient d'une alerte avec filtre → Pas de groupement
+    // Sinon → Grouper par alertes par défaut
+    _groupBy = widget.filterAnimalIds != null
+        ? GroupByOption.none
+        : GroupByOption.alerts;
+  }
+
+  // 🆕 État des sections collapsibles
+  final Map<String, bool> _expandedSections = {
+    'urgent': true, // Ouvert par défaut
+    'important': true, // Ouvert par défaut
+    'routine': false, // Fermé par défaut
+    'noalert': true, // 🔧 OUVERT par défaut pour voir les animaux
+  };
 
   // État filtres drawer
   int get _activeFilterCount {
@@ -50,9 +83,9 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     if (_hasActiveWithdrawal != null) count++;
     if (_motherEidFilter != null && _motherEidFilter!.isNotEmpty) count++;
     if (_batchIdFilter != null) count++;
-    // ÉTAPE 6 : Filtres Type et Race
     if (_selectedSpecies.isNotEmpty) count++;
     if (_selectedBreeds.isNotEmpty) count++;
+    if (_showOnlyWithAlerts) count++;
     return count;
   }
 
@@ -65,14 +98,24 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
   List<Animal> _getFilteredAnimals(List<Animal> animals) {
     var filtered = animals;
 
-    // Recherche texte
-    final query = _searchController.text.toLowerCase();
-    if (query.isNotEmpty) {
+    // 🆕 Si on vient d'une alerte, filtrer uniquement ces animaux
+    if (widget.filterAnimalIds != null) {
       filtered = filtered
-          .where((a) =>
-              a.eid.toLowerCase().contains(query) ||
-              (a.officialNumber?.toLowerCase().contains(query) ?? false))
+          .where((a) => widget.filterAnimalIds!.contains(a.id))
           .toList();
+    }
+
+    // Recherche texte (flexible - ignore tirets et espaces)
+    final query =
+        _searchController.text.toLowerCase().replaceAll(RegExp(r'[-\s]'), '');
+    if (query.isNotEmpty) {
+      filtered = filtered.where((a) {
+        final eidClean = a.eid.toLowerCase().replaceAll(RegExp(r'[-\s]'), '');
+        final numberClean = (a.officialNumber ?? '')
+            .toLowerCase()
+            .replaceAll(RegExp(r'[-\s]'), '');
+        return eidClean.contains(query) || numberClean.contains(query);
+      }).toList();
     }
 
     // Filtre statut
@@ -122,17 +165,25 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       }).toList();
     }
 
-    // ÉTAPE 6 : Filtre Type
+    // Filtre Type
     if (_selectedSpecies.isNotEmpty) {
       filtered = filtered.where((a) {
         return a.speciesId != null && _selectedSpecies.contains(a.speciesId);
       }).toList();
     }
 
-    // ÉTAPE 6 : Filtre Race
+    // Filtre Race
     if (_selectedBreeds.isNotEmpty) {
       filtered = filtered.where((a) {
         return a.breedId != null && _selectedBreeds.contains(a.breedId);
+      }).toList();
+    }
+
+    // 🆕 Filtre "Avec alertes uniquement"
+    if (_showOnlyWithAlerts) {
+      final alertProvider = context.read<AlertProvider>();
+      filtered = filtered.where((a) {
+        return alertProvider.getAlertsForAnimal(a.id).isNotEmpty;
       }).toList();
     }
 
@@ -145,6 +196,32 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     switch (_groupBy) {
       case GroupByOption.none:
         return {'all': animals};
+
+      // 🆕 NOUVEAU : Grouper par niveau d'alerte
+      case GroupByOption.alerts:
+        final alertProvider = context.read<AlertProvider>();
+
+        for (final animal in animals) {
+          final animalAlerts = alertProvider.getAlertsForAnimal(animal.id);
+
+          if (animalAlerts.isEmpty) {
+            groups.putIfAbsent('✅ Sans alerte', () => []).add(animal);
+          } else {
+            // Trouver l'alerte la plus urgente
+            final maxUrgency = animalAlerts
+                .map((a) => a.type.priority)
+                .reduce((a, b) => a < b ? a : b);
+
+            if (maxUrgency == AlertType.urgent.priority) {
+              groups.putIfAbsent('🚨 URGENTS', () => []).add(animal);
+            } else if (maxUrgency == AlertType.important.priority) {
+              groups.putIfAbsent('⚠️ À SURVEILLER', () => []).add(animal);
+            } else {
+              groups.putIfAbsent('📋 Routine', () => []).add(animal);
+            }
+          }
+        }
+        break;
 
       case GroupByOption.sex:
         for (final animal in animals) {
@@ -216,19 +293,17 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
         }
         break;
 
-      // ÉTAPE 6 : Group By Type
       case GroupByOption.species:
         for (final animal in animals) {
           if (animal.speciesId == null) {
             groups.putIfAbsent('❓ Type non défini', () => []).add(animal);
           } else {
-            final key = animal.fullDisplayFr.split(' - ').first; // "🐑 Ovin"
+            final key = animal.fullDisplayFr.split(' - ').first;
             groups.putIfAbsent(key, () => []).add(animal);
           }
         }
         break;
 
-      // ÉTAPE 6 : Group By Race
       case GroupByOption.breed:
         for (final animal in animals) {
           if (animal.breedId == null) {
@@ -244,6 +319,510 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     return groups;
   }
 
+  // 🆕 Obtenir la clé de section pour l'état collapsed
+  String _getSectionKey(String groupName) {
+    if (groupName.contains('URGENTS')) return 'urgent';
+    if (groupName.contains('SURVEILLER')) return 'important';
+    if (groupName.contains('Routine')) return 'routine';
+    if (groupName.contains('Sans alerte')) return 'noalert';
+    return groupName;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.customTitle ?? 'Animaux'),
+        actions: [
+          // 🆕 Badge d'alertes
+          Consumer<AlertProvider>(
+            builder: (context, alertProvider, child) {
+              final alertCount = alertProvider.alertCount;
+              if (alertCount == 0) return const SizedBox.shrink();
+
+              return Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: Stack(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.notifications),
+                      onPressed: () {
+                        // Navigation vers alerts_screen si besoin
+                      },
+                    ),
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Text(
+                          alertCount > 9 ? '9+' : '$alertCount',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: Badge(
+              isLabelVisible: _activeFilterCount > 0,
+              label: Text('$_activeFilterCount'),
+              child: const Icon(Icons.filter_list),
+            ),
+            onPressed: _showFiltersDrawer,
+          ),
+        ],
+      ),
+      body: Consumer2<AnimalProvider, AlertProvider>(
+        builder: (context, animalProvider, alertProvider, child) {
+          final filtered = _getFilteredAnimals(animalProvider.animals);
+          final grouped = _getGroupedAnimals(filtered);
+
+          // 🐛 DEBUG
+          print('🐛 DEBUG: filtered.length = ${filtered.length}');
+          print('🐛 DEBUG: grouped.keys = ${grouped.keys}');
+          grouped.forEach((key, value) {
+            print('🐛 DEBUG: $key has ${value.length} animals');
+          });
+          print('🐛 DEBUG: _expandedSections = $_expandedSections');
+
+          // 🆕 Tri des groupes pour mettre les alertes en premier
+          final sortedKeys = grouped.keys.toList();
+          if (_groupBy == GroupByOption.alerts) {
+            sortedKeys.sort((a, b) {
+              const priority = {
+                '🚨 URGENTS': 1,
+                '⚠️ À SURVEILLER': 2,
+                '📋 Routine': 3,
+                '✅ Sans alerte': 4,
+              };
+              return (priority[a] ?? 99).compareTo(priority[b] ?? 99);
+            });
+          }
+
+          return Column(
+            children: [
+              // Barre de recherche
+              _buildSearchBar(),
+
+              // 🆕 Chips de filtre rapide
+              _buildQuickFilters(alertProvider, filtered.length),
+
+              // Liste des animaux
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: () async {
+                    alertProvider.refresh();
+                    await Future.delayed(const Duration(milliseconds: 500));
+                  },
+                  child: filtered.isEmpty
+                      ? _buildEmptyState()
+                      : ListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: sortedKeys.length,
+                          itemBuilder: (context, index) {
+                            final groupName = sortedKeys[index];
+                            final groupAnimals = grouped[groupName]!;
+
+                            return _buildGroupSection(
+                              groupName,
+                              groupAnimals,
+                              alertProvider,
+                              animalProvider,
+                            );
+                          },
+                        ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AddAnimalScreen()),
+          );
+        },
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  /// Widget : Barre de recherche
+  Widget _buildSearchBar() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: TextField(
+        controller: _searchController,
+        decoration: InputDecoration(
+          hintText: 'Rechercher EID ou N°...',
+          prefixIcon: const Icon(Icons.search),
+          suffixIcon: _searchController.text.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    setState(() {
+                      _searchController.clear();
+                    });
+                  },
+                )
+              : null,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        onChanged: (value) => setState(() {}),
+      ),
+    );
+  }
+
+  /// 🆕 Widget : Chips de filtre rapide
+  Widget _buildQuickFilters(AlertProvider alertProvider, int totalCount) {
+    return Container(
+      height: 60,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        children: [
+          // Chip "Avec alertes"
+          FilterChip(
+            label: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.warning_amber, size: 16),
+                const SizedBox(width: 4),
+                Text('Alertes (${alertProvider.alertCount})'),
+              ],
+            ),
+            selected: _showOnlyWithAlerts,
+            onSelected: (selected) {
+              setState(() {
+                _showOnlyWithAlerts = selected;
+              });
+            },
+          ),
+          const SizedBox(width: 8),
+
+          // Dropdown Group By
+          Expanded(
+            child: DropdownButtonFormField<GroupByOption>(
+              value: _groupBy,
+              decoration: InputDecoration(
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              items: GroupByOption.values.map((option) {
+                return DropdownMenuItem(
+                  value: option,
+                  child: Text(
+                    option.label,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                );
+              }).toList(),
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() {
+                    _groupBy = value;
+                  });
+                }
+              },
+            ),
+          ),
+
+          const SizedBox(width: 8),
+          Text(
+            '$totalCount',
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 🆕 Widget : Section de groupe (collapsible si mode alertes)
+  Widget _buildGroupSection(
+    String groupName,
+    List<Animal> animals,
+    AlertProvider alertProvider,
+    AnimalProvider animalProvider,
+  ) {
+    final sectionKey = _getSectionKey(groupName);
+    final isExpanded = _expandedSections[sectionKey] ?? true;
+    final isAlertMode = _groupBy == GroupByOption.alerts;
+
+    // Couleur selon le groupe
+    Color getSectionColor() {
+      if (groupName.contains('URGENTS')) return Colors.red.shade700;
+      if (groupName.contains('SURVEILLER')) return Colors.orange.shade700;
+      if (groupName.contains('Routine')) return Colors.blue.shade700;
+      return Colors.grey.shade700;
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Header de section
+        InkWell(
+          onTap: isAlertMode
+              ? () {
+                  setState(() {
+                    _expandedSections[sectionKey] = !isExpanded;
+                  });
+                }
+              : null,
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            margin: const EdgeInsets.only(bottom: 8),
+            decoration: BoxDecoration(
+              color: getSectionColor().withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                Text(
+                  groupName,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: getSectionColor(),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: getSectionColor().withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '${animals.length}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: getSectionColor(),
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                if (isAlertMode)
+                  Icon(
+                    isExpanded ? Icons.expand_less : Icons.expand_more,
+                    color: getSectionColor(),
+                  ),
+              ],
+            ),
+          ),
+        ),
+
+        // Liste des animaux (collapsible)
+        if (isExpanded || !isAlertMode)
+          ...animals.map((animal) {
+            final animalAlerts = alertProvider.getAlertsForAnimal(animal.id);
+
+            return _buildAnimalCard(
+              animal,
+              animalAlerts,
+              animalProvider,
+            );
+          }),
+
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  /// 🆕 Widget : Carte d'animal avec badges d'alertes
+  Widget _buildAnimalCard(
+    Animal animal,
+    List<Alert> alerts,
+    AnimalProvider animalProvider,
+  ) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: InkWell(
+        onTap: () {
+          animalProvider.setCurrentAnimal(animal);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ScanScreen(preloadedAnimal: animal),
+            ),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              // Icône espèce
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Center(
+                  child: Text(
+                    animal.speciesIcon,
+                    style: const TextStyle(fontSize: 24),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+
+              // Infos animal
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      animal.officialNumber ?? animal.eid,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${animal.fullDisplayFr} • ${animal.ageFormatted}',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                    // 🆕 Badges d'alertes
+                    if (alerts.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 4,
+                        runSpacing: 4,
+                        children: alerts.take(2).map((alert) {
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color:
+                                  _getAlertColor(alert.type).withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: _getAlertColor(alert.type),
+                                width: 1,
+                              ),
+                            ),
+                            child: Text(
+                              alert.category.icon + ' ' + alert.title,
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: _getAlertColor(alert.type),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+
+              // Badge nombre d'alertes
+              if (alerts.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: _getAlertColor(alerts.first.type).withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Text(
+                    '${alerts.length}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: _getAlertColor(alerts.first.type),
+                    ),
+                  ),
+                ),
+
+              const SizedBox(width: 8),
+              Icon(
+                Icons.chevron_right,
+                color: Colors.grey.shade400,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Helper : Couleur selon type d'alerte
+  Color _getAlertColor(AlertType type) {
+    switch (type) {
+      case AlertType.urgent:
+        return Colors.red.shade700;
+      case AlertType.important:
+        return Colors.orange.shade700;
+      case AlertType.routine:
+        return Colors.blue.shade700;
+    }
+  }
+
+  /// Widget : État vide
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.search_off,
+            size: 80,
+            color: Colors.grey.shade300,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Aucun animal trouvé',
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.grey.shade600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Drawer de filtres (à implémenter - garder l'existant)
   void _showFiltersDrawer() {
     showModalBottomSheet(
       context: context,
@@ -254,19 +833,18 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
         selectedAgeRanges: _selectedAgeRanges,
         hasActiveWithdrawal: _hasActiveWithdrawal,
         motherEidFilter: _motherEidFilter,
-        selectedSpecies: _selectedSpecies, // NOUVEAU
-        selectedBreeds: _selectedBreeds, // NOUVEAU
+        selectedSpecies: _selectedSpecies,
+        selectedBreeds: _selectedBreeds,
         onApply:
             (statuses, sexes, ageRanges, withdrawal, mother, species, breeds) {
-          // MODIFIÉ
           setState(() {
             _selectedStatuses = statuses;
             _selectedSexes = sexes;
             _selectedAgeRanges = ageRanges;
             _hasActiveWithdrawal = withdrawal;
             _motherEidFilter = mother;
-            _selectedSpecies = species; // NOUVEAU
-            _selectedBreeds = breeds; // NOUVEAU
+            _selectedSpecies = species;
+            _selectedBreeds = breeds;
           });
         },
         onReset: () {
@@ -276,601 +854,50 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
             _selectedAgeRanges = {};
             _hasActiveWithdrawal = null;
             _motherEidFilter = null;
-            _selectedSpecies = {}; // NOUVEAU
-            _selectedBreeds = {}; // NOUVEAU
+            _selectedSpecies = {};
+            _selectedBreeds = {};
           });
         },
       ),
     );
   }
-
-  /// 🆕 NOUVEAU : Afficher le dialogue de scan et recherche
-  void _showScanAndSearchDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => const _ScanAndSearchDialog(),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final animalProvider = context.watch<AnimalProvider>();
-    final allAnimals = animalProvider.animals;
-    final filteredAnimals = _getFilteredAnimals(allAnimals);
-    final groupedAnimals = _getGroupedAnimals(filteredAnimals);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Animaux (${filteredAnimals.length})'),
-        actions: [
-          // 🆕 NOUVEAU : Bouton Scanner
-          IconButton(
-            icon: const Icon(Icons.search),
-            tooltip: AppLocalizations.of(context).translate('scan_to_search'),
-            onPressed: _showScanAndSearchDialog,
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Barre de recherche
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Rechercher EID ou n° officiel...',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: _searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          setState(() {
-                            _searchController.clear();
-                          });
-                        },
-                      )
-                    : null,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              onChanged: (value) => setState(() {}),
-            ),
-          ),
-
-          // Filtres et Group By
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                // Bouton Filtres
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: _showFiltersDrawer,
-                    icon: _activeFilterCount > 0
-                        ? Badge(
-                            label: Text('$_activeFilterCount'),
-                            child: const Icon(Icons.filter_list),
-                          )
-                        : const Icon(Icons.filter_list),
-                    label: const Text('Filtres'),
-                  ),
-                ),
-                const SizedBox(width: 12),
-
-                // Bouton Group By
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (context) => _GroupBySheet(
-                          currentValue: _groupBy,
-                          onSelected: (value) {
-                            setState(() => _groupBy = value);
-                            Navigator.pop(context);
-                          },
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.group_work),
-                    label: Text(_groupBy.label),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Liste des animaux
-          Expanded(
-            child: groupedAnimals.isEmpty
-                ? _buildEmptyState()
-                : _groupBy == GroupByOption.none
-                    ? _buildAnimalList(groupedAnimals['all']!)
-                    : _buildGroupedList(groupedAnimals),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const AddAnimalScreen()),
-          );
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('Ajouter'),
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.pets, size: 64, color: Colors.grey.shade400),
-          const SizedBox(height: 16),
-          Text(
-            'Aucun animal trouvé',
-            style: TextStyle(fontSize: 18, color: Colors.grey.shade600),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAnimalList(List<Animal> animals) {
-    return ListView.builder(
-      padding: const EdgeInsets.only(bottom: 80),
-      itemCount: animals.length,
-      itemBuilder: (context, index) {
-        final animal = animals[index];
-        return AnimalCard(
-          animal: animal,
-          onTap: () {
-            final animalProvider = context.read<AnimalProvider>();
-            animalProvider.setCurrentAnimal(animal);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => ScanScreen(preloadedAnimal: animal),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildGroupedList(Map<String, List<Animal>> groups) {
-    final sortedKeys = groups.keys.toList();
-    return ListView.builder(
-      padding: const EdgeInsets.only(bottom: 80),
-      itemCount: sortedKeys.length,
-      itemBuilder: (context, groupIndex) {
-        final groupName = sortedKeys[groupIndex];
-        final groupAnimals = groups[groupName]!;
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // En-tête de groupe
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              color: Colors.grey.shade100,
-              child: Row(
-                children: [
-                  Text(
-                    groupName,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '${groupAnimals.length}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Animaux du groupe
-            ...groupAnimals.map((animal) => AnimalCard(
-                  animal: animal,
-                  onTap: () {
-                    final animalProvider = context.read<AnimalProvider>();
-                    animalProvider.setCurrentAnimal(animal);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => ScanScreen(preloadedAnimal: animal),
-                      ),
-                    );
-                  },
-                )),
-          ],
-        );
-      },
-    );
-  }
 }
 
-// ==================== NOUVEAU DIALOGUE ====================
-
-/// 🆕 Dialogue de scan et recherche
-class _ScanAndSearchDialog extends StatefulWidget {
-  const _ScanAndSearchDialog();
-
-  @override
-  State<_ScanAndSearchDialog> createState() => _ScanAndSearchDialogState();
+// 🆕 Enum mis à jour avec option "alerts"
+enum GroupByOption {
+  alerts, // 🆕 NOUVEAU en premier !
+  none,
+  sex,
+  age,
+  status,
+  withdrawal,
+  mother,
+  species,
+  breed,
 }
 
-class _ScanAndSearchDialogState extends State<_ScanAndSearchDialog> {
-  bool _isScanning = false;
-  String? _scannedEID;
-  Animal? _foundAnimal;
-  final _random = Random();
-
-  /// Simuler le scan d'un EID
-  Future<void> _simulateScan() async {
-    setState(() {
-      _isScanning = true;
-      _scannedEID = null;
-      _foundAnimal = null;
-    });
-
-    // Feedback haptique
-    HapticFeedback.mediumImpact();
-
-    // Simuler délai de scan
-    await Future.delayed(const Duration(milliseconds: 800));
-
-    final animalProvider = context.read<AnimalProvider>();
-    final animals = animalProvider.animals;
-
-    if (animals.isEmpty) {
-      if (!mounted) return;
-      setState(() {
-        _isScanning = false;
-      });
-      return;
+extension GroupByOptionExt on GroupByOption {
+  String get label {
+    switch (this) {
+      case GroupByOption.alerts:
+        return 'Par Alerte'; // 🆕
+      case GroupByOption.none:
+        return 'Aucun';
+      case GroupByOption.sex:
+        return 'Par Sexe';
+      case GroupByOption.age:
+        return 'Par Âge';
+      case GroupByOption.status:
+        return 'Par Statut';
+      case GroupByOption.withdrawal:
+        return 'Par Rémanence';
+      case GroupByOption.mother:
+        return 'Par Mère';
+      case GroupByOption.species:
+        return 'Par Type';
+      case GroupByOption.breed:
+        return 'Par Race';
     }
-
-    // Générer un EID "scanné" (prendre un animal aléatoire)
-    final randomAnimal = animals[_random.nextInt(animals.length)];
-    final scannedEID = randomAnimal.eid;
-
-    // Rechercher l'animal
-    final foundAnimal = animalProvider.findByEIDOrNumber(scannedEID);
-
-    // Feedback haptique selon résultat
-    if (foundAnimal != null) {
-      HapticFeedback.heavyImpact(); // Succès
-    } else {
-      HapticFeedback.heavyImpact();
-      await Future.delayed(const Duration(milliseconds: 100));
-      HapticFeedback.heavyImpact(); // Double vibration pour "non trouvé"
-    }
-
-    if (!mounted) return;
-    setState(() {
-      _isScanning = false;
-      _scannedEID = scannedEID;
-      _foundAnimal = foundAnimal;
-    });
-  }
-
-  /// Naviguer vers l'écran de détail de l'animal
-  void _viewAnimalDetails() {
-    if (_foundAnimal == null) return;
-
-    Navigator.pop(context); // Fermer le dialogue
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => ScanScreen(preloadedAnimal: _foundAnimal),
-      ),
-    );
-  }
-
-  /// Proposer d'ajouter l'animal non trouvé
-  void _addAnimal() {
-    if (_scannedEID == null) return;
-
-    Navigator.pop(context); // Fermer le dialogue de scan
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => AddAnimalScreen(scannedEID: _scannedEID),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-
-    return AlertDialog(
-      title: Row(
-        children: [
-          const Icon(Icons.qr_code_scanner, color: Colors.blue),
-          const SizedBox(width: 8),
-          Text(l10n.translate('scan_to_search')),
-        ],
-      ),
-      content: SizedBox(
-        width: double.maxFinite,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Bouton Scanner
-            SizedBox(
-              width: double.infinity,
-              height: 120,
-              child: ElevatedButton(
-                onPressed: _isScanning ? null : _simulateScan,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: _isScanning
-                    ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const CircularProgressIndicator(color: Colors.white),
-                          const SizedBox(height: 12),
-                          Text(l10n.translate('scanning')),
-                        ],
-                      )
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.nfc, size: 48),
-                          const SizedBox(height: 8),
-                          Text(
-                            l10n.translate('scan_animal'),
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                        ],
-                      ),
-              ),
-            ),
-
-            // Résultat du scan
-            if (_scannedEID != null) ...[
-              const SizedBox(height: 20),
-
-              // EID scanné
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.tag, size: 20),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            l10n.translate('eid_scanned'),
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
-                            ),
-                          ),
-                          Text(
-                            _scannedEID!,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // Animal trouvé
-              if (_foundAnimal != null)
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade50,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.green.shade200, width: 2),
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.check_circle,
-                              color: Colors.green.shade700, size: 28),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              l10n.translate('animal_found'),
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.green.shade900,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      const Divider(),
-                      const SizedBox(height: 8),
-                      _buildAnimalInfoRow(
-                        Icons.tag,
-                        'EID',
-                        _foundAnimal!.eid,
-                      ),
-                      if (_foundAnimal!.officialNumber != null)
-                        _buildAnimalInfoRow(
-                          Icons.badge,
-                          l10n.translate('official_number'),
-                          _foundAnimal!.officialNumber!,
-                        ),
-                      _buildAnimalInfoRow(
-                        _foundAnimal!.sex == AnimalSex.male
-                            ? Icons.male
-                            : Icons.female,
-                        l10n.translate('sex'),
-                        l10n.translate(_foundAnimal!.sex == AnimalSex.male
-                            ? 'male'
-                            : 'female'),
-                      ),
-                      _buildAnimalInfoRow(
-                        Icons.cake,
-                        'Âge',
-                        '${_foundAnimal!.ageInMonths} mois',
-                      ),
-                    ],
-                  ),
-                )
-              // Animal non trouvé
-              else
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.shade50,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.orange.shade200, width: 2),
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.warning,
-                              color: Colors.orange.shade700, size: 28),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              l10n.translate('animal_not_found'),
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.orange.shade900,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        l10n.translate('animal_not_found_message'),
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.orange.shade900,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        l10n.translate('add_this_animal'),
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.orange.shade900,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
-          ],
-        ),
-      ),
-      actions: [
-        // Bouton Annuler / Scanner un autre
-        TextButton(
-          onPressed: _scannedEID == null
-              ? () => Navigator.pop(context)
-              : () => setState(() {
-                    _scannedEID = null;
-                    _foundAnimal = null;
-                  }),
-          child: Text(
-            _scannedEID == null
-                ? l10n.translate('cancel')
-                : l10n.translate('scan_another'),
-          ),
-        ),
-
-        // Bouton Voir détails / Ajouter
-        if (_scannedEID != null)
-          ElevatedButton(
-            onPressed: _foundAnimal != null ? _viewAnimalDetails : _addAnimal,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: _foundAnimal != null
-                  ? Colors.green
-                  : Theme.of(context).primaryColor,
-              foregroundColor: Colors.white,
-            ),
-            child: Text(
-              _foundAnimal != null
-                  ? l10n.translate('view_details')
-                  : l10n.translate('add_animal'),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildAnimalInfoRow(IconData icon, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Icon(icon, size: 16, color: Colors.grey.shade600),
-          const SizedBox(width: 8),
-          Text(
-            '$label: ',
-            style: const TextStyle(fontSize: 13, color: Colors.grey),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
 
@@ -1247,37 +1274,3 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
 }
 
 // ==================== Enums ====================
-
-enum GroupByOption {
-  none,
-  sex,
-  age,
-  status,
-  withdrawal,
-  mother,
-  species, // ÉTAPE 6
-  breed, // ÉTAPE 6
-}
-
-extension GroupByOptionExt on GroupByOption {
-  String get label {
-    switch (this) {
-      case GroupByOption.none:
-        return 'Aucun';
-      case GroupByOption.sex:
-        return 'Par Sexe';
-      case GroupByOption.age:
-        return 'Par Âge';
-      case GroupByOption.status:
-        return 'Par Statut';
-      case GroupByOption.withdrawal:
-        return 'Par Rémanence';
-      case GroupByOption.mother:
-        return 'Par Mère';
-      case GroupByOption.species:
-        return 'Par Type';
-      case GroupByOption.breed:
-        return 'Par Race';
-    }
-  }
-}

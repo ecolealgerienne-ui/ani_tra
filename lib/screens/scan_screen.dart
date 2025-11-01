@@ -12,6 +12,10 @@ import '../models/eid_change.dart';
 import '../providers/animal_provider.dart';
 import '../providers/weight_provider.dart';
 import '../providers/sync_provider.dart';
+import '../providers/alert_provider.dart';
+import '../models/alert.dart';
+import '../models/alert_type.dart';
+import '../models/alert_category.dart';
 import '../data/mock_data.dart';
 import '../widgets/change_eid_dialog.dart';
 import '../widgets/eid_history_card.dart';
@@ -330,6 +334,9 @@ class _InfosTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // 🆕 SECTION ALERTES EN PREMIER
+          AlertsSection(animalId: currentAnimal.id),
+          const SizedBox(height: 16),
           _InfoCard(
             title: 'Informations de base',
             children: [
@@ -1222,5 +1229,195 @@ class _VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
             child: const Text('Annuler')),
       ],
     );
+  }
+}
+
+// 🆕 WIDGET ALERTES
+class AlertsSection extends StatelessWidget {
+  final String animalId;
+
+  const AlertsSection({required this.animalId});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<AlertProvider>(
+      builder: (context, alertProvider, child) {
+        final alerts = alertProvider.getAlertsForAnimal(animalId);
+
+        if (alerts.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        final mostUrgent = alerts.first;
+
+        return Card(
+          elevation: 3,
+          color: _getBackgroundColor(mostUrgent.type),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(
+              color: _getColor(mostUrgent.type),
+              width: 2,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      _getIcon(mostUrgent.type),
+                      color: _getColor(mostUrgent.type),
+                      size: 28,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        alerts.length == 1
+                            ? 'Alerte active'
+                            : '${alerts.length} alertes actives',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: _getColor(mostUrgent.type),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _getColor(mostUrgent.type),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Text(
+                        _getPriorityLabel(mostUrgent.type),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                ...alerts.map((alert) => _buildAlertItem(alert, context)),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildAlertItem(Alert alert, BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: _getColor(alert.type).withOpacity(0.3),
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: _getColor(alert.type).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Center(
+              child: Text(
+                alert.category.icon,
+                style: const TextStyle(fontSize: 18),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  alert.title,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: _getColor(alert.type),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  alert.message,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Icon(
+            _getIcon(alert.type),
+            color: _getColor(alert.type),
+            size: 20,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getColor(AlertType type) {
+    switch (type) {
+      case AlertType.urgent:
+        return Colors.red.shade700;
+      case AlertType.important:
+        return Colors.orange.shade700;
+      case AlertType.routine:
+        return Colors.blue.shade700;
+    }
+  }
+
+  Color _getBackgroundColor(AlertType type) {
+    switch (type) {
+      case AlertType.urgent:
+        return Colors.red.shade50;
+      case AlertType.important:
+        return Colors.orange.shade50;
+      case AlertType.routine:
+        return Colors.blue.shade50;
+    }
+  }
+
+  IconData _getIcon(AlertType type) {
+    switch (type) {
+      case AlertType.urgent:
+        return Icons.error;
+      case AlertType.important:
+        return Icons.warning_amber;
+      case AlertType.routine:
+        return Icons.info_outline;
+    }
+  }
+
+  String _getPriorityLabel(AlertType type) {
+    switch (type) {
+      case AlertType.urgent:
+        return 'URGENT';
+      case AlertType.important:
+        return 'IMPORTANT';
+      case AlertType.routine:
+        return 'ROUTINE';
+    }
   }
 }

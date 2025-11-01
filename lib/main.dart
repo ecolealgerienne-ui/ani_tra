@@ -12,6 +12,7 @@ import 'providers/campaign_provider.dart';
 import 'providers/lot_provider.dart';
 import 'providers/weight_provider.dart';
 import 'providers/settings_provider.dart';
+import 'providers/alert_provider.dart';
 import 'i18n/app_localizations.dart';
 import 'screens/home_screen.dart';
 import 'screens/scan_screen.dart';
@@ -87,6 +88,23 @@ class MyApp extends StatelessWidget {
             provider.setWeights(MockData.generateWeights());
             return provider;
           },
+        ),
+
+        // 🆕 Provider d'alertes (dépend de Animal, Weight, Sync)
+        ChangeNotifierProxyProvider3<AnimalProvider, WeightProvider,
+            SyncProvider, AlertProvider>(
+          create: (context) => AlertProvider(
+            animalProvider: context.read<AnimalProvider>(),
+            weightProvider: context.read<WeightProvider>(),
+            syncProvider: context.read<SyncProvider>(),
+          ),
+          update: (context, animal, weight, sync, previous) =>
+              previous ??
+              AlertProvider(
+                animalProvider: animal,
+                weightProvider: weight,
+                syncProvider: sync,
+              ),
         ),
       ],
       child: Consumer<LocaleProvider>(
