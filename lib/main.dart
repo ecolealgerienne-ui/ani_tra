@@ -14,10 +14,10 @@ import 'providers/weight_provider.dart';
 import 'providers/settings_provider.dart';
 import 'providers/alert_provider.dart';
 import 'i18n/app_localizations.dart';
-import 'screens/home_screen.dart';
-import 'screens/scan_screen.dart';
-import 'screens/animal_list_screen.dart';
-import 'screens/sync_screen.dart';
+import 'screens/home/home_screen.dart'; // ✅ Mis à jour
+import 'screens/animal/animal_detail_screen.dart'; // ✅ Mis à jour
+import 'screens/animal/animal_list_screen.dart'; // ✅ Mis à jour
+import 'screens/sync/sync_screen.dart'; // ✅ Mis à jour
 import 'data/mock_data.dart';
 
 void main() {
@@ -31,12 +31,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // Providers de base (pas de dépendances)
+        // ... (garde tous tes providers comme avant)
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => QRProvider()),
         ChangeNotifierProvider(create: (_) => SyncProvider()),
-
-        // Provider de paramètres (ÉTAPE 4)
         ChangeNotifierProvider(
           create: (_) {
             final provider = SettingsProvider();
@@ -44,12 +42,9 @@ class MyApp extends StatelessWidget {
             return provider;
           },
         ),
-
-        // Provider avec données mock
         ChangeNotifierProvider(
           create: (_) {
             final provider = AnimalProvider();
-            // Charger les données mock
             provider.initializeWithMockData(
               MockData.generateAnimals(),
               MockData.generateProducts(),
@@ -59,38 +54,26 @@ class MyApp extends StatelessWidget {
             return provider;
           },
         ),
-
-        // Provider de lots/batches
         ChangeNotifierProvider(
           create: (_) {
             final provider = BatchProvider();
-            // Charger les lots mock
             provider.initializeWithMockData(MockData.generateBatches());
             return provider;
           },
         ),
-
-        // Provider de lots (nouveau système unifié)
         ChangeNotifierProvider(
           create: (_) => LotProvider(),
         ),
-
-        // Provider de campagnes
         ChangeNotifierProvider(
           create: (_) => CampaignProvider(),
         ),
-
-        // Provider de pesées
         ChangeNotifierProvider(
           create: (_) {
             final provider = WeightProvider();
-            // Charger les pesées mock
             provider.setWeights(MockData.generateWeights());
             return provider;
           },
         ),
-
-        // 🆕 Provider d'alertes (dépend de Animal, Weight, Sync)
         ChangeNotifierProxyProvider3<AnimalProvider, WeightProvider,
             SyncProvider, AlertProvider>(
           create: (context) => AlertProvider(
@@ -135,7 +118,6 @@ class MyApp extends StatelessWidget {
               ),
             ),
             locale: localeProvider.locale,
-            // ✅ AJOUT CRITIQUE : Delegates de localisation
             localizationsDelegates: const [
               AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,
@@ -165,9 +147,10 @@ class MainNavigation extends StatefulWidget {
 class _MainNavigationState extends State<MainNavigation> {
   int _selectedIndex = 0;
 
+  // ✅ ICI - _screens va dans _MainNavigationState
   static const List<Widget> _screens = [
     HomeScreen(),
-    ScanScreen(),
+    AnimalDetailScreen(), // ✅ Changé de AnimalDetailScreen
     AnimalListScreen(),
     SyncScreen(),
   ];
