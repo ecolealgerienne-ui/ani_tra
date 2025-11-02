@@ -6,7 +6,7 @@ import '../../providers/campaign_provider.dart';
 import '../../models/campaign.dart';
 import '../../i18n/app_localizations.dart';
 import '../lot/campaign_create_screen.dart';
-import '../lot/campaign_scan_screen.dart';
+
 import '../lot/campaign_detail_screen.dart';
 
 class CampaignListScreen extends StatelessWidget {
@@ -127,7 +127,7 @@ class _CampaignCard extends StatelessWidget {
                           : Theme.of(context)
                               .colorScheme
                               .primary
-                              .withOpacity(0.1),
+                              .withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(

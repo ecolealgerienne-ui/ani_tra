@@ -34,7 +34,7 @@ class InfoCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: cardColor.withOpacity(0.1),
+                  color: cardColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(icon, color: cardColor, size: 28),
@@ -129,9 +129,9 @@ class AlertCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.5), width: 1.5),
+        border: Border.all(color: color.withValues(alpha: 0.5), width: 1.5),
       ),
       child: Row(
         children: [
@@ -142,7 +142,7 @@ class AlertCard extends StatelessWidget {
               message,
               style: TextStyle(
                 fontWeight: FontWeight.w600,
-                color: color.withOpacity(0.9),
+                color: color.withValues(alpha: 0.9),
               ),
             ),
           ),

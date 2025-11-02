@@ -48,7 +48,7 @@ class StatusBadge extends StatelessWidget {
     return Chip(
       avatar: Icon(icon, size: 16, color: color),
       label: Text(label),
-      backgroundColor: color.withOpacity(0.1),
+      backgroundColor: color.withValues(alpha: 0.1),
       side: BorderSide(color: color),
       labelStyle: TextStyle(
         fontSize: 12,

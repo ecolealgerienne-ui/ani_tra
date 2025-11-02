@@ -13,6 +13,9 @@ import 'providers/lot_provider.dart';
 import 'providers/weight_provider.dart';
 import 'providers/settings_provider.dart';
 import 'providers/alert_provider.dart';
+import 'providers/vaccination_provider.dart';
+import 'providers/document_provider.dart';
+import 'providers/breeding_provider.dart';
 import 'i18n/app_localizations.dart';
 import 'screens/home/home_screen.dart'; // ✅ Mis à jour
 import 'screens/animal/animal_detail_screen.dart'; // ✅ Mis à jour

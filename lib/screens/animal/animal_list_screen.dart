@@ -3,9 +3,9 @@
 // PHASE 1+2 : Alertes prioritaires + Groupes collapsibles
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
 import 'package:provider/provider.dart';
-import 'dart:math';
+
 import '../../providers/animal_provider.dart';
 import '../../providers/alert_provider.dart';
 import '../../models/animal.dart';
@@ -15,8 +15,7 @@ import '../../models/alert_type.dart';
 import '../../models/alert_category.dart';
 import '../../models/breed.dart';
 import '../../data/animal_config.dart';
-import '../../i18n/app_localizations.dart';
-import '../../widgets/animal_card.dart';
+
 import 'animal_detail_screen.dart';
 import 'add_animal_screen.dart';
 
@@ -600,7 +599,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             margin: const EdgeInsets.only(bottom: 8),
             decoration: BoxDecoration(
-              color: getSectionColor().withOpacity(0.1),
+              color: getSectionColor().withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -620,7 +619,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: getSectionColor().withOpacity(0.2),
+                    color: getSectionColor().withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -732,8 +731,8 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color:
-                                  _getAlertColor(alert.type).withOpacity(0.1),
+                              color: _getAlertColor(alert.type)
+                                  .withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(4),
                               border: Border.all(
                                 color: _getAlertColor(alert.type),
@@ -761,7 +760,8 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: _getAlertColor(alerts.first.type).withOpacity(0.1),
+                    color: _getAlertColor(alerts.first.type)
+                        .withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Text(

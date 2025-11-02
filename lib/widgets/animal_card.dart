@@ -34,7 +34,7 @@ class AnimalCard extends StatelessWidget {
             children: [
               // Avatar
               CircleAvatar(
-                backgroundColor: sexColor.withOpacity(0.1),
+                backgroundColor: sexColor.withValues(alpha: 0.1),
                 radius: 24,
                 child: Icon(sexIcon, color: sexColor),
               ),

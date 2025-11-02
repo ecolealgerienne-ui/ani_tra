@@ -130,8 +130,8 @@ class LotDetailScreen extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            _getTypeColor(lot).withOpacity(0.2),
-            _getTypeColor(lot).withOpacity(0.1),
+            _getTypeColor(lot).withValues(alpha: 0.2),
+            _getTypeColor(lot).withValues(alpha: 0.1),
           ],
         ),
       ),
@@ -141,7 +141,7 @@ class LotDetailScreen extends StatelessWidget {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: _getTypeColor(lot).withOpacity(0.2),
+              color: _getTypeColor(lot).withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
             child: Center(
@@ -189,9 +189,9 @@ class LotDetailScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: statusColor.withOpacity(0.1),
+          color: statusColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: statusColor.withOpacity(0.3)),
+          border: Border.all(color: statusColor.withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [
@@ -371,9 +371,9 @@ class LotDetailScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
@@ -462,8 +462,8 @@ class LotDetailScreen extends StatelessWidget {
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: animal.sex == AnimalSex.male
-              ? Colors.blue.withOpacity(0.2)
-              : Colors.pink.withOpacity(0.2),
+              ? Colors.blue.withValues(alpha: 0.2)
+              : Colors.pink.withValues(alpha: 0.2),
           child: Icon(
             animal.sex == AnimalSex.male ? Icons.male : Icons.female,
             color: animal.sex == AnimalSex.male ? Colors.blue : Colors.pink,

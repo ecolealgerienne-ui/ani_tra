@@ -1,12 +1,18 @@
 // lib/models/weight_record.dart
 
+import 'syncable_entity.dart';
+
 /// Enregistrement de pesée d'un animal
 ///
 /// Stocke les données de pesée pour le suivi de croissance et de performance
-class WeightRecord {
-  /// Identifiant unique de la pesée
+class WeightRecord implements SyncableEntity {
+  // === Identification ===
+  @override
   final String id;
+  @override
+  final String farmId;
 
+  // === Données métier ===
   /// ID de l'animal pesé
   final String animalId;
 
@@ -22,26 +28,33 @@ class WeightRecord {
   /// Notes optionnelles sur la pesée
   final String? notes;
 
-  /// État de synchronisation avec le serveur
+  // === Synchronisation ===
+  @override
   final bool synced;
-
-  /// Date de création de l'enregistrement
+  @override
   final DateTime createdAt;
+  @override
+  final DateTime updatedAt;
+  @override
+  final DateTime? lastSyncedAt;
+  @override
+  final String? serverVersion;
 
-  /// Date de dernière modification
-  final DateTime? updatedAt;
-
-  const WeightRecord({
+  WeightRecord({
     required this.id,
+    this.farmId = 'mock-farm-001', // Valeur par défaut pour compatibilité mock
     required this.animalId,
     required this.weight,
     required this.recordedAt,
     this.source = WeightSource.manual,
     this.notes,
     this.synced = false,
-    required this.createdAt,
-    this.updatedAt,
-  });
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    this.lastSyncedAt,
+    this.serverVersion,
+  })  : createdAt = createdAt ?? DateTime.now(),
+        updatedAt = updatedAt ?? DateTime.now();
 
   // ==================== Getters de commodité ====================
 
@@ -69,7 +82,7 @@ class WeightRecord {
       case WeightSource.scale:
         return '⚖️';
       case WeightSource.manual:
-        return '✍️';
+        return '✏️';
       case WeightSource.estimated:
         return '📊';
       case WeightSource.veterinary:
@@ -109,38 +122,55 @@ class WeightRecord {
 
   /// Créer une copie avec modifications
   WeightRecord copyWith({
-    String? id,
+    String? farmId,
     String? animalId,
     double? weight,
     DateTime? recordedAt,
     WeightSource? source,
     String? notes,
     bool? synced,
-    DateTime? createdAt,
     DateTime? updatedAt,
+    DateTime? lastSyncedAt,
+    String? serverVersion,
   }) {
     return WeightRecord(
-      id: id ?? this.id,
+      id: id,
+      farmId: farmId ?? this.farmId,
       animalId: animalId ?? this.animalId,
       weight: weight ?? this.weight,
       recordedAt: recordedAt ?? this.recordedAt,
       source: source ?? this.source,
       notes: notes ?? this.notes,
       synced: synced ?? this.synced,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
+      createdAt: createdAt,
+      updatedAt: updatedAt ?? DateTime.now(),
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      serverVersion: serverVersion ?? this.serverVersion,
     );
   }
 
-  /// Marquer comme synchronisé
-  WeightRecord markAsSynced() {
-    return copyWith(synced: true, updatedAt: DateTime.now());
+  // === Méthodes de sync ===
+
+  WeightRecord markAsSynced({required String serverVersion}) {
+    return copyWith(
+      synced: true,
+      lastSyncedAt: DateTime.now(),
+      serverVersion: serverVersion,
+    );
+  }
+
+  WeightRecord markAsModified() {
+    return copyWith(
+      synced: false,
+      updatedAt: DateTime.now(),
+    );
   }
 
   /// Convertir en Map (pour base de données)
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'farm_id': farmId,
       'animalId': animalId,
       'weight': weight,
       'recordedAt': recordedAt.toIso8601String(),
@@ -148,7 +178,9 @@ class WeightRecord {
       'notes': notes,
       'synced': synced ? 1 : 0,
       'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt?.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+      'last_synced_at': lastSyncedAt?.toIso8601String(),
+      'server_version': serverVersion,
     };
   }
 
@@ -156,6 +188,7 @@ class WeightRecord {
   factory WeightRecord.fromMap(Map<String, dynamic> map) {
     return WeightRecord(
       id: map['id'] as String,
+      farmId: map['farm_id'] as String? ?? 'mock-farm-001',
       animalId: map['animalId'] as String,
       weight: (map['weight'] as num).toDouble(),
       recordedAt: DateTime.parse(map['recordedAt'] as String),
@@ -165,10 +198,16 @@ class WeightRecord {
       ),
       notes: map['notes'] as String?,
       synced: (map['synced'] as int) == 1,
-      createdAt: DateTime.parse(map['createdAt'] as String),
+      createdAt: map['createdAt'] != null
+          ? DateTime.parse(map['createdAt'] as String)
+          : null,
       updatedAt: map['updatedAt'] != null
           ? DateTime.parse(map['updatedAt'] as String)
           : null,
+      lastSyncedAt: map['last_synced_at'] != null
+          ? DateTime.parse(map['last_synced_at'] as String)
+          : null,
+      serverVersion: map['server_version'] as String?,
     );
   }
 
@@ -176,6 +215,7 @@ class WeightRecord {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'farm_id': farmId,
       'animal_id': animalId,
       'weight': weight,
       'recorded_at': recordedAt.toIso8601String(),
@@ -183,7 +223,9 @@ class WeightRecord {
       'notes': notes,
       'synced': synced,
       'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt?.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'last_synced_at': lastSyncedAt?.toIso8601String(),
+      'server_version': serverVersion,
     };
   }
 
@@ -191,6 +233,7 @@ class WeightRecord {
   factory WeightRecord.fromJson(Map<String, dynamic> json) {
     return WeightRecord(
       id: json['id'] as String,
+      farmId: json['farm_id'] as String? ?? 'mock-farm-001',
       animalId: json['animal_id'] as String,
       weight: (json['weight'] as num).toDouble(),
       recordedAt: DateTime.parse(json['recorded_at'] as String),
@@ -200,16 +243,22 @@ class WeightRecord {
       ),
       notes: json['notes'] as String?,
       synced: json['synced'] as bool? ?? false,
-      createdAt: DateTime.parse(json['created_at'] as String),
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'] as String)
+          : null,
       updatedAt: json['updated_at'] != null
           ? DateTime.parse(json['updated_at'] as String)
           : null,
+      lastSyncedAt: json['last_synced_at'] != null
+          ? DateTime.parse(json['last_synced_at'] as String)
+          : null,
+      serverVersion: json['server_version'] as String?,
     );
   }
 
   @override
   String toString() {
-    return 'WeightRecord(id: $id, animal: $animalId, weight: ${formattedWeight}, '
+    return 'WeightRecord(id: $id, animal: $animalId, weight: $formattedWeight, '
         'date: $formattedDate, source: $sourceLabel, synced: $synced)';
   }
 
@@ -261,7 +310,7 @@ extension WeightSourceExtension on WeightSource {
       case WeightSource.scale:
         return '⚖️';
       case WeightSource.manual:
-        return '✍️';
+        return '✏️';
       case WeightSource.estimated:
         return '📊';
       case WeightSource.veterinary:

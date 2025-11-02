@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/settings_provider.dart';
 import '../data/animal_config.dart';
-import '../models/animal_species.dart';
-import '../models/breed.dart';
 
 /// Section "Préférences d'élevage" pour l'écran des paramètres
 ///

@@ -5,7 +5,7 @@ import 'dart:math';
 import '../../models/animal.dart';
 import '../../models/batch.dart';
 import '../../models/slaughter.dart';
-import '../../models/treatment.dart';
+
 import '../../providers/animal_provider.dart';
 import '../../providers/batch_provider.dart';
 import '../../providers/sync_provider.dart';

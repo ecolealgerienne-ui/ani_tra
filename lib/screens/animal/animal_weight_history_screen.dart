@@ -133,8 +133,8 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            sexColor.withOpacity(0.1),
-            sexColor.withOpacity(0.05),
+            sexColor.withValues(alpha: 0.1),
+            sexColor.withValues(alpha: 0.05),
           ],
         ),
       ),
@@ -142,7 +142,7 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 36,
-            backgroundColor: sexColor.withOpacity(0.2),
+            backgroundColor: sexColor.withValues(alpha: 0.2),
             child: Icon(sexIcon, size: 40, color: sexColor),
           ),
           const SizedBox(width: 16),
@@ -295,7 +295,7 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(

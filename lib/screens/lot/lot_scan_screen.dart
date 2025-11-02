@@ -139,7 +139,7 @@ class _LotScanScreenState extends State<LotScanScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -207,7 +207,7 @@ class _LotScanScreenState extends State<LotScanScreen> {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: _getScanResultColor().withOpacity(0.1),
+                  color: _getScanResultColor().withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: _getScanResultColor(),
@@ -295,8 +295,8 @@ class _LotScanScreenState extends State<LotScanScreen> {
                               child: ListTile(
                                 leading: CircleAvatar(
                                   backgroundColor: animal.sex == AnimalSex.male
-                                      ? Colors.blue.withOpacity(0.2)
-                                      : Colors.pink.withOpacity(0.2),
+                                      ? Colors.blue.withValues(alpha: 0.2)
+                                      : Colors.pink.withValues(alpha: 0.2),
                                   child: Icon(
                                     animal.sex == AnimalSex.male
                                         ? Icons.male

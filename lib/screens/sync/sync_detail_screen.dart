@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../providers/sync_provider.dart';
 import '../../providers/animal_provider.dart';
-import '../../providers/campaign_provider.dart';
+
 import '../../i18n/app_localizations.dart';
 
 class SyncDetailScreen extends StatefulWidget {
@@ -305,7 +305,7 @@ class _PendingDataCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: _getTypeColor().withOpacity(0.1),
+          backgroundColor: _getTypeColor().withValues(alpha: 0.1),
           child: Icon(icon, color: _getTypeColor(), size: 20),
         ),
         title: Text(title),

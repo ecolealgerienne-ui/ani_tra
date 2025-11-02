@@ -8,7 +8,7 @@ import '../../models/animal.dart';
 import '../../models/treatment.dart';
 import '../../models/weight_record.dart';
 import '../../models/animal_extensions.dart';
-import '../../models/eid_change.dart';
+
 import '../../providers/animal_provider.dart';
 import '../../providers/weight_provider.dart';
 import '../../providers/sync_provider.dart';
@@ -221,7 +221,7 @@ class _StatusBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
+        color: color.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: color),
       ),
@@ -702,7 +702,7 @@ class _TreatmentCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: withdrawalColor.withOpacity(0.2),
+                color: withdrawalColor.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(4),
                 border: Border.all(color: withdrawalColor),
               ),
@@ -1086,7 +1086,7 @@ class AlertsSection extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: _getColor(alert.type).withOpacity(0.3),
+          color: _getColor(alert.type).withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -1096,7 +1096,7 @@ class AlertsSection extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: _getColor(alert.type).withOpacity(0.1),
+              color: _getColor(alert.type).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Center(

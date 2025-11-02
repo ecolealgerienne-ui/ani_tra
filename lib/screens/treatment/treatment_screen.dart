@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../models/animal.dart';
 import '../../models/product.dart';
 import '../../models/treatment.dart';
 import '../../models/veterinarian.dart';

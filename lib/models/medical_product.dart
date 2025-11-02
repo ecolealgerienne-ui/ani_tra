@@ -1,42 +1,114 @@
 // lib/models/medical_product.dart
-class MedicalProduct {
+import 'syncable_entity.dart';
+
+/// Produit médical pour le traitement des animaux
+class MedicalProduct implements SyncableEntity {
+  /// Identifiant unique du produit
+  @override
   final String id;
+
+  /// ID de la ferme (multi-tenancy)
+  @override
+  final String farmId;
+
+  /// Nom du produit
   final String name;
+
+  /// Nom commercial
   final String? commercialName;
-  final String category; // antibiotique, anti-inflammatoire, vaccin, etc.
+
+  /// Catégorie (antibiotique, anti-inflammatoire, vaccin, etc.)
+  final String category;
+
+  /// Principe actif
   final String? activeIngredient;
+
+  /// Fabricant
   final String? manufacturer;
-  final String? form; // injectable, oral, topique, etc.
+
+  /// Forme (injectable, oral, topique, etc.)
+  final String? form;
+
+  /// Dosage
   final double? dosage;
+
+  /// Unité de dosage
   final String? dosageUnit;
 
-  // Délais d'attente
-  final int withdrawalPeriodMeat; // en jours
-  final int withdrawalPeriodMilk; // en jours
+  // ==================== Délais d'attente ====================
 
-  // Stock
+  /// Délai d'attente viande (en jours)
+  final int withdrawalPeriodMeat;
+
+  /// Délai d'attente lait (en jours)
+  final int withdrawalPeriodMilk;
+
+  // ==================== Stock ====================
+
+  /// Stock actuel
   final double currentStock;
-  final double minStock;
-  final String stockUnit; // ml, comprimés, doses, etc.
 
-  // Prix
+  /// Stock minimum
+  final double minStock;
+
+  /// Unité de stock (ml, comprimés, doses, etc.)
+  final String stockUnit;
+
+  // ==================== Prix ====================
+
+  /// Prix unitaire
   final double? unitPrice;
+
+  /// Devise
   final String? currency;
 
-  // Informations complémentaires
+  // ==================== Informations complémentaires ====================
+
+  /// Numéro de lot
   final String? batchNumber;
+
+  /// Date de péremption
   final DateTime? expiryDate;
+
+  /// Conditions de stockage
   final String? storageConditions;
-  final String? prescription; // Ordonnance requise
+
+  /// Ordonnance requise
+  final String? prescription;
+
+  /// Notes
   final String? notes;
 
-  // Métadonnées
-  final DateTime createdAt;
-  final DateTime? updatedAt;
+  /// Produit actif
   final bool isActive;
+
+  // ==================== Champs SyncableEntity ====================
+
+  /// État de synchronisation
+  @override
+  final bool synced;
+
+  /// Date de création
+  @override
+  final DateTime createdAt;
+
+  /// Date de dernière modification
+  @override
+  final DateTime updatedAt;
+
+  /// Date de dernière synchronisation
+  @override
+  final DateTime? lastSyncedAt;
+
+  /// Version serveur
+  @override
+  final String? serverVersion;
+
+  // ==================== Constructeur ====================
 
   MedicalProduct({
     required this.id,
+    this.farmId = 'mock-farm-001', // Valeur par défaut pour compatibilité mock
     required this.name,
     this.commercialName,
     required this.category,
@@ -57,14 +129,45 @@ class MedicalProduct {
     this.storageConditions,
     this.prescription,
     this.notes,
-    required this.createdAt,
-    this.updatedAt,
     this.isActive = true,
-  });
+    this.synced = false,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    this.lastSyncedAt,
+    this.serverVersion,
+  })  : createdAt = createdAt ?? DateTime.now(),
+        updatedAt = updatedAt ?? createdAt ?? DateTime.now();
 
-  // Copie avec modification
+  // ==================== Getters ====================
+
+  /// Vérifier si le stock est bas
+  bool get isLowStock => currentStock <= minStock;
+
+  /// Vérifier si le produit est périmé
+  bool get isExpired =>
+      expiryDate != null && expiryDate!.isBefore(DateTime.now());
+
+  /// Vérifier si le produit arrive à péremption (≤ 30 jours)
+  bool get isExpiringSoon {
+    if (expiryDate == null) return false;
+    final daysUntilExpiry = expiryDate!.difference(DateTime.now()).inDays;
+    return daysUntilExpiry <= 30 && daysUntilExpiry > 0;
+  }
+
+  /// Nom à afficher (commercial ou générique)
+  String get displayName => commercialName ?? name;
+
+  /// Délai d'attente maximum
+  int get maxWithdrawalPeriod => withdrawalPeriodMeat > withdrawalPeriodMilk
+      ? withdrawalPeriodMeat
+      : withdrawalPeriodMilk;
+
+  // ==================== Méthodes ====================
+
+  /// Copie avec modifications
   MedicalProduct copyWith({
     String? id,
+    String? farmId,
     String? name,
     String? commercialName,
     String? category,
@@ -85,12 +188,16 @@ class MedicalProduct {
     String? storageConditions,
     String? prescription,
     String? notes,
+    bool? isActive,
+    bool? synced,
     DateTime? createdAt,
     DateTime? updatedAt,
-    bool? isActive,
+    DateTime? lastSyncedAt,
+    String? serverVersion,
   }) {
     return MedicalProduct(
       id: id ?? this.id,
+      farmId: farmId ?? this.farmId,
       name: name ?? this.name,
       commercialName: commercialName ?? this.commercialName,
       category: category ?? this.category,
@@ -111,16 +218,39 @@ class MedicalProduct {
       storageConditions: storageConditions ?? this.storageConditions,
       prescription: prescription ?? this.prescription,
       notes: notes ?? this.notes,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
       isActive: isActive ?? this.isActive,
+      synced: synced ?? this.synced,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? DateTime.now(),
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      serverVersion: serverVersion ?? this.serverVersion,
     );
   }
 
-  // Conversion JSON
+  /// Marquer comme synchronisé avec le serveur
+  MedicalProduct markAsSynced({required String serverVersion}) {
+    return copyWith(
+      synced: true,
+      lastSyncedAt: DateTime.now(),
+      serverVersion: serverVersion,
+    );
+  }
+
+  /// Marquer comme modifié (à synchroniser)
+  MedicalProduct markAsModified() {
+    return copyWith(
+      synced: false,
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  // ==================== Sérialisation ====================
+
+  /// Convertir en JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'farmId': farmId,
       'name': name,
       'commercialName': commercialName,
       'category': category,
@@ -141,60 +271,81 @@ class MedicalProduct {
       'storageConditions': storageConditions,
       'prescription': prescription,
       'notes': notes,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt?.toIso8601String(),
       'isActive': isActive,
+      'synced': synced,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+      'lastSyncedAt': lastSyncedAt?.toIso8601String(),
+      'serverVersion': serverVersion,
     };
   }
 
+  /// Créer depuis JSON
   factory MedicalProduct.fromJson(Map<String, dynamic> json) {
     return MedicalProduct(
       id: json['id'] as String,
+      farmId: json['farmId'] as String? ??
+          json['farm_id'] as String? ??
+          'mock-farm-001',
       name: json['name'] as String,
-      commercialName: json['commercialName'] as String?,
+      commercialName: json['commercialName'] as String? ??
+          json['commercial_name'] as String?,
       category: json['category'] as String,
-      activeIngredient: json['activeIngredient'] as String?,
+      activeIngredient: json['activeIngredient'] as String? ??
+          json['active_ingredient'] as String?,
       manufacturer: json['manufacturer'] as String?,
       form: json['form'] as String?,
-      // ✅ robustesse: accepter int ou double
       dosage: (json['dosage'] as num?)?.toDouble(),
-      dosageUnit: json['dosageUnit'] as String?,
-      withdrawalPeriodMeat: json['withdrawalPeriodMeat'] as int,
-      withdrawalPeriodMilk: json['withdrawalPeriodMilk'] as int,
-      currentStock: (json['currentStock'] as num).toDouble(),
-      minStock: (json['minStock'] as num).toDouble(),
-      stockUnit: json['stockUnit'] as String,
-      // ✅ robustesse: accepter int ou double
-      unitPrice: (json['unitPrice'] as num?)?.toDouble(),
+      dosageUnit:
+          json['dosageUnit'] as String? ?? json['dosage_unit'] as String?,
+      withdrawalPeriodMeat: json['withdrawalPeriodMeat'] as int? ??
+          json['withdrawal_period_meat'] as int,
+      withdrawalPeriodMilk: json['withdrawalPeriodMilk'] as int? ??
+          json['withdrawal_period_milk'] as int,
+      currentStock:
+          (json['currentStock'] ?? json['current_stock'] as num).toDouble(),
+      minStock: (json['minStock'] ?? json['min_stock'] as num).toDouble(),
+      stockUnit: json['stockUnit'] as String? ?? json['stock_unit'] as String,
+      unitPrice: (json['unitPrice'] ?? json['unit_price'] as num?)?.toDouble(),
       currency: json['currency'] as String?,
-      batchNumber: json['batchNumber'] as String?,
-      expiryDate: json['expiryDate'] != null
-          ? DateTime.parse(json['expiryDate'] as String)
+      batchNumber:
+          json['batchNumber'] as String? ?? json['batch_number'] as String?,
+      expiryDate: json['expiryDate'] != null || json['expiry_date'] != null
+          ? DateTime.parse(json['expiryDate'] ?? json['expiry_date'] as String)
           : null,
-      storageConditions: json['storageConditions'] as String?,
+      storageConditions: json['storageConditions'] as String? ??
+          json['storage_conditions'] as String?,
       prescription: json['prescription'] as String?,
       notes: json['notes'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'] as String)
-          : null,
-      isActive: json['isActive'] as bool? ?? true,
+      isActive: json['isActive'] as bool? ?? json['is_active'] as bool? ?? true,
+      synced: json['synced'] as bool? ?? false,
+      createdAt:
+          DateTime.parse(json['createdAt'] ?? json['created_at'] as String),
+      updatedAt: json['updatedAt'] != null || json['updated_at'] != null
+          ? DateTime.parse(json['updatedAt'] ?? json['updated_at'] as String)
+          : DateTime.now(),
+      lastSyncedAt:
+          json['lastSyncedAt'] != null || json['last_synced_at'] != null
+              ? DateTime.parse(
+                  json['lastSyncedAt'] ?? json['last_synced_at'] as String)
+              : null,
+      serverVersion:
+          json['serverVersion'] as String? ?? json['server_version'] as String?,
     );
   }
 
-  // Vérifications
-  bool get isLowStock => currentStock <= minStock;
-  bool get isExpired =>
-      expiryDate != null && expiryDate!.isBefore(DateTime.now());
-  bool get isExpiringSoon {
-    if (expiryDate == null) return false;
-    final daysUntilExpiry = expiryDate!.difference(DateTime.now()).inDays;
-    return daysUntilExpiry <= 30 && daysUntilExpiry > 0;
+  @override
+  String toString() {
+    return 'MedicalProduct(id: $id, name: $displayName, category: $category, '
+        'stock: $currentStock $stockUnit, synced: $synced)';
   }
 
-  String get displayName => commercialName ?? name;
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is MedicalProduct && other.id == id;
+  }
 
-  int get maxWithdrawalPeriod => withdrawalPeriodMeat > withdrawalPeriodMilk
-      ? withdrawalPeriodMeat
-      : withdrawalPeriodMilk;
+  @override
+  int get hashCode => id.hashCode;
 }

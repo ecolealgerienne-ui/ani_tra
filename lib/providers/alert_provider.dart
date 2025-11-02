@@ -5,11 +5,10 @@ import '../models/alert.dart';
 import '../models/alert_type.dart';
 import '../models/alert_category.dart';
 import '../models/animal.dart';
-import '../models/treatment.dart';
-import '../models/weight_record.dart';
+
 import '../models/weighing_rule.dart';
 import '../models/incomplete_event.dart';
-import '../models/sync_status.dart';
+
 import 'animal_provider.dart';
 import 'weight_provider.dart';
 import 'sync_provider.dart';

@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 
 import '../models/lot.dart';
-import '../models/product.dart';
+
 import '../models/treatment.dart';
 import '../models/movement.dart';
 

@@ -7,8 +7,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../models/animal.dart';
 import '../../models/movement.dart';
-import '../../models/animal_species.dart';
-import '../../models/breed.dart';
+
 import '../../providers/animal_provider.dart';
 import '../../providers/sync_provider.dart';
 import '../../providers/settings_provider.dart';

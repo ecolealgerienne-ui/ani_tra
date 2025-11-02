@@ -218,10 +218,10 @@ class _BatchCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: purposeColor.withOpacity(0.3)),
+        border: Border.all(color: purposeColor.withValues(alpha: 0.3)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -237,7 +237,7 @@ class _BatchCard extends StatelessWidget {
               children: [
                 // Icône
                 CircleAvatar(
-                  backgroundColor: purposeColor.withOpacity(0.1),
+                  backgroundColor: purposeColor.withValues(alpha: 0.1),
                   child: Icon(
                     purposeIcon,
                     color: purposeColor,
@@ -281,7 +281,7 @@ class _BatchCard extends StatelessWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: purposeColor.withOpacity(0.1),
+                              color: purposeColor.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(

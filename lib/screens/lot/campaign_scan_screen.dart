@@ -158,7 +158,7 @@ class _CampaignScanScreenState extends State<CampaignScanScreen> {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             child: Column(
               children: [
                 Text(

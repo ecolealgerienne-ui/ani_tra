@@ -3,7 +3,6 @@
 
 import '../models/alert.dart';
 import '../models/alert_type.dart';
-import '../models/alert_category.dart';
 
 /// Générateur d'alertes de test
 class MockAlertsGenerator {
