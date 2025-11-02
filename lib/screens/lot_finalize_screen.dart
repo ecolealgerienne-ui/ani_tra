@@ -12,6 +12,7 @@ import '../models/animal.dart';
 import '../i18n/app_localizations.dart';
 import '../models/veterinarian.dart';
 import '../data/mock_data.dart';
+import 'treatment_screen.dart';
 
 class LotFinalizeScreen extends StatefulWidget {
   final String lotId;
@@ -128,43 +129,14 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
 
     switch (_selectedType!) {
       case LotType.treatment:
-        if (_selectedProduct == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Veuillez sélectionner un produit'),
-              backgroundColor: Colors.red,
-            ),
-          );
-          return;
-        }
-
-        final withdrawalEnd = _treatmentDate.add(
-          Duration(days: _selectedProduct!.withdrawalDaysMeat),
+        // Le traitement doit être fait via TreatmentScreen
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Veuillez configurer le traitement'),
+            backgroundColor: Colors.orange,
+          ),
         );
-
-        success = lotProvider.finalizeLot(
-          widget.lotId,
-          type: LotType.treatment,
-          productId: _selectedProduct!.id,
-          productName: _selectedProduct!.name,
-          treatmentDate: _treatmentDate,
-          withdrawalEndDate: withdrawalEnd,
-          veterinarianId: _selectedVetId,
-          veterinarianName: _selectedVetName,
-          notes: _notesController.text.isEmpty ? null : _notesController.text,
-        );
-
-        if (success) {
-          // Créer les traitements individuels
-          final treatments = lotProvider.expandLotToTreatments(
-            lotProvider.getLotById(widget.lotId)!,
-          );
-          for (final treatment in treatments) {
-            animalProvider.addTreatment(treatment);
-          }
-          syncProvider.addPendingData(treatments.length + 1);
-        }
-        break;
+        return;
 
       case LotType.sale:
         final pricePerAnimal = double.tryParse(_pricePerAnimalController.text);
@@ -446,7 +418,7 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
 
           // Formulaire selon type
           if (_selectedType == LotType.treatment)
-            _buildTreatmentForm(animalProvider),
+            _buildTreatmentButton(context),
           if (_selectedType == LotType.sale) _buildSaleForm(),
           if (_selectedType == LotType.slaughter) _buildSlaughterForm(),
 
@@ -483,211 +455,63 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
     );
   }
 
-  Widget _buildTreatmentForm(AnimalProvider animalProvider) {
-    final dateFormat = DateFormat('dd/MM/yyyy');
-    final products = animalProvider.products;
+  /// Bouton pour naviguer vers l'écran de traitement unifié
+  Widget _buildTreatmentButton(BuildContext context) {
+    final lotProvider = context.read<LotProvider>();
+    final lot = lotProvider.getLotById(widget.lotId);
+    if (lot == null) return const SizedBox.shrink();
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Produit
-        DropdownButtonFormField<Product>(
-          value: _selectedProduct,
-          decoration: const InputDecoration(
-            labelText: 'Produit *',
-            border: OutlineInputBorder(),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.blue.shade50,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.blue.shade200),
           ),
-          items: products.map((product) {
-            return DropdownMenuItem(
-              value: product,
-              child: Text(product.name),
-            );
-          }).toList(),
-          onChanged: (value) {
-            setState(() => _selectedProduct = value);
-          },
-          validator: (value) =>
-              value == null ? 'Veuillez sélectionner un produit' : null,
-        ),
-        const SizedBox(height: 16),
-
-        // Date traitement
-        ListTile(
-          contentPadding: EdgeInsets.zero,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-            side: BorderSide(color: Colors.grey.shade400),
-          ),
-          leading: const Icon(Icons.calendar_today),
-          title: const Text('Date du traitement'),
-          subtitle: Text(dateFormat.format(_treatmentDate)),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () async {
-            final date = await showDatePicker(
-              context: context,
-              initialDate: _treatmentDate,
-              firstDate: DateTime.now().subtract(const Duration(days: 7)),
-              lastDate: DateTime.now().add(const Duration(days: 30)),
-            );
-            if (date != null) {
-              setState(() => _treatmentDate = date);
-            }
-          },
-        ),
-        const SizedBox(height: 16),
-
-        // ==================== Section Vétérinaire ====================
-        Row(
-          children: [
-            Icon(Icons.medical_services, color: Colors.blue.shade700),
-            const SizedBox(width: 8),
-            Text(
-              'Vétérinaire prescripteur (optionnel)',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey.shade800,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-
-        // Si aucun vétérinaire sélectionné
-        if (_selectedVetId == null) ...[
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade100,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade300),
-            ),
-            child: Column(
-              children: [
-                Icon(
-                  Icons.person_search,
-                  size: 48,
-                  color: Colors.grey.shade400,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'Aucun vétérinaire sélectionné',
+          child: Row(
+            children: [
+              Icon(Icons.info_outline, color: Colors.blue.shade700),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Le traitement sera appliqué aux ${lot.animalIds.length} animaux du lot',
                   style: TextStyle(
-                    color: Colors.grey.shade600,
-                    fontStyle: FontStyle.italic,
+                    color: Colors.blue.shade900,
+                    fontSize: 14,
                   ),
                 ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: _searchVeterinarian,
-                        icon: const Icon(Icons.search),
-                        label: const Text('Rechercher'),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: _scanVeterinarianQR,
-                        icon: const Icon(Icons.qr_code_scanner),
-                        label: const Text('Scanner QR'),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-
-        // Si vétérinaire sélectionné
-        if (_selectedVetId != null) ...[
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.green.shade50,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.green.shade300, width: 2),
-            ),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  backgroundColor: Colors.green.shade100,
-                  radius: 24,
-                  child: Icon(
-                    Icons.verified_user,
-                    color: Colors.green.shade700,
-                    size: 28,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _selectedVetName ?? '',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        _selectedVetOrg ?? '',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  onPressed: _removeVeterinarian,
-                  icon: const Icon(Icons.close, color: Colors.red),
-                  tooltip: 'Retirer',
-                ),
-              ],
-            ),
-          ),
-        ],
+        ),
         const SizedBox(height: 16),
-
-        // Info rémanence
-        if (_selectedProduct != null)
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.orange.shade50,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.orange.shade200),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.warning, color: Colors.orange.shade700),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Rémanence: ${_selectedProduct!.withdrawalDaysMeat} jours\n'
-                    'Fin: ${dateFormat.format(_treatmentDate.add(Duration(days: _selectedProduct!.withdrawalDaysMeat)))}',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.orange.shade900,
-                    ),
-                  ),
+        ElevatedButton.icon(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => TreatmentScreen(
+                  animalIds: lot.animalIds,
+                  batchId: lot.id,
+                  batchName: lot.name,
                 ),
-              ],
-            ),
+              ),
+            );
+          },
+          icon: const Icon(Icons.medical_services, size: 24),
+          label: const Text(
+            'Configurer le traitement',
+            style: TextStyle(fontSize: 16),
           ),
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
+          ),
+        ),
       ],
     );
   }

@@ -20,6 +20,7 @@ import '../data/mock_data.dart';
 import '../widgets/change_eid_dialog.dart';
 import '../widgets/eid_history_card.dart';
 import 'death_screen.dart';
+import 'treatment_screen.dart';
 
 class ScanScreen extends StatefulWidget {
   final Animal? preloadedAnimal;
@@ -564,9 +565,11 @@ class _InfosTab extends StatelessWidget {
   }
 
   void _showAddTreatmentDialog(BuildContext context, String animalId) {
-    showDialog(
-      context: context,
-      builder: (context) => _AddTreatmentDialog(animalId: animalId),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => TreatmentScreen(animalId: animalId),
+      ),
     );
   }
 }
@@ -609,9 +612,11 @@ class _SoinsTab extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: ElevatedButton.icon(
             onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => _AddTreatmentDialog(animalId: animal.id),
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => TreatmentScreen(animalId: animal.id),
+                ),
               );
             },
             icon: const Icon(Icons.add),
@@ -901,248 +906,6 @@ class _InfoRow extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-class _AddTreatmentDialog extends StatefulWidget {
-  final String animalId;
-
-  const _AddTreatmentDialog({required this.animalId});
-
-  @override
-  State<_AddTreatmentDialog> createState() => _AddTreatmentDialogState();
-}
-
-class _AddTreatmentDialogState extends State<_AddTreatmentDialog> {
-  final _doseController = TextEditingController();
-  final _uuid = const Uuid();
-  dynamic _selectedProduct;
-  DateTime _selectedDate = DateTime.now();
-  String? _selectedVetId;
-  String? _selectedVetName;
-  String? _selectedVetOrg;
-
-  @override
-  void dispose() {
-    _doseController.dispose();
-    super.dispose();
-  }
-
-  void _searchVeterinarian() {
-    showDialog(
-      context: context,
-      builder: (context) => _VeterinarianSearchDialog(
-        onSelect: (vet) {
-          setState(() {
-            _selectedVetId = vet.id;
-            _selectedVetName = vet.fullName;
-            _selectedVetOrg = vet.clinic ?? 'Non spécifié';
-          });
-          Navigator.pop(context);
-        },
-      ),
-    );
-  }
-
-  Future<void> _scanVeterinarianQR() async {
-    // TODO: Implémenter le vrai scan QR
-    // Pour l'instant, simulation simplifiée
-    final vets = MockData.veterinarians;
-    if (vets.isEmpty) return;
-
-    final selectedVet = vets.first;
-
-    setState(() {
-      _selectedVetId = selectedVet.id;
-      _selectedVetName = selectedVet.fullName;
-      _selectedVetOrg = selectedVet.clinic ?? 'Non spécifié';
-    });
-
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('✅ ${selectedVet.fullName} validé'),
-        backgroundColor: Colors.green,
-      ),
-    );
-  }
-
-  void _saveTreatment() {
-    if (_selectedProduct == null || _doseController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Veuillez remplir tous les champs requis')),
-      );
-      return;
-    }
-
-    final treatment = Treatment(
-      id: _uuid.v4(),
-      animalId: widget.animalId,
-      productName: _selectedProduct.name,
-      productId: _selectedProduct.id,
-      dose: double.parse(_doseController.text),
-      treatmentDate: _selectedDate,
-      withdrawalEndDate: _selectedDate
-          .add(Duration(days: _selectedProduct.withdrawalDaysMeat)),
-      veterinarianId: _selectedVetId,
-      veterinarianName: _selectedVetName,
-      synced: false,
-      createdAt: DateTime.now(),
-    );
-
-    context.read<AnimalProvider>().addTreatment(treatment);
-    context.read<SyncProvider>().incrementPendingData();
-    Navigator.pop(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Soin ajouté')),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final products = MockData.products;
-
-    return AlertDialog(
-      title: const Text('Ajouter un Soin'),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            DropdownButtonFormField(
-              decoration: const InputDecoration(labelText: 'Produit *'),
-              items: products
-                  .map((p) => DropdownMenuItem(value: p, child: Text(p.name)))
-                  .toList(),
-              onChanged: (value) => setState(() => _selectedProduct = value),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _doseController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Dose (ml) *'),
-            ),
-            const SizedBox(height: 16),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              title: const Text('Date du traitement'),
-              subtitle: Text(
-                  '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}'),
-              trailing: const Icon(Icons.calendar_today),
-              onTap: () async {
-                final picked = await showDatePicker(
-                  context: context,
-                  initialDate: _selectedDate,
-                  firstDate: DateTime.now().subtract(const Duration(days: 30)),
-                  lastDate: DateTime.now(),
-                );
-                if (picked != null) setState(() => _selectedDate = picked);
-              },
-            ),
-            const SizedBox(height: 16),
-            const Text('Vétérinaire (optionnel)',
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: _searchVeterinarian,
-                    icon: const Icon(Icons.search, size: 18),
-                    label: const Text('Rechercher'),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _scanVeterinarianQR,
-                    icon: const Icon(Icons.qr_code_scanner, size: 18),
-                    label: const Text('Scanner QR'),
-                  ),
-                ),
-              ],
-            ),
-            if (_selectedVetName != null) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.green[50],
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.green),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.check_circle, color: Colors.green),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(_selectedVetName!,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold)),
-                          if (_selectedVetOrg != null)
-                            Text(_selectedVetOrg!,
-                                style: const TextStyle(fontSize: 12)),
-                        ],
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close, size: 18),
-                      onPressed: () => setState(() {
-                        _selectedVetId = null;
-                        _selectedVetName = null;
-                        _selectedVetOrg = null;
-                      }),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-            if (_selectedProduct != null) ...[
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.orange[50],
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.orange),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('⚠️ Fin de rémanence',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(
-                      _formatDate(_selectedDate.add(
-                          Duration(days: _selectedProduct.withdrawalDaysMeat))),
-                      style:
-                          const TextStyle(fontSize: 16, color: Colors.orange),
-                    ),
-                    Text(
-                        '(${_selectedProduct.withdrawalDaysMeat} jours d\'attente)'),
-                  ],
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler')),
-        ElevatedButton(
-            onPressed: _saveTreatment, child: const Text('Enregistrer')),
-      ],
-    );
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   }
 }
 
