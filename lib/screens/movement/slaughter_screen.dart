@@ -427,7 +427,7 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
                   : (animal.sex == AnimalSex.male ? Colors.blue : Colors.pink),
             ),
             title: Text(
-              animal.officialNumber ?? animal.eid,
+              animal.displayName,
               style: TextStyle(
                 fontWeight: FontWeight.w500,
                 decoration: isBlocked ? TextDecoration.lineThrough : null,

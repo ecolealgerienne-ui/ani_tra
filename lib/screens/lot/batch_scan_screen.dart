@@ -115,7 +115,7 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                '⚠️ ${animal.officialNumber ?? animal.eid} déjà scanné',
+                '⚠️ ${animal.displayName} déjà scanné',
               ),
             ),
           ],
@@ -139,7 +139,7 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                '✅ ${animal.officialNumber ?? animal.eid} ajouté',
+                '✅ ${animal.displayName} ajouté',
               ),
             ),
           ],
@@ -396,7 +396,7 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
                               ),
                             ),
                             title: Text(
-                              animal.officialNumber ?? animal.eid,
+                              animal.displayName,
                               style: const TextStyle(fontSize: 14),
                             ),
                             trailing: IconButton(

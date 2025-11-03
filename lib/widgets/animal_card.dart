@@ -47,7 +47,7 @@ class AnimalCard extends StatelessWidget {
                   children: [
                     // Numéro officiel ou EID
                     Text(
-                      animal.officialNumber ?? animal.eid,
+                      animal.displayName,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -72,7 +72,7 @@ class AnimalCard extends StatelessWidget {
                     // EID (si différent du numéro affiché)
                     if (animal.officialNumber != null)
                       Text(
-                        animal.eid,
+                        animal.displayName,
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey.shade600,

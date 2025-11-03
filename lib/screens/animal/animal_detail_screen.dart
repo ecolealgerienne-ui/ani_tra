@@ -1,4 +1,4 @@
-// lib/screens/scan_screen.dart
+// lib/screens/animal/animal_detail_screen.dart
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -96,8 +96,7 @@ class _AnimalDetailScreenState extends State<AnimalDetailScreen> {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
-              _scannedAnimal!.officialNumber ?? _scannedAnimal!.currentEid),
+          title: Text(_scannedAnimal!.displayName),
           bottom: const TabBar(
             tabs: [
               Tab(icon: Icon(Icons.info), text: 'Infos'),
@@ -158,7 +157,7 @@ class _AnimalHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  animal.officialNumber ?? animal.currentEid,
+                  animal.displayName,
                   style: const TextStyle(
                       fontSize: 18, fontWeight: FontWeight.bold),
                 ),
@@ -341,8 +340,7 @@ class _InfosTab extends StatelessWidget {
           _InfoCard(
             title: 'Informations de base',
             children: [
-              _InfoRow(
-                  label: 'EID', value: _formatEID(currentAnimal.currentEid)),
+              _InfoRow(label: 'EID', value: _formatEID(currentAnimal.safeEid)),
               if (currentAnimal.officialNumber != null)
                 _InfoRow(
                     label: 'N° Officiel', value: currentAnimal.officialNumber!),
@@ -402,7 +400,7 @@ class _InfosTab extends StatelessWidget {
             children: [
               _InfoRow(
                 label: 'EID actuel',
-                value: currentAnimal.currentEid,
+                value: currentAnimal.safeEid,
               ),
               if (currentAnimal.eidHistory != null &&
                   currentAnimal.eidHistory!.isNotEmpty)
@@ -764,14 +762,15 @@ class _GenealogieTab extends StatelessWidget {
           if (mother != null)
             ListTile(
               leading: const Icon(Icons.family_restroom, color: Colors.pink),
-              title: Text(mother.officialNumber ?? mother.currentEid),
+              title: Text(mother.displayName),
               subtitle: Text(_getAgeFormatted(mother)),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AnimalDetailScreen(preloadedAnimal: mother),
+                    builder: (context) =>
+                        AnimalDetailScreen(preloadedAnimal: mother),
                   ),
                 );
               },
@@ -798,7 +797,7 @@ class _GenealogieTab extends StatelessWidget {
                           ? Colors.blue
                           : Colors.pink,
                     ),
-                    title: Text(child.officialNumber ?? child.currentEid),
+                    title: Text(child.displayName),
                     subtitle: Text(_getAgeFormatted(child)),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                     onTap: () {

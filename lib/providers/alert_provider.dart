@@ -12,31 +12,31 @@ import '../models/incomplete_event.dart';
 import 'animal_provider.dart';
 import 'weight_provider.dart';
 import 'sync_provider.dart';
-import '../data/mock_alerts_generator.dart'; // 🆕 MOCK TEMPORAIRE
+import '../data/mock_alerts_generator.dart'; // ðŸ†• MOCK TEMPORAIRE
 
-/// Provider de gestion des alertes métier
+/// Provider de gestion des alertes mÃ©tier
 ///
-/// Calcule automatiquement toutes les alertes en écoutant :
+/// Calcule automatiquement toutes les alertes en Ã©coutant :
 /// - AnimalProvider (animaux, traitements, mouvements)
-/// - WeightProvider (pesées)
+/// - WeightProvider (pesÃ©es)
 /// - SyncProvider (synchronisation)
 ///
-/// Hiérarchise par priorité et fournit les alertes au UI.
+/// HiÃ©rarchise par prioritÃ© et fournit les alertes au UI.
 class AlertProvider extends ChangeNotifier {
   final AnimalProvider _animalProvider;
   final WeightProvider _weightProvider;
   final SyncProvider _syncProvider;
 
-  /// Liste de toutes les alertes calculées
+  /// Liste de toutes les alertes calculÃ©es
   List<Alert> _alerts = [];
 
-  /// Liste des événements incomplets
+  /// Liste des Ã©vÃ©nements incomplets
   List<IncompleteEvent> _incompleteEvents = [];
 
-  /// Configuration : Délai max de sync (jours)
+  /// Configuration : DÃ©lai max de sync (jours)
   int _maxSyncDelayDays = 7;
 
-  /// Configuration : Tolérance pesée par défaut (jours)
+  /// Configuration : TolÃ©rance pesÃ©e par dÃ©faut (jours)
   int _weighingToleranceDays = 7;
 
   AlertProvider({
@@ -46,7 +46,7 @@ class AlertProvider extends ChangeNotifier {
   })  : _animalProvider = animalProvider,
         _weightProvider = weightProvider,
         _syncProvider = syncProvider {
-    // Écouter les changements des providers
+    // Ã‰couter les changements des providers
     _animalProvider.addListener(_recalculateAlerts);
     _weightProvider.addListener(_recalculateAlerts);
     _syncProvider.addListener(_recalculateAlerts);
@@ -65,10 +65,10 @@ class AlertProvider extends ChangeNotifier {
 
   // ==================== GETTERS ====================
 
-  /// Toutes les alertes (triées par priorité)
+  /// Toutes les alertes (triÃ©es par prioritÃ©)
   List<Alert> get alerts => List.unmodifiable(_alerts);
 
-  /// Alertes URGENTES uniquement (bannière rouge)
+  /// Alertes URGENTES uniquement (banniÃ¨re rouge)
   List<Alert> get urgentAlerts =>
       _alerts.where((a) => a.type == AlertType.urgent).toList();
 
@@ -76,7 +76,7 @@ class AlertProvider extends ChangeNotifier {
   List<Alert> get importantAlerts =>
       _alerts.where((a) => a.type == AlertType.important).toList();
 
-  /// Tâches ROUTINE
+  /// TÃ¢ches ROUTINE
   List<Alert> get routineAlerts =>
       _alerts.where((a) => a.type == AlertType.routine).toList();
 
@@ -92,13 +92,13 @@ class AlertProvider extends ChangeNotifier {
   /// A des alertes urgentes ?
   bool get hasUrgentAlerts => urgentAlerts.isNotEmpty;
 
-  /// Événements incomplets
+  /// Ã‰vÃ©nements incomplets
   List<IncompleteEvent> get incompleteEvents =>
       List.unmodifiable(_incompleteEvents);
 
   // ==================== CONFIGURATION ====================
 
-  /// Définir le délai max de sync
+  /// DÃ©finir le dÃ©lai max de sync
   void setMaxSyncDelayDays(int days) {
     if (days < 1) return;
     if (days > 30) return; // Max 30 jours
@@ -106,7 +106,7 @@ class AlertProvider extends ChangeNotifier {
     _recalculateAlerts();
   }
 
-  /// Définir la tolérance pesée
+  /// DÃ©finir la tolÃ©rance pesÃ©e
   void setWeighingToleranceDays(int days) {
     if (days < 1) return;
     _weighingToleranceDays = days;
@@ -119,7 +119,7 @@ class AlertProvider extends ChangeNotifier {
   void _recalculateAlerts() {
     final newAlerts = <Alert>[];
 
-    // 1. Alertes de rémanence
+    // 1. Alertes de rÃ©manence
     newAlerts.addAll(_calculateRemanenceAlerts());
 
     // 2. Alertes d'identification
@@ -129,10 +129,10 @@ class AlertProvider extends ChangeNotifier {
     final syncAlert = _calculateSyncAlert();
     if (syncAlert != null) newAlerts.add(syncAlert);
 
-    // 4. Tâches de pesée
+    // 4. TÃ¢ches de pesÃ©e
     newAlerts.addAll(_calculateWeighingTasks());
 
-    // 5. Événements incomplets
+    // 5. Ã‰vÃ©nements incomplets
     _incompleteEvents = _calculateIncompleteEvents();
     newAlerts.addAll(_incompleteEvents
         .where((e) => e.needsAlert)
@@ -143,28 +143,28 @@ class AlertProvider extends ChangeNotifier {
               daysOld: e.daysOld,
             )));
 
-    // 6. Traitements à renouveler
+    // 6. Traitements Ã  renouveler
     newAlerts.addAll(_calculateTreatmentRenewals());
 
-    // 🆕 MOCK TEMPORAIRE : Ajouter des alertes de test
+    // ðŸ†• MOCK TEMPORAIRE : Ajouter des alertes de test
     final animalIds = _animalProvider.animals.map((a) => a.id).toList();
     if (animalIds.length >= 5) {
       MockAlertsGenerator.addMockAlertsToProvider(newAlerts, animalIds);
     }
 
-    // Trier par priorité (urgent > important > routine)
+    // Trier par prioritÃ© (urgent > important > routine)
     newAlerts.sort((a, b) => a.type.priority.compareTo(b.type.priority));
 
     _alerts = newAlerts;
     notifyListeners();
 
-    debugPrint('🔔 Alertes recalculées : ${_alerts.length} alertes');
-    debugPrint('   🚨 Urgent: ${urgentAlertCount}');
-    debugPrint('   ⚠️ Important: ${importantAlertCount}');
-    debugPrint('   📋 Routine: ${routineAlerts.length}');
+    debugPrint('ðŸ”” Alertes recalculÃ©es : ${_alerts.length} alertes');
+    debugPrint('   ðŸš¨ Urgent: ${urgentAlertCount}');
+    debugPrint('   âš ï¸ Important: ${importantAlertCount}');
+    debugPrint('   ðŸ“‹ Routine: ${routineAlerts.length}');
   }
 
-  /// Calculer alertes de rémanence
+  /// Calculer alertes de rÃ©manence
   List<Alert> _calculateRemanenceAlerts() {
     final alerts = <Alert>[];
     final animals = _animalProvider.animals
@@ -179,11 +179,14 @@ class AlertProvider extends ChangeNotifier {
 
         final daysRemaining = treatment.daysUntilWithdrawalEnd;
 
-        // Créer alerte si < 7 jours
+        // CrÃ©er alerte si < 7 jours
         if (daysRemaining < 7) {
           alerts.add(Alert.remanence(
             animalId: animal.id,
-            animalName: animal.officialNumber ?? animal.eid,
+            animalName: animal.officialNumber ??
+                animal.displayName ??
+                animal.visualId ??
+                'Animal ${animal.id.substring(0, 8)}',
             daysRemaining: daysRemaining,
             treatmentName: treatment.productName ?? 'Traitement',
           ));
@@ -202,14 +205,16 @@ class AlertProvider extends ChangeNotifier {
         .toList();
 
     for (final animal in animals) {
-      // Vérifier si EID manquant ou invalide
-      if (animal.eid.isEmpty ||
-          animal.eid.length < 10 ||
-          animal.eid.startsWith('TEMP_')) {
+      // VÃ©rifier si EID manquant ou invalide
+      if (animal.displayName == null ||
+          animal.displayName!.isEmpty ||
+          animal.displayName!.length < 10 ||
+          animal.displayName!.startsWith('TEMP_')) {
         alerts.add(Alert.missingIdentification(
           animalId: animal.id,
-          animalName:
-              animal.officialNumber ?? 'Animal ${animal.id.substring(0, 8)}',
+          animalName: animal.officialNumber ??
+              animal.visualId ??
+              'Animal ${animal.id.substring(0, 8)}',
           ageInDays: animal.ageInDays,
         ));
       }
@@ -224,15 +229,15 @@ class AlertProvider extends ChangeNotifier {
     // Si sync en cours, pas d'alerte
     if (_syncProvider.isSyncing) return null;
 
-    // Calculer jours depuis dernière sync
+    // Calculer jours depuis derniÃ¨re sync
     final daysSinceLastSync = _syncProvider.lastSyncDate != null
         ? DateTime.now().difference(_syncProvider.lastSyncDate!).inDays
         : 999;
 
-    // Nombre d'éléments en attente
+    // Nombre d'Ã©lÃ©ments en attente
     final pendingItems = _syncProvider.pendingDataCount;
 
-    // Si sync nécessaire ou critique
+    // Si sync nÃ©cessaire ou critique
     final needsSync =
         daysSinceLastSync > _maxSyncDelayDays || pendingItems > 10;
 
@@ -246,39 +251,39 @@ class AlertProvider extends ChangeNotifier {
     return null;
   }
 
-  /// Calculer tâches de pesée
+  /// Calculer tÃ¢ches de pesÃ©e
   List<Alert> _calculateWeighingTasks() {
     final alerts = <Alert>[];
     final animals = _animalProvider.animals
         .where((a) => a.status == AnimalStatus.alive)
         .toList();
 
-    // Grouper par raison de pesée
+    // Grouper par raison de pesÃ©e
     final animalsByReason = <String, List<String>>{};
 
     for (final animal in animals) {
-      // Récupérer les règles pour cette espèce
+      // RÃ©cupÃ©rer les rÃ¨gles pour cette espÃ¨ce
       final rules = WeighingRulesConfig.getRulesForSpecies(
         animal.speciesId ?? 'ovine',
       );
 
-      // Obtenir la dernière pesée
+      // Obtenir la derniÃ¨re pesÃ©e
       final weights = _weightProvider.weights
           .where((w) => w.animalId == animal.id)
           .toList();
       weights.sort((a, b) => b.recordedAt.compareTo(a.recordedAt));
       final lastWeight = weights.isNotEmpty ? weights.first : null;
 
-      // Calculer la prochaine pesée attendue
+      // Calculer la prochaine pesÃ©e attendue
       for (final rule in rules) {
         if (rule.ageInDays != null) {
-          // Règle à âge précis
+          // RÃ¨gle Ã  Ã¢ge prÃ©cis
           final targetAge = rule.ageInDays!;
           final currentAge = animal.ageInDays;
 
-          // Animal a-t-il atteint cet âge ?
+          // Animal a-t-il atteint cet Ã¢ge ?
           if (currentAge >= targetAge) {
-            // A-t-il été pesé à cet âge ?
+            // A-t-il Ã©tÃ© pesÃ© Ã  cet Ã¢ge ?
             final hasWeightAtAge = weights.any((w) {
               final weightAge =
                   animal.birthDate.difference(w.recordedAt).inDays.abs();
@@ -295,7 +300,7 @@ class AlertProvider extends ChangeNotifier {
             }
           }
         } else if (rule.recurringDays != null && lastWeight != null) {
-          // Règle récurrente
+          // RÃ¨gle rÃ©currente
           final daysSinceLastWeight =
               DateTime.now().difference(lastWeight.recordedAt).inDays;
 
@@ -308,7 +313,7 @@ class AlertProvider extends ChangeNotifier {
       }
     }
 
-    // Créer une alerte par groupe
+    // CrÃ©er une alerte par groupe
     animalsByReason.forEach((reason, animalIds) {
       if (animalIds.isNotEmpty) {
         alerts.add(Alert.weighingRequired(
@@ -321,11 +326,11 @@ class AlertProvider extends ChangeNotifier {
     return alerts;
   }
 
-  /// Calculer événements incomplets
+  /// Calculer Ã©vÃ©nements incomplets
   List<IncompleteEvent> _calculateIncompleteEvents() {
     final events = <IncompleteEvent>[];
 
-    // Vérifier les animaux incomplets
+    // VÃ©rifier les animaux incomplets
     for (final animal in _animalProvider.animals) {
       final missingFields = <String>[];
       var completionRate = 1.0;
@@ -346,16 +351,23 @@ class AlertProvider extends ChangeNotifier {
         completionRate -= 0.3;
       }
 
-      if (animal.eid.isEmpty || animal.eid.length < 10) {
+      if (animal.displayName == null ||
+          animal.displayName!.isEmpty ||
+          animal.displayName!.length < 10) {
         missingFields.add('EID valide');
         completionRate -= 0.4;
       }
 
-      // Si des champs manquent, créer un événement incomplet
+      // Si des champs manquent, crÃ©er un Ã©vÃ©nement incomplet
       if (missingFields.isNotEmpty && completionRate < 0.9) {
         events.add(IncompleteEvent.animal(
           animalId: animal.id,
-          animalName: animal.officialNumber ?? animal.eid,
+          animalName: animal.officialNumber ??
+              animal.displayName ??
+              animal.visualId ??
+              'Animal ${animal.id.substring(0, 8)}' ??
+              animal.visualId ??
+              'Animal ${animal.id.substring(0, 8)}',
           missingFields: missingFields,
           completionRate: completionRate,
           createdAt: animal.createdAt,
@@ -366,17 +378,17 @@ class AlertProvider extends ChangeNotifier {
     return events;
   }
 
-  /// Calculer traitements à renouveler
+  /// Calculer traitements Ã  renouveler
   List<Alert> _calculateTreatmentRenewals() {
     final alerts = <Alert>[];
-    // TODO: Implémenter la logique de renouvellement
+    // TODO: ImplÃ©menter la logique de renouvellement
     // Pour l'instant, retour vide
     return alerts;
   }
 
   // ==================== FILTRES ====================
 
-  /// Filtrer alertes par catégorie
+  /// Filtrer alertes par catÃ©gorie
   List<Alert> getAlertsByCategory(AlertCategory category) {
     return _alerts.where((a) => a.category == category).toList();
   }
@@ -386,14 +398,14 @@ class AlertProvider extends ChangeNotifier {
     return _alerts.where((a) => a.type == type).toList();
   }
 
-  /// Obtenir alertes pour un animal spécifique
+  /// Obtenir alertes pour un animal spÃ©cifique
   List<Alert> getAlertsForAnimal(String animalId) {
     return _alerts.where((a) => a.entityId == animalId).toList();
   }
 
   // ==================== STATS ====================
 
-  /// Statistiques par catégorie
+  /// Statistiques par catÃ©gorie
   Map<AlertCategory, int> getAlertCountsByCategory() {
     final counts = <AlertCategory, int>{};
     for (final alert in _alerts) {
@@ -415,11 +427,11 @@ class AlertProvider extends ChangeNotifier {
 
   /// Marquer une alerte comme lue (future feature)
   void markAlertAsRead(String alertId) {
-    // TODO: Implémenter persistance
+    // TODO: ImplÃ©menter persistance
     notifyListeners();
   }
 
-  /// Effacer une alerte (temporaire, sera recalculée)
+  /// Effacer une alerte (temporaire, sera recalculÃ©e)
   void dismissAlert(String alertId) {
     _alerts.removeWhere((a) => a.id == alertId);
     notifyListeners();
@@ -432,10 +444,10 @@ class AlertProvider extends ChangeNotifier {
 
   // ==================== HELPERS ====================
 
-  /// Message de résumé pour l'utilisateur
+  /// Message de rÃ©sumÃ© pour l'utilisateur
   String getSummary() {
     if (_alerts.isEmpty) {
-      return 'Aucune alerte 🎉';
+      return 'Aucune alerte ðŸŽ‰';
     }
 
     final urgent = urgentAlertCount;
@@ -447,19 +459,19 @@ class AlertProvider extends ChangeNotifier {
     if (important > 0) {
       parts.add('$important importante${important > 1 ? 's' : ''}');
     }
-    if (routine > 0) parts.add('$routine tâche${routine > 1 ? 's' : ''}');
+    if (routine > 0) parts.add('$routine tÃ¢che${routine > 1 ? 's' : ''}');
 
     return parts.join(', ');
   }
 
-  /// Message pour la bannière rouge
+  /// Message pour la banniÃ¨re rouge
   String? getUrgentBannerMessage() {
     if (!hasUrgentAlerts) return null;
 
     final count = urgentAlertCount;
     if (count == 1) {
-      return '🚨 ${urgentAlerts.first.title}';
+      return 'ðŸš¨ ${urgentAlerts.first.title}';
     }
-    return '🚨 $count ALERTES URGENTES';
+    return 'ðŸš¨ $count ALERTES URGENTES';
   }
 }

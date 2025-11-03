@@ -476,14 +476,14 @@ class CampaignDetailScreen extends StatelessWidget {
         child: Icon(sexIcon, color: sexColor, size: 20),
       ),
       title: Text(
-        animal.officialNumber ?? animal.eid,
+        animal.displayName,
         style: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w500,
         ),
       ),
       subtitle: Text(
-        animal.eid,
+        animal.displayName,
         style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
       ),
       trailing: campaign.completed
@@ -591,7 +591,7 @@ class CampaignDetailScreen extends StatelessWidget {
       builder: (context) => AlertDialog(
         title: const Text('Retirer cet animal ?'),
         content: Text(
-          'Voulez-vous retirer "${animal.officialNumber ?? animal.eid}" de la campagne ?',
+          'Voulez-vous retirer "${animal.displayName}" de la campagne ?',
         ),
         actions: [
           TextButton(
@@ -618,7 +618,7 @@ class CampaignDetailScreen extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '✅ Animal retiré: ${animal.officialNumber ?? animal.eid}',
+              '✅ Animal retiré: ${animal.displayName}',
             ),
             backgroundColor: Colors.orange,
           ),
@@ -888,7 +888,7 @@ class _AddAnimalDialogState extends State<_AddAnimalDialog> {
       setState(() {
         _isScanning = false;
         _scannedAnimal = mockAnimal;
-        _eidController.text = mockAnimal.eid;
+        _eidController.text = mockAnimal.displayName;
       });
     });
   }
@@ -899,7 +899,7 @@ class _AddAnimalDialogState extends State<_AddAnimalDialog> {
 
     final animalProvider = context.read<AnimalProvider>();
     final animal = animalProvider.animals.firstWhere(
-      (a) => a.eid.toLowerCase() == eid.trim().toLowerCase(),
+      (a) => (a.currentEid?.toLowerCase() ?? '') == eid.trim().toLowerCase(),
       orElse: () => animalProvider.animals.firstWhere(
         (a) =>
             (a.officialNumber?.toLowerCase() ?? '') == eid.trim().toLowerCase(),
@@ -1167,7 +1167,7 @@ class _RemoveAnimalDialogState extends State<_RemoveAnimalDialog> {
       setState(() {
         _isScanning = false;
         _scannedAnimal = mockAnimal;
-        _eidController.text = mockAnimal.eid;
+        _eidController.text = mockAnimal.displayName;
       });
     });
   }
@@ -1180,9 +1180,13 @@ class _RemoveAnimalDialogState extends State<_RemoveAnimalDialog> {
 
     try {
       final animal = animalProvider.animals.firstWhere(
-        (a) =>
-            a.eid.toLowerCase() == eid.trim().toLowerCase() ||
-            (a.officialNumber?.toLowerCase() ?? '') == eid.trim().toLowerCase(),
+        (a) => (a.currentEid?.toLowerCase() ?? '') == eid.trim().toLowerCase(),
+        orElse: () => animalProvider.animals.firstWhere(
+          (a) =>
+              (a.officialNumber?.toLowerCase() ?? '') ==
+              eid.trim().toLowerCase(),
+          orElse: () => throw Exception('Animal non trouvé'),
+        ),
       );
 
       // Vérifier si dans la campagne

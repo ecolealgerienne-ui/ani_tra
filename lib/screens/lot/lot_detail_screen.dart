@@ -469,8 +469,8 @@ class LotDetailScreen extends StatelessWidget {
             color: animal.sex == AnimalSex.male ? Colors.blue : Colors.pink,
           ),
         ),
-        title: Text(animal.officialNumber ?? animal.eid),
-        subtitle: Text(animal.eid),
+        title: Text(animal.displayName),
+        subtitle: Text(animal.displayName),
         trailing: !lot.completed
             ? IconButton(
                 icon: const Icon(Icons.remove_circle, color: Colors.red),

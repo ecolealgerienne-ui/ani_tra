@@ -20,6 +20,7 @@ import 'i18n/app_localizations.dart';
 import 'screens/home/home_screen.dart'; // ✅ Mis à jour
 import 'screens/animal/animal_detail_screen.dart'; // ✅ Mis à jour
 import 'screens/animal/animal_list_screen.dart'; // ✅ Mis à jour
+import 'screens/animal/universal_scanner_screen.dart'; // ✅ Scanner Phase 1
 import 'screens/sync/sync_screen.dart'; // ✅ Mis à jour
 import 'data/mock_data.dart';
 
@@ -132,6 +133,9 @@ class MyApp extends StatelessWidget {
               Locale('en', ''),
               Locale('ar', ''),
             ],
+            routes: {
+              '/scanner': (context) => const UniversalScannerScreen(),
+            },
             home: const MainNavigation(),
           );
         },

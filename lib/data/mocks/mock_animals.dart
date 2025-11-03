@@ -12,8 +12,9 @@ class MockAnimals {
       // ==================== BREBIS REPRODUCTRICES (5) ====================
       Animal(
         id: 'animal_001',
-        currentEid: '250001234567801',
+        currentEid: 'FR1234567801',
         officialNumber: 'FR-2021-0001',
+        visualId: 'Blanche-1', // ✨ Exemple avec visualId
         birthDate: DateTime(2021, 3, 15),
         sex: AnimalSex.female,
         status: AnimalStatus.alive,
@@ -25,8 +26,9 @@ class MockAnimals {
 
       Animal(
         id: 'animal_002',
-        currentEid: '250001234567802',
+        currentEid: 'FR1234567802',
         officialNumber: 'FR-2021-0002',
+        visualId: 'Tacheté-42', // ✨ Exemple avec visualId
         birthDate: DateTime(2021, 4, 20),
         sex: AnimalSex.female,
         status: AnimalStatus.alive,
@@ -38,7 +40,7 @@ class MockAnimals {
 
       Animal(
         id: 'animal_003',
-        currentEid: '250001234567803',
+        currentEid: 'FR1234567803',
         officialNumber: 'FR-2022-0003',
         birthDate: DateTime(2022, 2, 10),
         sex: AnimalSex.female,
@@ -49,8 +51,8 @@ class MockAnimals {
         eidHistory: [
           EidChange(
             id: 'eid_change_001',
-            oldEid: '250001234567777',
-            newEid: '250001234567803',
+            oldEid: 'FR1234567777',
+            newEid: 'FR1234567803',
             changedAt: DateTime(2023, 6, 15, 14, 30),
             reason: EidChangeReason.puceCassee,
             notes: 'Puce cassée trouvée lors du scan de routine',
@@ -62,7 +64,7 @@ class MockAnimals {
 
       Animal(
         id: 'animal_004',
-        currentEid: '250001234567804',
+        currentEid: 'FR1234567804',
         officialNumber: 'FR-2022-0004',
         birthDate: DateTime(2022, 3, 25),
         sex: AnimalSex.female,
@@ -75,8 +77,9 @@ class MockAnimals {
 
       Animal(
         id: 'animal_005',
-        currentEid: '250001234567805',
+        currentEid: 'FR1234567805',
         officialNumber: 'FR-2023-0005',
+        visualId: 'Rouge-3', // ✨ Exemple avec visualId
         birthDate: DateTime(2023, 1, 15),
         sex: AnimalSex.female,
         motherId: 'animal_001',
@@ -90,7 +93,7 @@ class MockAnimals {
       // ==================== BÉLIERS (3) ====================
       Animal(
         id: 'animal_006',
-        currentEid: '250001234567806',
+        currentEid: 'FR1234567806',
         officialNumber: 'FR-2020-0006',
         birthDate: DateTime(2020, 12, 5),
         sex: AnimalSex.male,
@@ -103,7 +106,7 @@ class MockAnimals {
 
       Animal(
         id: 'animal_007',
-        currentEid: '250001234567807',
+        currentEid: 'FR1234567807',
         officialNumber: 'FR-2021-0007',
         birthDate: DateTime(2021, 11, 10),
         sex: AnimalSex.male,
@@ -116,7 +119,7 @@ class MockAnimals {
 
       Animal(
         id: 'animal_008',
-        currentEid: '250001234567808',
+        currentEid: 'FR1234567808',
         officialNumber: 'FR-2022-0008',
         birthDate: DateTime(2022, 10, 20),
         sex: AnimalSex.male,
@@ -127,16 +130,16 @@ class MockAnimals {
         eidHistory: [
           EidChange(
             id: 'eid_change_002',
-            oldEid: '250001234567888',
-            newEid: '250001234567999',
+            oldEid: 'FR1234567888',
+            newEid: 'FR1234567999',
             changedAt: DateTime(2023, 3, 10, 9, 15),
             reason: EidChangeReason.pucePerdue,
             notes: 'Puce perdue dans le pâturage',
           ),
           EidChange(
             id: 'eid_change_003',
-            oldEid: '250001234567999',
-            newEid: '250001234567808',
+            oldEid: 'FR1234567999',
+            newEid: 'FR1234567808',
             changedAt: DateTime(2024, 8, 22, 16, 45),
             reason: EidChangeReason.puceDefectueuse,
             notes: 'Puce ne répondait plus au lecteur',
@@ -149,7 +152,7 @@ class MockAnimals {
       // ==================== AGNEAUX 2024 (5) ====================
       Animal(
         id: 'animal_009',
-        currentEid: '250001234567809',
+        currentEid: 'FR1234567809',
         officialNumber: 'FR-2024-0009',
         birthDate: DateTime(2024, 2, 10),
         sex: AnimalSex.male,
@@ -163,7 +166,7 @@ class MockAnimals {
 
       Animal(
         id: 'animal_010',
-        currentEid: '250001234567810',
+        currentEid: 'FR1234567810',
         officialNumber: 'FR-2024-0010',
         birthDate: DateTime(2024, 2, 15),
         sex: AnimalSex.female,
@@ -177,7 +180,7 @@ class MockAnimals {
 
       Animal(
         id: 'animal_011',
-        currentEid: '250001234567811',
+        currentEid: 'FR1234567811',
         officialNumber: 'FR-2024-0011',
         birthDate: DateTime(2024, 3, 1),
         sex: AnimalSex.male,
@@ -191,7 +194,7 @@ class MockAnimals {
 
       Animal(
         id: 'animal_012',
-        currentEid: '250001234567812',
+        currentEid: 'FR1234567812',
         officialNumber: 'FR-2024-0012',
         birthDate: DateTime(2024, 3, 20),
         sex: AnimalSex.female,
@@ -205,7 +208,7 @@ class MockAnimals {
 
       Animal(
         id: 'animal_013',
-        currentEid: '250001234567813',
+        currentEid: 'FR1234567813',
         officialNumber: 'FR-2024-0013',
         birthDate: DateTime(2024, 4, 5),
         sex: AnimalSex.male,
@@ -220,7 +223,7 @@ class MockAnimals {
       // ==================== BOVINS (3) ====================
       Animal(
         id: 'animal_014',
-        currentEid: '250002234567814',
+        currentEid: 'FR2234567814',
         officialNumber: 'FR-2022-0014',
         birthDate: DateTime(2022, 5, 10),
         sex: AnimalSex.female,
@@ -233,7 +236,7 @@ class MockAnimals {
 
       Animal(
         id: 'animal_015',
-        currentEid: '250002234567815',
+        currentEid: 'FR2234567815',
         officialNumber: 'FR-2023-0015',
         birthDate: DateTime(2023, 3, 20),
         sex: AnimalSex.male,
@@ -246,7 +249,7 @@ class MockAnimals {
 
       Animal(
         id: 'animal_016',
-        currentEid: '250002234567816',
+        currentEid: 'FR2234567816',
         officialNumber: 'FR-2024-0016',
         birthDate: DateTime(2024, 1, 15),
         sex: AnimalSex.female,
@@ -261,7 +264,7 @@ class MockAnimals {
       // ==================== CAPRINS (2) ====================
       Animal(
         id: 'animal_017',
-        currentEid: '250003234567817',
+        currentEid: 'FR3234567817',
         officialNumber: 'FR-2023-0017',
         birthDate: DateTime(2023, 6, 10),
         sex: AnimalSex.female,
@@ -275,7 +278,7 @@ class MockAnimals {
       // ==================== ANIMAL VENDU (1) ====================
       Animal(
         id: 'animal_018',
-        currentEid: '250001234567818',
+        currentEid: 'FR1234567818',
         officialNumber: 'FR-2023-0018',
         birthDate: DateTime(2023, 12, 5),
         sex: AnimalSex.male,
@@ -290,7 +293,7 @@ class MockAnimals {
       // ==================== ANIMAL MORT (1) ====================
       Animal(
         id: 'animal_019',
-        currentEid: '250001234567819',
+        currentEid: 'FR1234567819',
         officialNumber: 'FR-2024-0019',
         birthDate: DateTime(2024, 1, 15),
         sex: AnimalSex.male,
@@ -305,7 +308,7 @@ class MockAnimals {
       // ==================== ANIMAL AVEC RÉMANENCE (1) ====================
       Animal(
         id: 'animal_020',
-        currentEid: '250001234567820',
+        currentEid: 'FR1234567820',
         officialNumber: 'FR-2024-0020',
         birthDate: DateTime(2024, 4, 1),
         sex: AnimalSex.male,
@@ -315,6 +318,34 @@ class MockAnimals {
         breedId: 'texel',
         createdAt: now.subtract(const Duration(days: 210)),
         updatedAt: now.subtract(const Duration(days: 5)),
+      ),
+
+      // ==================== ANIMAUX SANS EID (avec visualId uniquement) ✨ ====================
+      Animal(
+        id: 'animal_021',
+        visualId: 'Noire-7', // Pas d'EID, uniquement visualId
+        birthDate: DateTime(2024, 5, 10),
+        sex: AnimalSex.female,
+        motherId: 'animal_002',
+        status: AnimalStatus.alive,
+        speciesId: 'sheep',
+        breedId: 'suffolk',
+        createdAt: now.subtract(const Duration(days: 175)),
+        updatedAt: now,
+      ),
+
+      Animal(
+        id: 'animal_022',
+        visualId: 'Tachetée-99', // Pas d'EID, uniquement visualId
+        officialNumber: 'FR-2024-0022',
+        birthDate: DateTime(2024, 6, 1),
+        sex: AnimalSex.female,
+        motherId: 'animal_003',
+        status: AnimalStatus.alive,
+        speciesId: 'sheep',
+        breedId: 'lacaune',
+        createdAt: now.subtract(const Duration(days: 150)),
+        updatedAt: now.subtract(const Duration(days: 1)),
       ),
     ];
   }

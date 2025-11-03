@@ -7,11 +7,13 @@ import 'package:uuid/uuid.dart';
 
 import '../../models/animal.dart';
 import '../../models/movement.dart';
+import '../../models/scan_result.dart';
 
 import '../../providers/animal_provider.dart';
 import '../../providers/sync_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../data/animal_config.dart';
+import 'universal_scanner_screen.dart';
 
 /// Écran d'ajout rapide d'un animal
 ///
@@ -34,6 +36,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
   // Controllers
   final _primaryIdController = TextEditingController();
   final _officialNumberController = TextEditingController();
+  final _visualIdController = TextEditingController();
   final _provenanceController = TextEditingController();
   final _priceController = TextEditingController();
   final _notesController = TextEditingController();
@@ -75,6 +78,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
   void dispose() {
     _primaryIdController.dispose();
     _officialNumberController.dispose();
+    _visualIdController.dispose();
     _provenanceController.dispose();
     _priceController.dispose();
     _notesController.dispose();
@@ -140,6 +144,18 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
     }
 
     // Vérifications supplémentaires
+
+    // Au moins un identifiant requis
+    final hasEid = _primaryIdController.text.trim().isNotEmpty;
+    final hasOfficialNumber = _officialNumberController.text.trim().isNotEmpty;
+    final hasVisualId = _visualIdController.text.trim().isNotEmpty;
+
+    if (!hasEid && !hasOfficialNumber && !hasVisualId) {
+      _showError(
+          '⚠️ Au moins un identifiant requis (EID, N° officiel ou ID visuel)');
+      return;
+    }
+
     if (_selectedSex == null) {
       _showError('⚠️ Veuillez sélectionner le sexe');
       return;
@@ -177,7 +193,9 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
       // 1. Créer l'animal
       final animal = Animal(
         id: _generateId(),
-        currentEid: _primaryIdController.text.trim(),
+        currentEid: _primaryIdController.text.trim().isNotEmpty
+            ? _primaryIdController.text.trim()
+            : null,
         sex: _selectedSex!,
         status: AnimalStatus.alive,
         createdAt: DateTime.now(),
@@ -190,6 +208,9 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
         // ÉTAPE 5 : Ajouter type et race
         speciesId: _selectedSpeciesId,
         breedId: _selectedBreedId,
+        visualId: _visualIdController.text.trim().isNotEmpty
+            ? _visualIdController.text.trim()
+            : null,
       );
 
       animalProvider.addAnimal(animal);
@@ -291,11 +312,59 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
             _buildSectionHeader('📋 Identification'),
             const SizedBox(height: 16),
 
+            // BOUTON SCANNER UNIVERSEL
+            FilledButton.icon(
+              onPressed: () async {
+                final result = await Navigator.push<ScanResult>(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        const UniversalScannerScreen(mode: 'register'),
+                  ),
+                );
+
+                if (result != null && mounted) {
+                  setState(() {
+                    if (result.parsedData.containsKey('eid')) {
+                      _primaryIdController.text = result.parsedData['eid']!;
+                    }
+                    if (result.parsedData.containsKey('officialNumber')) {
+                      _officialNumberController.text =
+                          result.parsedData['officialNumber']!;
+                    }
+                  });
+                }
+              },
+              icon: const Icon(Icons.qr_code_scanner),
+              label: const Text('Scanner l\'identification'),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(double.infinity, 56),
+                backgroundColor: Colors.blue,
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Divider "OU"
+            Row(
+              children: [
+                const Expanded(child: Divider()),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child:
+                      Text('OU', style: Theme.of(context).textTheme.bodyMedium),
+                ),
+                const Expanded(child: Divider()),
+              ],
+            ),
+
+            const SizedBox(height: 16),
+
             // EID / Numéro principal
             TextFormField(
               controller: _primaryIdController,
               decoration: InputDecoration(
-                labelText: 'EID (Numéro électronique) *',
+                labelText: 'EID (Numéro électronique)',
                 hintText: 'FR1234567890123',
                 prefixIcon: const Icon(Icons.qr_code),
                 suffixIcon: IconButton(
@@ -303,13 +372,9 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                   tooltip: 'Scanner',
                   onPressed: _simulateScan,
                 ),
+                helperText:
+                    'Au moins un identifiant requis (EID, N° officiel ou ID visuel)',
               ),
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'EID obligatoire';
-                }
-                return null;
-              },
             ),
 
             const SizedBox(height: 16),
@@ -321,6 +386,19 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                 labelText: 'Numéro officiel (optionnel)',
                 hintText: 'Ex: 123456',
                 prefixIcon: Icon(Icons.numbers),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // ID visuel
+            TextFormField(
+              controller: _visualIdController,
+              decoration: const InputDecoration(
+                labelText: 'ID visuel (optionnel)',
+                hintText: 'Rouge-42, Tache-Blanche...',
+                prefixIcon: Icon(Icons.visibility),
+                helperText: 'Pour identifier facilement l\'animal',
               ),
             ),
 
@@ -746,7 +824,7 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
       setState(() {
         _isScanning = false;
         _scannedMother = mockMother;
-        _eidController.text = mockMother.eid;
+        _eidController.text = mockMother.eid ?? '';
       });
     });
   }
@@ -860,13 +938,19 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      'EID: ${_scannedMother!.eid}',
-                      style: const TextStyle(fontSize: 13),
-                    ),
+                    if (_scannedMother!.eid != null)
+                      Text(
+                        'EID: ${_scannedMother!.eid}',
+                        style: const TextStyle(fontSize: 13),
+                      ),
                     if (_scannedMother!.officialNumber != null)
                       Text(
                         'N° officiel: ${_scannedMother!.officialNumber}',
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                    if (_scannedMother!.visualId != null)
+                      Text(
+                        'ID visuel: ${_scannedMother!.visualId}',
                         style: const TextStyle(fontSize: 13),
                       ),
                     Text(
@@ -891,13 +975,16 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
               : () {
                   widget.onMotherSelected(
                     _scannedMother!.id,
-                    _scannedMother!.officialNumber ?? _scannedMother!.eid,
+                    _scannedMother!.officialNumber ??
+                        _scannedMother!.eid ??
+                        _scannedMother!.visualId ??
+                        'Animal ${_scannedMother!.id.substring(0, 8)}',
                   );
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        '✅ Mère ajoutée: ${_scannedMother!.officialNumber ?? _scannedMother!.eid}',
+                        '✅ Mère ajoutée: ${_scannedMother!.officialNumber ?? _scannedMother!.eid ?? _scannedMother!.visualId ?? 'Animal ${_scannedMother!.id.substring(0, 8)}'}',
                       ),
                       backgroundColor: Colors.green,
                       duration: const Duration(seconds: 2),

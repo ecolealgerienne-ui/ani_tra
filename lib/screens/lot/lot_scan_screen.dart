@@ -306,9 +306,8 @@ class _LotScanScreenState extends State<LotScanScreen> {
                                         : Colors.pink,
                                   ),
                                 ),
-                                title:
-                                    Text(animal.officialNumber ?? animal.eid),
-                                subtitle: Text(animal.eid),
+                                title: Text(animal.displayName),
+                                subtitle: Text(animal.displayName),
                                 trailing: IconButton(
                                   icon: const Icon(Icons.remove_circle,
                                       color: Colors.red),

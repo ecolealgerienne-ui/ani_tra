@@ -4,7 +4,6 @@ import '../models/animal.dart';
 import '../models/treatment.dart';
 import '../models/movement.dart';
 import '../models/product.dart';
-import '../models/eid_change.dart';
 
 class AnimalProvider extends ChangeNotifier {
   // Données principales
@@ -41,7 +40,7 @@ class AnimalProvider extends ChangeNotifier {
       final q = _searchQuery.toLowerCase();
       list = list.where((a) {
         // Aucun texte UI ici (multi-langue côté interface)
-        final eid = a.currentEid.toLowerCase();
+        final eid = a.currentEid?.toLowerCase() ?? '';
         final off = a.officialNumber?.toLowerCase() ?? '';
         final sex = a.sex.name.toLowerCase();
         final status = a.status.name.toLowerCase();
@@ -136,7 +135,7 @@ class AnimalProvider extends ChangeNotifier {
     try {
       // Chercher par EID (contient la query)
       return _animals.firstWhere(
-        (a) => a.currentEid.toLowerCase().contains(q),
+        (a) => (a.currentEid?.toLowerCase() ?? '').contains(q),
       );
     } catch (_) {
       // Si pas trouvé par EID, chercher par N° officiel
@@ -295,18 +294,64 @@ class AnimalProvider extends ChangeNotifier {
     }
   }
 
-  // ==================== CHANGEMENT D'EID ====================
+  // ==================== Recherche intelligente (Phase 1) ====================
 
-  /// Changer l'EID d'un animal (en cas de puce perdue/cassée)
-  ///
-  /// Crée automatiquement un enregistrement dans l'historique
-  ///
-  /// [animalId] : ID de l'animal
-  /// [newEid] : Nouveau code EID
-  /// [reason] : Raison du changement (voir EidChangeReason)
-  /// [notes] : Notes optionnelles
-  ///
-  /// Retourne true si le changement a réussi
+  /// Recherche intelligente multi-critères
+  List<Animal> searchAnimals(String query) {
+    if (query.isEmpty) return List.from(_animals);
+
+    final lowercaseQuery = query.toLowerCase();
+
+    return _animals.where((animal) {
+      if (animal.currentEid?.toLowerCase().contains(lowercaseQuery) == true) {
+        return true;
+      }
+
+      if (animal.officialNumber?.toLowerCase().contains(lowercaseQuery) ==
+          true) {
+        return true;
+      }
+
+      if (animal.visualId?.toLowerCase().contains(lowercaseQuery) == true) {
+        return true;
+      }
+
+      if (animal.eidHistory != null) {
+        for (final eidChange in animal.eidHistory!) {
+          if (eidChange.oldEid.toLowerCase().contains(lowercaseQuery) ||
+              eidChange.newEid.toLowerCase().contains(lowercaseQuery)) {
+            return true;
+          }
+        }
+      }
+
+      return false;
+    }).toList();
+  }
+
+  /// Trouve un animal par n'importe quel identifiant
+  Animal? findAnimalByAnyId(String id) {
+    try {
+      return _animals.firstWhere((animal) {
+        if (animal.currentEid == id) return true;
+        if (animal.officialNumber == id) return true;
+        if (animal.visualId == id) return true;
+
+        if (animal.eidHistory != null) {
+          return animal.eidHistory!.any(
+              (eidChange) => eidChange.oldEid == id || eidChange.newEid == id);
+        }
+
+        return false;
+      });
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // ==================== Changement EID ====================
+
+  /// Change l'EID d'un animal
   bool changeAnimalEid({
     required String animalId,
     required String newEid,
@@ -314,75 +359,15 @@ class AnimalProvider extends ChangeNotifier {
     String? notes,
   }) {
     final animal = getAnimalById(animalId);
-    if (animal == null) {
-      debugPrint('❌ Animal non trouvé: $animalId');
-      return false;
-    }
+    if (animal == null) return false;
 
-    // Vérifier que le nouvel EID est différent
-    if (animal.currentEid == newEid) {
-      debugPrint('⚠️ Le nouvel EID est identique à l\'actuel');
-      return false;
-    }
-
-    // Vérifier que le nouvel EID n'existe pas déjà
-    final existingAnimal = _animals
-        .where(
-          (a) => a.currentEid == newEid && a.id != animalId,
-        )
-        .firstOrNull;
-
-    if (existingAnimal != null) {
-      debugPrint('❌ EID $newEid déjà utilisé par un autre animal');
-      return false;
-    }
-
-    // Créer l'animal mis à jour avec le nouvel EID
-    final updatedAnimal = animal.changeEid(
+    final updated = animal.changeEid(
       newEid: newEid,
       reason: reason,
       notes: notes,
     );
 
-    // Mettre à jour dans la liste
-    updateAnimal(updatedAnimal);
-
-    debugPrint(
-        '✅ EID changé: ${animal.currentEid} → $newEid (raison: $reason)');
+    updateAnimal(updated);
     return true;
-  }
-
-  /// Obtenir l'historique des changements d'EID d'un animal
-  List<EidChange> getAnimalEidHistory(String animalId) {
-    final animal = getAnimalById(animalId);
-    if (animal == null) return [];
-    return animal.eidHistory ?? [];
-  }
-
-  /// Vérifier si un EID existe déjà dans le troupeau
-  bool isEidExists(String eid, {String? excludeAnimalId}) {
-    return _animals.any((a) =>
-        a.currentEid == eid &&
-        (excludeAnimalId == null || a.id != excludeAnimalId));
-  }
-
-  /// Obtenir tous les EID utilisés (actuels + historique)
-  Set<String> getAllUsedEids() {
-    final eids = <String>{};
-
-    for (final animal in _animals) {
-      // EID actuel
-      eids.add(animal.currentEid);
-
-      // EID historiques
-      if (animal.eidHistory != null) {
-        for (final change in animal.eidHistory!) {
-          eids.add(change.oldEid);
-          eids.add(change.newEid);
-        }
-      }
-    }
-
-    return eids;
   }
 }

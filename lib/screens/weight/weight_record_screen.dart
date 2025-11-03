@@ -95,8 +95,7 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content:
-              Text('✅ Animal scanné: ${animal.officialNumber ?? animal.eid}'),
+          content: Text('✅ Animal scanné: ${animal.displayName}'),
           backgroundColor: Colors.green,
           duration: const Duration(seconds: 2),
         ),
@@ -239,7 +238,7 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
                     _selectedAnimal!.officialNumber ?? 'Sans numéro',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  subtitle: Text(_selectedAnimal!.eid),
+                  subtitle: Text(_selectedAnimal!.displayName),
                   trailing: IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () {

@@ -159,7 +159,7 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  animal.eid,
+                  animal.displayName,
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey.shade700,

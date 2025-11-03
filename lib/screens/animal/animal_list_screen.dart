@@ -96,6 +96,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
 
   List<Animal> _getFilteredAnimals(List<Animal> animals) {
     var filtered = animals;
+    final animalProvider = context.read<AnimalProvider>();
 
     // 🆕 Si on vient d'une alerte, filtrer uniquement ces animaux
     if (widget.filterAnimalIds != null) {
@@ -108,13 +109,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     final query =
         _searchController.text.toLowerCase().replaceAll(RegExp(r'[-\s]'), '');
     if (query.isNotEmpty) {
-      filtered = filtered.where((a) {
-        final eidClean = a.eid.toLowerCase().replaceAll(RegExp(r'[-\s]'), '');
-        final numberClean = (a.officialNumber ?? '')
-            .toLowerCase()
-            .replaceAll(RegExp(r'[-\s]'), '');
-        return eidClean.contains(query) || numberClean.contains(query);
-      }).toList();
+      filtered = animalProvider.searchAnimals(_searchController.text);
     }
 
     // Filtre statut
@@ -157,7 +152,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
         if (a.motherId == null) return false;
         final mother =
             context.read<AnimalProvider>().getAnimalById(a.motherId!);
-        return mother?.eid
+        return mother?.safeEid
                 .toLowerCase()
                 .contains(_motherEidFilter!.toLowerCase()) ??
             false;
@@ -704,7 +699,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      animal.officialNumber ?? animal.eid,
+                      animal.displayName,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,

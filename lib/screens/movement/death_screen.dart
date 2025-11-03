@@ -183,7 +183,7 @@ class _DeathScreenState extends State<DeathScreen> {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              Text(_scannedAnimal!.eid),
+                              Text(_scannedAnimal!.displayName),
                             ],
                           ),
                         ),

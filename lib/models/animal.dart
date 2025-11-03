@@ -27,7 +27,8 @@ class Animal implements SyncableEntity {
 
   /// EID actuel (Electronic IDentification) - Code RFID de la puce
   /// ✅ MODIFIABLE - Peut être changé si la puce est perdue/cassée
-  String currentEid;
+  /// ℹ️ OPTIONNEL - Si null, utiliser visualId ou officialNumber
+  String? currentEid;
 
   /// Historique des changements d'EID
   /// Permet la traçabilité complète des changements de puces
@@ -55,6 +56,13 @@ class Animal implements SyncableEntity {
   /// Race (breed) - Ex: 'merinos', 'charolaise', 'alpine'
   /// Utilisé avec breed.dart pour affichage multilingue
   String? breedId;
+
+  /// ID visuel personnalisé pour identification de secours
+  /// Ex: "Rouge-42", "Tache-Blanche", "Oreille-Coupée"
+  final String? visualId;
+
+  /// Photo optionnelle de l'animal
+  final String? photoUrl;
 
   /// Champ de compatibilité pour mock_data.dart
   final int? days;
@@ -86,7 +94,7 @@ class Animal implements SyncableEntity {
   Animal({
     String? id,
     this.farmId = 'mock-farm-001', // Valeur par défaut pour compatibilité mock
-    required this.currentEid,
+    this.currentEid,
     this.eidHistory,
     this.officialNumber,
     required this.birthDate,
@@ -95,6 +103,8 @@ class Animal implements SyncableEntity {
     this.status = AnimalStatus.alive,
     this.speciesId,
     this.breedId,
+    this.visualId,
+    this.photoUrl,
     this.days,
     this.synced = false,
     DateTime? createdAt,
@@ -115,7 +125,7 @@ class Animal implements SyncableEntity {
 
   /// Getter de compatibilité pour le code existant
   /// @deprecated Utiliser currentEid à la place
-  String get eid => currentEid;
+  String? get eid => currentEid;
 
   /// L'animal a-t-il un type (species) défini ?
   bool get hasSpecies => speciesId != null && speciesId!.isNotEmpty;
@@ -128,6 +138,42 @@ class Animal implements SyncableEntity {
 
   /// Nombre de changements d'EID
   int get eidChangeCount => eidHistory?.length ?? 0;
+
+  // ==================== GETTERS SAFE (JAMAIS NULL) ====================
+
+  /// Identifiant principal pour l'affichage (JAMAIS NULL)
+  /// Priorité : visualId > officialNumber > currentEid > "Sans ID"
+  String get displayId {
+    if (visualId != null && visualId!.isNotEmpty) return visualId!;
+    if (officialNumber != null && officialNumber!.isNotEmpty)
+      return officialNumber!;
+    if (currentEid != null && currentEid!.isNotEmpty) return currentEid!;
+    return 'Sans ID';
+  }
+
+  /// Nom complet pour affichage en titre (JAMAIS NULL)
+  String get displayName => displayId;
+
+  /// Identifiant complet pour recherche (JAMAIS NULL)
+  String get fullIdentification {
+    final parts = <String>[];
+    if (visualId != null && visualId!.isNotEmpty) parts.add('ID: $visualId');
+    if (currentEid != null && currentEid!.isNotEmpty)
+      parts.add('EID: $currentEid');
+    if (officialNumber != null && officialNumber!.isNotEmpty) {
+      parts.add('N°: $officialNumber');
+    }
+    return parts.isEmpty ? 'Sans identification' : parts.join(' • ');
+  }
+
+  /// Numéro officiel safe (JAMAIS NULL)
+  String get safeOfficialNumber => officialNumber ?? '-';
+
+  /// EID safe (JAMAIS NULL)
+  String get safeEid => currentEid ?? '-';
+
+  /// Visual ID safe (JAMAIS NULL)
+  String get safeVisualId => visualId ?? '-';
 
   // ==================== Méthodes ====================
 
@@ -142,7 +188,7 @@ class Animal implements SyncableEntity {
   }) {
     final change = EidChange(
       id: const Uuid().v4(),
-      oldEid: currentEid,
+      oldEid: currentEid ?? 'N/A',
       newEid: newEid,
       changedAt: DateTime.now(),
       reason: reason,
@@ -172,6 +218,8 @@ class Animal implements SyncableEntity {
     AnimalStatus? status,
     String? speciesId,
     String? breedId,
+    String? visualId,
+    String? photoUrl,
     int? days,
     bool? synced,
     DateTime? createdAt,
@@ -191,6 +239,8 @@ class Animal implements SyncableEntity {
       status: status ?? this.status,
       speciesId: speciesId ?? this.speciesId,
       breedId: breedId ?? this.breedId,
+      visualId: visualId ?? this.visualId,
+      photoUrl: photoUrl ?? this.photoUrl,
       days: days ?? this.days,
       synced: synced ?? this.synced,
       createdAt: createdAt ?? this.createdAt,
@@ -233,6 +283,8 @@ class Animal implements SyncableEntity {
       'status': status.name,
       'species_id': speciesId,
       'breed_id': breedId,
+      'visual_id': visualId,
+      'photo_url': photoUrl,
       'days': days,
       'synced': synced,
       'created_at': createdAt.toIso8601String(),
@@ -264,6 +316,8 @@ class Animal implements SyncableEntity {
       status: AnimalStatus.values.firstWhere((e) => e.name == json['status']),
       speciesId: json['species_id'] ?? json['speciesId'],
       breedId: json['breed_id'] ?? json['breedId'],
+      visualId: json['visual_id'] ?? json['visualId'],
+      photoUrl: json['photo_url'] ?? json['photoUrl'],
       days: json['days'] as int?,
       synced: json['synced'] as bool? ?? false,
       createdAt: DateTime.parse(json['created_at'] ?? json['createdAt']),

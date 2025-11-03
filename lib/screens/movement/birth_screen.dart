@@ -385,7 +385,7 @@ class _AnimalCard extends StatelessWidget {
               ),
               _InfoRow(
                 label: 'EID',
-                value: animal!.eid,
+                value: animal!.displayName,
               ),
               _InfoRow(
                 label: 'Sexe',

@@ -11,6 +11,7 @@ import '../../models/animal.dart';
 
 import '../animal/animal_list_screen.dart';
 import '../animal/animal_detail_screen.dart'; // Au lieu de scan_screen
+import '../animal/universal_scanner_screen.dart'; // Scanner Phase 1
 import '../lot/lot_list_screen.dart';
 import '../settings/settings_screen.dart';
 import '../alert/alerts_screen.dart';
@@ -222,7 +223,10 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const AnimalDetailScreen()),
+            MaterialPageRoute(
+              builder: (context) =>
+                  const UniversalScannerScreen(mode: 'identify'),
+            ),
           );
         },
         icon: const Icon(Icons.qr_code_scanner),

@@ -202,7 +202,7 @@ class _SaleScreenState extends State<SaleScreen> {
               child: ListTile(
                 leading: const Icon(Icons.check_circle, color: Colors.green),
                 title: Text(_scannedAnimal!.officialNumber ?? 'N/A'),
-                subtitle: Text(_scannedAnimal!.eid),
+                subtitle: Text(_scannedAnimal!.displayName),
                 trailing: IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () {

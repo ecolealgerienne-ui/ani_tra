@@ -131,7 +131,7 @@ class _ChangeEidDialogState extends State<ChangeEidDialog> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      widget.animal.currentEid,
+                      widget.animal.displayName,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
