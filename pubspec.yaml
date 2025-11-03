@@ -54,6 +54,10 @@ dependencies:
 
   mobile_scanner: ^4.0.0
   flutter_vibrate: ^1.3.0
+  
+  # À AJOUTER pour RFID
+  flutter_blue_plus: ^1.32.0  # Bluetooth Low Energy
+  permission_handler: ^11.0.0 # Permissions Bluetooth
 
   # DB SQL Lit
   drift: ^2.20.0

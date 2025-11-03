@@ -18,6 +18,7 @@ import '../../data/animal_config.dart';
 
 import 'animal_detail_screen.dart';
 import 'add_animal_screen.dart';
+import 'animal_finder_screen.dart';
 
 class AnimalListScreen extends StatefulWidget {
   /// Liste d'IDs à afficher uniquement (pour filtrer depuis une alerte)
@@ -469,16 +470,27 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
         decoration: InputDecoration(
           hintText: 'Rechercher EID ou N°...',
           prefixIcon: const Icon(Icons.search),
-          suffixIcon: _searchController.text.isNotEmpty
-              ? IconButton(
+          suffixIcon: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Bouton clear (si texte présent)
+              if (_searchController.text.isNotEmpty)
+                IconButton(
                   icon: const Icon(Icons.clear),
                   onPressed: () {
                     setState(() {
                       _searchController.clear();
                     });
                   },
-                )
-              : null,
+                ),
+              // Bouton scan (toujours visible)
+              IconButton(
+                icon: const Icon(Icons.qr_code_scanner),
+                tooltip: 'Scanner',
+                onPressed: _scanAnimal,
+              ),
+            ],
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -486,6 +498,28 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
         onChanged: (value) => setState(() {}),
       ),
     );
+  }
+
+  /// Scanner un animal et l'ouvrir
+  Future<void> _scanAnimal() async {
+    final animal = await Navigator.push<Animal>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AnimalFinderScreen(
+          mode: AnimalFinderMode.single,
+          title: 'Scanner un animal',
+        ),
+      ),
+    );
+
+    if (animal != null && mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AnimalDetailScreen(preloadedAnimal: animal),
+        ),
+      );
+    }
   }
 
   /// 🆕 Widget : Chips de filtre rapide

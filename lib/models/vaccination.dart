@@ -3,15 +3,26 @@
 import 'package:uuid/uuid.dart';
 import 'syncable_entity.dart';
 
-/// Statut d'une vaccination
-enum VaccinationStatus {
-  planned, // Planifiée
-  administered, // Administrée
-  overdue, // En retard
-  cancelled, // Annulée
+/// Type de vaccination
+enum VaccinationType {
+  obligatoire, // Vaccination obligatoire
+  recommandee, // Vaccination recommandée
+  optionnelle, // Vaccination optionnelle
 }
 
-/// Enregistrement d'une vaccination
+extension VaccinationTypeExtension on VaccinationType {
+  String get label {
+    switch (this) {
+      case VaccinationType.obligatoire:
+        return 'Obligatoire';
+      case VaccinationType.recommandee:
+        return 'Recommandée';
+      case VaccinationType.optionnelle:
+        return 'Optionnelle';
+    }
+  }
+}
+
 class Vaccination implements SyncableEntity {
   // === Identification ===
   @override
@@ -19,57 +30,35 @@ class Vaccination implements SyncableEntity {
   @override
   final String farmId;
 
-  /// ID de l'animal vacciné
-  final String animalId;
+  // === Animal(aux) concerné(s) ===
+  final String? animalId;
+  final List<String> animalIds;
 
-  /// ID du produit vaccinal utilisé
-  final String productId;
+  // === Protocole ===
+  final String? protocolId;
+  final String vaccineName;
+  final VaccinationType type;
+  final String disease;
 
-  /// Nom du produit (pour affichage rapide)
-  final String productName;
-
-  // === Dates ===
-  /// Date d'administration (réelle ou planifiée)
-  final DateTime administrationDate;
-
-  /// Date du prochain rappel
-  final DateTime? nextDueDate;
-
-  // === Détails administration ===
-  /// Numéro de lot du vaccin
+  // === Administration ===
+  final DateTime vaccinationDate;
   final String? batchNumber;
-
-  /// Dosage administré
-  final double? dosage;
-
-  /// Unité de dosage
-  final String? dosageUnit;
-
-  /// Voie d'administration (SC, IM, ID, etc.)
-  final String? administrationRoute;
-
-  /// Site d'injection (encolure, cuisse, etc.)
-  final String? injectionSite;
+  final DateTime? expiryDate;
+  final String dose;
+  final String administrationRoute;
 
   // === Acteurs ===
-  /// ID du vétérinaire (si applicable)
   final String? veterinarianId;
-
-  /// Nom du vétérinaire
   final String? veterinarianName;
 
-  /// Personne ayant administré
-  final String? administeredBy;
+  // === Rappel ===
+  final DateTime? nextDueDate;
 
-  // === Traçabilité ===
-  /// Statut de la vaccination
-  final VaccinationStatus status;
+  // === Délai d'attente ===
+  final int withdrawalPeriodDays;
 
-  /// Notes additionnelles
+  // === Notes ===
   final String? notes;
-
-  /// Réaction adverse observée
-  final String? adverseReaction;
 
   // === Synchronisation ===
   @override
@@ -85,23 +74,23 @@ class Vaccination implements SyncableEntity {
 
   Vaccination({
     String? id,
-    required this.farmId,
-    required this.animalId,
-    required this.productId,
-    required this.productName,
-    required this.administrationDate,
-    this.nextDueDate,
+    this.farmId = 'farm_default',
+    this.animalId,
+    this.animalIds = const [],
+    this.protocolId,
+    required this.vaccineName,
+    required this.type,
+    required this.disease,
+    required this.vaccinationDate,
     this.batchNumber,
-    this.dosage,
-    this.dosageUnit,
-    this.administrationRoute,
-    this.injectionSite,
+    this.expiryDate,
+    required this.dose,
+    required this.administrationRoute,
     this.veterinarianId,
     this.veterinarianName,
-    this.administeredBy,
-    this.status = VaccinationStatus.planned,
+    this.nextDueDate,
+    this.withdrawalPeriodDays = 0,
     this.notes,
-    this.adverseReaction,
     this.synced = false,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -109,50 +98,63 @@ class Vaccination implements SyncableEntity {
     this.serverVersion,
   })  : id = id ?? const Uuid().v4(),
         createdAt = createdAt ?? DateTime.now(),
-        updatedAt = updatedAt ?? DateTime.now();
-
-  // === Helpers ===
-
-  /// La vaccination est en retard ?
-  bool get isOverdue {
-    if (status != VaccinationStatus.planned) return false;
-    return administrationDate.isBefore(DateTime.now());
+        updatedAt = updatedAt ?? DateTime.now() {
+    assert(
+      (animalId != null && animalIds.isEmpty) ||
+          (animalId == null && animalIds.isNotEmpty),
+      'Vaccination must have either animalId or animalIds',
+    );
   }
 
-  /// Jours avant/après la date prévue
-  int get daysUntilDue {
-    return administrationDate.difference(DateTime.now()).inDays;
-  }
+  // === Getters ===
 
-  /// Le rappel est bientôt dû ?
+  bool get isGroupVaccination => animalIds.isNotEmpty;
+  int get animalCount => isGroupVaccination ? animalIds.length : 1;
+
   bool get isReminderDue {
     if (nextDueDate == null) return false;
     final daysUntil = nextDueDate!.difference(DateTime.now()).inDays;
-    return daysUntil <= 30 && daysUntil >= 0;
+    return daysUntil <= 30 &&
+        daysUntil >= -999; // Rappel dans 30 jours ou en retard
   }
 
-  /// Vaccin déjà administré ?
-  bool get isAdministered => status == VaccinationStatus.administered;
+  int? get daysUntilReminder {
+    if (nextDueDate == null) return null;
+    return nextDueDate!.difference(DateTime.now()).inDays;
+  }
 
-  // === Méthodes CRUD ===
+  bool get isInWithdrawalPeriod {
+    if (withdrawalPeriodDays == 0) return false;
+    final endDate = vaccinationDate.add(Duration(days: withdrawalPeriodDays));
+    return DateTime.now().isBefore(endDate);
+  }
+
+  int get daysRemainingInWithdrawal {
+    if (withdrawalPeriodDays == 0) return 0;
+    final endDate = vaccinationDate.add(Duration(days: withdrawalPeriodDays));
+    final remaining = endDate.difference(DateTime.now()).inDays;
+    return remaining > 0 ? remaining : 0;
+  }
+
+  // === CRUD ===
 
   Vaccination copyWith({
     String? animalId,
-    String? productId,
-    String? productName,
-    DateTime? administrationDate,
-    DateTime? nextDueDate,
+    List<String>? animalIds,
+    String? protocolId,
+    String? vaccineName,
+    VaccinationType? type,
+    String? disease,
+    DateTime? vaccinationDate,
     String? batchNumber,
-    double? dosage,
-    String? dosageUnit,
+    DateTime? expiryDate,
+    String? dose,
     String? administrationRoute,
-    String? injectionSite,
     String? veterinarianId,
     String? veterinarianName,
-    String? administeredBy,
-    VaccinationStatus? status,
+    DateTime? nextDueDate,
+    int? withdrawalPeriodDays,
     String? notes,
-    String? adverseReaction,
     bool? synced,
     DateTime? updatedAt,
     DateTime? lastSyncedAt,
@@ -162,21 +164,21 @@ class Vaccination implements SyncableEntity {
       id: id,
       farmId: farmId,
       animalId: animalId ?? this.animalId,
-      productId: productId ?? this.productId,
-      productName: productName ?? this.productName,
-      administrationDate: administrationDate ?? this.administrationDate,
-      nextDueDate: nextDueDate ?? this.nextDueDate,
+      animalIds: animalIds ?? this.animalIds,
+      protocolId: protocolId ?? this.protocolId,
+      vaccineName: vaccineName ?? this.vaccineName,
+      type: type ?? this.type,
+      disease: disease ?? this.disease,
+      vaccinationDate: vaccinationDate ?? this.vaccinationDate,
       batchNumber: batchNumber ?? this.batchNumber,
-      dosage: dosage ?? this.dosage,
-      dosageUnit: dosageUnit ?? this.dosageUnit,
+      expiryDate: expiryDate ?? this.expiryDate,
+      dose: dose ?? this.dose,
       administrationRoute: administrationRoute ?? this.administrationRoute,
-      injectionSite: injectionSite ?? this.injectionSite,
       veterinarianId: veterinarianId ?? this.veterinarianId,
       veterinarianName: veterinarianName ?? this.veterinarianName,
-      administeredBy: administeredBy ?? this.administeredBy,
-      status: status ?? this.status,
+      nextDueDate: nextDueDate ?? this.nextDueDate,
+      withdrawalPeriodDays: withdrawalPeriodDays ?? this.withdrawalPeriodDays,
       notes: notes ?? this.notes,
-      adverseReaction: adverseReaction ?? this.adverseReaction,
       synced: synced ?? this.synced,
       createdAt: createdAt,
       updatedAt: updatedAt ?? DateTime.now(),
@@ -185,7 +187,7 @@ class Vaccination implements SyncableEntity {
     );
   }
 
-  // === Méthodes de sync ===
+  // === Sync ===
 
   Vaccination markAsSynced({required String serverVersion}) {
     return copyWith(
@@ -202,65 +204,87 @@ class Vaccination implements SyncableEntity {
     );
   }
 
-  // === JSON Serialization ===
+  // === JSON ===
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'farmId': farmId,
-      'animalId': animalId,
-      'productId': productId,
-      'productName': productName,
-      'administrationDate': administrationDate.toIso8601String(),
-      'nextDueDate': nextDueDate?.toIso8601String(),
-      'batchNumber': batchNumber,
-      'dosage': dosage,
-      'dosageUnit': dosageUnit,
-      'administrationRoute': administrationRoute,
-      'injectionSite': injectionSite,
-      'veterinarianId': veterinarianId,
-      'veterinarianName': veterinarianName,
-      'administeredBy': administeredBy,
-      'status': status.name,
+      'farm_id': farmId,
+      'animal_id': animalId,
+      'animal_ids': animalIds,
+      'protocol_id': protocolId,
+      'vaccine_name': vaccineName,
+      'type': type.name,
+      'disease': disease,
+      'vaccination_date': vaccinationDate.toIso8601String(),
+      'batch_number': batchNumber,
+      'expiry_date': expiryDate?.toIso8601String(),
+      'dose': dose,
+      'administration_route': administrationRoute,
+      'veterinarian_id': veterinarianId,
+      'veterinarian_name': veterinarianName,
+      'next_due_date': nextDueDate?.toIso8601String(),
+      'withdrawal_period_days': withdrawalPeriodDays,
       'notes': notes,
-      'adverseReaction': adverseReaction,
       'synced': synced,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
-      'lastSyncedAt': lastSyncedAt?.toIso8601String(),
-      'serverVersion': serverVersion,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'last_synced_at': lastSyncedAt?.toIso8601String(),
+      'server_version': serverVersion,
     };
   }
 
   factory Vaccination.fromJson(Map<String, dynamic> json) {
     return Vaccination(
       id: json['id'] as String,
-      farmId: json['farmId'] as String,
-      animalId: json['animalId'] as String,
-      productId: json['productId'] as String,
-      productName: json['productName'] as String,
-      administrationDate: DateTime.parse(json['administrationDate'] as String),
-      nextDueDate: json['nextDueDate'] != null
-          ? DateTime.parse(json['nextDueDate'] as String)
+      farmId: json['farm_id'] as String? ?? 'farm_default',
+      animalId: json['animal_id'] as String?,
+      animalIds: (json['animal_ids'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [],
+      protocolId: json['protocol_id'] as String?,
+      vaccineName: json['vaccine_name'] as String,
+      type: VaccinationType.values.byName(json['type'] as String),
+      disease: json['disease'] as String,
+      vaccinationDate: DateTime.parse(json['vaccination_date'] as String),
+      batchNumber: json['batch_number'] as String?,
+      expiryDate: json['expiry_date'] != null
+          ? DateTime.parse(json['expiry_date'] as String)
           : null,
-      batchNumber: json['batchNumber'] as String?,
-      dosage: (json['dosage'] as num?)?.toDouble(),
-      dosageUnit: json['dosageUnit'] as String?,
-      administrationRoute: json['administrationRoute'] as String?,
-      injectionSite: json['injectionSite'] as String?,
-      veterinarianId: json['veterinarianId'] as String?,
-      veterinarianName: json['veterinarianName'] as String?,
-      administeredBy: json['administeredBy'] as String?,
-      status: VaccinationStatus.values.byName(json['status'] as String),
+      dose: json['dose'] as String,
+      administrationRoute: json['administration_route'] as String,
+      veterinarianId: json['veterinarian_id'] as String?,
+      veterinarianName: json['veterinarian_name'] as String?,
+      nextDueDate: json['next_due_date'] != null
+          ? DateTime.parse(json['next_due_date'] as String)
+          : null,
+      withdrawalPeriodDays: json['withdrawal_period_days'] as int? ?? 0,
       notes: json['notes'] as String?,
-      adverseReaction: json['adverseReaction'] as String?,
       synced: json['synced'] as bool? ?? false,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
-      lastSyncedAt: json['lastSyncedAt'] != null
-          ? DateTime.parse(json['lastSyncedAt'] as String)
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: DateTime.parse(json['updated_at'] as String),
+      lastSyncedAt: json['last_synced_at'] != null
+          ? DateTime.parse(json['last_synced_at'] as String)
           : null,
-      serverVersion: json['serverVersion'] as String?,
+      serverVersion: json['server_version'] as String?,
     );
   }
+
+  @override
+  String toString() =>
+      'Vaccination(id: $id, vaccineName: $vaccineName, disease: $disease, animalCount: $animalCount)';
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Vaccination &&
+        other.id == id &&
+        other.vaccineName == vaccineName &&
+        other.disease == disease &&
+        other.vaccinationDate == vaccinationDate;
+  }
+
+  @override
+  int get hashCode => Object.hash(id, vaccineName, disease, vaccinationDate);
 }

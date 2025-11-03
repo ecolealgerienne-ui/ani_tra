@@ -10,9 +10,10 @@ import '../../providers/alert_provider.dart';
 import '../../models/animal.dart';
 
 import '../animal/animal_list_screen.dart';
-import '../animal/animal_detail_screen.dart'; // Au lieu de scan_screen
-import '../animal/universal_scanner_screen.dart'; // Scanner Phase 1
+import '../animal/animal_detail_screen.dart';
+import '../animal/animal_finder_screen.dart';
 import '../lot/lot_list_screen.dart';
+import '../vaccination/vaccination_list_screen.dart';
 import '../settings/settings_screen.dart';
 import '../alert/alerts_screen.dart';
 
@@ -22,7 +23,7 @@ import '../alert/alerts_screen.dart';
 /// - 🆕 Bannière d'alerte rouge (si urgence)
 /// - Barre de recherche rapide
 /// - Statistiques clés (3 cartes compactes)
-/// - 2 Actions Rapides principales (Animaux + Lots)
+/// - 3 Actions Rapides principales (Animaux + Lots + Vaccinations)
 /// - FAB Scanner
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -210,6 +211,25 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
 
+                    const SizedBox(height: 16),
+
+                    // 🆕 CARTE 3 : VACCINATIONS (grosse carte)
+                    _buildMainActionCard(
+                      context: context,
+                      icon: Icons.vaccines,
+                      iconColor: Colors.green,
+                      title: 'Vaccinations',
+                      subtitle: 'Suivi sanitaire',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const VaccinationListScreen(),
+                          ),
+                        );
+                      },
+                    ),
+
                     const SizedBox(height: 24),
                   ],
                 ),
@@ -220,14 +240,26 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       // FAB Scanner
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          final animal = await Navigator.push<Animal>(
             context,
             MaterialPageRoute(
-              builder: (context) =>
-                  const UniversalScannerScreen(mode: 'identify'),
+              builder: (context) => const AnimalFinderScreen(
+                mode: AnimalFinderMode.single,
+                title: 'Identifier un animal',
+              ),
             ),
           );
+
+          if (animal != null && mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    AnimalDetailScreen(preloadedAnimal: animal),
+              ),
+            );
+          }
         },
         icon: const Icon(Icons.qr_code_scanner),
         label: const Text('Scanner'),

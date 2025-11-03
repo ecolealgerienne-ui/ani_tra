@@ -3,19 +3,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:provider/provider.dart';
 
 import '../../models/scan_result.dart';
-import '../../providers/animal_provider.dart';
 
 class UniversalScannerScreen extends StatefulWidget {
-  final String mode; // 'identify' ou 'register'
+  final String? mode;
   final Function(ScanResult)? onScanSuccess;
+  final String title;
+  final String hint;
 
   const UniversalScannerScreen({
     super.key,
-    this.mode = 'identify',
+    this.mode,
     this.onScanSuccess,
+    this.title = 'Scanner',
+    this.hint = 'Scannez un code-barres, EID ou ID visuel',
   });
 
   @override
@@ -44,13 +46,12 @@ class _UniversalScannerScreenState extends State<UniversalScannerScreen> {
       final scanResult = ScanResult.parse(barcode.rawValue!);
       HapticFeedback.mediumImpact();
 
-      if (widget.mode == 'identify') {
-        await _handleIdentifyMode(scanResult);
-      } else {
-        if (widget.onScanSuccess != null) {
-          widget.onScanSuccess!(scanResult);
-        }
-        if (mounted) Navigator.pop(context, scanResult);
+      if (widget.onScanSuccess != null) {
+        widget.onScanSuccess!(scanResult);
+      }
+
+      if (mounted) {
+        Navigator.pop(context, scanResult);
       }
     } catch (e) {
       _showError('Erreur de scan : $e');
@@ -59,60 +60,6 @@ class _UniversalScannerScreenState extends State<UniversalScannerScreen> {
         setState(() => _isProcessing = false);
       }
     }
-  }
-
-  Future<void> _handleIdentifyMode(ScanResult scanResult) async {
-    final animalProvider = context.read<AnimalProvider>();
-    final animal = scanResult.findMatchingAnimal(animalProvider.animals);
-
-    if (animal != null) {
-      if (mounted) {
-        Navigator.pop(context);
-        Navigator.pushNamed(
-          context,
-          '/animal-detail',
-          arguments: animal.id,
-        );
-      }
-    } else {
-      _showNotFoundDialog(scanResult);
-    }
-  }
-
-  void _showNotFoundDialog(ScanResult scanResult) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Animal non trouvé'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Valeur : ${scanResult.rawValue}'),
-            const SizedBox(height: 16),
-            const Text('Voulez-vous enregistrer ce nouvel animal ?'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
-          ),
-          FilledButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
-              Navigator.pushNamed(
-                context,
-                '/add-animal',
-                arguments: scanResult,
-              );
-            },
-            child: const Text('Enregistrer'),
-          ),
-        ],
-      ),
-    );
   }
 
   void _showError(String message) {
@@ -129,7 +76,7 @@ class _UniversalScannerScreenState extends State<UniversalScannerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Scanner'),
+        title: Text(widget.title),
         actions: [
           IconButton(
             icon: const Icon(Icons.flash_on),
@@ -170,9 +117,7 @@ class _UniversalScannerScreenState extends State<UniversalScannerScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    _isProcessing
-                        ? 'Traitement en cours...'
-                        : 'Scannez un code-barres, EID ou ID visuel',
+                    _isProcessing ? 'Traitement en cours...' : widget.hint,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,

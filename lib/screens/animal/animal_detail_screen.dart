@@ -13,14 +13,18 @@ import '../../providers/animal_provider.dart';
 import '../../providers/weight_provider.dart';
 import '../../providers/sync_provider.dart';
 import '../../providers/alert_provider.dart';
+import '../../providers/vaccination_provider.dart';
 import '../../models/alert.dart';
 import '../../models/alert_type.dart';
 import '../../models/alert_category.dart';
+import '../../models/vaccination.dart';
 import '../../data/mock_data.dart';
 import '../../widgets/change_eid_dialog.dart';
 import '../../widgets/eid_history_card.dart';
 import '../movement/death_screen.dart';
 import '../treatment/treatment_screen.dart';
+import '../vaccination/add_vaccination_screen.dart';
+import '../vaccination/vaccination_detail_screen.dart';
 
 class AnimalDetailScreen extends StatefulWidget {
   final Animal? preloadedAnimal;
@@ -580,12 +584,15 @@ class _SoinsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final animalProvider = context.watch<AnimalProvider>();
+    final vaccinationProvider = context.watch<VaccinationProvider>();
     final treatments = animalProvider.getAnimalTreatments(animal.id);
+    final vaccinations =
+        vaccinationProvider.getVaccinationsForAnimal(animal.id);
 
     return Column(
       children: [
         Expanded(
-          child: treatments.isEmpty
+          child: (treatments.isEmpty && vaccinations.isEmpty)
               ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -598,29 +605,108 @@ class _SoinsTab extends StatelessWidget {
                     ],
                   ),
                 )
-              : ListView.builder(
+              : ListView(
                   padding: const EdgeInsets.all(16),
-                  itemCount: treatments.length,
-                  itemBuilder: (context, index) {
-                    return _TreatmentCard(treatment: treatments[index]);
-                  },
+                  children: [
+                    if (vaccinations.isNotEmpty) ...[
+                      Row(
+                        children: [
+                          const Icon(Icons.vaccines,
+                              color: Colors.green, size: 20),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Vaccinations',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const Spacer(),
+                          Text(
+                            '${vaccinations.length}',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      ...vaccinations
+                          .map((v) => _VaccinationCard(vaccination: v)),
+                      const SizedBox(height: 24),
+                    ],
+                    if (treatments.isNotEmpty) ...[
+                      Row(
+                        children: [
+                          const Icon(Icons.medical_services,
+                              color: Colors.blue, size: 20),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Traitements',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const Spacer(),
+                          Text(
+                            '${treatments.length}',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      ...treatments.map((t) => _TreatmentCard(treatment: t)),
+                    ],
+                  ],
                 ),
         ),
         Padding(
           padding: const EdgeInsets.all(16),
-          child: ElevatedButton.icon(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => TreatmentScreen(animalId: animal.id),
+          child: Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => AddVaccinationScreen(
+                          preselectedAnimalId: animal.id,
+                        ),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.vaccines),
+                  label: const Text('Vaccination'),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(48),
+                    backgroundColor: Colors.green,
+                  ),
                 ),
-              );
-            },
-            icon: const Icon(Icons.add),
-            label: const Text('Ajouter un soin individuel'),
-            style: ElevatedButton.styleFrom(
-                minimumSize: const Size.fromHeight(48)),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => TreatmentScreen(animalId: animal.id),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.medical_services),
+                  label: const Text('Traitement'),
+                  style: ElevatedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(48)),
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -1181,5 +1267,159 @@ class AlertsSection extends StatelessWidget {
       case AlertType.routine:
         return 'ROUTINE';
     }
+  }
+}
+
+class _VaccinationCard extends StatelessWidget {
+  final Vaccination vaccination;
+
+  const _VaccinationCard({required this.vaccination});
+
+  Color _getTypeColor() {
+    switch (vaccination.type) {
+      case VaccinationType.obligatoire:
+        return Colors.red;
+      case VaccinationType.recommandee:
+        return Colors.orange;
+      case VaccinationType.optionnelle:
+        return Colors.blue;
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final typeColor = _getTypeColor();
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => VaccinationDetailScreen(vaccination: vaccination),
+            ),
+          );
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.vaccines, color: Colors.green),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      vaccination.vaccineName,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: typeColor.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      vaccination.type.label,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: typeColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  const Icon(Icons.medical_services,
+                      size: 14, color: Colors.grey),
+                  const SizedBox(width: 4),
+                  Text(
+                    vaccination.disease,
+                    style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  const Icon(Icons.calendar_today,
+                      size: 14, color: Colors.grey),
+                  const SizedBox(width: 4),
+                  Text(
+                    _formatDate(vaccination.vaccinationDate),
+                    style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                  ),
+                ],
+              ),
+              if (vaccination.nextDueDate != null) ...[
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: vaccination.isReminderDue
+                        ? (vaccination.daysUntilReminder! < 0
+                            ? Colors.red.withValues(alpha: 0.1)
+                            : Colors.orange.withValues(alpha: 0.1))
+                        : Colors.blue.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        vaccination.daysUntilReminder! < 0
+                            ? Icons.error
+                            : Icons.notifications,
+                        size: 14,
+                        color: vaccination.isReminderDue
+                            ? (vaccination.daysUntilReminder! < 0
+                                ? Colors.red
+                                : Colors.orange)
+                            : Colors.blue,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        vaccination.daysUntilReminder! < 0
+                            ? 'Rappel en retard'
+                            : 'Rappel dans ${vaccination.daysUntilReminder}j',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: vaccination.isReminderDue
+                              ? (vaccination.daysUntilReminder! < 0
+                                  ? Colors.red
+                                  : Colors.orange)
+                              : Colors.blue,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

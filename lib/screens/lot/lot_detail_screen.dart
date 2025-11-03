@@ -8,7 +8,7 @@ import '../../providers/animal_provider.dart';
 import '../../models/lot.dart';
 import '../../models/animal.dart';
 import '../../i18n/app_localizations.dart';
-import '../lot/lot_scan_screen.dart';
+import '../animal/animal_finder_screen.dart';
 import '../lot/lot_finalize_screen.dart';
 
 class LotDetailScreen extends StatelessWidget {
@@ -413,15 +413,37 @@ class LotDetailScreen extends StatelessWidget {
               ),
               if (!lot.completed)
                 TextButton.icon(
-                  onPressed: () {
-                    Navigator.push(
+                  onPressed: () async {
+                    final result = await Navigator.push<List<Animal>>(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => LotScanScreen(lotId: lot.id),
+                        builder: (_) => const AnimalFinderScreen(
+                          mode: AnimalFinderMode.multiple,
+                          title: 'Scanner les animaux',
+                          allowedStatuses: [AnimalStatus.alive],
+                        ),
                       ),
                     );
+
+                    if (result != null && context.mounted) {
+                      final lotProvider = context.read<LotProvider>();
+                      lotProvider.setActiveLot(lot);
+
+                      for (final animal in result) {
+                        if (!lot.animalIds.contains(animal.id)) {
+                          lotProvider.addAnimalToActiveLot(animal.id);
+                        }
+                      }
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('${result.length} animaux ajoutés'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    }
                   },
-                  icon: const Icon(Icons.nfc, size: 18),
+                  icon: const Icon(Icons.qr_code_scanner, size: 18),
                   label: const Text('Scanner'),
                 ),
             ],

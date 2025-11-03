@@ -3,9 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'models/animal.dart';
 import 'providers/animal_provider.dart';
 import 'providers/sync_provider.dart';
 import 'providers/qr_provider.dart';
+import 'providers/rfid_scanner_provider.dart';
 import 'providers/locale_provider.dart';
 import 'providers/batch_provider.dart';
 import 'providers/campaign_provider.dart';
@@ -14,6 +16,7 @@ import 'providers/weight_provider.dart';
 import 'providers/settings_provider.dart';
 import 'providers/alert_provider.dart';
 import 'providers/vaccination_provider.dart';
+import 'providers/vaccination_reference_provider.dart';
 import 'providers/document_provider.dart';
 import 'providers/breeding_provider.dart';
 import 'providers/auth_provider.dart';
@@ -21,9 +24,11 @@ import 'i18n/app_localizations.dart';
 import 'screens/home/home_screen.dart'; // ✅ Mis à jour
 import 'screens/animal/animal_detail_screen.dart'; // ✅ Mis à jour
 import 'screens/animal/animal_list_screen.dart'; // ✅ Mis à jour
+import 'screens/animal/animal_finder_screen.dart'; // ✅ Scanner universel
 import 'screens/animal/universal_scanner_screen.dart'; // ✅ Scanner Phase 1
 import 'screens/sync/sync_screen.dart'; // ✅ Mis à jour
 import 'data/mock_data.dart';
+import 'data/mocks/mock_vaccination_references.dart';
 
 void main() {
   runApp(const MyApp());
@@ -43,6 +48,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => QRProvider()),
         ChangeNotifierProvider(create: (_) => SyncProvider()),
+        ChangeNotifierProvider(create: (_) => RFIDScannerProvider()),
         ChangeNotifierProvider(
           create: (_) {
             final provider = SettingsProvider();
@@ -99,9 +105,28 @@ class MyApp extends StatelessWidget {
           update: (context, auth, previous) => previous ?? WeightProvider(auth),
         ),
 
+        ChangeNotifierProxyProvider<AuthProvider, VaccinationReferenceProvider>(
+          create: (context) {
+            final auth = context.read<AuthProvider>();
+            final provider = VaccinationReferenceProvider(auth);
+            provider.setReferences(
+              vaccines: MockVaccinationReferences.generateVaccines(),
+              diseases: MockVaccinationReferences.generateDiseases(),
+              routes: MockVaccinationReferences.generateRoutes(),
+            );
+            return provider;
+          },
+          update: (context, auth, previous) =>
+              previous ?? VaccinationReferenceProvider(auth),
+        ),
+
         ChangeNotifierProxyProvider<AuthProvider, VaccinationProvider>(
-          create: (context) =>
-              VaccinationProvider(context.read<AuthProvider>()),
+          create: (context) {
+            final auth = context.read<AuthProvider>();
+            final provider = VaccinationProvider(auth);
+            provider.setVaccinations(MockData.generateVaccinations());
+            return provider;
+          },
           update: (context, auth, previous) =>
               previous ?? VaccinationProvider(auth),
         ),
@@ -119,19 +144,21 @@ class MyApp extends StatelessWidget {
         ),
 
         // 4. AlertProvider (dépend de plusieurs providers)
-        ChangeNotifierProxyProvider3<AnimalProvider, WeightProvider,
-            SyncProvider, AlertProvider>(
+        ChangeNotifierProxyProvider4<AnimalProvider, WeightProvider,
+            SyncProvider, VaccinationProvider, AlertProvider>(
           create: (context) => AlertProvider(
             animalProvider: context.read<AnimalProvider>(),
             weightProvider: context.read<WeightProvider>(),
             syncProvider: context.read<SyncProvider>(),
+            vaccinationProvider: context.read<VaccinationProvider>(),
           ),
-          update: (context, animal, weight, sync, previous) =>
+          update: (context, animal, weight, sync, vaccination, previous) =>
               previous ??
               AlertProvider(
                 animalProvider: animal,
                 weightProvider: weight,
                 syncProvider: sync,
+                vaccinationProvider: vaccination,
               ),
         ),
       ],
@@ -195,13 +222,24 @@ class MainNavigation extends StatefulWidget {
 class _MainNavigationState extends State<MainNavigation> {
   int _selectedIndex = 0;
 
-  // ✅ ICI - _screens va dans _MainNavigationState
-  static const List<Widget> _screens = [
-    HomeScreen(),
-    AnimalDetailScreen(), // ✅ Changé de AnimalDetailScreen
-    AnimalListScreen(),
-    SyncScreen(),
-  ];
+  List<Widget> _getScreens() {
+    return [
+      const HomeScreen(),
+      _ScanTabScreen(onAnimalSelected: (animal) {
+        setState(() {
+          _selectedIndex = 0; // Retour à l'accueil
+        });
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AnimalDetailScreen(preloadedAnimal: animal),
+          ),
+        );
+      }),
+      const AnimalListScreen(),
+      const SyncScreen(),
+    ];
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -211,8 +249,10 @@ class _MainNavigationState extends State<MainNavigation> {
 
   @override
   Widget build(BuildContext context) {
+    final screens = _getScreens();
+
     return Scaffold(
-      body: _screens[_selectedIndex],
+      body: screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
@@ -239,5 +279,48 @@ class _MainNavigationState extends State<MainNavigation> {
         ],
       ),
     );
+  }
+}
+
+/// Widget pour l'onglet Scan qui gère la navigation vers la fiche animal
+class _ScanTabScreen extends StatelessWidget {
+  final Function(Animal) onAnimalSelected;
+
+  const _ScanTabScreen({required this.onAnimalSelected});
+
+  @override
+  Widget build(BuildContext context) {
+    // Utiliser un Builder pour avoir accès au bon context
+    return Builder(
+      builder: (context) {
+        // Auto-navigation vers AnimalFinderScreen
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _navigateToScanner(context);
+        });
+
+        // Afficher un écran vide pendant la navigation
+        return const Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _navigateToScanner(BuildContext context) async {
+    final animal = await Navigator.push<Animal>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AnimalFinderScreen(
+          mode: AnimalFinderMode.single,
+          title: 'Scanner un animal',
+        ),
+      ),
+    );
+
+    if (animal != null) {
+      onAnimalSelected(animal);
+    }
   }
 }

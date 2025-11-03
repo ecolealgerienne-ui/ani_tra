@@ -1,228 +1,256 @@
-// lib/mock/mock_vaccinations.dart
+// lib/data/mocks/mock_vaccinations.dart
 
 import '../../models/vaccination.dart';
 
-/// Données de test pour les vaccinations
-final List<Vaccination> mockVaccinations = [
-  // === Vaccinations administrées ===
-  Vaccination(
-    id: 'vacc-001',
-    farmId: 'mock-farm-001',
-    animalId: 'animal-001', // Belle (vache laitière)
-    productId: 'med-001',
-    productName: 'Bovilis IBR Marker Live',
-    administrationDate: DateTime.now().subtract(const Duration(days: 45)),
-    nextDueDate: DateTime.now().add(const Duration(days: 320)),
-    batchNumber: 'LOT2024-IBR-443',
-    dosage: 2.0,
-    dosageUnit: 'ml',
-    administrationRoute: 'IM',
-    injectionSite: 'Encolure gauche',
-    veterinarianId: 'vet-001',
-    veterinarianName: 'Dr. Martin Dubois',
-    administeredBy: 'Jean Dupont',
-    status: VaccinationStatus.administered,
-    notes: 'Vaccination annuelle IBR - Aucune réaction',
-    createdAt: DateTime.now().subtract(const Duration(days: 50)),
-    updatedAt: DateTime.now().subtract(const Duration(days: 45)),
-  ),
+class MockVaccinations {
+  static List<Vaccination> generateVaccinations() {
+    final now = DateTime.now();
 
-  Vaccination(
-    id: 'vacc-002',
-    farmId: 'mock-farm-001',
-    animalId: 'animal-001',
-    productId: 'med-002',
-    productName: 'Bravoxin 10',
-    administrationDate: DateTime.now().subtract(const Duration(days: 60)),
-    nextDueDate: DateTime.now().add(const Duration(days: 305)),
-    batchNumber: 'LOT2024-BRV-881',
-    dosage: 5.0,
-    dosageUnit: 'ml',
-    administrationRoute: 'SC',
-    injectionSite: 'Flanc droit',
-    veterinarianId: 'vet-001',
-    veterinarianName: 'Dr. Martin Dubois',
-    administeredBy: 'Jean Dupont',
-    status: VaccinationStatus.administered,
-    notes: 'Vaccination clostridies - RAS',
-    createdAt: DateTime.now().subtract(const Duration(days: 65)),
-    updatedAt: DateTime.now().subtract(const Duration(days: 60)),
-  ),
+    return [
+      // === VACCINATION INDIVIDUELLE - Entérotoxémie ===
+      Vaccination(
+        id: 'vacc_001',
+        farmId: 'farm_default',
+        animalId: 'animal_001',
+        protocolId: 'ovine_enterotoxemie',
+        vaccineName: 'Covexin 10',
+        type: VaccinationType.recommandee,
+        disease: 'Entérotoxémie',
+        vaccinationDate: now.subtract(const Duration(days: 90)),
+        batchNumber: 'LOT2024-COV-123',
+        expiryDate: now.add(const Duration(days: 300)),
+        dose: '2 ml',
+        administrationRoute: 'IM',
+        veterinarianId: 'vet_001',
+        veterinarianName: 'Dr. Martin',
+        nextDueDate: now.add(const Duration(days: 275)),
+        withdrawalPeriodDays: 0,
+        notes: 'Vaccination annuelle - RAS',
+        synced: true,
+        createdAt: now.subtract(const Duration(days: 90)),
+      ),
 
-  Vaccination(
-    id: 'vacc-003',
-    farmId: 'mock-farm-001',
-    animalId: 'animal-002', // Marguerite
-    productId: 'med-001',
-    productName: 'Bovilis IBR Marker Live',
-    administrationDate: DateTime.now().subtract(const Duration(days: 30)),
-    nextDueDate: DateTime.now().add(const Duration(days: 335)),
-    batchNumber: 'LOT2024-IBR-443',
-    dosage: 2.0,
-    dosageUnit: 'ml',
-    administrationRoute: 'IM',
-    injectionSite: 'Encolure droite',
-    veterinarianId: 'vet-001',
-    veterinarianName: 'Dr. Martin Dubois',
-    administeredBy: 'Jean Dupont',
-    status: VaccinationStatus.administered,
-    adverseReaction: 'Légère réaction locale - œdème 2cm disparu en 48h',
-    notes: 'Vaccination IBR - Surveiller réaction',
-    createdAt: DateTime.now().subtract(const Duration(days: 35)),
-    updatedAt: DateTime.now().subtract(const Duration(days: 30)),
-  ),
+      // === VACCINATION INDIVIDUELLE - Pasteurellose ===
+      Vaccination(
+        id: 'vacc_002',
+        farmId: 'farm_default',
+        animalId: 'animal_002',
+        protocolId: 'ovine_pasteurellose',
+        vaccineName: 'Ovipast Plus',
+        type: VaccinationType.recommandee,
+        disease: 'Pasteurellose',
+        vaccinationDate: now.subtract(const Duration(days: 60)),
+        batchNumber: 'LOT2024-OVI-456',
+        expiryDate: now.add(const Duration(days: 330)),
+        dose: '2 ml',
+        administrationRoute: 'SC',
+        veterinarianId: 'vet_002',
+        veterinarianName: 'Dr. Dubois',
+        nextDueDate: now.add(const Duration(days: 305)),
+        withdrawalPeriodDays: 0,
+        notes: 'Avant rentrée bergerie',
+        synced: true,
+        createdAt: now.subtract(const Duration(days: 60)),
+      ),
 
-  Vaccination(
-    id: 'vacc-004',
-    farmId: 'mock-farm-001',
-    animalId: 'animal-005', // Duchesse
-    productId: 'med-003',
-    productName: 'Bovilis BVD',
-    administrationDate: DateTime.now().subtract(const Duration(days: 90)),
-    nextDueDate: DateTime.now().add(const Duration(days: 275)),
-    batchNumber: 'LOT2024-BVD-223',
-    dosage: 2.0,
-    dosageUnit: 'ml',
-    administrationRoute: 'IM',
-    injectionSite: 'Cuisse gauche',
-    veterinarianId: 'vet-002',
-    veterinarianName: 'Dr. Sophie Laurent',
-    administeredBy: 'Marie Martin',
-    status: VaccinationStatus.administered,
-    notes: 'Vaccination BVD génisse - RAS',
-    createdAt: DateTime.now().subtract(const Duration(days: 95)),
-    updatedAt: DateTime.now().subtract(const Duration(days: 90)),
-  ),
+      // === VACCINATION DE GROUPE - Entérotoxémie (5 animaux) ===
+      Vaccination(
+        id: 'vacc_003',
+        farmId: 'farm_default',
+        animalIds: [
+          'animal_003',
+          'animal_004',
+          'animal_005',
+          'animal_006',
+          'animal_007',
+        ],
+        protocolId: 'ovine_enterotoxemie',
+        vaccineName: 'Covexin 10',
+        type: VaccinationType.recommandee,
+        disease: 'Entérotoxémie',
+        vaccinationDate: now.subtract(const Duration(days: 30)),
+        batchNumber: 'LOT2024-COV-789',
+        expiryDate: now.add(const Duration(days: 360)),
+        dose: '2 ml/animal',
+        administrationRoute: 'IM',
+        veterinarianId: 'vet_001',
+        veterinarianName: 'Dr. Martin',
+        nextDueDate: now.add(const Duration(days: 335)),
+        withdrawalPeriodDays: 0,
+        notes: 'Vaccination de lot - Agnelles',
+        synced: true,
+        createdAt: now.subtract(const Duration(days: 30)),
+      ),
 
-  // === Vaccinations planifiées ===
-  Vaccination(
-    id: 'vacc-005',
-    farmId: 'mock-farm-001',
-    animalId: 'animal-003', // Blanchette
-    productId: 'med-001',
-    productName: 'Bovilis IBR Marker Live',
-    administrationDate: DateTime.now().add(const Duration(days: 7)),
-    batchNumber: 'LOT2024-IBR-443',
-    dosage: 2.0,
-    dosageUnit: 'ml',
-    veterinarianId: 'vet-001',
-    veterinarianName: 'Dr. Martin Dubois',
-    status: VaccinationStatus.planned,
-    notes: 'Vaccination IBR à planifier',
-    createdAt: DateTime.now().subtract(const Duration(days: 5)),
-  ),
+      // === VACCINATION AVEC RAPPEL PROCHE (7 jours) ===
+      Vaccination(
+        id: 'vacc_004',
+        farmId: 'farm_default',
+        animalId: 'animal_008',
+        protocolId: 'ovine_pasteurellose',
+        vaccineName: 'Ovipast Plus',
+        type: VaccinationType.recommandee,
+        disease: 'Pasteurellose',
+        vaccinationDate: now.subtract(const Duration(days: 358)),
+        batchNumber: 'LOT2023-OVI-321',
+        dose: '2 ml',
+        administrationRoute: 'SC',
+        veterinarianId: 'vet_001',
+        veterinarianName: 'Dr. Martin',
+        nextDueDate: now.add(const Duration(days: 7)),
+        withdrawalPeriodDays: 0,
+        notes: 'Rappel annuel bientôt',
+        synced: true,
+        createdAt: now.subtract(const Duration(days: 358)),
+      ),
 
-  Vaccination(
-    id: 'vacc-006',
-    farmId: 'mock-farm-001',
-    animalId: 'animal-004', // Caramel
-    productId: 'med-002',
-    productName: 'Bravoxin 10',
-    administrationDate: DateTime.now().add(const Duration(days: 14)),
-    dosage: 5.0,
-    dosageUnit: 'ml',
-    veterinarianId: 'vet-001',
-    veterinarianName: 'Dr. Martin Dubois',
-    status: VaccinationStatus.planned,
-    notes: 'Rappel clostridies',
-    createdAt: DateTime.now().subtract(const Duration(days: 2)),
-  ),
+      // === VACCINATION RAPPEL EN RETARD ===
+      Vaccination(
+        id: 'vacc_005',
+        farmId: 'farm_default',
+        animalId: 'animal_009',
+        protocolId: 'ovine_enterotoxemie',
+        vaccineName: 'Covexin 10',
+        type: VaccinationType.recommandee,
+        disease: 'Entérotoxémie',
+        vaccinationDate: now.subtract(const Duration(days: 380)),
+        batchNumber: 'LOT2023-COV-654',
+        dose: '2 ml',
+        administrationRoute: 'IM',
+        veterinarianId: 'vet_003',
+        veterinarianName: 'Dr. Laurent',
+        nextDueDate: now.subtract(const Duration(days: 15)),
+        withdrawalPeriodDays: 0,
+        notes: '⚠️ Rappel en retard',
+        synced: true,
+        createdAt: now.subtract(const Duration(days: 380)),
+      ),
 
-  // === Vaccinations en retard ===
-  Vaccination(
-    id: 'vacc-007',
-    farmId: 'mock-farm-001',
-    animalId: 'animal-006', // Noisette
-    productId: 'med-001',
-    productName: 'Bovilis IBR Marker Live',
-    administrationDate: DateTime.now().subtract(const Duration(days: 3)),
-    veterinarianId: 'vet-001',
-    veterinarianName: 'Dr. Martin Dubois',
-    status: VaccinationStatus.planned,
-    notes: '⚠️ RETARD - Prévoir rapidement',
-    createdAt: DateTime.now().subtract(const Duration(days: 15)),
-  ),
+      // === VACCINATION DE GROUPE - Fièvre Q (10 animaux) ===
+      Vaccination(
+        id: 'vacc_006',
+        farmId: 'farm_default',
+        animalIds: [
+          'animal_010',
+          'animal_011',
+          'animal_012',
+          'animal_013',
+          'animal_014',
+          'animal_015',
+          'animal_016',
+          'animal_017',
+          'animal_018',
+          'animal_019',
+        ],
+        protocolId: 'ovine_fievre_q',
+        vaccineName: 'Coxevac',
+        type: VaccinationType.optionnelle,
+        disease: 'Fièvre Q',
+        vaccinationDate: now.subtract(const Duration(days: 120)),
+        batchNumber: 'LOT2024-COX-999',
+        expiryDate: now.add(const Duration(days: 270)),
+        dose: '1 ml/animal',
+        administrationRoute: 'SC',
+        veterinarianId: 'vet_002',
+        veterinarianName: 'Dr. Dubois',
+        nextDueDate: now.add(const Duration(days: 245)),
+        withdrawalPeriodDays: 0,
+        notes: 'Campagne zone endémique',
+        synced: true,
+        createdAt: now.subtract(const Duration(days: 120)),
+      ),
 
-  Vaccination(
-    id: 'vacc-008',
-    farmId: 'mock-farm-001',
-    animalId: 'animal-007', // Perle
-    productId: 'med-002',
-    productName: 'Bravoxin 10',
-    administrationDate: DateTime.now().subtract(const Duration(days: 8)),
-    veterinarianId: 'vet-002',
-    veterinarianName: 'Dr. Sophie Laurent',
-    status: VaccinationStatus.planned,
-    notes: '⚠️ EN RETARD depuis 8 jours',
-    createdAt: DateTime.now().subtract(const Duration(days: 20)),
-  ),
+      // === VACCINATION RÉCENTE (5 jours) ===
+      Vaccination(
+        id: 'vacc_007',
+        farmId: 'farm_default',
+        animalId: 'animal_020',
+        protocolId: 'ovine_pasteurellose',
+        vaccineName: 'Ovipast Plus',
+        type: VaccinationType.recommandee,
+        disease: 'Pasteurellose',
+        vaccinationDate: now.subtract(const Duration(days: 5)),
+        batchNumber: 'LOT2024-OVI-111',
+        expiryDate: now.add(const Duration(days: 385)),
+        dose: '2 ml',
+        administrationRoute: 'SC',
+        veterinarianId: 'vet_001',
+        veterinarianName: 'Dr. Martin',
+        nextDueDate: now.add(const Duration(days: 360)),
+        withdrawalPeriodDays: 0,
+        notes: 'Nouvelle agnelle',
+        synced: false,
+        createdAt: now.subtract(const Duration(days: 5)),
+      ),
 
-  // === Rappels à venir (dans 30 jours) ===
-  Vaccination(
-    id: 'vacc-009',
-    farmId: 'mock-farm-001',
-    animalId: 'animal-008', // Étoile
-    productId: 'med-001',
-    productName: 'Bovilis IBR Marker Live',
-    administrationDate: DateTime.now().add(const Duration(days: 21)),
-    nextDueDate: DateTime.now().add(const Duration(days: 386)),
-    veterinarianId: 'vet-001',
-    veterinarianName: 'Dr. Martin Dubois',
-    status: VaccinationStatus.planned,
-    notes: 'Rappel annuel IBR',
-    createdAt: DateTime.now().subtract(const Duration(days: 1)),
-  ),
+      // === VACCINATION BOVINE - BVD ===
+      Vaccination(
+        id: 'vacc_008',
+        farmId: 'farm_default',
+        animalId: 'animal_bovine_001',
+        protocolId: 'bovine_bvd',
+        vaccineName: 'Bovilis BVD',
+        type: VaccinationType.recommandee,
+        disease: 'BVD',
+        vaccinationDate: now.subtract(const Duration(days: 180)),
+        batchNumber: 'LOT2024-BVD-777',
+        expiryDate: now.add(const Duration(days: 210)),
+        dose: '2 ml',
+        administrationRoute: 'IM',
+        veterinarianId: 'vet_001',
+        veterinarianName: 'Dr. Martin',
+        nextDueDate: now.add(const Duration(days: 185)),
+        withdrawalPeriodDays: 0,
+        notes: 'Génisse avant saillie',
+        synced: true,
+        createdAt: now.subtract(const Duration(days: 180)),
+      ),
 
-  Vaccination(
-    id: 'vacc-010',
-    farmId: 'mock-farm-001',
-    animalId: 'animal-009', // Câline
-    productId: 'med-003',
-    productName: 'Bovilis BVD',
-    administrationDate: DateTime.now().add(const Duration(days: 28)),
-    veterinarianId: 'vet-002',
-    veterinarianName: 'Dr. Sophie Laurent',
-    status: VaccinationStatus.planned,
-    notes: 'Première vaccination BVD génisse',
-    createdAt: DateTime.now(),
-  ),
+      // === VACCINATION BOVINE - IBR (rappel 6 mois) ===
+      Vaccination(
+        id: 'vacc_009',
+        farmId: 'farm_default',
+        animalId: 'animal_bovine_002',
+        protocolId: 'bovine_ibr',
+        vaccineName: 'Bovilis IBR',
+        type: VaccinationType.recommandee,
+        disease: 'IBR',
+        vaccinationDate: now.subtract(const Duration(days: 150)),
+        batchNumber: 'LOT2024-IBR-888',
+        expiryDate: now.add(const Duration(days: 240)),
+        dose: '2 ml',
+        administrationRoute: 'IM',
+        veterinarianId: 'vet_002',
+        veterinarianName: 'Dr. Dubois',
+        nextDueDate: now.add(const Duration(days: 30)),
+        withdrawalPeriodDays: 0,
+        notes: 'Reproductrice - rappel 6 mois',
+        synced: true,
+        createdAt: now.subtract(const Duration(days: 150)),
+      ),
 
-  // === Vaccination annulée ===
-  Vaccination(
-    id: 'vacc-011',
-    farmId: 'mock-farm-001',
-    animalId: 'animal-010',
-    productId: 'med-002',
-    productName: 'Bravoxin 10',
-    administrationDate: DateTime.now().subtract(const Duration(days: 15)),
-    veterinarianId: 'vet-001',
-    veterinarianName: 'Dr. Martin Dubois',
-    status: VaccinationStatus.cancelled,
-    notes: 'Annulée - Animal malade (fièvre)',
-    createdAt: DateTime.now().subtract(const Duration(days: 20)),
-    updatedAt: DateTime.now().subtract(const Duration(days: 15)),
-  ),
-];
-
-/// Statistiques des vaccinations mock
-class MockVaccinationStats {
-  static int get totalVaccinations => mockVaccinations.length;
-
-  static int get administered => mockVaccinations
-      .where((v) => v.status == VaccinationStatus.administered)
-      .length;
-
-  static int get planned => mockVaccinations
-      .where((v) => v.status == VaccinationStatus.planned)
-      .length;
-
-  static int get overdue => mockVaccinations.where((v) => v.isOverdue).length;
-
-  static int get withAdverseReactions =>
-      mockVaccinations.where((v) => v.adverseReaction != null).length;
-
-  static double get complianceRate {
-    if (totalVaccinations == 0) return 0.0;
-    return (administered / totalVaccinations * 100);
+      // === VACCINATION CAPRINE - Entérotoxémie ===
+      Vaccination(
+        id: 'vacc_010',
+        farmId: 'farm_default',
+        animalId: 'animal_caprine_001',
+        protocolId: 'caprine_enterotoxemie',
+        vaccineName: 'Covexin 10',
+        type: VaccinationType.recommandee,
+        disease: 'Entérotoxémie',
+        vaccinationDate: now.subtract(const Duration(days: 45)),
+        batchNumber: 'LOT2024-COV-555',
+        expiryDate: now.add(const Duration(days: 345)),
+        dose: '2 ml',
+        administrationRoute: 'IM',
+        veterinarianId: 'vet_003',
+        veterinarianName: 'Dr. Laurent',
+        nextDueDate: now.add(const Duration(days: 320)),
+        withdrawalPeriodDays: 0,
+        notes: 'Chevrette avant mise à l\'herbe',
+        synced: true,
+        createdAt: now.subtract(const Duration(days: 45)),
+      ),
+    ];
   }
 }

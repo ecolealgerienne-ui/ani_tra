@@ -14,6 +14,7 @@ import '../../providers/sync_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../data/animal_config.dart';
 import 'universal_scanner_screen.dart';
+import 'animal_finder_screen.dart';
 
 /// Écran d'ajout rapide d'un animal
 ///
@@ -88,33 +89,76 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
   /// Générer un ID unique
   String _generateId() => _uuid.v4();
 
-  /// Simuler le scan d'un EID
-  void _simulateScan() {
-    showDialog(
-      context: context,
-      builder: (context) => _ScanEIDDialog(
-        onEIDScanned: (eid) {
-          setState(() {
-            _primaryIdController.text = eid;
-          });
-        },
+  /// Scanner un animal pour pré-remplir l'EID
+  Future<void> _simulateScan() async {
+    final animal = await Navigator.push<Animal>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AnimalFinderScreen(
+          mode: AnimalFinderMode.single,
+          title: 'Scanner l\'animal',
+        ),
       ),
     );
+
+    if (animal != null && mounted) {
+      setState(() {
+        if (animal.currentEid != null) {
+          _primaryIdController.text = animal.currentEid!;
+        }
+        if (animal.officialNumber != null) {
+          _officialNumberController.text = animal.officialNumber!;
+        }
+        if (animal.visualId != null) {
+          _visualIdController.text = animal.visualId!;
+        }
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('✅ Identification scannée: ${animal.displayName}'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
   }
 
-  /// Sélectionner la mère via scan (simulation)
-  void _scanMother() {
-    showDialog(
-      context: context,
-      builder: (context) => _ScanMotherDialog(
-        onMotherSelected: (motherId, motherDisplay) {
-          setState(() {
-            _selectedMotherId = motherId;
-            _selectedMotherDisplay = motherDisplay;
-          });
-        },
+  /// Sélectionner la mère via scan
+  Future<void> _scanMother() async {
+    final mother = await Navigator.push<Animal>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AnimalFinderScreen(
+          mode: AnimalFinderMode.single,
+          title: 'Scanner la mère',
+          allowedStatuses: [AnimalStatus.alive],
+        ),
       ),
     );
+
+    if (mother != null) {
+      // Vérifier que c'est une femelle
+      if (mother.sex != AnimalSex.female) {
+        if (mounted) {
+          _showError('⚠️ La mère doit être une femelle');
+        }
+        return;
+      }
+
+      setState(() {
+        _selectedMotherId = mother.id;
+        _selectedMotherDisplay = mother.displayName;
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('✅ Mère sélectionnée: ${mother.displayName}'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    }
   }
 
   /// Sélectionner la date de naissance
@@ -310,54 +354,6 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
           children: [
             // === Section : Identification ===
             _buildSectionHeader('📋 Identification'),
-            const SizedBox(height: 16),
-
-            // BOUTON SCANNER UNIVERSEL
-            FilledButton.icon(
-              onPressed: () async {
-                final result = await Navigator.push<ScanResult>(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        const UniversalScannerScreen(mode: 'register'),
-                  ),
-                );
-
-                if (result != null && mounted) {
-                  setState(() {
-                    if (result.parsedData.containsKey('eid')) {
-                      _primaryIdController.text = result.parsedData['eid']!;
-                    }
-                    if (result.parsedData.containsKey('officialNumber')) {
-                      _officialNumberController.text =
-                          result.parsedData['officialNumber']!;
-                    }
-                  });
-                }
-              },
-              icon: const Icon(Icons.qr_code_scanner),
-              label: const Text('Scanner l\'identification'),
-              style: FilledButton.styleFrom(
-                minimumSize: const Size(double.infinity, 56),
-                backgroundColor: Colors.blue,
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Divider "OU"
-            Row(
-              children: [
-                const Expanded(child: Divider()),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child:
-                      Text('OU', style: Theme.of(context).textTheme.bodyMedium),
-                ),
-                const Expanded(child: Divider()),
-              ],
-            ),
-
             const SizedBox(height: 16),
 
             // EID / Numéro principal
