@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 
 import '../models/campaign.dart';
+import 'auth_provider.dart';
 import '../models/product.dart';
 import '../models/treatment.dart';
 
@@ -11,18 +12,24 @@ const uuid = Uuid();
 /// Provider de gestion des campagnes.
 /// Aucune chaîne destinée à l'utilisateur n'est émise ici (multi-langue côté UI).
 class CampaignProvider extends ChangeNotifier {
-  List<Campaign> _campaigns = [];
+  final AuthProvider _authProvider;
+
+  CampaignProvider(this._authProvider);
+
+  List<Campaign> _allCampaigns = [];
   Campaign? _activeCampaign;
 
   // ==================== Getters ====================
 
-  List<Campaign> get campaigns => List.unmodifiable(_campaigns);
+  List<Campaign> get campaigns => List.unmodifiable(
+    _allCampaigns.where((item) => item.farmId == _authProvider.currentFarmId)
+  );
 
   List<Campaign> get completedCampaigns =>
-      _campaigns.where((c) => c.completed).toList();
+      _allCampaigns.where((c) => c.completed).toList();
 
   List<Campaign> get activeCampaigns =>
-      _campaigns.where((c) => !c.completed).toList();
+      _allCampaigns.where((c) => !c.completed).toList();
 
   Campaign? get activeCampaign => _activeCampaign;
 
@@ -33,7 +40,7 @@ class CampaignProvider extends ChangeNotifier {
   int get completedCampaignsCount => completedCampaigns.length;
 
   /// Nombre total de campagnes
-  int get campaignsCount => _campaigns.length;
+  int get campaignsCount => _allCampaigns.length;
 
   // ==================== Campaign Management ====================
 
@@ -63,7 +70,8 @@ class CampaignProvider extends ChangeNotifier {
       createdAt: DateTime.now(),
     );
 
-    _campaigns.add(campaign);
+    final campaignWithFarm = campaign.copyWith(farmId: _authProvider.currentFarmId);
+    _allCampaigns.add(campaignWithFarm);
     _activeCampaign = campaign;
     notifyListeners();
 
@@ -88,9 +96,9 @@ class CampaignProvider extends ChangeNotifier {
     final updatedIds = [...current.animalIds, animalId];
     final updatedCampaign = current.copyWith(animalIds: updatedIds);
 
-    final index = _campaigns.indexWhere((c) => c.id == current.id);
+    final index = _allCampaigns.indexWhere((c) => c.id == current.id);
     if (index != -1) {
-      _campaigns[index] = updatedCampaign;
+      _allCampaigns[index] = updatedCampaign;
       _activeCampaign = updatedCampaign;
       notifyListeners();
       return true;
@@ -122,9 +130,9 @@ class CampaignProvider extends ChangeNotifier {
     final updatedIds = current.animalIds.where((id) => id != animalId).toList();
     final updatedCampaign = current.copyWith(animalIds: updatedIds);
 
-    final index = _campaigns.indexWhere((c) => c.id == current.id);
+    final index = _allCampaigns.indexWhere((c) => c.id == current.id);
     if (index != -1) {
-      _campaigns[index] = updatedCampaign;
+      _allCampaigns[index] = updatedCampaign;
       _activeCampaign = updatedCampaign;
       notifyListeners();
       return true;
@@ -142,9 +150,9 @@ class CampaignProvider extends ChangeNotifier {
       updatedAt: DateTime.now(),
     );
 
-    final index = _campaigns.indexWhere((c) => c.id == current.id);
+    final index = _allCampaigns.indexWhere((c) => c.id == current.id);
     if (index != -1) {
-      _campaigns[index] = updated;
+      _allCampaigns[index] = updated;
     }
 
     _activeCampaign = null;
@@ -160,14 +168,14 @@ class CampaignProvider extends ChangeNotifier {
     }
 
     // Sinon, compléter la campagne par ID
-    final index = _campaigns.indexWhere((c) => c.id == campaignId);
+    final index = _allCampaigns.indexWhere((c) => c.id == campaignId);
     if (index != -1) {
-      final campaign = _campaigns[index];
+      final campaign = _allCampaigns[index];
       final updated = campaign.copyWith(
         completed: true,
         updatedAt: DateTime.now(),
       );
-      _campaigns[index] = updated;
+      _allCampaigns[index] = updated;
       notifyListeners();
     }
   }
@@ -179,7 +187,7 @@ class CampaignProvider extends ChangeNotifier {
 
     // Si aucun animal scanné, supprimer la campagne
     if (current.animalIds.isEmpty) {
-      _campaigns.removeWhere((c) => c.id == current.id);
+      _allCampaigns.removeWhere((c) => c.id == current.id);
     }
 
     _activeCampaign = null;
@@ -188,7 +196,7 @@ class CampaignProvider extends ChangeNotifier {
 
   /// Supprime une campagne par ID
   void deleteCampaign(String campaignId) {
-    _campaigns.removeWhere((c) => c.id == campaignId);
+    _allCampaigns.removeWhere((c) => c.id == campaignId);
     if (_activeCampaign?.id == campaignId) {
       _activeCampaign = null;
     }
@@ -198,7 +206,7 @@ class CampaignProvider extends ChangeNotifier {
   /// Récupère une campagne par ID
   Campaign? getCampaignById(String id) {
     try {
-      return _campaigns.firstWhere((c) => c.id == id);
+      return _allCampaigns.firstWhere((c) => c.id == id);
     } catch (_) {
       return null;
     }
@@ -206,11 +214,11 @@ class CampaignProvider extends ChangeNotifier {
 
   /// Met à jour une campagne existante
   void updateCampaign(Campaign updated) {
-    final index = _campaigns.indexWhere((c) => c.id == updated.id);
+    final index = _allCampaigns.indexWhere((c) => c.id == updated.id);
     if (index != -1) {
-      _campaigns[index] = updated;
+      _allCampaigns[index] = updated;
       if (_activeCampaign?.id == updated.id) {
-        _activeCampaign = _campaigns[index];
+        _activeCampaign = _allCampaigns[index];
       }
       notifyListeners();
     }
@@ -218,7 +226,7 @@ class CampaignProvider extends ChangeNotifier {
 
   /// API conservée pour compatibilité (pas de champ `synced` dans le model)
   void markCampaignAsSynced(String campaignId) {
-    if (_campaigns.any((c) => c.id == campaignId)) {
+    if (_allCampaigns.any((c) => c.id == campaignId)) {
       notifyListeners(); // no-op pour ne pas casser les appels existants
     }
   }
@@ -248,12 +256,12 @@ class CampaignProvider extends ChangeNotifier {
   // ==================== Mock / Reset ====================
 
   void loadMockCampaigns(List<Campaign> mockCampaigns) {
-    _campaigns = mockCampaigns;
+    _allCampaigns = mockCampaigns;
     notifyListeners();
   }
 
   void clearAllCampaigns() {
-    _campaigns.clear();
+    _allCampaigns.clear();
     _activeCampaign = null;
     notifyListeners();
   }

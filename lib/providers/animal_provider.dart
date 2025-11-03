@@ -4,29 +4,43 @@ import '../models/animal.dart';
 import '../models/treatment.dart';
 import '../models/movement.dart';
 import '../models/product.dart';
+import 'auth_provider.dart';
 
 class AnimalProvider extends ChangeNotifier {
-  // Données principales
-  final List<Product> _products = [];
-  final List<Animal> _animals = [];
-  final List<Treatment> _treatments = [];
-  final List<Movement> _movements = [];
+  final AuthProvider _authProvider;
+  
+  // Données principales (NON FILTRÉES - contient toutes les fermes)
+  final List<Product> _allProducts = [];
+  final List<Animal> _allAnimals = [];
+  final List<Treatment> _allTreatments = [];
+  final List<Movement> _allMovements = [];
 
   // État courant / filtres
   Animal? _currentAnimal;
   String _searchQuery = '';
   AnimalStatus? _statusFilter;
 
-  AnimalProvider() {
+  AnimalProvider(this._authProvider) {
     _loadMockData();
   }
 
-  // ==================== Getters ====================
+  // ==================== Getters FILTRÉS par farmId ====================
 
-  List<Product> get products => List.unmodifiable(_products);
-  List<Animal> get animals => List.unmodifiable(_animals);
-  List<Treatment> get treatments => List.unmodifiable(_treatments);
-  List<Movement> get movements => List.unmodifiable(_movements);
+  List<Product> get products => List.unmodifiable(
+    _allProducts.where((p) => p.farmId == _authProvider.currentFarmId)
+  );
+  
+  List<Animal> get animals => List.unmodifiable(
+    _allAnimals.where((a) => a.farmId == _authProvider.currentFarmId)
+  );
+  
+  List<Treatment> get treatments => List.unmodifiable(
+    _allTreatments.where((t) => t.farmId == _authProvider.currentFarmId)
+  );
+  
+  List<Movement> get movements => List.unmodifiable(
+    _allMovements.where((m) => m.farmId == _authProvider.currentFarmId)
+  );
 
   Animal? get currentAnimal => _currentAnimal;
   String get searchQuery => _searchQuery;
@@ -34,12 +48,11 @@ class AnimalProvider extends ChangeNotifier {
 
   /// Animaux filtrés selon recherche et statut
   List<Animal> get filteredAnimals {
-    Iterable<Animal> list = _animals;
+    Iterable<Animal> list = animals; // Déjà filtré par farmId
 
     if (_searchQuery.trim().isNotEmpty) {
       final q = _searchQuery.toLowerCase();
       list = list.where((a) {
-        // Aucun texte UI ici (multi-langue côté interface)
         final eid = a.currentEid?.toLowerCase() ?? '';
         final off = a.officialNumber?.toLowerCase() ?? '';
         final sex = a.sex.name.toLowerCase();
@@ -66,21 +79,21 @@ class AnimalProvider extends ChangeNotifier {
     List<Treatment> treatments,
     List<Movement> movements,
   ) {
-    _animals
+    _allAnimals
       ..clear()
       ..addAll(animals);
-    _products
+    _allProducts
       ..clear()
       ..addAll(products);
-    _treatments
+    _allTreatments
       ..clear()
       ..addAll(treatments);
-    _movements
+    _allMovements
       ..clear()
       ..addAll(movements);
 
     if (_currentAnimal != null) {
-      _currentAnimal = _animals.firstWhere((a) => a.id == _currentAnimal!.id,
+      _currentAnimal = animals.firstWhere((a) => a.id == _currentAnimal!.id,
           orElse: () => _currentAnimal!);
     }
 
@@ -88,7 +101,7 @@ class AnimalProvider extends ChangeNotifier {
   }
 
   void _loadMockData() {
-    // no-op : à remplir si tu veux précharger des mocks
+    // no-op
   }
 
   // ==================== Sélection / Filtres ====================
@@ -117,58 +130,52 @@ class AnimalProvider extends ChangeNotifier {
 
   Animal? getAnimalById(String id) {
     try {
-      return _animals.firstWhere((a) => a.id == id);
+      return animals.firstWhere((a) => a.id == id);
     } catch (_) {
       return null;
     }
   }
 
-  /// 🆕 MÉTHODE AJOUTÉE : Recherche par EID ou N° officiel
-  ///
-  /// Recherche un animal dont l'EID ou le N° officiel contient la query.
-  /// Retourne le premier animal correspondant ou null si aucun match.
   Animal? findByEIDOrNumber(String query) {
     if (query.trim().isEmpty) return null;
 
     final q = query.toLowerCase().trim();
 
     try {
-      // Chercher par EID (contient la query)
-      return _animals.firstWhere(
+      return animals.firstWhere(
         (a) => (a.currentEid?.toLowerCase() ?? '').contains(q),
       );
     } catch (_) {
-      // Si pas trouvé par EID, chercher par N° officiel
       try {
-        return _animals.firstWhere(
+        return animals.firstWhere(
           (a) => (a.officialNumber?.toLowerCase() ?? '').contains(q),
         );
       } catch (_) {
-        // Aucun match
         return null;
       }
     }
   }
 
   List<Treatment> getAnimalTreatments(String animalId) {
-    return _treatments.where((t) => t.animalId == animalId).toList();
+    return treatments.where((t) => t.animalId == animalId).toList();
   }
 
   List<Movement> getAnimalMovements(String animalId) {
-    return _movements.where((m) => m.animalId == animalId).toList();
+    return movements.where((m) => m.animalId == animalId).toList();
   }
 
   // ==================== CRUD: Animals ====================
 
   void addAnimal(Animal animal) {
-    _animals.add(animal);
+    final withFarm = animal.copyWith(farmId: _authProvider.currentFarmId);
+    _allAnimals.add(withFarm);
     notifyListeners();
   }
 
   void updateAnimal(Animal updated) {
-    final i = _animals.indexWhere((a) => a.id == updated.id);
+    final i = _allAnimals.indexWhere((a) => a.id == updated.id);
     if (i != -1) {
-      _animals[i] = updated;
+      _allAnimals[i] = updated;
       if (_currentAnimal?.id == updated.id) {
         _currentAnimal = updated;
       }
@@ -177,9 +184,9 @@ class AnimalProvider extends ChangeNotifier {
   }
 
   void removeAnimal(String id) {
-    final before = _animals.length;
-    _animals.removeWhere((a) => a.id == id);
-    if (_animals.length < before) {
+    final before = _allAnimals.length;
+    _allAnimals.removeWhere((a) => a.id == id);
+    if (_allAnimals.length < before) {
       if (_currentAnimal?.id == id) {
         _currentAnimal = null;
       }
@@ -190,22 +197,23 @@ class AnimalProvider extends ChangeNotifier {
   // ==================== CRUD: Treatments ====================
 
   void addTreatment(Treatment t) {
-    _treatments.add(t);
+    final withFarm = t.copyWith(farmId: _authProvider.currentFarmId);
+    _allTreatments.add(withFarm);
     notifyListeners();
   }
 
   void updateTreatment(Treatment updated) {
-    final i = _treatments.indexWhere((t) => t.id == updated.id);
+    final i = _allTreatments.indexWhere((t) => t.id == updated.id);
     if (i != -1) {
-      _treatments[i] = updated;
+      _allTreatments[i] = updated;
       notifyListeners();
     }
   }
 
   void removeTreatment(String id) {
-    final before = _treatments.length;
-    _treatments.removeWhere((t) => t.id == id);
-    if (_treatments.length < before) {
+    final before = _allTreatments.length;
+    _allTreatments.removeWhere((t) => t.id == id);
+    if (_allTreatments.length < before) {
       notifyListeners();
     }
   }
@@ -213,22 +221,23 @@ class AnimalProvider extends ChangeNotifier {
   // ==================== CRUD: Movements ====================
 
   void addMovement(Movement m) {
-    _movements.add(m);
+    final withFarm = m.copyWith(farmId: _authProvider.currentFarmId);
+    _allMovements.add(withFarm);
     notifyListeners();
   }
 
   void updateMovement(Movement updated) {
-    final i = _movements.indexWhere((m) => m.id == updated.id);
+    final i = _allMovements.indexWhere((m) => m.id == updated.id);
     if (i != -1) {
-      _movements[i] = updated;
+      _allMovements[i] = updated;
       notifyListeners();
     }
   }
 
   void removeMovement(String id) {
-    final before = _movements.length;
-    _movements.removeWhere((m) => m.id == id);
-    if (_movements.length < before) {
+    final before = _allMovements.length;
+    _allMovements.removeWhere((m) => m.id == id);
+    if (_allMovements.length < before) {
       notifyListeners();
     }
   }
@@ -236,7 +245,7 @@ class AnimalProvider extends ChangeNotifier {
   // ==================== Produits ====================
 
   void setProducts(List<Product> items) {
-    _products
+    _allProducts
       ..clear()
       ..addAll(items);
     notifyListeners();
@@ -244,7 +253,7 @@ class AnimalProvider extends ChangeNotifier {
 
   Product? getProductById(String id) {
     try {
-      return _products.firstWhere((p) => p.id == id);
+      return products.firstWhere((p) => p.id == id);
     } catch (_) {
       return null;
     }
@@ -262,30 +271,26 @@ class AnimalProvider extends ChangeNotifier {
 
   // ==================== Compteurs ====================
 
-  int get totalAnimals => _animals.length;
-  int get totalTreatments => _treatments.length;
-  int get totalMovements => _movements.length;
+  int get totalAnimals => animals.length;
+  int get totalTreatments => treatments.length;
+  int get totalMovements => movements.length;
 
-  /// Retourne tous les traitements avec rémanence active
   List<Treatment> getActiveWithdrawalTreatments() {
-    return _treatments.where((t) => t.isWithdrawalActive).toList();
+    return treatments.where((t) => t.isWithdrawalActive).toList();
   }
 
-  /// Statistiques du troupeau
   Map<String, int> get stats {
     return {
-      'total': _animals.length,
-      'alive': _animals.where((a) => a.status == AnimalStatus.alive).length,
-      'male': _animals.where((a) => a.sex == AnimalSex.male).length,
-      'female': _animals.where((a) => a.sex == AnimalSex.female).length,
-      'sold': _animals.where((a) => a.status == AnimalStatus.sold).length,
-      'dead': _animals.where((a) => a.status == AnimalStatus.dead).length,
-      'slaughtered':
-          _animals.where((a) => a.status == AnimalStatus.slaughtered).length,
+      'total': animals.length,
+      'alive': animals.where((a) => a.status == AnimalStatus.alive).length,
+      'male': animals.where((a) => a.sex == AnimalSex.male).length,
+      'female': animals.where((a) => a.sex == AnimalSex.female).length,
+      'sold': animals.where((a) => a.status == AnimalStatus.sold).length,
+      'dead': animals.where((a) => a.status == AnimalStatus.dead).length,
+      'slaughtered': animals.where((a) => a.status == AnimalStatus.slaughtered).length,
     };
   }
 
-  /// Met à jour le statut d'un animal
   void updateAnimalStatus(String animalId, AnimalStatus newStatus) {
     final animal = getAnimalById(animalId);
     if (animal != null) {
@@ -294,21 +299,19 @@ class AnimalProvider extends ChangeNotifier {
     }
   }
 
-  // ==================== Recherche intelligente (Phase 1) ====================
+  // ==================== Recherche intelligente ====================
 
-  /// Recherche intelligente multi-critères
   List<Animal> searchAnimals(String query) {
-    if (query.isEmpty) return List.from(_animals);
+    if (query.isEmpty) return List.from(animals);
 
     final lowercaseQuery = query.toLowerCase();
 
-    return _animals.where((animal) {
+    return animals.where((animal) {
       if (animal.currentEid?.toLowerCase().contains(lowercaseQuery) == true) {
         return true;
       }
 
-      if (animal.officialNumber?.toLowerCase().contains(lowercaseQuery) ==
-          true) {
+      if (animal.officialNumber?.toLowerCase().contains(lowercaseQuery) == true) {
         return true;
       }
 
@@ -329,10 +332,9 @@ class AnimalProvider extends ChangeNotifier {
     }).toList();
   }
 
-  /// Trouve un animal par n'importe quel identifiant
   Animal? findAnimalByAnyId(String id) {
     try {
-      return _animals.firstWhere((animal) {
+      return animals.firstWhere((animal) {
         if (animal.currentEid == id) return true;
         if (animal.officialNumber == id) return true;
         if (animal.visualId == id) return true;
@@ -351,7 +353,6 @@ class AnimalProvider extends ChangeNotifier {
 
   // ==================== Changement EID ====================
 
-  /// Change l'EID d'un animal
   bool changeAnimalEid({
     required String animalId,
     required String newEid,

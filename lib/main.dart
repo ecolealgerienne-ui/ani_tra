@@ -16,6 +16,7 @@ import 'providers/alert_provider.dart';
 import 'providers/vaccination_provider.dart';
 import 'providers/document_provider.dart';
 import 'providers/breeding_provider.dart';
+import 'providers/auth_provider.dart';
 import 'i18n/app_localizations.dart';
 import 'screens/home/home_screen.dart'; // ✅ Mis à jour
 import 'screens/animal/animal_detail_screen.dart'; // ✅ Mis à jour
@@ -35,7 +36,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // ... (garde tous tes providers comme avant)
+        // 1. AuthProvider EN PREMIER
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+
+        // 2. Providers sans dépendance
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => QRProvider()),
         ChangeNotifierProvider(create: (_) => SyncProvider()),
@@ -46,9 +50,12 @@ class MyApp extends StatelessWidget {
             return provider;
           },
         ),
-        ChangeNotifierProvider(
-          create: (_) {
-            final provider = AnimalProvider();
+
+        // AnimalProvider - ligne ~24
+        ChangeNotifierProxyProvider<AuthProvider, AnimalProvider>(
+          create: (context) {
+            final auth = context.read<AuthProvider>();
+            final provider = AnimalProvider(auth);
             provider.initializeWithMockData(
               MockData.generateAnimals(),
               MockData.generateProducts(),
@@ -57,27 +64,61 @@ class MyApp extends StatelessWidget {
             );
             return provider;
           },
+          update: (context, auth, previous) => previous ?? AnimalProvider(auth),
         ),
-        ChangeNotifierProvider(
-          create: (_) {
-            final provider = BatchProvider();
+
+        // BatchProvider - ligne ~30
+        ChangeNotifierProxyProvider<AuthProvider, BatchProvider>(
+          create: (context) {
+            final auth = context.read<AuthProvider>();
+            final provider = BatchProvider(auth);
             provider.initializeWithMockData(MockData.generateBatches());
             return provider;
           },
+          update: (context, auth, previous) => previous ?? BatchProvider(auth),
         ),
-        ChangeNotifierProvider(
-          create: (_) => LotProvider(),
+
+        ChangeNotifierProxyProvider<AuthProvider, LotProvider>(
+          create: (context) => LotProvider(context.read<AuthProvider>()),
+          update: (context, auth, previous) => previous ?? LotProvider(auth),
         ),
-        ChangeNotifierProvider(
-          create: (_) => CampaignProvider(),
+
+        ChangeNotifierProxyProvider<AuthProvider, CampaignProvider>(
+          create: (context) => CampaignProvider(context.read<AuthProvider>()),
+          update: (context, auth, previous) =>
+              previous ?? CampaignProvider(auth),
         ),
-        ChangeNotifierProvider(
-          create: (_) {
-            final provider = WeightProvider();
+
+        ChangeNotifierProxyProvider<AuthProvider, WeightProvider>(
+          create: (context) {
+            final auth = context.read<AuthProvider>();
+            final provider = WeightProvider(auth);
             provider.setWeights(MockData.generateWeights());
             return provider;
           },
+          update: (context, auth, previous) => previous ?? WeightProvider(auth),
         ),
+
+        ChangeNotifierProxyProvider<AuthProvider, VaccinationProvider>(
+          create: (context) =>
+              VaccinationProvider(context.read<AuthProvider>()),
+          update: (context, auth, previous) =>
+              previous ?? VaccinationProvider(auth),
+        ),
+
+        ChangeNotifierProxyProvider<AuthProvider, DocumentProvider>(
+          create: (context) => DocumentProvider(context.read<AuthProvider>()),
+          update: (context, auth, previous) =>
+              previous ?? DocumentProvider(auth),
+        ),
+
+        ChangeNotifierProxyProvider<AuthProvider, BreedingProvider>(
+          create: (context) => BreedingProvider(context.read<AuthProvider>()),
+          update: (context, auth, previous) =>
+              previous ?? BreedingProvider(auth),
+        ),
+
+        // 4. AlertProvider (dépend de plusieurs providers)
         ChangeNotifierProxyProvider3<AnimalProvider, WeightProvider,
             SyncProvider, AlertProvider>(
           create: (context) => AlertProvider(

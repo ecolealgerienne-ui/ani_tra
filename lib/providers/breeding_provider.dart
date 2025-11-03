@@ -2,42 +2,49 @@
 
 import 'package:flutter/foundation.dart';
 import '../models/breeding.dart';
+import 'auth_provider.dart';
 
 /// Provider pour la gestion des reproductions
 /// Mode MOCK : Données en mémoire uniquement
 class BreedingProvider extends ChangeNotifier {
+  final AuthProvider _authProvider;
+
+  BreedingProvider(this._authProvider);
+
   // === Données en mémoire (MOCK) ===
-  List<Breeding> _breedings = [];
+  List<Breeding> _allBreedings = [];
 
   // === Getters ===
 
   /// Toutes les reproductions
-  List<Breeding> get breedings => List.unmodifiable(_breedings);
+  List<Breeding> get breedings => List.unmodifiable(
+    _allBreedings.where((item) => item.farmId == _authProvider.currentFarmId)
+  );
 
   /// Nombre total de reproductions
-  int get count => _breedings.length;
+  int get count => _allBreedings.length;
 
   /// Reproductions par animal (mère)
   List<Breeding> getByMother(String motherId) {
-    return _breedings.where((b) => b.motherId == motherId).toList()
+    return _allBreedings.where((b) => b.motherId == motherId).toList()
       ..sort((a, b) => b.breedingDate.compareTo(a.breedingDate));
   }
 
   /// Reproductions par père
   List<Breeding> getByFather(String fatherId) {
-    return _breedings.where((b) => b.fatherId == fatherId).toList()
+    return _allBreedings.where((b) => b.fatherId == fatherId).toList()
       ..sort((a, b) => b.breedingDate.compareTo(a.breedingDate));
   }
 
   /// Reproductions en attente
   List<Breeding> get pending {
-    return _breedings.where((b) => b.status == BreedingStatus.pending).toList()
+    return _allBreedings.where((b) => b.status == BreedingStatus.pending).toList()
       ..sort((a, b) => a.expectedBirthDate.compareTo(b.expectedBirthDate));
   }
 
   /// Reproductions terminées
   List<Breeding> get completed {
-    return _breedings
+    return _allBreedings
         .where((b) => b.status == BreedingStatus.completed)
         .toList()
       ..sort((a, b) => b.actualBirthDate!.compareTo(a.actualBirthDate!));
@@ -45,33 +52,33 @@ class BreedingProvider extends ChangeNotifier {
 
   /// Reproductions en retard
   List<Breeding> get overdue {
-    return _breedings.where((b) => b.isOverdue).toList()
+    return _allBreedings.where((b) => b.isOverdue).toList()
       ..sort((a, b) => a.expectedBirthDate.compareTo(b.expectedBirthDate));
   }
 
   /// Mises-bas imminentes (< 7 jours)
   List<Breeding> get birthSoon {
-    return _breedings.where((b) => b.isBirthSoon).toList()
+    return _allBreedings.where((b) => b.isBirthSoon).toList()
       ..sort((a, b) =>
           a.daysUntilExpectedBirth.compareTo(b.daysUntilExpectedBirth));
   }
 
   /// Reproductions échouées
   List<Breeding> get failed {
-    return _breedings.where((b) => b.hasFailed).toList()
+    return _allBreedings.where((b) => b.hasFailed).toList()
       ..sort((a, b) => b.breedingDate.compareTo(a.breedingDate));
   }
 
   /// Reproductions par méthode
   List<Breeding> getByMethod(BreedingMethod method) {
-    return _breedings.where((b) => b.method == method).toList()
+    return _allBreedings.where((b) => b.method == method).toList()
       ..sort((a, b) => b.breedingDate.compareTo(a.breedingDate));
   }
 
   /// Trouver par ID
   Breeding? getById(String id) {
     try {
-      return _breedings.firstWhere((b) => b.id == id);
+      return _allBreedings.firstWhere((b) => b.id == id);
     } catch (e) {
       return null;
     }
@@ -82,16 +89,16 @@ class BreedingProvider extends ChangeNotifier {
   /// Ajouter une reproduction
   Future<void> add(Breeding breeding) async {
     await Future.delayed(const Duration(milliseconds: 100)); // Simulate async
-    _breedings.add(breeding);
+    _allBreedings.add(breeding);
     notifyListeners();
   }
 
   /// Mettre à jour une reproduction
   Future<void> update(Breeding breeding) async {
     await Future.delayed(const Duration(milliseconds: 100));
-    final index = _breedings.indexWhere((b) => b.id == breeding.id);
+    final index = _allBreedings.indexWhere((b) => b.id == breeding.id);
     if (index != -1) {
-      _breedings[index] = breeding.markAsModified();
+      _allBreedings[index] = breeding.markAsModified();
       notifyListeners();
     }
   }
@@ -99,7 +106,7 @@ class BreedingProvider extends ChangeNotifier {
   /// Supprimer une reproduction
   Future<void> delete(String id) async {
     await Future.delayed(const Duration(milliseconds: 100));
-    _breedings.removeWhere((b) => b.id == id);
+    _allBreedings.removeWhere((b) => b.id == id);
     notifyListeners();
   }
 
@@ -195,15 +202,15 @@ class BreedingProvider extends ChangeNotifier {
 
   /// Taux de réussite (%) des reproductions
   double get successRate {
-    if (_breedings.isEmpty) return 0.0;
-    final completed = _breedings.where((b) => b.isCompleted).length;
-    return (completed / _breedings.length) * 100;
+    if (_allBreedings.isEmpty) return 0.0;
+    final completed = _allBreedings.where((b) => b.isCompleted).length;
+    return (completed / _allBreedings.length) * 100;
   }
 
   /// Nombre moyen de petits par portée
   double get averageOffspringCount {
     final completedWithOffspring =
-        _breedings.where((b) => b.isCompleted && b.actualOffspringCount > 0);
+        _allBreedings.where((b) => b.isCompleted && b.actualOffspringCount > 0);
     if (completedWithOffspring.isEmpty) return 0.0;
 
     final totalOffspring = completedWithOffspring.fold<int>(
@@ -217,7 +224,7 @@ class BreedingProvider extends ChangeNotifier {
   /// Durée moyenne de gestation (jours)
   double get averageGestationDays {
     final completedWithGestation =
-        _breedings.where((b) => b.gestationDays != null);
+        _allBreedings.where((b) => b.gestationDays != null);
     if (completedWithGestation.isEmpty) return 0.0;
 
     final totalDays = completedWithGestation.fold<int>(
@@ -231,7 +238,7 @@ class BreedingProvider extends ChangeNotifier {
   /// Nombre de reproductions par méthode
   Map<BreedingMethod, int> getCountsByMethod() {
     final counts = <BreedingMethod, int>{};
-    for (final breeding in _breedings) {
+    for (final breeding in _allBreedings) {
       counts[breeding.method] = (counts[breeding.method] ?? 0) + 1;
     }
     return counts;
@@ -240,7 +247,7 @@ class BreedingProvider extends ChangeNotifier {
   /// Reproductions ce mois
   int get thisMonthCount {
     final now = DateTime.now();
-    return _breedings.where((b) {
+    return _allBreedings.where((b) {
       return b.breedingDate.year == now.year &&
           b.breedingDate.month == now.month;
     }).length;
@@ -249,7 +256,7 @@ class BreedingProvider extends ChangeNotifier {
   /// Mises-bas ce mois
   int get birthsThisMonth {
     final now = DateTime.now();
-    return _breedings.where((b) {
+    return _allBreedings.where((b) {
       return b.actualBirthDate != null &&
           b.actualBirthDate!.year == now.year &&
           b.actualBirthDate!.month == now.month;
@@ -261,13 +268,13 @@ class BreedingProvider extends ChangeNotifier {
   /// Charger les données de mock
   Future<void> loadMockData(List<Breeding> mockBreedings) async {
     await Future.delayed(const Duration(milliseconds: 200));
-    _breedings = mockBreedings;
+    _allBreedings = mockBreedings;
     notifyListeners();
   }
 
   /// Réinitialiser les données
   void clear() {
-    _breedings.clear();
+    _allBreedings.clear();
     notifyListeners();
   }
 

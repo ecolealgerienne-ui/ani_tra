@@ -24,6 +24,7 @@ class MockVeterinarians {
         rating: 5,
         totalInterventions: 45,
         createdAt: now.subtract(const Duration(days: 365)),
+        farmId: 'farm_default',
       ),
       Veterinarian(
         id: 'vet_002',
@@ -41,6 +42,7 @@ class MockVeterinarians {
         rating: 4,
         totalInterventions: 32,
         createdAt: now.subtract(const Duration(days: 500)),
+        farmId: 'farm_default',
       ),
       Veterinarian(
         id: 'vet_003',
@@ -58,6 +60,7 @@ class MockVeterinarians {
         rating: 5,
         totalInterventions: 67,
         createdAt: now.subtract(const Duration(days: 730)),
+        farmId: 'farm_default',
       ),
       Veterinarian(
         id: 'vet_004',
@@ -75,6 +78,7 @@ class MockVeterinarians {
         rating: 4,
         totalInterventions: 28,
         createdAt: now.subtract(const Duration(days: 200)),
+        farmId: 'farm_default',
       ),
       Veterinarian(
         id: 'vet_005',
@@ -92,6 +96,7 @@ class MockVeterinarians {
         rating: 4,
         totalInterventions: 89,
         createdAt: now.subtract(const Duration(days: 1500)),
+        farmId: 'farm_default',
       ),
       Veterinarian(
         id: 'vet_006',
@@ -109,6 +114,7 @@ class MockVeterinarians {
         rating: 5,
         totalInterventions: 23,
         createdAt: now.subtract(const Duration(days: 120)),
+        farmId: 'farm_default',
       ),
       Veterinarian(
         id: 'vet_007',
@@ -126,6 +132,7 @@ class MockVeterinarians {
         rating: 3,
         totalInterventions: 54,
         createdAt: now.subtract(const Duration(days: 1800)),
+        farmId: 'farm_default',
       ),
       Veterinarian(
         id: 'vet_008',
@@ -143,6 +150,7 @@ class MockVeterinarians {
         rating: 4,
         totalInterventions: 41,
         createdAt: now.subtract(const Duration(days: 400)),
+        farmId: 'farm_default',
       ),
       Veterinarian(
         id: 'vet_009',
@@ -160,6 +168,7 @@ class MockVeterinarians {
         rating: 5,
         totalInterventions: 78,
         createdAt: now.subtract(const Duration(days: 900)),
+        farmId: 'farm_default',
       ),
       Veterinarian(
         id: 'vet_010',
@@ -177,6 +186,7 @@ class MockVeterinarians {
         rating: 4,
         totalInterventions: 36,
         createdAt: now.subtract(const Duration(days: 600)),
+        farmId: 'farm_default',
       ),
     ];
   }

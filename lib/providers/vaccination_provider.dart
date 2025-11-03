@@ -2,30 +2,37 @@
 
 import 'package:flutter/foundation.dart';
 import '../models/vaccination.dart';
+import 'auth_provider.dart';
 
 /// Provider pour la gestion des vaccinations
 /// Mode MOCK : Données en mémoire uniquement
 class VaccinationProvider extends ChangeNotifier {
+  final AuthProvider _authProvider;
+
+  VaccinationProvider(this._authProvider);
+
   // === Données en mémoire (MOCK) ===
-  List<Vaccination> _vaccinations = [];
+  List<Vaccination> _allVaccinations = [];
 
   // === Getters ===
 
   /// Toutes les vaccinations
-  List<Vaccination> get vaccinations => List.unmodifiable(_vaccinations);
+  List<Vaccination> get vaccinations => List.unmodifiable(
+    _allVaccinations.where((item) => item.farmId == _authProvider.currentFarmId)
+  );
 
   /// Nombre total de vaccinations
-  int get count => _vaccinations.length;
+  int get count => _allVaccinations.length;
 
   /// Vaccinations par animal
   List<Vaccination> getByAnimal(String animalId) {
-    return _vaccinations.where((v) => v.animalId == animalId).toList()
+    return _allVaccinations.where((v) => v.animalId == animalId).toList()
       ..sort((a, b) => b.administrationDate.compareTo(a.administrationDate));
   }
 
   /// Vaccinations planifiées
   List<Vaccination> get planned {
-    return _vaccinations
+    return _allVaccinations
         .where((v) => v.status == VaccinationStatus.planned)
         .toList()
       ..sort((a, b) => a.administrationDate.compareTo(b.administrationDate));
@@ -33,7 +40,7 @@ class VaccinationProvider extends ChangeNotifier {
 
   /// Vaccinations administrées
   List<Vaccination> get administered {
-    return _vaccinations
+    return _allVaccinations
         .where((v) => v.status == VaccinationStatus.administered)
         .toList()
       ..sort((a, b) => b.administrationDate.compareTo(a.administrationDate));
@@ -41,19 +48,19 @@ class VaccinationProvider extends ChangeNotifier {
 
   /// Vaccinations en retard
   List<Vaccination> get overdue {
-    return _vaccinations.where((v) => v.isOverdue).toList()
+    return _allVaccinations.where((v) => v.isOverdue).toList()
       ..sort((a, b) => a.administrationDate.compareTo(b.administrationDate));
   }
 
   /// Rappels à venir (dans les 30 jours)
   List<Vaccination> get upcomingReminders {
-    return _vaccinations.where((v) => v.isReminderDue).toList()
+    return _allVaccinations.where((v) => v.isReminderDue).toList()
       ..sort((a, b) => a.nextDueDate!.compareTo(b.nextDueDate!));
   }
 
   /// Vaccinations avec réactions adverses
   List<Vaccination> get withAdverseReactions {
-    return _vaccinations
+    return _allVaccinations
         .where(
             (v) => v.adverseReaction != null && v.adverseReaction!.isNotEmpty)
         .toList();
@@ -62,7 +69,7 @@ class VaccinationProvider extends ChangeNotifier {
   /// Trouver par ID
   Vaccination? getById(String id) {
     try {
-      return _vaccinations.firstWhere((v) => v.id == id);
+      return _allVaccinations.firstWhere((v) => v.id == id);
     } catch (e) {
       return null;
     }
@@ -73,16 +80,16 @@ class VaccinationProvider extends ChangeNotifier {
   /// Ajouter une vaccination
   Future<void> add(Vaccination vaccination) async {
     await Future.delayed(const Duration(milliseconds: 100)); // Simulate async
-    _vaccinations.add(vaccination);
+    _allVaccinations.add(vaccination);
     notifyListeners();
   }
 
   /// Mettre à jour une vaccination
   Future<void> update(Vaccination vaccination) async {
     await Future.delayed(const Duration(milliseconds: 100));
-    final index = _vaccinations.indexWhere((v) => v.id == vaccination.id);
+    final index = _allVaccinations.indexWhere((v) => v.id == vaccination.id);
     if (index != -1) {
-      _vaccinations[index] = vaccination.markAsModified();
+      _allVaccinations[index] = vaccination.markAsModified();
       notifyListeners();
     }
   }
@@ -90,7 +97,7 @@ class VaccinationProvider extends ChangeNotifier {
   /// Supprimer une vaccination
   Future<void> delete(String id) async {
     await Future.delayed(const Duration(milliseconds: 100));
-    _vaccinations.removeWhere((v) => v.id == id);
+    _allVaccinations.removeWhere((v) => v.id == id);
     notifyListeners();
   }
 
@@ -164,7 +171,7 @@ class VaccinationProvider extends ChangeNotifier {
   /// Taux de vaccination par produit
   Map<String, int> getVaccinationCountsByProduct() {
     final counts = <String, int>{};
-    for (final vacc in _vaccinations.where((v) => v.isAdministered)) {
+    for (final vacc in _allVaccinations.where((v) => v.isAdministered)) {
       counts[vacc.productName] = (counts[vacc.productName] ?? 0) + 1;
     }
     return counts;
@@ -173,7 +180,7 @@ class VaccinationProvider extends ChangeNotifier {
   /// Nombre de vaccinations ce mois
   int get vaccinationsThisMonth {
     final now = DateTime.now();
-    return _vaccinations.where((v) {
+    return _allVaccinations.where((v) {
       return v.isAdministered &&
           v.administrationDate.year == now.year &&
           v.administrationDate.month == now.month;
@@ -182,9 +189,9 @@ class VaccinationProvider extends ChangeNotifier {
 
   /// Taux de conformité (administrées vs planifiées)
   double get complianceRate {
-    if (_vaccinations.isEmpty) return 0.0;
-    final administered = _vaccinations.where((v) => v.isAdministered).length;
-    return administered / _vaccinations.length;
+    if (_allVaccinations.isEmpty) return 0.0;
+    final administered = _allVaccinations.where((v) => v.isAdministered).length;
+    return administered / _allVaccinations.length;
   }
 
   // === Chargement initial (MOCK) ===
@@ -192,13 +199,13 @@ class VaccinationProvider extends ChangeNotifier {
   /// Charger les données de mock
   Future<void> loadMockData(List<Vaccination> mockVaccinations) async {
     await Future.delayed(const Duration(milliseconds: 200));
-    _vaccinations = mockVaccinations;
+    _allVaccinations = mockVaccinations;
     notifyListeners();
   }
 
   /// Réinitialiser les données
   void clear() {
-    _vaccinations.clear();
+    _allVaccinations.clear();
     notifyListeners();
   }
 

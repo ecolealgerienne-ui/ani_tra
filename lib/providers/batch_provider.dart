@@ -1,6 +1,7 @@
 // providers/batch_provider.dart
 import 'package:flutter/foundation.dart';
 import '../models/batch.dart';
+import 'auth_provider.dart';
 
 /// Provider pour la gestion des lots d'animaux
 ///
@@ -11,6 +12,9 @@ import '../models/batch.dart';
 /// - Autres actions de masse
 class BatchProvider with ChangeNotifier {
   // ==================== Constantes (clés de messages / logs) ====================
+  final AuthProvider _authProvider;
+  BatchProvider(this._authProvider);
+
   static const String kLogBatchCreated = 'log.batch.created';
   static const String kLogBatchNoActive = 'log.batch.no_active';
   static const String kLogBatchAnimalAlreadyIn = 'log.batch.animal_already_in';
@@ -34,7 +38,7 @@ class BatchProvider with ChangeNotifier {
   // ==================== État ====================
 
   /// Liste de tous les lots (actifs et complétés)
-  List<Batch> _batches = [];
+  List<Batch> _allBatches = [];
 
   /// Lot actuellement en cours de création (scan en cours)
   Batch? _activeBatch;
@@ -42,17 +46,15 @@ class BatchProvider with ChangeNotifier {
   // ==================== Getters ====================
 
   /// Tous les lots
-  List<Batch> get batches => List.unmodifiable(_batches);
+  List<Batch> get batches => List.unmodifiable(
+      _allBatches.where((b) => b.farmId == _authProvider.currentFarmId));
 
   /// Lots non complétés uniquement
-  List<Batch> get activeBatches {
-    return _batches.where((batch) => !batch.completed).toList();
-  }
+  List<Batch> get activeBatches => batches.where((b) => !b.completed).toList();
 
   /// Lots complétés uniquement
-  List<Batch> get completedBatches {
-    return _batches.where((batch) => batch.completed).toList();
-  }
+  List<Batch> get completedBatches =>
+      batches.where((b) => b.completed).toList();
 
   /// Lot en cours de création/modification
   Batch? get activeBatch => _activeBatch;
@@ -61,7 +63,7 @@ class BatchProvider with ChangeNotifier {
   bool get hasActiveBatch => _activeBatch != null;
 
   /// Nombre total de lots
-  int get batchCount => _batches.length;
+  int get batchCount => _allBatches.length;
 
   /// Nombre de lots actifs
   int get activeBatchCount => activeBatches.length;
@@ -85,8 +87,9 @@ class BatchProvider with ChangeNotifier {
       synced: false,
     );
 
-    _batches.add(batch);
-    _activeBatch = batch;
+    final batchWithFarm = batch.copyWith(farmId: _authProvider.currentFarmId);
+    _allBatches.add(batchWithFarm);
+    _activeBatch = batchWithFarm;
 
     notifyListeners();
 
@@ -126,9 +129,9 @@ class BatchProvider with ChangeNotifier {
     );
 
     // Remplacer dans la liste
-    final index = _batches.indexWhere((b) => b.id == _activeBatch!.id);
+    final index = _allBatches.indexWhere((b) => b.id == _activeBatch!.id);
     if (index != -1) {
-      _batches[index] = updatedBatch;
+      _allBatches[index] = updatedBatch;
       _activeBatch = updatedBatch;
     }
 
@@ -172,9 +175,9 @@ class BatchProvider with ChangeNotifier {
     );
 
     // Remplacer dans la liste
-    final index = _batches.indexWhere((b) => b.id == _activeBatch!.id);
+    final index = _allBatches.indexWhere((b) => b.id == _activeBatch!.id);
     if (index != -1) {
-      _batches[index] = updatedBatch;
+      _allBatches[index] = updatedBatch;
       _activeBatch = updatedBatch;
     }
 
@@ -200,14 +203,14 @@ class BatchProvider with ChangeNotifier {
   ///
   /// Appelé après une vente, un abattage, etc.
   void completeBatch(String batchId) {
-    final index = _batches.indexWhere((b) => b.id == batchId);
+    final index = _allBatches.indexWhere((b) => b.id == batchId);
 
     if (index == -1) {
       debugPrint('$kLogBatchNotFound|id=$batchId');
       return;
     }
 
-    final batch = _batches[index];
+    final batch = _allBatches[index];
 
     final updatedBatch = Batch(
       id: batch.id,
@@ -220,7 +223,7 @@ class BatchProvider with ChangeNotifier {
       synced: false,
     );
 
-    _batches[index] = updatedBatch;
+    _allBatches[index] = updatedBatch;
 
     // Si c'était le lot actif, le déréférencer
     if (_activeBatch?.id == batchId) {
@@ -236,16 +239,16 @@ class BatchProvider with ChangeNotifier {
   ///
   /// [batchId] : ID du lot à supprimer
   void deleteBatch(String batchId) {
-    final index = _batches.indexWhere((b) => b.id == batchId);
+    final index = _allBatches.indexWhere((b) => b.id == batchId);
 
     if (index == -1) {
       debugPrint('$kLogBatchNotFound|id=$batchId');
       return;
     }
 
-    final batch = _batches[index];
+    final batch = _allBatches[index];
 
-    _batches.removeAt(index);
+    _allBatches.removeAt(index);
 
     // Si c'était le lot actif, le déréférencer
     if (_activeBatch?.id == batchId) {
@@ -270,7 +273,7 @@ class BatchProvider with ChangeNotifier {
   ///
   /// [batchId] : ID du lot à réactiver
   void setActiveBatch(String batchId) {
-    final batch = _batches.firstWhere(
+    final batch = _allBatches.firstWhere(
       (b) => b.id == batchId,
       orElse: () => throw Exception(kErrBatchNotFound),
     );
@@ -292,7 +295,7 @@ class BatchProvider with ChangeNotifier {
   /// Retourne null si non trouvé
   Batch? getBatchById(String batchId) {
     try {
-      return _batches.firstWhere((b) => b.id == batchId);
+      return _allBatches.firstWhere((b) => b.id == batchId);
     } catch (e) {
       return null;
     }
@@ -302,14 +305,14 @@ class BatchProvider with ChangeNotifier {
   ///
   /// Utile pour vérifier si un animal est déjà dans un lot
   List<Batch> getBatchesContainingAnimal(String animalId) {
-    return _batches
+    return _allBatches
         .where((batch) => batch.animalIds.contains(animalId))
         .toList();
   }
 
   /// Obtenir les lots par objectif
   List<Batch> getBatchesByPurpose(BatchPurpose purpose) {
-    return _batches.where((b) => b.purpose == purpose).toList();
+    return _allBatches.where((b) => b.purpose == purpose).toList();
   }
 
   // ==================== Méthodes de Chargement ====================
@@ -335,7 +338,7 @@ class BatchProvider with ChangeNotifier {
 
   /// Initialiser avec des données de test (mock)
   void initializeWithMockData(List<Batch> mockBatches) {
-    _batches = mockBatches;
+    _allBatches = mockBatches;
     notifyListeners();
 
     debugPrint('$kLogBatchMockLoaded|count=${mockBatches.length}');
@@ -368,7 +371,7 @@ class BatchProvider with ChangeNotifier {
       BatchPurpose.other: 0,
     };
 
-    for (final batch in _batches) {
+    for (final batch in _allBatches) {
       distribution[batch.purpose] = (distribution[batch.purpose] ?? 0) + 1;
     }
 
@@ -378,7 +381,7 @@ class BatchProvider with ChangeNotifier {
   /// Réinitialiser toutes les données (pour tests)
   @visibleForTesting
   void reset() {
-    _batches.clear();
+    _allBatches.clear();
     _activeBatch = null;
     notifyListeners();
     debugPrint(kLogBatchReset);

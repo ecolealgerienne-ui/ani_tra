@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 
 import '../models/lot.dart';
+import 'auth_provider.dart';
 
 import '../models/treatment.dart';
 import '../models/movement.dart';
@@ -11,22 +12,28 @@ const uuid = Uuid();
 
 /// Provider de gestion des lots
 class LotProvider extends ChangeNotifier {
-  List<Lot> _lots = [];
+  final AuthProvider _authProvider;
+
+  LotProvider(this._authProvider);
+
+  List<Lot> _allLots = [];
   Lot? _activeLot;
 
   // ==================== Getters ====================
 
-  List<Lot> get lots => List.unmodifiable(_lots);
+  List<Lot> get lots => List.unmodifiable(
+    _allLots.where((item) => item.farmId == _authProvider.currentFarmId)
+  );
 
-  List<Lot> get openLots => _lots.where((l) => !l.completed).toList();
+  List<Lot> get openLots => _allLots.where((l) => !l.completed).toList();
 
-  List<Lot> get closedLots => _lots.where((l) => l.completed).toList();
+  List<Lot> get closedLots => _allLots.where((l) => l.completed).toList();
 
   Lot? get activeLot => _activeLot;
 
   int get openLotsCount => openLots.length;
   int get closedLotsCount => closedLots.length;
-  int get totalLotsCount => _lots.length;
+  int get totalLotsCount => _allLots.length;
 
   // ==================== Création ====================
 
@@ -46,7 +53,8 @@ class LotProvider extends ChangeNotifier {
       createdAt: DateTime.now(),
     );
 
-    _lots.add(lot);
+    final lotWithFarm = lot.copyWith(farmId: _authProvider.currentFarmId);
+    _allLots.add(lotWithFarm);
     _activeLot = lot;
     notifyListeners();
 
@@ -69,9 +77,9 @@ class LotProvider extends ChangeNotifier {
 
   /// Met à jour un lot
   void updateLot(Lot updated) {
-    final index = _lots.indexWhere((l) => l.id == updated.id);
+    final index = _allLots.indexWhere((l) => l.id == updated.id);
     if (index != -1) {
-      _lots[index] = updated;
+      _allLots[index] = updated;
       if (_activeLot?.id == updated.id) {
         _activeLot = updated;
       }
@@ -250,7 +258,8 @@ class LotProvider extends ChangeNotifier {
       notes: keepType ? sourceLot.notes : null,
     );
 
-    _lots.add(duplicated);
+    final duplicatedWithFarm = duplicated.copyWith(farmId: _authProvider.currentFarmId);
+    _allLots.add(duplicatedWithFarm);
     notifyListeners();
 
     return duplicated;
@@ -259,7 +268,7 @@ class LotProvider extends ChangeNotifier {
   // ==================== Suppression ====================
 
   void deleteLot(String lotId) {
-    _lots.removeWhere((l) => l.id == lotId);
+    _allLots.removeWhere((l) => l.id == lotId);
     if (_activeLot?.id == lotId) {
       _activeLot = null;
     }
@@ -271,7 +280,7 @@ class LotProvider extends ChangeNotifier {
 
     // Si aucun animal, supprimer
     if (_activeLot!.animalIds.isEmpty) {
-      _lots.removeWhere((l) => l.id == _activeLot!.id);
+      _allLots.removeWhere((l) => l.id == _activeLot!.id);
     }
 
     _activeLot = null;
@@ -282,7 +291,7 @@ class LotProvider extends ChangeNotifier {
 
   Lot? getLotById(String id) {
     try {
-      return _lots.firstWhere((l) => l.id == id);
+      return _allLots.firstWhere((l) => l.id == id);
     } catch (_) {
       return null;
     }
@@ -346,12 +355,12 @@ class LotProvider extends ChangeNotifier {
   // ==================== Mock / Reset ====================
 
   void loadMockLots(List<Lot> mockLots) {
-    _lots = mockLots;
+    _allLots = mockLots;
     notifyListeners();
   }
 
   void clearAllLots() {
-    _lots.clear();
+    _allLots.clear();
     _activeLot = null;
     notifyListeners();
   }
@@ -390,7 +399,8 @@ class LotProvider extends ChangeNotifier {
       veterinarianName: veterinarianName,
     );
 
-    _lots.add(lot);
+    final lotWithFarm = lot.copyWith(farmId: _authProvider.currentFarmId);
+    _allLots.add(lotWithFarm);
     notifyListeners();
   }
 }
