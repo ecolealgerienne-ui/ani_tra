@@ -15,6 +15,7 @@ import '../../providers/settings_provider.dart';
 import '../../data/animal_config.dart';
 import 'universal_scanner_screen.dart';
 import 'animal_finder_screen.dart';
+import 'mother_history_screen.dart';
 
 /// Écran d'ajout rapide d'un animal
 ///
@@ -210,7 +211,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
       return;
     }
 
-    // Vérifier que la mère existe si fournie
+    // 🆕 PART3 - Vérifier que la mère existe et est valide
     if (_selectedMotherId != null) {
       final animalProvider = context.read<AnimalProvider>();
       final mother = animalProvider.getAnimalById(_selectedMotherId!);
@@ -220,8 +221,9 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
         return;
       }
 
-      if (mother.sex != AnimalSex.female) {
-        _showError('⚠️ La mère doit être une femelle');
+      // Validation PART3
+      if (!mother.canBeMother) {
+        _showError('⚠️ ${mother.cannotBeMotherReason}');
         return;
       }
     }

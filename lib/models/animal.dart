@@ -139,6 +139,40 @@ class Animal implements SyncableEntity {
   /// Nombre de changements d'EID
   int get eidChangeCount => eidHistory?.length ?? 0;
 
+  /// 🆕 PART3 - VALIDATION MÈRE
+  /// Peut-elle être mère ?
+  bool get canBeMother {
+    return sex == AnimalSex.female &&
+        status == AnimalStatus.alive &&
+        ageInMonths >= _getReproductionMinAge();
+  }
+
+  int _getReproductionMinAge() {
+    switch (speciesId?.toLowerCase()) {
+      case 'ovine':
+      case 'caprine':
+        return 7;
+      case 'bovine':
+        return 15;
+      default:
+        return 12;
+    }
+  }
+
+  /// Raison pour laquelle elle ne peut pas être mère
+  String? get cannotBeMotherReason {
+    if (sex != AnimalSex.female) {
+      return 'L\'animal n\'est pas une femelle';
+    }
+    if (status != AnimalStatus.alive) {
+      return 'L\'animal n\'est plus vivant';
+    }
+    if (ageInMonths < _getReproductionMinAge()) {
+      return 'L\'animal est trop jeune (min. ${_getReproductionMinAge()} mois)';
+    }
+    return null;
+  }
+
   // ==================== GETTERS SAFE (JAMAIS NULL) ====================
 
   /// Identifiant principal pour l'affichage (JAMAIS NULL)

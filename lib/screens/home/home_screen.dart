@@ -8,6 +8,8 @@ import '../../providers/batch_provider.dart';
 import '../../../providers/sync_provider.dart';
 import '../../providers/alert_provider.dart';
 import '../../models/animal.dart';
+import '../../models/alert.dart';
+import '../../models/alert_type.dart';
 
 import '../animal/animal_list_screen.dart';
 import '../animal/animal_detail_screen.dart';
@@ -16,6 +18,7 @@ import '../lot/lot_list_screen.dart';
 import '../vaccination/vaccination_list_screen.dart';
 import '../settings/settings_screen.dart';
 import '../alert/alerts_screen.dart';
+import '../services/export_registry_screen.dart'; // 🆕 PART3
 
 /// Écran d'accueil simplifié
 ///
@@ -24,6 +27,7 @@ import '../alert/alerts_screen.dart';
 /// - Barre de recherche rapide
 /// - Statistiques clés (3 cartes compactes)
 /// - 3 Actions Rapides principales (Animaux + Lots + Vaccinations)
+/// - 🆕 Export PDF (PART3)
 /// - FAB Scanner
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -97,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       top: 8,
                       child: Container(
                         padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: Colors.red,
                           shape: BoxShape.circle,
                         ),
@@ -142,11 +146,10 @@ class _HomeScreenState extends State<HomeScreen> {
             child: RefreshIndicator(
               onRefresh: () async {
                 await Future.delayed(const Duration(seconds: 1));
-                if (mounted) {
-                  // Forcer le recalcul des alertes
-                  context.read<AlertProvider>().refresh();
-                  setState(() {});
-                }
+                if (!mounted) return;
+                // Forcer le recalcul des alertes
+                context.read<AlertProvider>().refresh();
+                setState(() {});
               },
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
@@ -230,6 +233,25 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
 
+                    const SizedBox(height: 16),
+
+                    // 🆕 PART3 : CARTE 4 : EXPORT PDF
+                    _buildMainActionCard(
+                      context: context,
+                      icon: Icons.picture_as_pdf,
+                      iconColor: Colors.purple,
+                      title: 'Export Registre',
+                      subtitle: 'PDF pour contrôle',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ExportRegistryScreen(),
+                          ),
+                        );
+                      },
+                    ),
+
                     const SizedBox(height: 24),
                   ],
                 ),
@@ -251,12 +273,14 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
 
-          if (animal != null && mounted) {
+          if (!mounted) return;
+          if (animal != null) {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) =>
-                    AnimalDetailScreen(preloadedAnimal: animal),
+                builder: (context) => AnimalDetailScreen(
+                  preloadedAnimal: animal,
+                ),
               ),
             );
           }
@@ -267,21 +291,35 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// 🆕 Widget : Bannière d'alerte urgente
+  /// Widget : Bannière d'alerte urgente (rouge, en haut)
+  /// 🆕 Affiche la première alerte urgente s'il y en a
   Widget _buildUrgentAlertBanner(BuildContext context) {
     return Consumer<AlertProvider>(
       builder: (context, alertProvider, child) {
-        if (!alertProvider.hasUrgentAlerts) {
+        final urgentAlerts = alertProvider.alerts
+            .where((a) => a.type == AlertType.urgent)
+            .toList();
+
+        if (urgentAlerts.isEmpty) {
           return const SizedBox.shrink();
         }
 
-        final message = alertProvider.getUrgentBannerMessage();
+        final firstAlert = urgentAlerts.first;
 
-        return Material(
-          color: Colors.red.shade700,
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.red.shade50,
+            border: Border(
+              bottom: BorderSide(
+                color: Colors.red.shade200,
+                width: 1,
+              ),
+            ),
+          ),
           child: InkWell(
             onTap: () {
-              // Naviguer vers l'écran de détails des alertes
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -289,34 +327,65 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               );
             },
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.warning_rounded,
-                    color: Colors.white,
-                    size: 24,
+            child: Row(
+              children: [
+                Icon(
+                  Icons.error,
+                  color: Colors.red.shade700,
+                  size: 24,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        firstAlert.title,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red.shade900,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        firstAlert.message,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.red.shade700,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
+                ),
+                const SizedBox(width: 8),
+                if (urgentAlerts.length > 1)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade700,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     child: Text(
-                      message ?? 'Alertes urgentes',
+                      '+${urgentAlerts.length - 1}',
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                  const Icon(
-                    Icons.chevron_right,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                ],
-              ),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 16,
+                  color: Colors.red.shade700,
+                ),
+              ],
             ),
           ),
         );
@@ -324,7 +393,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Widget : Barre de recherche rapide
+  /// Widget : Barre de recherche
   Widget _buildSearchBar(BuildContext context) {
     return Container(
       decoration: BoxDecoration(

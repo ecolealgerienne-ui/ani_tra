@@ -237,6 +237,45 @@ class Alert {
     );
   }
 
+  /// 🆕 PART3 - Constructeur : Mère non déclarée
+  factory Alert.missingMother({
+    required String animalId,
+    required String animalName,
+  }) {
+    return Alert(
+      id: 'missing_mother_$animalId',
+      type: AlertType.important,
+      category: AlertCategory.registre,
+      title: 'Mère non déclarée',
+      message: '$animalName : Animal né dans l\'élevage sans mère',
+      entityId: animalId,
+      entityType: 'animal',
+      entityName: animalName,
+      actionLabel: 'Déclarer la mère',
+      animalIds: [animalId],
+    );
+  }
+
+  /// 🆕 PART3 - Constructeur : Mère invalide
+  factory Alert.invalidMother({
+    required String animalId,
+    required String animalName,
+    required String reason,
+  }) {
+    return Alert(
+      id: 'invalid_mother_$animalId',
+      type: AlertType.urgent,
+      category: AlertCategory.registre,
+      title: 'Mère invalide',
+      message: '$animalName : $reason',
+      entityId: animalId,
+      entityType: 'animal',
+      entityName: animalName,
+      actionLabel: 'Corriger',
+      animalIds: [animalId],
+    );
+  }
+
   /// Copie avec modifications
   Alert copyWith({
     String? id,

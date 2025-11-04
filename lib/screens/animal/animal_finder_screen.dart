@@ -287,9 +287,21 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
 
           // Zone centrale
           Expanded(
-            child: _selectedAnimals.isEmpty
-                ? _buildEmptyState()
-                : _buildAnimalTable(),
+            child: Column(
+              children: [
+                // Animaux sélectionnés (si mode multiple)
+                if (_selectedAnimals.isNotEmpty &&
+                    widget.mode == AnimalFinderMode.multiple)
+                  _buildSelectedAnimalsSection(),
+
+                // Résultats de recherche ou état vide
+                Expanded(
+                  child: _searchQuery.isEmpty && _selectedAnimals.isEmpty
+                      ? _buildEmptyState()
+                      : _buildSearchResults(),
+                ),
+              ],
+            ),
           ),
 
           // Boutons scan
@@ -373,6 +385,120 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSelectedAnimalsSection() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      color: Colors.green.shade50,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.green.shade700, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                'Sélectionnés (${_selectedAnimals.length})',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green.shade900,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: _selectedAnimals.map((animal) {
+              return Chip(
+                avatar: const Icon(Icons.pets, size: 16),
+                label: Text(
+                  animal.displayName,
+                  style: const TextStyle(fontSize: 12),
+                ),
+                deleteIcon: const Icon(Icons.close, size: 16),
+                onDeleted: () => _removeAnimal(animal),
+                backgroundColor: Colors.white,
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchResults() {
+    final availableAnimals = _getAvailableAnimals();
+
+    if (availableAnimals.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.search_off,
+              size: 64,
+              color: Colors.grey.shade400,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Aucun animal trouvé',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey.shade600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Essayez avec un autre identifiant',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey.shade500,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: availableAnimals.length,
+      itemBuilder: (context, index) {
+        final animal = availableAnimals[index];
+        final isSelected = _selectedAnimals.any((a) => a.id == animal.id);
+
+        return Card(
+          color: isSelected ? Colors.green.shade50 : null,
+          child: ListTile(
+            leading: Icon(
+              Icons.pets,
+              color: isSelected ? Colors.green : null,
+            ),
+            title: Text(
+              animal.displayName,
+              style: TextStyle(
+                fontWeight: isSelected ? FontWeight.bold : null,
+              ),
+            ),
+            subtitle: Text(
+              [
+                if (animal.currentEid != null) 'EID: ${animal.currentEid}',
+                if (animal.officialNumber != null)
+                  'N°: ${animal.officialNumber}',
+                if (animal.visualId != null) 'ID: ${animal.visualId}',
+              ].join(' • '),
+            ),
+            trailing: isSelected
+                ? Icon(Icons.check_circle, color: Colors.green.shade700)
+                : const Icon(Icons.add_circle_outline),
+            onTap: () => _onAnimalFound(animal),
+          ),
+        );
+      },
     );
   }
 

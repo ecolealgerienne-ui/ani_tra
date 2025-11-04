@@ -5,10 +5,11 @@ import '../models/treatment.dart';
 import '../models/movement.dart';
 import '../models/product.dart';
 import 'auth_provider.dart';
+import '../models/mother_stats.dart';
 
 class AnimalProvider extends ChangeNotifier {
   final AuthProvider _authProvider;
-  
+
   // Données principales (NON FILTRÉES - contient toutes les fermes)
   final List<Product> _allProducts = [];
   final List<Animal> _allAnimals = [];
@@ -27,20 +28,16 @@ class AnimalProvider extends ChangeNotifier {
   // ==================== Getters FILTRÉS par farmId ====================
 
   List<Product> get products => List.unmodifiable(
-    _allProducts.where((p) => p.farmId == _authProvider.currentFarmId)
-  );
-  
+      _allProducts.where((p) => p.farmId == _authProvider.currentFarmId));
+
   List<Animal> get animals => List.unmodifiable(
-    _allAnimals.where((a) => a.farmId == _authProvider.currentFarmId)
-  );
-  
+      _allAnimals.where((a) => a.farmId == _authProvider.currentFarmId));
+
   List<Treatment> get treatments => List.unmodifiable(
-    _allTreatments.where((t) => t.farmId == _authProvider.currentFarmId)
-  );
-  
+      _allTreatments.where((t) => t.farmId == _authProvider.currentFarmId));
+
   List<Movement> get movements => List.unmodifiable(
-    _allMovements.where((m) => m.farmId == _authProvider.currentFarmId)
-  );
+      _allMovements.where((m) => m.farmId == _authProvider.currentFarmId));
 
   Animal? get currentAnimal => _currentAnimal;
   String get searchQuery => _searchQuery;
@@ -287,7 +284,8 @@ class AnimalProvider extends ChangeNotifier {
       'female': animals.where((a) => a.sex == AnimalSex.female).length,
       'sold': animals.where((a) => a.status == AnimalStatus.sold).length,
       'dead': animals.where((a) => a.status == AnimalStatus.dead).length,
-      'slaughtered': animals.where((a) => a.status == AnimalStatus.slaughtered).length,
+      'slaughtered':
+          animals.where((a) => a.status == AnimalStatus.slaughtered).length,
     };
   }
 
@@ -311,7 +309,8 @@ class AnimalProvider extends ChangeNotifier {
         return true;
       }
 
-      if (animal.officialNumber?.toLowerCase().contains(lowercaseQuery) == true) {
+      if (animal.officialNumber?.toLowerCase().contains(lowercaseQuery) ==
+          true) {
         return true;
       }
 
@@ -370,5 +369,63 @@ class AnimalProvider extends ChangeNotifier {
 
     updateAnimal(updated);
     return true;
+  }
+
+  // ==================== 🆕 PART3 - VALIDATION MÈRE ====================
+
+  /// Récupère toutes les femelles pouvant être mères
+  List<Animal> get potentialMothers {
+    return animals.where((a) => a.canBeMother).toList()
+      ..sort((a, b) {
+        final aNum = a.officialNumber ?? a.currentEid ?? '';
+        final bNum = b.officialNumber ?? b.currentEid ?? '';
+        return aNum.compareTo(bNum);
+      });
+  }
+
+  /// Compte le nombre de naissances d'une mère
+  int getBirthCountForMother(String motherId) {
+    return animals.where((a) => a.motherId == motherId).length;
+  }
+
+  /// Récupère tous les enfants d'une mère
+  List<Animal> getOffspring(String motherId) {
+    return animals.where((a) => a.motherId == motherId).toList()
+      ..sort((a, b) => b.birthDate.compareTo(a.birthDate));
+  }
+
+  /// Statistiques de reproduction d'une mère
+  MotherStats getMotherStats(String motherId) {
+    final offspring = getOffspring(motherId);
+
+    return MotherStats(
+      totalBirths: offspring.length,
+      aliveOffspring:
+          offspring.where((a) => a.status == AnimalStatus.alive).length,
+      lastBirthDate: offspring.isNotEmpty ? offspring.first.birthDate : null,
+      averageInterval: _calculateAverageInterval(offspring),
+    );
+  }
+
+  Duration? _calculateAverageInterval(List<Animal> offspring) {
+    if (offspring.length < 2) return null;
+
+    final intervals = <int>[];
+    for (var i = 0; i < offspring.length - 1; i++) {
+      final interval =
+          offspring[i].birthDate.difference(offspring[i + 1].birthDate).inDays;
+      intervals.add(interval);
+    }
+
+    final avgDays = intervals.reduce((a, b) => a + b) ~/ intervals.length;
+    return Duration(days: avgDays);
+  }
+
+  /// Validation : vérifie les animaux sans mère déclarée
+  List<Animal> getAnimalsWithoutMother() {
+    return animals.where((a) {
+      final bornInFarm = a.birthDate.isAfter(DateTime(2020));
+      return bornInFarm && a.motherId == null;
+    }).toList();
   }
 }
