@@ -41,6 +41,7 @@ class Veterinarian implements SyncableEntity {
   // === Notes et préférences ===
   final String? notes;
   final bool isPreferred; // Vétérinaire préféré
+  final bool isDefault; // Vétérinaire par défaut
   final int rating; // Note de 1 à 5
 
   // === Statistiques ===
@@ -86,6 +87,7 @@ class Veterinarian implements SyncableEntity {
     this.currency,
     this.notes,
     this.isPreferred = false,
+    this.isDefault = false,
     this.rating = 5,
     this.totalInterventions = 0,
     this.lastInterventionDate,
@@ -163,6 +165,7 @@ class Veterinarian implements SyncableEntity {
     String? currency,
     String? notes,
     bool? isPreferred,
+    bool? isDefault,
     int? rating,
     int? totalInterventions,
     DateTime? lastInterventionDate,
@@ -196,6 +199,7 @@ class Veterinarian implements SyncableEntity {
       currency: currency ?? this.currency,
       notes: notes ?? this.notes,
       isPreferred: isPreferred ?? this.isPreferred,
+      isDefault: isDefault ?? this.isDefault,
       rating: rating ?? this.rating,
       totalInterventions: totalInterventions ?? this.totalInterventions,
       lastInterventionDate: lastInterventionDate ?? this.lastInterventionDate,
@@ -252,6 +256,7 @@ class Veterinarian implements SyncableEntity {
       'currency': currency,
       'notes': notes,
       'isPreferred': isPreferred,
+      'isDefault': isDefault,
       'rating': rating,
       'totalInterventions': totalInterventions,
       'lastInterventionDate': lastInterventionDate?.toIso8601String(),
@@ -292,6 +297,7 @@ class Veterinarian implements SyncableEntity {
       currency: json['currency'] as String?,
       notes: json['notes'] as String?,
       isPreferred: json['isPreferred'] as bool? ?? false,
+      isDefault: json['isDefault'] as bool? ?? false,
       rating: json['rating'] as int? ?? 5,
       totalInterventions: json['totalInterventions'] as int? ?? 0,
       lastInterventionDate: json['lastInterventionDate'] != null

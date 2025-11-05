@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/locale_provider.dart';
 import '../../providers/sync_provider.dart';
+import '../../providers/veterinarian_provider.dart';
+import '../../models/veterinarian.dart';
 import '../../widgets/farm_preferences_section.dart';
 import '../../i18n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -37,6 +39,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   int _cacheSize = 0;
   bool _autoBackup = false;
 
+  // Vétérinaire par défaut
+  String? _defaultVeterinarianId;
+  String? _selectedVetName;
+  String? _selectedVetOrg;
+
   @override
   void initState() {
     super.initState();
@@ -60,6 +67,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _autoLockMinutes = prefs.getInt('auto_lock_minutes') ?? 5;
       _cacheSize = prefs.getInt('cache_size') ?? 0;
       _autoBackup = prefs.getBool('auto_backup') ?? false;
+      _defaultVeterinarianId = prefs.getString('default_veterinarian_id');
+
+      // Charger les infos du vétérinaire si sélectionné
+      if (_defaultVeterinarianId != null && mounted) {
+        final vetProvider = context.read<VeterinarianProvider>();
+        final vet = vetProvider.getVeterinarianById(_defaultVeterinarianId!);
+        if (vet != null) {
+          _selectedVetName = vet.fullName;
+          _selectedVetOrg = vet.clinic;
+        }
+      }
     });
   }
 
@@ -111,6 +129,141 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           // Farm Preferences Section (ÉTAPE 4)
           const FarmPreferencesSection(),
+
+          const Divider(),
+
+          // Vétérinaire par défaut
+          const _SectionHeader(title: 'Vétérinaire prescripteur'),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Column(
+              children: [
+                if (_defaultVeterinarianId == null) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 32, horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.person_search,
+                          size: 48,
+                          color: Colors.grey.shade400,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Aucun vétérinaire défini',
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: _searchVeterinarian,
+                                icon: const Icon(Icons.search),
+                                label: const Text('Rechercher'),
+                                style: OutlinedButton.styleFrom(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: _scanVeterinarianQR,
+                                icon: const Icon(Icons.qr_code_scanner),
+                                label: const Text('Scanner QR'),
+                                style: OutlinedButton.styleFrom(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ] else ...[
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                      border:
+                          Border.all(color: Colors.green.shade300, width: 2),
+                    ),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: Colors.green.shade100,
+                          radius: 24,
+                          child: Icon(
+                            Icons.verified_user,
+                            color: Colors.green.shade700,
+                            size: 28,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _selectedVetName ?? 'Vétérinaire',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                _selectedVetOrg ?? '',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: _removeVeterinarian,
+                          icon: const Icon(Icons.close, color: Colors.red),
+                          tooltip: 'Retirer',
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: _searchVeterinarian,
+                          icon: const Icon(Icons.search),
+                          label: const Text('Changer'),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
 
           const Divider(),
 
@@ -971,6 +1124,119 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  void _searchVeterinarian() {
+    final vetProvider = context.read<VeterinarianProvider>();
+    showDialog(
+      context: context,
+      builder: (context) => _VeterinarianSearchDialog(
+        veterinarians: vetProvider.veterinarians,
+        onSelect: (vet) async {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('default_veterinarian_id', vet.id);
+          setState(() {
+            _defaultVeterinarianId = vet.id;
+            _selectedVetName = vet.fullName;
+            _selectedVetOrg = vet.clinic;
+          });
+          if (!context.mounted) return;
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${vet.fullName} défini par défaut'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Future<void> _scanVeterinarianQR() async {
+    final vetProvider = context.read<VeterinarianProvider>();
+    final vets = vetProvider.veterinarians;
+    if (vets.isEmpty) return;
+
+    final selectedVet = vets.first;
+
+    setState(() {
+      _defaultVeterinarianId = selectedVet.id;
+      _selectedVetName = selectedVet.fullName;
+      _selectedVetOrg = selectedVet.clinic;
+    });
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('default_veterinarian_id', selectedVet.id);
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('✅ ${selectedVet.fullName} validé'),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _removeVeterinarian() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('default_veterinarian_id');
+    setState(() {
+      _defaultVeterinarianId = null;
+      _selectedVetName = null;
+      _selectedVetOrg = null;
+    });
+  }
+
+  void _showSelectDefaultVeterinarianDialog(BuildContext context) {
+    final vetProvider = context.read<VeterinarianProvider>();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Sélectionner vétérinaire par défaut'),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: vetProvider.veterinarians.length,
+            itemBuilder: (context, index) {
+              final vet = vetProvider.veterinarians[index];
+              return ListTile(
+                leading: CircleAvatar(
+                  child: Text(vet.firstName[0]),
+                ),
+                title: Text(vet.fullName),
+                subtitle: Text(vet.clinic ?? 'Non spécifié'),
+                trailing: vet.isDefault
+                    ? const Icon(Icons.check, color: Colors.green)
+                    : null,
+                onTap: () async {
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.setString('default_veterinarian_id', vet.id);
+                  setState(() => _defaultVeterinarianId = vet.id);
+                  if (!context.mounted) return;
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('${vet.fullName} défini par défaut'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Annuler'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showPrivacyDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -1187,6 +1453,106 @@ class _LanguageTile extends StatelessWidget {
           isSelected ? const Icon(Icons.check, color: Colors.green) : null,
       selected: isSelected,
       onTap: onTap,
+    );
+  }
+}
+
+// Veterinarian Search Dialog Widget
+class _VeterinarianSearchDialog extends StatefulWidget {
+  final List<Veterinarian> veterinarians;
+  final Function(Veterinarian) onSelect;
+
+  const _VeterinarianSearchDialog({
+    required this.veterinarians,
+    required this.onSelect,
+  });
+
+  @override
+  State<_VeterinarianSearchDialog> createState() =>
+      _VeterinarianSearchDialogState();
+}
+
+class _VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
+  final _searchController = TextEditingController();
+  List<Veterinarian> _filtered = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _filtered = widget.veterinarians;
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _filterVets(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filtered = widget.veterinarians;
+      } else {
+        _filtered = widget.veterinarians
+            .where((v) =>
+                v.fullName.toLowerCase().contains(query.toLowerCase()) ||
+                (v.clinic?.toLowerCase().contains(query.toLowerCase()) ??
+                    false))
+            .toList();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Rechercher un vétérinaire'),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _searchController,
+              decoration: const InputDecoration(
+                labelText: 'Rechercher',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
+              ),
+              onChanged: _filterVets,
+            ),
+            const SizedBox(height: 16),
+            Flexible(
+              child: _filtered.isEmpty
+                  ? const Center(child: Text('Aucun vétérinaire trouvé'))
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: _filtered.length,
+                      itemBuilder: (context, index) {
+                        final vet = _filtered[index];
+                        return ListTile(
+                          leading: CircleAvatar(
+                            child: Text(vet.fullName[0]),
+                          ),
+                          title: Text(vet.fullName),
+                          subtitle: Text(vet.clinic ?? 'Non spécifié'),
+                          onTap: () {
+                            widget.onSelect(vet);
+                            Navigator.pop(context);
+                          },
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Annuler'),
+        ),
+      ],
     );
   }
 }

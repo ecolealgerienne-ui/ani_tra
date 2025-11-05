@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import '../../providers/vaccination_provider.dart';
 import '../../providers/animal_provider.dart';
 import '../../models/vaccination.dart';
-import '../../models/animal.dart';
+//import '../../models/animal.dart';
 import '../../models/vaccination_protocol.dart';
 
 class VaccinationDetailScreen extends StatelessWidget {

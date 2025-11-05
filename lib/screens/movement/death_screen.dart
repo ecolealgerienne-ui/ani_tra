@@ -11,7 +11,9 @@ import '../../models/movement.dart';
 import '../../i18n/app_localizations.dart';
 
 class DeathScreen extends StatefulWidget {
-  const DeathScreen({super.key});
+  final Animal? animal;
+
+  const DeathScreen({super.key, this.animal});
 
   @override
   State<DeathScreen> createState() => _DeathScreenState();
@@ -23,6 +25,15 @@ class _DeathScreenState extends State<DeathScreen> {
   DateTime _deathDate = DateTime.now();
   bool _isScanning = false;
   final _random = Random();
+
+  @override
+  void initState() {
+    super.initState();
+    // Si un animal est passé en paramètre, l'utiliser directement
+    if (widget.animal != null) {
+      _scannedAnimal = widget.animal;
+    }
+  }
 
   @override
   void dispose() {
@@ -71,7 +82,8 @@ class _DeathScreenState extends State<DeathScreen> {
   }
 
   void _confirmDeath() {
-    if (_scannedAnimal == null) return;
+    final animal = _scannedAnimal ?? widget.animal;
+    if (animal == null) return;
 
     final animalProvider = context.read<AnimalProvider>();
     final syncProvider = context.read<SyncProvider>();
@@ -79,7 +91,7 @@ class _DeathScreenState extends State<DeathScreen> {
     // Create death movement
     final movement = Movement(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      animalId: _scannedAnimal!.id,
+      animalId: animal.id,
       type: MovementType.death,
       movementDate: _deathDate,
       notes: _notesController.text.isEmpty
@@ -89,6 +101,11 @@ class _DeathScreenState extends State<DeathScreen> {
     );
 
     animalProvider.addMovement(movement);
+
+    // Mettre à jour le statut de l'animal à "mort"
+    final updatedAnimal = animal.copyWith(status: AnimalStatus.dead);
+    animalProvider.updateAnimal(updatedAnimal);
+
     syncProvider.incrementPendingData();
 
     if (!mounted) return;
@@ -139,7 +156,7 @@ class _DeathScreenState extends State<DeathScreen> {
           const SizedBox(height: 24),
 
           // Scan Animal
-          if (_scannedAnimal == null)
+          if (_scannedAnimal == null && widget.animal == null)
             SizedBox(
               height: 120,
               child: ElevatedButton(
@@ -161,50 +178,53 @@ class _DeathScreenState extends State<DeathScreen> {
                       ),
               ),
             )
-          else ...[
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.pets, size: 32),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _scannedAnimal!.officialNumber ?? 'N/A',
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+          else if (_scannedAnimal != null || widget.animal != null) ...[
+            Builder(builder: (context) {
+              final animal = _scannedAnimal ?? widget.animal;
+              return Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.pets, size: 32),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  animal!.officialNumber ?? 'N/A',
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                              Text(_scannedAnimal!.displayName),
-                            ],
+                                Text(animal.displayName),
+                              ],
+                            ),
                           ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: () {
-                            setState(() => _scannedAnimal = null);
-                          },
-                        ),
-                      ],
-                    ),
-                    const Divider(height: 24),
-                    Text(
-                        'Sexe: ${_scannedAnimal!.sex == AnimalSex.female ? "Femelle" : "Mâle"}'),
-                    Text('Âge: ${_scannedAnimal!.ageInMonths} mois'),
-                    Text(
-                        'Naissance: ${dateFormat.format(_scannedAnimal!.birthDate)}'),
-                  ],
+                          if (widget.animal == null)
+                            IconButton(
+                              icon: const Icon(Icons.close),
+                              onPressed: () {
+                                setState(() => _scannedAnimal = null);
+                              },
+                            ),
+                        ],
+                      ),
+                      const Divider(height: 24),
+                      Text(
+                          'Sexe: ${animal.sex == AnimalSex.female ? "Femelle" : "Mâle"}'),
+                      Text('Âge: ${animal.ageInMonths} mois'),
+                      Text('Naissance: ${dateFormat.format(animal.birthDate)}'),
+                    ],
+                  ),
                 ),
-              ),
-            ),
+              );
+            }),
             const SizedBox(height: 24),
 
             // Death Date

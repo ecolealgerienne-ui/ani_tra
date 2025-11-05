@@ -8,7 +8,7 @@ import '../../providers/batch_provider.dart';
 import '../../../providers/sync_provider.dart';
 import '../../providers/alert_provider.dart';
 import '../../models/animal.dart';
-import '../../models/alert.dart';
+//import '../../models/alert.dart';
 import '../../models/alert_type.dart';
 
 import '../animal/animal_list_screen.dart';

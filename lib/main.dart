@@ -24,6 +24,7 @@ import 'providers/document_provider.dart';
 import 'providers/breeding_provider.dart';
 import 'providers/auth_provider.dart';
 import 'providers/reminder_provider.dart';
+import 'providers/veterinarian_provider.dart';
 import 'i18n/app_localizations.dart';
 import 'screens/home/home_screen.dart'; // ✅ Mis à jour
 import 'screens/animal/animal_detail_screen.dart'; // ✅ Mis à jour
@@ -33,6 +34,7 @@ import 'screens/animal/universal_scanner_screen.dart'; // ✅ Scanner Phase 1
 import 'screens/sync/sync_screen.dart'; // ✅ Mis à jour
 import 'data/mock_data.dart';
 import 'data/mocks/mock_vaccination_references.dart';
+import 'data/mocks/mock_veterinarians.dart';
 
 // Instance globale du plugin de notifications
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -183,6 +185,17 @@ class MyApp extends StatelessWidget {
           create: (context) => BreedingProvider(context.read<AuthProvider>()),
           update: (context, auth, previous) =>
               previous ?? BreedingProvider(auth),
+        ),
+
+        ChangeNotifierProxyProvider<AuthProvider, VeterinarianProvider>(
+          create: (context) {
+            final auth = context.read<AuthProvider>();
+            final provider = VeterinarianProvider(auth);
+            provider.loadMockVets(MockVeterinarians.generateVeterinarians());
+            return provider;
+          },
+          update: (context, auth, previous) =>
+              previous ?? VeterinarianProvider(auth),
         ),
 
         // 4. AlertProvider (dépend de plusieurs providers)

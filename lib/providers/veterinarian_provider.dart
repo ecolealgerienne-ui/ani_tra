@@ -27,6 +27,19 @@ class VeterinarianProvider with ChangeNotifier {
       .where((v) => v.emergencyService && v.isAvailable && v.isActive)
       .toList();
 
+  Veterinarian? get defaultVeterinarian => _allVeterinarians.firstWhere(
+        (v) => v.isDefault && v.isActive,
+        orElse: () => null as Veterinarian,
+      );
+
+  // ==================== Mock Data ====================
+
+  void loadMockVets(List<Veterinarian> mockVets) {
+    _allVeterinarians.clear();
+    _allVeterinarians.addAll(mockVets);
+    notifyListeners();
+  }
+
   // Statistiques
   Map<String, dynamic> get stats {
     final active = activeVeterinarians;

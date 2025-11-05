@@ -21,9 +21,9 @@ import '../../models/vaccination.dart';
 import '../../data/mock_data.dart';
 import '../../widgets/change_eid_dialog.dart';
 import '../../widgets/eid_history_card.dart';
-import '../movement/0_death_screen.dart';
+import '../movement/death_screen.dart';
 //import '../treatment/0_treatment_screen.dart';
-import '../vaccination/0_vaccination_detail_screen.dart';
+import '../vaccination/vaccination_detail_screen.dart';
 import '../medical/medical_act_screen.dart';
 
 class AnimalDetailScreen extends StatefulWidget {
@@ -516,17 +516,23 @@ class _InfosTab extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           OutlinedButton.icon(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const DeathScreen()),
-              );
-            },
+            onPressed: currentAnimal.status == AnimalStatus.dead
+                ? null
+                : () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              DeathScreen(animal: currentAnimal)),
+                    );
+                  },
             icon: const Icon(Icons.dangerous),
             label: const Text('Déclarer mort'),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size.fromHeight(48),
-              foregroundColor: Colors.red,
+              foregroundColor: currentAnimal.status == AnimalStatus.dead
+                  ? Colors.grey
+                  : Colors.red,
             ),
           ),
         ],

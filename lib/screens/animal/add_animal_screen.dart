@@ -7,15 +7,15 @@ import 'package:uuid/uuid.dart';
 
 import '../../models/animal.dart';
 import '../../models/movement.dart';
-import '../../models/scan_result.dart';
+//import '../../models/scan_result.dart';
 
 import '../../providers/animal_provider.dart';
 import '../../providers/sync_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../data/animal_config.dart';
-import 'universal_scanner_screen.dart';
+//import 'universal_scanner_screen.dart';
 import 'animal_finder_screen.dart';
-import 'mother_history_screen.dart';
+//import 'mother_history_screen.dart';
 
 /// Écran d'ajout rapide d'un animal
 ///

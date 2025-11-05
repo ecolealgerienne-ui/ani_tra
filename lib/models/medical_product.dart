@@ -5,15 +5,15 @@ import 'syncable_entity.dart';
 
 /// Type de produit médical
 enum ProductType {
-  treatment,  // Traitement
-  vaccine     // Vaccination
+  treatment, // Traitement
+  vaccine // Vaccination
 }
 
 /// Espèces animales
 enum AnimalSpecies {
-  ovin,   // Ovins (moutons, brebis)
-  bovin,  // Bovins (vaches, taureaux)
-  caprin  // Caprins (chèvres)
+  ovin, // Ovins (moutons, brebis)
+  bovin, // Bovins (vaches, taureaux)
+  caprin // Caprins (chèvres)
 }
 
 /// Produit médical pour le traitement des animaux
@@ -234,25 +234,43 @@ class MedicalProduct implements SyncableEntity {
   double? calculateDosage(double animalWeightKg) {
     if (dosageFormula == null) return null;
 
-    // Parser la formule
-    if (dosageFormula!.contains('/kg')) {
-      // Ex: "1ml/10kg" → 0.1 ml/kg
-      // Ex: "0.2ml/kg" → 0.2 ml/kg
-      final parts = dosageFormula!.split('/');
+    final formula = dosageFormula!.replaceAll(' ', '');
+
+    if (formula.contains('/kg')) {
+      final parts = formula.split('/');
       if (parts.length >= 2) {
-        final amountStr = parts[0].replaceAll(RegExp(r'[^0-9.]'), '');
+        // Extraire l'unité (mg, UI, ml, g, etc.)
+        final amountPart = parts[0];
+        final unit = amountPart.replaceAll(RegExp(r'[0-9.]'), '').toLowerCase();
+
+        final amountStr = amountPart.replaceAll(RegExp(r'[^0-9.]'), '');
         final weightStr = parts[1].replaceAll(RegExp(r'[^0-9.]'), '');
 
         final amount = double.tryParse(amountStr);
-        final weight = double.tryParse(weightStr);
+        final weight = weightStr.isEmpty ? 1.0 : double.tryParse(weightStr);
 
         if (amount != null && weight != null && weight > 0) {
-          return (amount / weight) * animalWeightKg;
+          var calculatedDose = (amount / weight) * animalWeightKg;
+
+          // Si l'unité est mg, UI, g... convertir en ml
+          if (unit != 'ml' && dosage != null && dosage! > 0) {
+            // dosageUnit = 'mg/ml' ou 'UI/ml', extraire le nombre avant /
+            final concentrationStr =
+                dosageUnit?.split('/')[0].replaceAll(RegExp(r'[^0-9.]'), '') ??
+                    '';
+            final concentration = double.tryParse(concentrationStr);
+
+            if (concentration != null && concentration > 0) {
+              calculatedDose = calculatedDose / concentration;
+            }
+          }
+
+          return calculatedDose;
         }
       }
-    } else if (dosageFormula!.contains('/animal')) {
+    } else if (formula.contains('/animal')) {
       // Ex: "2ml/animal" → dose fixe
-      final amountStr = dosageFormula!.replaceAll(RegExp(r'[^0-9.]'), '');
+      final amountStr = formula.replaceAll(RegExp(r'[^0-9.]'), '');
       return double.tryParse(amountStr);
     }
 
@@ -347,11 +365,13 @@ class MedicalProduct implements SyncableEntity {
       type: type ?? this.type,
       targetSpecies: targetSpecies ?? this.targetSpecies,
       standardCureDays: standardCureDays ?? this.standardCureDays,
-      administrationFrequency: administrationFrequency ?? this.administrationFrequency,
+      administrationFrequency:
+          administrationFrequency ?? this.administrationFrequency,
       dosageFormula: dosageFormula ?? this.dosageFormula,
       vaccinationProtocol: vaccinationProtocol ?? this.vaccinationProtocol,
       reminderDays: reminderDays ?? this.reminderDays,
-      defaultAdministrationRoute: defaultAdministrationRoute ?? this.defaultAdministrationRoute,
+      defaultAdministrationRoute:
+          defaultAdministrationRoute ?? this.defaultAdministrationRoute,
       defaultInjectionSite: defaultInjectionSite ?? this.defaultInjectionSite,
       synced: synced ?? this.synced,
       createdAt: createdAt ?? this.createdAt,
@@ -467,23 +487,34 @@ class MedicalProduct implements SyncableEntity {
               orElse: () => ProductType.treatment,
             )
           : ProductType.treatment,
-      targetSpecies: json['targetSpecies'] != null || json['target_species'] != null
-          ? (json['targetSpecies'] ?? json['target_species'] as List)
-              .map((e) => AnimalSpecies.values.firstWhere(
-                  (s) => s.name == e,
-                  orElse: () => AnimalSpecies.ovin,
-                ))
-              .toList()
-          : [],
-      standardCureDays: json['standardCureDays'] as int? ?? json['standard_cure_days'] as int?,
-      administrationFrequency: json['administrationFrequency'] as String? ?? json['administration_frequency'] as String?,
-      dosageFormula: json['dosageFormula'] as String? ?? json['dosage_formula'] as String?,
-      vaccinationProtocol: json['vaccinationProtocol'] as String? ?? json['vaccination_protocol'] as String?,
-      reminderDays: json['reminderDays'] != null || json['reminder_days'] != null
-          ? (json['reminderDays'] ?? json['reminder_days'] as List?)?.map((e) => e as int).toList()
-          : null,
-      defaultAdministrationRoute: json['defaultAdministrationRoute'] as String? ?? json['default_administration_route'] as String?,
-      defaultInjectionSite: json['defaultInjectionSite'] as String? ?? json['default_injection_site'] as String?,
+      targetSpecies:
+          json['targetSpecies'] != null || json['target_species'] != null
+              ? (json['targetSpecies'] ?? json['target_species'] as List)
+                  .map((e) => AnimalSpecies.values.firstWhere(
+                        (s) => s.name == e,
+                        orElse: () => AnimalSpecies.ovin,
+                      ))
+                  .toList()
+              : [],
+      standardCureDays: json['standardCureDays'] as int? ??
+          json['standard_cure_days'] as int?,
+      administrationFrequency: json['administrationFrequency'] as String? ??
+          json['administration_frequency'] as String?,
+      dosageFormula:
+          json['dosageFormula'] as String? ?? json['dosage_formula'] as String?,
+      vaccinationProtocol: json['vaccinationProtocol'] as String? ??
+          json['vaccination_protocol'] as String?,
+      reminderDays:
+          json['reminderDays'] != null || json['reminder_days'] != null
+              ? (json['reminderDays'] ?? json['reminder_days'] as List?)
+                  ?.map((e) => e as int)
+                  .toList()
+              : null,
+      defaultAdministrationRoute:
+          json['defaultAdministrationRoute'] as String? ??
+              json['default_administration_route'] as String?,
+      defaultInjectionSite: json['defaultInjectionSite'] as String? ??
+          json['default_injection_site'] as String?,
       synced: json['synced'] as bool? ?? false,
       createdAt:
           DateTime.parse(json['createdAt'] ?? json['created_at'] as String),

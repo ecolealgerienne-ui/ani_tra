@@ -2,16 +2,21 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/medical_product.dart';
 import '../../models/animal.dart';
 import 'package:uuid/uuid.dart';
 import '../../models/treatment.dart';
 import '../../models/vaccination.dart';
 import '../../models/veterinarian.dart';
+//import '../../models/lot.dart';
 import '../../providers/animal_provider.dart';
 import '../../providers/weight_provider.dart';
 import '../../providers/reminder_provider.dart';
 import '../../providers/vaccination_provider.dart';
+//import '../../providers/lot_provider.dart';
+//import '../../providers/sync_provider.dart';
+import '../../providers/veterinarian_provider.dart';
 import '../../data/mocks/mock_medical_products.dart';
 import '../../data/mock_data.dart';
 
@@ -27,6 +32,7 @@ class MedicalActScreen extends StatefulWidget {
   final String? animalId;
   final String? batchId;
   final List<String>? animalIds;
+  final String? lotId;
 
   const MedicalActScreen({
     super.key,
@@ -34,6 +40,7 @@ class MedicalActScreen extends StatefulWidget {
     this.animalId,
     this.batchId,
     this.animalIds,
+    this.lotId,
   });
 
   @override
@@ -124,6 +131,25 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
       }
     }
 
+    // Charger le vétérinaire par défaut s'il existe
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final defaultVetId = prefs.getString('default_veterinarian_id');
+
+      if (defaultVetId != null) {
+        final vetProvider = context.read<VeterinarianProvider>();
+        final defaultVet = vetProvider.getVeterinarianById(defaultVetId);
+
+        if (defaultVet != null) {
+          _selectedVetId = defaultVet.id;
+          _selectedVetName = defaultVet.fullName;
+          _selectedVetOrg = defaultVet.clinic ?? 'Non spécifié';
+        }
+      }
+    } catch (e) {
+      debugPrint('Erreur lors du chargement du vétérinaire par défaut: $e');
+    }
+
     setState(() {});
   }
 
@@ -177,6 +203,10 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
 
   /// Gérer la sélection d'un produit
   void _onProductSelected(MedicalProduct product) {
+    print('🔍 DEBUG: product=${product.commercialName}');
+    print('   widget.mode=${widget.mode}');
+    print('   _animal=${_animal?.eid}');
+    print('   _animalWeight=$_animalWeight');
     setState(() {
       _selectedProduct = product;
       _selectedRoute = product.defaultAdministrationRoute;
@@ -187,9 +217,16 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
           _animal != null &&
           _animalWeight != null) {
         _calculatedDosage = product.calculateDosage(_animalWeight!);
-        // Pré-remplir UNIQUEMENT pour les vaccins
-        if (_calculatedDosage != null && product.type == ProductType.vaccine) {
+        print('   ✅ _calculatedDosage=$_calculatedDosage');
+        // Pré-remplir pour les vaccins ET les traitements
+        if (_calculatedDosage != null &&
+            (product.type == ProductType.vaccine ||
+                product.type == ProductType.treatment)) {
           _dosageController.text = _calculatedDosage!.toStringAsFixed(1);
+          print('   ✅ Dosage rempli: ${_dosageController.text}');
+        } else {
+          print(
+              '   ❌ Pas de remplissage: _calculatedDosage=$_calculatedDosage, type=${product.type}');
         }
       }
     });
@@ -759,7 +796,13 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                 ),
-                items: ['Encolure', 'Cuisse', 'Flanc', 'Arrière-cuisse']
+                items: [
+                  'Encolure',
+                  'Cuisse',
+                  'Flanc',
+                  'Arrière-cuisse',
+                  'Veine jugulaire'
+                ]
                     .map((site) => DropdownMenuItem(
                           value: site,
                           child: Text(site),

@@ -114,7 +114,7 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
     super.dispose();
   }
 
-  void _finalize() {
+  void _finalize() async {
     if (_selectedType == null) return;
     if (!_formKey.currentState!.validate()) return;
 
@@ -129,14 +129,31 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
 
     switch (_selectedType!) {
       case LotType.treatment:
-        // Le traitement doit être fait via TreatmentScreen
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Veuillez configurer le traitement'),
-            backgroundColor: Colors.orange,
+        // Naviguer vers medical_act_screen pour le traitement du lot
+        if (!mounted) return;
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => MedicalActScreen(
+              mode: MedicalActMode.batch,
+              animalIds: lot.animalIds,
+              lotId: widget.lotId,
+            ),
           ),
         );
-        return;
+
+        // Après retour de medical_act_screen, finaliser le lot
+        if (!mounted) return;
+        success = lotProvider.finalizeLot(
+          widget.lotId,
+          type: LotType.treatment,
+          notes: _notesController.text.isEmpty ? null : _notesController.text,
+        );
+
+        if (success) {
+          syncProvider.incrementPendingData();
+        }
+        break;
 
       case LotType.sale:
         final pricePerAnimal = double.tryParse(_pricePerAnimalController.text);
@@ -277,17 +294,46 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
           title: l10n.translate('treatment_lot'),
           subtitle: 'Traitement sanitaire groupé',
           color: Colors.blue,
-          onTap: () {
-            Navigator.push(
+          onTap: () async {
+            await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (_) => MedicalActScreen(
                   mode: MedicalActMode.batch,
                   batchId: lot.id,
                   animalIds: lot.animalIds,
+                  lotId: widget.lotId,
                 ),
               ),
             );
+
+            // Après retour de medical_act_screen, finaliser le lot
+            if (!mounted) return;
+            final lotProvider = context.read<LotProvider>();
+            final syncProvider = context.read<SyncProvider>();
+
+            final success = lotProvider.finalizeLot(
+              widget.lotId,
+              type: LotType.treatment,
+              notes:
+                  _notesController.text.isEmpty ? null : _notesController.text,
+            );
+
+            if (success) {
+              syncProvider.incrementPendingData();
+              if (mounted) {
+                Navigator.pop(context);
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      AppLocalizations.of(context).translate('lot_finalized'),
+                    ),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              }
+            }
           },
         ),
         const SizedBox(height: 16),
