@@ -10,6 +10,8 @@ import '../../models/alert_category.dart';
 import '../animal/animal_detail_screen.dart';
 import '../animal/animal_list_screen.dart';
 import '../sync/sync_screen.dart';
+import '../../i18n/app_localizations.dart';
+import '../../i18n/app_strings.dart';
 
 /// Écran de détails des alertes
 ///
@@ -26,7 +28,7 @@ class AlertsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Alertes'),
+        title: Text(AppLocalizations.of(context).translate(AppStrings.alerts)),
         actions: [
           // Badge avec le nombre total d'alertes
           Consumer<AlertProvider>(
@@ -74,14 +76,16 @@ class AlertsScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               children: [
                 // Résumé en haut
-                _buildSummaryCard(alertProvider),
+                _buildSummaryCard(context, alertProvider),
                 const SizedBox(height: 24),
 
                 // Alertes URGENTES
                 if (alertProvider.urgentAlerts.isNotEmpty) ...[
                   _buildSectionHeader(
+                    context: context,
                     icon: Icons.error_rounded,
-                    title: 'URGENTES',
+                    title: AppLocalizations.of(context)
+                        .translate(AppStrings.urgentAlerts),
                     count: alertProvider.urgentAlertCount,
                     color: Colors.red.shade700,
                   ),
@@ -96,8 +100,10 @@ class AlertsScreen extends StatelessWidget {
                 // Alertes IMPORTANTES
                 if (alertProvider.importantAlerts.isNotEmpty) ...[
                   _buildSectionHeader(
+                    context: context,
                     icon: Icons.warning_rounded,
-                    title: 'IMPORTANTES',
+                    title: AppLocalizations.of(context)
+                        .translate(AppStrings.importantAlerts),
                     count: alertProvider.importantAlertCount,
                     color: Colors.orange.shade700,
                   ),
@@ -112,8 +118,10 @@ class AlertsScreen extends StatelessWidget {
                 // Alertes ROUTINE
                 if (alertProvider.routineAlerts.isNotEmpty) ...[
                   _buildSectionHeader(
+                    context: context,
                     icon: Icons.info_rounded,
-                    title: 'ROUTINE',
+                    title: AppLocalizations.of(context)
+                        .translate(AppStrings.routineAlerts),
                     count: alertProvider.routineAlerts.length,
                     color: Colors.blue.shade700,
                   ),
@@ -147,8 +155,9 @@ class AlertsScreen extends StatelessWidget {
                   color: Colors.green.shade300,
                 ),
                 const SizedBox(height: 24),
-                const Text(
-                  'Aucune alerte ! 🎉',
+                Text(
+                  AppLocalizations.of(context)
+                      .translate(AppStrings.noAlertsTitle),
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -168,14 +177,16 @@ class AlertsScreen extends StatelessWidget {
                   onPressed: () {
                     alertProvider.refresh();
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Alertes recalculées'),
+                      SnackBar(
+                        content: Text(AppLocalizations.of(context)
+                            .translate(AppStrings.alertsRecalculated)),
                         duration: Duration(seconds: 1),
                       ),
                     );
                   },
                   icon: const Icon(Icons.refresh),
-                  label: const Text('Recalculer les alertes'),
+                  label: Text(AppLocalizations.of(context)
+                      .translate(AppStrings.recalculateAlerts)),
                 ),
                 const SizedBox(height: 16),
                 // Debug info
@@ -189,7 +200,8 @@ class AlertsScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Debug Info:',
+                        AppLocalizations.of(context)
+                            .translate(AppStrings.debugInfo),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.grey.shade700,
@@ -228,7 +240,7 @@ class AlertsScreen extends StatelessWidget {
   }
 
   /// Widget : Carte de résumé en haut
-  Widget _buildSummaryCard(AlertProvider alertProvider) {
+  Widget _buildSummaryCard(BuildContext context, AlertProvider alertProvider) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -249,12 +261,12 @@ class AlertsScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
               Icon(Icons.notifications_active, color: Colors.white, size: 28),
               SizedBox(width: 12),
               Text(
-                'Vue d\'ensemble',
+                AppLocalizations.of(context).translate(AppStrings.overview),
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 20,
@@ -276,16 +288,19 @@ class AlertsScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildStatBadge(
+                context: context,
                 label: 'Urgentes',
                 value: alertProvider.urgentAlertCount,
                 color: Colors.red.shade300,
               ),
               _buildStatBadge(
+                context: context,
                 label: 'Importantes',
                 value: alertProvider.importantAlertCount,
                 color: Colors.orange.shade300,
               ),
               _buildStatBadge(
+                context: context,
                 label: 'Routine',
                 value: alertProvider.routineAlerts.length,
                 color: Colors.green.shade300,
@@ -299,6 +314,7 @@ class AlertsScreen extends StatelessWidget {
 
   /// Widget : Badge de statistique
   Widget _buildStatBadge({
+    required BuildContext context,
     required String label,
     required int value,
     required Color color,
@@ -334,6 +350,7 @@ class AlertsScreen extends StatelessWidget {
 
   /// Widget : Header de section
   Widget _buildSectionHeader({
+    required BuildContext context,
     required IconData icon,
     required String title,
     required int count,
@@ -534,10 +551,6 @@ class AlertsScreen extends StatelessWidget {
       case AlertCategory.weighing:
         // Alerte de pesée (multiple animaux)
         if (alert.animalIds != null && alert.animalIds!.isNotEmpty) {
-          // 🐛 DEBUG
-          print('🐛 animalIds from alert: ${alert.animalIds}');
-          print('🐛 Count: ${alert.count}');
-
           // Naviguer vers AnimalListScreen avec filtre
           Navigator.push(
             context,
@@ -576,7 +589,8 @@ class AlertsScreen extends StatelessWidget {
             SnackBar(
               content: Text('Événement incomplet : ${alert.message}'),
               action: SnackBarAction(
-                label: 'Compléter',
+                label:
+                    AppLocalizations.of(context).translate(AppStrings.complete),
                 onPressed: () {},
               ),
               duration: const Duration(seconds: 3),
@@ -593,7 +607,9 @@ class AlertsScreen extends StatelessWidget {
             MaterialPageRoute(
               builder: (_) => AnimalListScreen(
                 filterAnimalIds: alert.animalIds!,
-                customTitle: alert.entityName ?? 'Animaux du lot',
+                customTitle: alert.entityName ??
+                    AppLocalizations.of(context)
+                        .translate(AppStrings.batchAnimals),
               ),
             ),
           );

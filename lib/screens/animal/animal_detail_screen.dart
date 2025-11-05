@@ -25,6 +25,8 @@ import '../movement/death_screen.dart';
 //import '../treatment/0_treatment_screen.dart';
 import '../vaccination/vaccination_detail_screen.dart';
 import '../medical/medical_act_screen.dart';
+import '../../i18n/app_localizations.dart';
+import '../../i18n/app_strings.dart';
 
 class AnimalDetailScreen extends StatefulWidget {
   final Animal? preloadedAnimal;
@@ -74,7 +76,9 @@ class _AnimalDetailScreenState extends State<AnimalDetailScreen> {
   Widget build(BuildContext context) {
     if (_scannedAnimal == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Scanner un Animal')),
+        appBar: AppBar(
+            title: Text(AppLocalizations.of(context)
+                .translate(AppStrings.animalDetail))),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -246,7 +250,8 @@ class _InfosTab extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Ajouter une Pesée'),
+        title: Text(
+            AppLocalizations.of(context).translate(AppStrings.animalDetail)),
         content: TextField(
           controller: weightController,
           keyboardType: TextInputType.number,
@@ -1015,7 +1020,8 @@ class _VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Rechercher un Vétérinaire'),
+      title:
+          Text(AppLocalizations.of(context).translate(AppStrings.animalDetail)),
       content: SizedBox(
         width: double.maxFinite,
         child: Column(

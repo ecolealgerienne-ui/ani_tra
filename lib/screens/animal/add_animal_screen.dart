@@ -15,6 +15,8 @@ import '../../providers/settings_provider.dart';
 import '../../data/animal_config.dart';
 //import 'universal_scanner_screen.dart';
 import 'animal_finder_screen.dart';
+import '../../i18n/app_localizations.dart';
+import '../../i18n/app_strings.dart';
 //import 'mother_history_screen.dart';
 
 /// Écran d'ajout rapide d'un animal
@@ -345,7 +347,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ajouter un animal'),
+        title:
+            Text(AppLocalizations.of(context).translate(AppStrings.addAnimal)),
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,
       ),
@@ -726,7 +729,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                               color: Colors.white,
                             ),
                           )
-                        : const Row(
+                        : Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(Icons.save, size: 20),
@@ -830,7 +833,7 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Row(
+      title: Row(
         children: [
           Icon(Icons.qr_code_scanner, color: Colors.green),
           SizedBox(width: 8),
@@ -1047,7 +1050,7 @@ class _ScanEIDDialogState extends State<_ScanEIDDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Row(
+      title: Row(
         children: [
           Icon(Icons.qr_code_scanner, color: Colors.blue),
           SizedBox(width: 8),

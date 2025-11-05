@@ -19,6 +19,8 @@ import '../../data/animal_config.dart';
 import 'animal_detail_screen.dart';
 import 'add_animal_screen.dart';
 import 'animal_finder_screen.dart';
+import '../../i18n/app_localizations.dart';
+import '../../i18n/app_strings.dart';
 
 class AnimalListScreen extends StatefulWidget {
   /// Liste d'IDs à afficher uniquement (pour filtrer depuis une alerte)
@@ -468,7 +470,8 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       child: TextField(
         controller: _searchController,
         decoration: InputDecoration(
-          hintText: 'Rechercher EID ou N°...',
+          hintText:
+              AppLocalizations.of(context).translate(AppStrings.searchHint),
           prefixIcon: const Icon(Icons.search),
           suffixIcon: Row(
             mainAxisSize: MainAxisSize.min,
