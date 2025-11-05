@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/batch.dart';
 import '../../providers/batch_provider.dart';
-import '../lot/batch_create_screen.dart';
+import '0_batch_create_screen.dart';
 // import '../movement/sale_screen.dart';
 // import '../movement/slaughter_screen.dart';
 

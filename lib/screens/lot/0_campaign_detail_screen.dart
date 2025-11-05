@@ -8,7 +8,7 @@ import '../../models/animal.dart';
 import '../../providers/campaign_provider.dart';
 import '../../providers/animal_provider.dart';
 import '../../providers/sync_provider.dart';
-import '../lot/campaign_scan_screen.dart';
+import '0_campaign_scan_screen.dart';
 
 /// Écran de détails d'une campagne sanitaire
 ///

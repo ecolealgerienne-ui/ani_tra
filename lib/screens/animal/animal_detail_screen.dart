@@ -21,9 +21,9 @@ import '../../models/vaccination.dart';
 import '../../data/mock_data.dart';
 import '../../widgets/change_eid_dialog.dart';
 import '../../widgets/eid_history_card.dart';
-import '../movement/death_screen.dart';
-import '../treatment/treatment_screen.dart';
-import '../vaccination/vaccination_detail_screen.dart';
+import '../movement/0_death_screen.dart';
+//import '../treatment/0_treatment_screen.dart';
+import '../vaccination/0_vaccination_detail_screen.dart';
 import '../medical/medical_act_screen.dart';
 
 class AnimalDetailScreen extends StatefulWidget {
@@ -515,14 +515,6 @@ class _InfosTab extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          ElevatedButton.icon(
-            onPressed: () => _showAddTreatmentDialog(context, currentAnimal.id),
-            icon: const Icon(Icons.medical_services),
-            label: const Text('Ajouter un soin'),
-            style: ElevatedButton.styleFrom(
-                minimumSize: const Size.fromHeight(48)),
-          ),
-          const SizedBox(height: 8),
           OutlinedButton.icon(
             onPressed: () {
               Navigator.push(
@@ -566,14 +558,14 @@ class _InfosTab extends StatelessWidget {
     }
   }
 
-  void _showAddTreatmentDialog(BuildContext context, String animalId) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => TreatmentScreen(animalId: animalId),
-      ),
-    );
-  }
+  // void _showAddTreatmentDialog(BuildContext context, String animalId) {
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (_) => TreatmentScreen(animalId: animalId),
+  //     ),
+  //   );
+  // }
 }
 
 class _SoinsTab extends StatelessWidget {

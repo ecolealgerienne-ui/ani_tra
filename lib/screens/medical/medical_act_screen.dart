@@ -7,11 +7,13 @@ import '../../models/animal.dart';
 import 'package:uuid/uuid.dart';
 import '../../models/treatment.dart';
 import '../../models/vaccination.dart';
+import '../../models/veterinarian.dart';
 import '../../providers/animal_provider.dart';
 import '../../providers/weight_provider.dart';
 import '../../providers/reminder_provider.dart';
 import '../../providers/vaccination_provider.dart';
 import '../../data/mocks/mock_medical_products.dart';
+import '../../data/mock_data.dart';
 
 /// Mode de l'acte médical
 enum MedicalActMode {
@@ -51,6 +53,11 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
   bool _enableReminders = false;
   TimeOfDay _reminderTime = const TimeOfDay(hour: 9, minute: 0);
 
+  // Vétérinaire
+  String? _selectedVetId;
+  String? _selectedVetName;
+  String? _selectedVetOrg;
+
   // Données chargées
   Animal? _animal;
   double? _animalWeight; // Poids de l'animal (depuis WeightProvider)
@@ -88,7 +95,8 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
           _animalWeight = weights.first.weight;
         }
       }
-    } else if (widget.mode == MedicalActMode.batch && widget.animalIds != null) {
+    } else if (widget.mode == MedicalActMode.batch &&
+        widget.animalIds != null) {
       _batchAnimals = widget.animalIds!
           .map((id) => animalProvider.getAnimalById(id))
           .whereType<Animal>()
@@ -127,7 +135,9 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
     var filtered = allProducts.where((p) => p.type == _selectedType).toList();
 
     // Filtrer par espèce si animal unitaire
-    if (widget.mode == MedicalActMode.singleAnimal && _animal != null && _animal!.speciesId != null) {
+    if (widget.mode == MedicalActMode.singleAnimal &&
+        _animal != null &&
+        _animal!.speciesId != null) {
       final animalSpecies = _getAnimalSpecies(_animal!.speciesId!);
       if (animalSpecies != null) {
         filtered = filtered
@@ -185,6 +195,57 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
     });
   }
 
+  /// Rechercher un vétérinaire
+  void _searchVeterinarian() {
+    showDialog(
+      context: context,
+      builder: (context) => _VeterinarianSearchDialog(
+        veterinarians: MockData.veterinarians,
+        onSelect: (vet) {
+          setState(() {
+            _selectedVetId = vet.id;
+            _selectedVetName = vet.fullName;
+            _selectedVetOrg = vet.clinic ?? 'Non spécifié';
+          });
+          Navigator.pop(context);
+        },
+      ),
+    );
+  }
+
+  /// Scanner le QR d'un vétérinaire
+  Future<void> _scanVeterinarianQR() async {
+    final vets = MockData.veterinarians;
+    if (vets.isEmpty) return;
+
+    final selectedVet = vets.first;
+
+    setState(() {
+      _selectedVetId = selectedVet.id;
+      _selectedVetName = selectedVet.fullName;
+      _selectedVetOrg = selectedVet.clinic ?? 'Non spécifié';
+    });
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('✅ ${selectedVet.fullName} validé'),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  /// Supprimer le vétérinaire sélectionné
+  void _removeVeterinarian() {
+    setState(() {
+      _selectedVetId = null;
+      _selectedVetName = null;
+      _selectedVetOrg = null;
+    });
+  }
+
   /// Sauvegarder l'acte médical
   Future<void> _saveAct() async {
     if (_selectedProduct == null) {
@@ -222,9 +283,10 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
     // Sauvegarder selon le type d'acte
     if (_selectedType == ProductType.treatment) {
       // Créer un traitement pour chaque animal concerné
-      final targetIds = widget.mode == MedicalActMode.singleAnimal && _animal != null
-          ? [_animal!.id]
-          : _batchAnimals?.map((a) => a.id).toList() ?? [];
+      final targetIds =
+          widget.mode == MedicalActMode.singleAnimal && _animal != null
+              ? [_animal!.id]
+              : _batchAnimals?.map((a) => a.id).toList() ?? [];
 
       for (final animalId in targetIds) {
         final treatmentId = uuid.v4();
@@ -240,7 +302,8 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
           dose: dose,
           treatmentDate: _selectedDate,
           withdrawalEndDate: withdrawalEndDate,
-          notes: _notesController.text.isNotEmpty ? _notesController.text : null,
+          notes:
+              _notesController.text.isNotEmpty ? _notesController.text : null,
         );
 
         animalProvider.addTreatment(treatment);
@@ -268,7 +331,8 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
 
       final vaccination = Vaccination(
         id: vaccinationId,
-        animalId: widget.mode == MedicalActMode.singleAnimal ? _animal?.id : null,
+        animalId:
+            widget.mode == MedicalActMode.singleAnimal ? _animal?.id : null,
         animalIds: widget.mode == MedicalActMode.batch
             ? _batchAnimals?.map((a) => a.id).toList() ?? []
             : [],
@@ -279,10 +343,14 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
         batchNumber: _selectedProduct!.batchNumber,
         expiryDate: _selectedProduct!.expiryDate,
         dose: '${dose.toStringAsFixed(1)} ${_selectedProduct!.stockUnit}',
-        administrationRoute: _selectedRoute ?? _selectedProduct!.defaultAdministrationRoute ?? 'IM',
+        administrationRoute: _selectedRoute ??
+            _selectedProduct!.defaultAdministrationRoute ??
+            'IM',
         withdrawalPeriodDays: _selectedProduct!.withdrawalPeriodMeat,
-        nextDueDate: _selectedProduct!.reminderDays != null && _selectedProduct!.reminderDays!.isNotEmpty
-            ? _selectedDate.add(Duration(days: _selectedProduct!.reminderDays!.first))
+        nextDueDate: _selectedProduct!.reminderDays != null &&
+                _selectedProduct!.reminderDays!.isNotEmpty
+            ? _selectedDate
+                .add(Duration(days: _selectedProduct!.reminderDays!.first))
             : null,
         notes: _notesController.text.isNotEmpty ? _notesController.text : null,
       );
@@ -347,6 +415,10 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
 
                   // Informations animal/lot
                   _buildAnimalInfo(theme),
+                  const SizedBox(height: 24),
+
+                  // Vétérinaire prescripteur
+                  _buildVeterinarianField(),
                   const SizedBox(height: 24),
 
                   // Sélection du produit
@@ -445,7 +517,8 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (widget.mode == MedicalActMode.singleAnimal && _animal != null) ...[
+            if (widget.mode == MedicalActMode.singleAnimal &&
+                _animal != null) ...[
               Row(
                 children: [
                   const Icon(Icons.pets, size: 20),
@@ -534,13 +607,16 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
           children: [
             if (_selectedType == ProductType.treatment) ...[
               if (_selectedProduct!.standardCureDays != null)
-                Text('ℹ️ Cure standard: ${_selectedProduct!.standardCureDays} jours'),
+                Text(
+                    'ℹ️ Cure standard: ${_selectedProduct!.standardCureDays} jours'),
               if (_selectedProduct!.administrationFrequency != null) ...[
                 const SizedBox(height: 4),
-                Text('ℹ️ Administration: ${_selectedProduct!.administrationFrequency}'),
+                Text(
+                    'ℹ️ Administration: ${_selectedProduct!.administrationFrequency}'),
               ],
             ] else if (_selectedType == ProductType.vaccine) ...[
-              Text('ℹ️ Protocole: ${_selectedProduct!.vaccinationProtocol ?? "Unique"}'),
+              Text(
+                  'ℹ️ Protocole: ${_selectedProduct!.vaccinationProtocol ?? "Unique"}'),
               const SizedBox(height: 4),
               Text(_selectedProduct!.getProtocolDescription()),
             ],
@@ -576,7 +652,9 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                   : 'Saisir le dosage',
             ),
           ),
-          if (_calculatedDosage == null && _selectedProduct?.dosageFormula != null && _animalWeight == null) ...[
+          if (_calculatedDosage == null &&
+              _selectedProduct?.dosageFormula != null &&
+              _animalWeight == null) ...[
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.all(12),
@@ -586,12 +664,14 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.info_outline, size: 20, color: Colors.orange.shade700),
+                  Icon(Icons.info_outline,
+                      size: 20, color: Colors.orange.shade700),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'Ajoutez un poids pour calculer automatiquement le dosage',
-                      style: TextStyle(fontSize: 12, color: Colors.orange.shade900),
+                      style: TextStyle(
+                          fontSize: 12, color: Colors.orange.shade900),
                     ),
                   ),
                 ],
@@ -607,13 +687,17 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (_selectedProduct!.dosageFormula != null)
-                    Text('ℹ️ Dosage produit: ${_selectedProduct!.dosageFormula}'),
+                    Text(
+                        'ℹ️ Dosage produit: ${_selectedProduct!.dosageFormula}'),
                   const SizedBox(height: 8),
                   const Text('💡 Calcul indicatif:'),
-                  if (_averageWeight != null && _selectedProduct!.dosageFormula != null) ...[
+                  if (_averageWeight != null &&
+                      _selectedProduct!.dosageFormula != null) ...[
                     const SizedBox(height: 4),
-                    Text('   • ${(_averageWeight! * 0.8).toStringAsFixed(0)}kg → ${_selectedProduct!.calculateDosage(_averageWeight! * 0.8)?.toStringAsFixed(1)} ml'),
-                    Text('   • ${_averageWeight!.toStringAsFixed(0)}kg → ${_selectedProduct!.calculateDosage(_averageWeight!)?.toStringAsFixed(1)} ml'),
+                    Text(
+                        '   • ${(_averageWeight! * 0.8).toStringAsFixed(0)}kg → ${_selectedProduct!.calculateDosage(_averageWeight! * 0.8)?.toStringAsFixed(1)} ml'),
+                    Text(
+                        '   • ${_averageWeight!.toStringAsFixed(0)}kg → ${_selectedProduct!.calculateDosage(_averageWeight!)?.toStringAsFixed(1)} ml'),
                   ],
                   const SizedBox(height: 8),
                   const Text(
@@ -791,14 +875,16 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
     if (_selectedProduct == null) return 'Configurez vos rappels';
 
     if (_selectedType == ProductType.treatment) {
-      if (_selectedProduct!.standardCureDays != null && _selectedProduct!.standardCureDays! > 1) {
+      if (_selectedProduct!.standardCureDays != null &&
+          _selectedProduct!.standardCureDays! > 1) {
         final days = _selectedProduct!.standardCureDays! - 1;
         return 'J2 à J${_selectedProduct!.standardCureDays} ($days rappels)';
       } else {
         return 'Configurez des rappels personnalisés';
       }
     } else {
-      if (_selectedProduct!.reminderDays != null && _selectedProduct!.reminderDays!.isNotEmpty) {
+      if (_selectedProduct!.reminderDays != null &&
+          _selectedProduct!.reminderDays!.isNotEmpty) {
         final days = _selectedProduct!.reminderDays!;
         return '${days.length} rappel(s): ${days.map((d) => "J$d").join(", ")}';
       } else {
@@ -826,7 +912,8 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
             ),
             const SizedBox(height: 8),
             Text('Viande: ${_selectedProduct!.withdrawalPeriodMeat} jours'),
-            Text('Lait: ${_selectedProduct!.withdrawalPeriodMilk > 0 ? "${_selectedProduct!.withdrawalPeriodMilk} heures" : "0"}'),
+            Text(
+                'Lait: ${_selectedProduct!.withdrawalPeriodMilk > 0 ? "${_selectedProduct!.withdrawalPeriodMilk} heures" : "0"}'),
           ],
         ),
       ),
@@ -857,6 +944,158 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
     );
   }
 
+  /// Construire la section vétérinaire prescripteur
+  Widget _buildVeterinarianField() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Icon(Icons.medical_services, color: Colors.blue.shade700),
+                const SizedBox(width: 8),
+                Text(
+                  'Vétérinaire prescripteur',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey.shade800,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    'Optionnel',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Si aucun vétérinaire sélectionné
+            if (_selectedVetId == null) ...[
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.person_search,
+                      size: 48,
+                      color: Colors.grey.shade400,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Aucun vétérinaire sélectionné',
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: _searchVeterinarian,
+                            icon: const Icon(Icons.search),
+                            label: const Text('Rechercher'),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: _scanVeterinarianQR,
+                            icon: const Icon(Icons.qr_code_scanner),
+                            label: const Text('Scanner QR'),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+
+            // Si vétérinaire sélectionné
+            if (_selectedVetId != null) ...[
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.green.shade300, width: 2),
+                ),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: Colors.green.shade100,
+                      radius: 24,
+                      child: Icon(
+                        Icons.verified_user,
+                        color: Colors.green.shade700,
+                        size: 28,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _selectedVetName ?? '',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _selectedVetOrg ?? '',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: _removeVeterinarian,
+                      icon: const Icon(Icons.close, color: Colors.red),
+                      tooltip: 'Retirer',
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
   /// Construire les boutons d'action
   Widget _buildActionButtons(ThemeData theme) {
     return Row(
@@ -873,6 +1112,103 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
             onPressed: _saveAct,
             child: const Text('Enregistrer'),
           ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Dialog de recherche de vétérinaire
+class _VeterinarianSearchDialog extends StatefulWidget {
+  final List<Veterinarian> veterinarians;
+  final Function(Veterinarian) onSelect;
+
+  const _VeterinarianSearchDialog({
+    required this.veterinarians,
+    required this.onSelect,
+  });
+
+  @override
+  State<_VeterinarianSearchDialog> createState() =>
+      _VeterinarianSearchDialogState();
+}
+
+class _VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
+  final _searchController = TextEditingController();
+  List<Veterinarian> _filtered = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _filtered = widget.veterinarians;
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _filterVets(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filtered = widget.veterinarians;
+      } else {
+        _filtered = widget.veterinarians
+            .where((v) =>
+                v.fullName.toLowerCase().contains(query.toLowerCase()) ||
+                (v.clinic?.toLowerCase().contains(query.toLowerCase()) ??
+                    false))
+            .toList();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Rechercher un vétérinaire'),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _searchController,
+              decoration: const InputDecoration(
+                labelText: 'Rechercher',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
+              ),
+              onChanged: _filterVets,
+            ),
+            const SizedBox(height: 16),
+            Flexible(
+              child: _filtered.isEmpty
+                  ? const Center(child: Text('Aucun vétérinaire trouvé'))
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: _filtered.length,
+                      itemBuilder: (context, index) {
+                        final vet = _filtered[index];
+                        return ListTile(
+                          leading: CircleAvatar(
+                            child: Text(vet.fullName[0]),
+                          ),
+                          title: Text(vet.fullName),
+                          subtitle: Text(vet.clinic ?? 'Non spécifié'),
+                          onTap: () => widget.onSelect(vet),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Annuler'),
         ),
       ],
     );

@@ -7,7 +7,7 @@ import '../../models/weight_record.dart';
 import '../../models/animal.dart';
 import '../../providers/weight_provider.dart';
 import '../../providers/animal_provider.dart';
-import '../weight/weight_record_screen.dart';
+import '0_weight_record_screen.dart';
 import '../animal/animal_weight_history_screen.dart';
 
 /// Écran de liste des pesées

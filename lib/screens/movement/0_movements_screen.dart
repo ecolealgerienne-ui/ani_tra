@@ -1,9 +1,9 @@
 // lib/screens/movements_screen.dart
 import 'package:flutter/material.dart';
 import '../../i18n/app_localizations.dart';
-import '../movement/birth_screen.dart';
-import '../movement/sale_screen.dart';
-import '../movement/death_screen.dart';
+import '0_birth_screen.dart';
+import '0_sale_screen.dart';
+import '0_death_screen.dart';
 
 class MovementsScreen extends StatelessWidget {
   const MovementsScreen({super.key});

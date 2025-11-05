@@ -11,7 +11,7 @@ import '../../models/product.dart';
 import '../../models/veterinarian.dart';
 import '../../data/mock_data.dart';
 import '../../i18n/app_localizations.dart';
-import '../lot/campaign_scan_screen.dart';
+import '0_campaign_scan_screen.dart';
 
 class CampaignCreateScreen extends StatefulWidget {
   const CampaignCreateScreen({super.key});

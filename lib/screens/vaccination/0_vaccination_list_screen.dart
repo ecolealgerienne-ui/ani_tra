@@ -6,8 +6,8 @@ import '../../providers/vaccination_provider.dart';
 import '../../providers/animal_provider.dart';
 import '../../models/vaccination.dart';
 import '../../models/animal.dart';
-import 'vaccination_detail_screen.dart';
-import 'add_vaccination_screen.dart';
+import '0_vaccination_detail_screen.dart';
+import '0_add_vaccination_screen.dart';
 
 class VaccinationListScreen extends StatefulWidget {
   const VaccinationListScreen({super.key});

@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/batch.dart';
 import '../../providers/batch_provider.dart';
-import '../lot/batch_scan_screen.dart';
+import '0_batch_scan_screen.dart';
 
 /// Écran de création de lot
 ///

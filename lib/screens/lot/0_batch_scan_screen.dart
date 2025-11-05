@@ -9,7 +9,7 @@ import '../../models/animal.dart';
 import '../../providers/batch_provider.dart';
 import '../../providers/animal_provider.dart';
 import '../../providers/sync_provider.dart';
-import '../lot/batch_list_screen.dart';
+import '0_batch_list_screen.dart';
 
 /// Écran de scan d'animaux pour un lot
 ///

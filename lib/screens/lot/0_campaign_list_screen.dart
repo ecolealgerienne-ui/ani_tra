@@ -5,9 +5,9 @@ import 'package:intl/intl.dart';
 import '../../providers/campaign_provider.dart';
 import '../../models/campaign.dart';
 import '../../i18n/app_localizations.dart';
-import '../lot/campaign_create_screen.dart';
+import '0_campaign_create_screen.dart';
 
-import '../lot/campaign_detail_screen.dart';
+import '0_campaign_detail_screen.dart';
 
 class CampaignListScreen extends StatelessWidget {
   const CampaignListScreen({super.key});

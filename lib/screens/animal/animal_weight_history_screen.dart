@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import '../../models/animal.dart';
 import '../../models/weight_record.dart';
 import '../../providers/weight_provider.dart';
-import '../weight/weight_record_screen.dart';
+import '../weight/0_weight_record_screen.dart';
 
 /// Écran d'historique des pesées d'un animal
 ///
