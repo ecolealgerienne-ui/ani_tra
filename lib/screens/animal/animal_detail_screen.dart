@@ -23,8 +23,8 @@ import '../../widgets/change_eid_dialog.dart';
 import '../../widgets/eid_history_card.dart';
 import '../movement/death_screen.dart';
 import '../treatment/treatment_screen.dart';
-import '../vaccination/add_vaccination_screen.dart';
 import '../vaccination/vaccination_detail_screen.dart';
+import '../medical/medical_act_screen.dart';
 
 class AnimalDetailScreen extends StatefulWidget {
   final Animal? preloadedAnimal;
@@ -667,46 +667,25 @@ class _SoinsTab extends StatelessWidget {
         ),
         Padding(
           padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => AddVaccinationScreen(
-                          preselectedAnimalId: animal.id,
-                        ),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.vaccines),
-                  label: const Text('Vaccination'),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(48),
-                    backgroundColor: Colors.green,
+          child: ElevatedButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => MedicalActScreen(
+                    mode: MedicalActMode.singleAnimal,
+                    animalId: animal.id,
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => TreatmentScreen(animalId: animal.id),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.medical_services),
-                  label: const Text('Traitement'),
-                  style: ElevatedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(48)),
-                ),
-              ),
-            ],
+              );
+            },
+            icon: const Icon(Icons.medical_services),
+            label: const Text('Traiter'),
+            style: ElevatedButton.styleFrom(
+              minimumSize: const Size.fromHeight(48),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Colors.white,
+            ),
           ),
         ),
       ],

@@ -1,6 +1,21 @@
 // lib/models/medical_product.dart
 import 'syncable_entity.dart';
 
+// ==================== Enums ====================
+
+/// Type de produit médical
+enum ProductType {
+  treatment,  // Traitement
+  vaccine     // Vaccination
+}
+
+/// Espèces animales
+enum AnimalSpecies {
+  ovin,   // Ovins (moutons, brebis)
+  bovin,  // Bovins (vaches, taureaux)
+  caprin  // Caprins (chèvres)
+}
+
 /// Produit médical pour le traitement des animaux
 class MedicalProduct implements SyncableEntity {
   /// Identifiant unique du produit
@@ -82,6 +97,46 @@ class MedicalProduct implements SyncableEntity {
   /// Produit actif
   final bool isActive;
 
+  // ==================== Nouveaux champs (Unification Traitement/Vaccination) ====================
+
+  /// Type de produit (traitement ou vaccin)
+  final ProductType type;
+
+  /// Espèces cibles
+  final List<AnimalSpecies> targetSpecies;
+
+  // --- Pour TRAITEMENTS ---
+
+  /// Durée cure standard (en jours) selon AMM
+  /// Ex: 5 pour Amoxicilline
+  final int? standardCureDays;
+
+  /// Fréquence d'administration
+  /// Ex: "1x/jour", "2x/jour", "Unique"
+  final String? administrationFrequency;
+
+  /// Formule de calcul dosage
+  /// Ex: "1ml/10kg", "2ml/animal", "0.5ml/kg"
+  final String? dosageFormula;
+
+  // --- Pour VACCINS ---
+
+  /// Protocole vaccinal
+  /// Ex: "J0+J21+Annuel", "Unique", "J0+J28+6mois"
+  final String? vaccinationProtocol;
+
+  /// Jours des rappels
+  /// Ex: [21, 365] pour J0+J21+Annuel
+  final List<int>? reminderDays;
+
+  /// Voie d'administration par défaut
+  /// Ex: "IM", "SC", "ID", "Orale"
+  final String? defaultAdministrationRoute;
+
+  /// Site d'injection par défaut
+  /// Ex: "Encolure", "Cuisse", "Arrière-cuisse"
+  final String? defaultInjectionSite;
+
   // ==================== Champs SyncableEntity ====================
 
   /// État de synchronisation
@@ -130,6 +185,17 @@ class MedicalProduct implements SyncableEntity {
     this.prescription,
     this.notes,
     this.isActive = true,
+    // Nouveaux champs
+    this.type = ProductType.treatment,
+    this.targetSpecies = const [],
+    this.standardCureDays,
+    this.administrationFrequency,
+    this.dosageFormula,
+    this.vaccinationProtocol,
+    this.reminderDays,
+    this.defaultAdministrationRoute,
+    this.defaultInjectionSite,
+    // SyncableEntity
     this.synced = false,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -164,6 +230,56 @@ class MedicalProduct implements SyncableEntity {
 
   // ==================== Méthodes ====================
 
+  /// Calculer le dosage selon le poids de l'animal
+  double? calculateDosage(double animalWeightKg) {
+    if (dosageFormula == null) return null;
+
+    // Parser la formule
+    if (dosageFormula!.contains('/kg')) {
+      // Ex: "1ml/10kg" → 0.1 ml/kg
+      // Ex: "0.2ml/kg" → 0.2 ml/kg
+      final parts = dosageFormula!.split('/');
+      if (parts.length >= 2) {
+        final amountStr = parts[0].replaceAll(RegExp(r'[^0-9.]'), '');
+        final weightStr = parts[1].replaceAll(RegExp(r'[^0-9.]'), '');
+
+        final amount = double.tryParse(amountStr);
+        final weight = double.tryParse(weightStr);
+
+        if (amount != null && weight != null && weight > 0) {
+          return (amount / weight) * animalWeightKg;
+        }
+      }
+    } else if (dosageFormula!.contains('/animal')) {
+      // Ex: "2ml/animal" → dose fixe
+      final amountStr = dosageFormula!.replaceAll(RegExp(r'[^0-9.]'), '');
+      return double.tryParse(amountStr);
+    }
+
+    return null;
+  }
+
+  /// Obtenir le texte du protocole vaccinal
+  String getProtocolDescription() {
+    if (vaccinationProtocol == null) return 'Injection unique';
+
+    switch (vaccinationProtocol) {
+      case 'J0+J21+Annuel':
+        return 'Primo-vaccination (J0), Rappel 21 jours, Rappel annuel';
+      case 'J0+J28+6mois':
+        return 'Primo-vaccination (J0), Rappel 28 jours, Rappel 6 mois';
+      case 'Unique':
+        return 'Injection unique, pas de rappel';
+      default:
+        return vaccinationProtocol!;
+    }
+  }
+
+  /// Vérifier si compatible avec l'espèce
+  bool isCompatibleWithSpecies(AnimalSpecies species) {
+    return targetSpecies.contains(species);
+  }
+
   /// Copie avec modifications
   MedicalProduct copyWith({
     String? id,
@@ -189,6 +305,15 @@ class MedicalProduct implements SyncableEntity {
     String? prescription,
     String? notes,
     bool? isActive,
+    ProductType? type,
+    List<AnimalSpecies>? targetSpecies,
+    int? standardCureDays,
+    String? administrationFrequency,
+    String? dosageFormula,
+    String? vaccinationProtocol,
+    List<int>? reminderDays,
+    String? defaultAdministrationRoute,
+    String? defaultInjectionSite,
     bool? synced,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -219,6 +344,15 @@ class MedicalProduct implements SyncableEntity {
       prescription: prescription ?? this.prescription,
       notes: notes ?? this.notes,
       isActive: isActive ?? this.isActive,
+      type: type ?? this.type,
+      targetSpecies: targetSpecies ?? this.targetSpecies,
+      standardCureDays: standardCureDays ?? this.standardCureDays,
+      administrationFrequency: administrationFrequency ?? this.administrationFrequency,
+      dosageFormula: dosageFormula ?? this.dosageFormula,
+      vaccinationProtocol: vaccinationProtocol ?? this.vaccinationProtocol,
+      reminderDays: reminderDays ?? this.reminderDays,
+      defaultAdministrationRoute: defaultAdministrationRoute ?? this.defaultAdministrationRoute,
+      defaultInjectionSite: defaultInjectionSite ?? this.defaultInjectionSite,
       synced: synced ?? this.synced,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? DateTime.now(),
@@ -272,6 +406,15 @@ class MedicalProduct implements SyncableEntity {
       'prescription': prescription,
       'notes': notes,
       'isActive': isActive,
+      'type': type.name,
+      'targetSpecies': targetSpecies.map((e) => e.name).toList(),
+      'standardCureDays': standardCureDays,
+      'administrationFrequency': administrationFrequency,
+      'dosageFormula': dosageFormula,
+      'vaccinationProtocol': vaccinationProtocol,
+      'reminderDays': reminderDays,
+      'defaultAdministrationRoute': defaultAdministrationRoute,
+      'defaultInjectionSite': defaultInjectionSite,
       'synced': synced,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
@@ -318,6 +461,29 @@ class MedicalProduct implements SyncableEntity {
       prescription: json['prescription'] as String?,
       notes: json['notes'] as String?,
       isActive: json['isActive'] as bool? ?? json['is_active'] as bool? ?? true,
+      type: json['type'] != null
+          ? ProductType.values.firstWhere(
+              (e) => e.name == json['type'],
+              orElse: () => ProductType.treatment,
+            )
+          : ProductType.treatment,
+      targetSpecies: json['targetSpecies'] != null || json['target_species'] != null
+          ? (json['targetSpecies'] ?? json['target_species'] as List)
+              .map((e) => AnimalSpecies.values.firstWhere(
+                  (s) => s.name == e,
+                  orElse: () => AnimalSpecies.ovin,
+                ))
+              .toList()
+          : [],
+      standardCureDays: json['standardCureDays'] as int? ?? json['standard_cure_days'] as int?,
+      administrationFrequency: json['administrationFrequency'] as String? ?? json['administration_frequency'] as String?,
+      dosageFormula: json['dosageFormula'] as String? ?? json['dosage_formula'] as String?,
+      vaccinationProtocol: json['vaccinationProtocol'] as String? ?? json['vaccination_protocol'] as String?,
+      reminderDays: json['reminderDays'] != null || json['reminder_days'] != null
+          ? (json['reminderDays'] ?? json['reminder_days'] as List?)?.map((e) => e as int).toList()
+          : null,
+      defaultAdministrationRoute: json['defaultAdministrationRoute'] as String? ?? json['default_administration_route'] as String?,
+      defaultInjectionSite: json['defaultInjectionSite'] as String? ?? json['default_injection_site'] as String?,
       synced: json['synced'] as bool? ?? false,
       createdAt:
           DateTime.parse(json['createdAt'] ?? json['created_at'] as String),

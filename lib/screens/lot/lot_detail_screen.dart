@@ -10,6 +10,7 @@ import '../../models/animal.dart';
 import '../../i18n/app_localizations.dart';
 import '../animal/animal_finder_screen.dart';
 import '../lot/lot_finalize_screen.dart';
+import '../medical/medical_act_screen.dart';
 
 class LotDetailScreen extends StatelessWidget {
   final String lotId;

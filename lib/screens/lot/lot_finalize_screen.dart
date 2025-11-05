@@ -12,7 +12,7 @@ import '../../models/animal.dart';
 import '../../i18n/app_localizations.dart';
 import '../../models/veterinarian.dart';
 import '../../data/mock_data.dart';
-import '../treatment/treatment_screen.dart';
+import '../medical/medical_act_screen.dart';
 
 class LotFinalizeScreen extends StatefulWidget {
   final String lotId;
@@ -278,7 +278,16 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
           subtitle: 'Traitement sanitaire groupé',
           color: Colors.blue,
           onTap: () {
-            setState(() => _selectedType = LotType.treatment);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => MedicalActScreen(
+                  mode: MedicalActMode.batch,
+                  batchId: lot.id,
+                  animalIds: lot.animalIds,
+                ),
+              ),
+            );
           },
         ),
         const SizedBox(height: 16),
@@ -493,17 +502,17 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => TreatmentScreen(
-                  animalIds: lot.animalIds,
+                builder: (_) => MedicalActScreen(
+                  mode: MedicalActMode.batch,
                   batchId: lot.id,
-                  batchName: lot.name,
+                  animalIds: lot.animalIds,
                 ),
               ),
             );
           },
           icon: const Icon(Icons.medical_services, size: 24),
           label: const Text(
-            'Configurer le traitement',
+            'Traiter le lot',
             style: TextStyle(fontSize: 16),
           ),
           style: ElevatedButton.styleFrom(

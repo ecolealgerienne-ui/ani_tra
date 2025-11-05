@@ -3,6 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 import 'models/animal.dart';
 import 'providers/animal_provider.dart';
 import 'providers/sync_provider.dart';
@@ -20,6 +23,7 @@ import 'providers/vaccination_reference_provider.dart';
 import 'providers/document_provider.dart';
 import 'providers/breeding_provider.dart';
 import 'providers/auth_provider.dart';
+import 'providers/reminder_provider.dart';
 import 'i18n/app_localizations.dart';
 import 'screens/home/home_screen.dart'; // ✅ Mis à jour
 import 'screens/animal/animal_detail_screen.dart'; // ✅ Mis à jour
@@ -30,7 +34,42 @@ import 'screens/sync/sync_screen.dart'; // ✅ Mis à jour
 import 'data/mock_data.dart';
 import 'data/mocks/mock_vaccination_references.dart';
 
-void main() {
+// Instance globale du plugin de notifications
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialiser les fuseaux horaires
+  tz.initializeTimeZones();
+  tz.setLocalLocation(tz.getLocation('Europe/Paris'));
+
+  // Initialiser les notifications
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  const DarwinInitializationSettings initializationSettingsIOS =
+      DarwinInitializationSettings(
+    requestAlertPermission: true,
+    requestBadgePermission: true,
+    requestSoundPermission: true,
+  );
+
+  const InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+    iOS: initializationSettingsIOS,
+  );
+
+  await flutterLocalNotificationsPlugin.initialize(
+    initializationSettings,
+    onDidReceiveNotificationResponse: (NotificationResponse response) {
+      // TODO: Gérer le clic sur notification
+      // → Ouvrir écran pré-rempli pour enregistrer le soin
+      debugPrint('Notification cliquée: ${response.payload}');
+    },
+  );
+
   runApp(const MyApp());
 }
 
@@ -55,6 +94,9 @@ class MyApp extends StatelessWidget {
             provider.initializeWithDefaults();
             return provider;
           },
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ReminderProvider(flutterLocalNotificationsPlugin),
         ),
 
         // AnimalProvider - ligne ~24

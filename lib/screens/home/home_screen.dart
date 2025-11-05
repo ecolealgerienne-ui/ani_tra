@@ -15,7 +15,6 @@ import '../animal/animal_list_screen.dart';
 import '../animal/animal_detail_screen.dart';
 import '../animal/animal_finder_screen.dart';
 import '../lot/lot_list_screen.dart';
-import '../vaccination/vaccination_list_screen.dart';
 import '../settings/settings_screen.dart';
 import '../alert/alerts_screen.dart';
 import '../services/export_registry_screen.dart'; // 🆕 PART3
@@ -216,26 +215,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     const SizedBox(height: 16),
 
-                    // 🆕 CARTE 3 : VACCINATIONS (grosse carte)
-                    _buildMainActionCard(
-                      context: context,
-                      icon: Icons.vaccines,
-                      iconColor: Colors.green,
-                      title: 'Vaccinations',
-                      subtitle: 'Suivi sanitaire',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const VaccinationListScreen(),
-                          ),
-                        );
-                      },
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // 🆕 PART3 : CARTE 4 : EXPORT PDF
+                    // 🆕 PART3 : CARTE 3 : EXPORT PDF
                     _buildMainActionCard(
                       context: context,
                       icon: Icons.picture_as_pdf,
