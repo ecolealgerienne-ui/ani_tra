@@ -59,7 +59,7 @@ dependencies:
 
   # ==================== SCANNER & RFID ====================
   mobile_scanner: ^7.1.3
-  flutter_vibrate: ^1.3.0
+  #vibration: ^1.10.6
   flutter_blue_plus: ^2.0.0
   permission_handler: ^12.0.1
 
