@@ -8,12 +8,23 @@ import 'auth_provider.dart';
 
 class VaccinationReferenceProvider extends ChangeNotifier {
   final AuthProvider _authProvider;
+  String _currentFarmId;
 
   List<VaccineReference> _allVaccines = [];
   List<DiseaseReference> _allDiseases = [];
   List<AdministrationRoute> _allRoutes = [];
 
-  VaccinationReferenceProvider(this._authProvider);
+  VaccinationReferenceProvider(this._authProvider)
+      : _currentFarmId = _authProvider.currentFarmId {
+    _authProvider.addListener(_onFarmChanged);
+  }
+
+  void _onFarmChanged() {
+    if (_currentFarmId != _authProvider.currentFarmId) {
+      _currentFarmId = _authProvider.currentFarmId;
+      notifyListeners();
+    }
+  }
 
   List<VaccineReference> get vaccines => _allVaccines
       .where((v) => v.farmId == _authProvider.currentFarmId && v.isActive)
@@ -80,5 +91,11 @@ class VaccinationReferenceProvider extends ChangeNotifier {
   Future<void> syncToServer() async {
     await Future.delayed(const Duration(milliseconds: 100));
     debugPrint('🔄 Sync références vaccinations simulée (mode mock)');
+  }
+
+  @override
+  void dispose() {
+    _authProvider.removeListener(_onFarmChanged);
+    super.dispose();
   }
 }

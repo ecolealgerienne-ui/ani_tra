@@ -10,14 +10,10 @@ import '../../models/weight_record.dart';
 import '../../providers/animal_provider.dart';
 import '../../providers/weight_provider.dart';
 import '../../providers/sync_provider.dart';
+import '../../i18n/app_localizations.dart';
+import '../../i18n/app_strings.dart';
 
 /// Écran d'enregistrement d'une nouvelle pesée
-///
-/// Permet de :
-/// - Scanner un animal (ou le sélectionner)
-/// - Saisir le poids
-/// - Choisir la source de mesure
-/// - Ajouter des notes
 class WeightRecordScreen extends StatefulWidget {
   final Animal? preselectedAnimal;
 
@@ -54,7 +50,6 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
     super.dispose();
   }
 
-  /// Simuler le scan d'un animal
   Future<void> _scanAnimal() async {
     setState(() => _isScanning = true);
 
@@ -64,7 +59,6 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
     final animalProvider = context.read<AnimalProvider>();
 
     try {
-      // Obtenir la liste des animaux vivants
       final animals = animalProvider.animals
           .where((a) => a.status == AnimalStatus.alive)
           .toList();
@@ -72,8 +66,9 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
       if (animals.isEmpty) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Aucun animal disponible'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)
+                .translate(AppStrings.noAnimalsAvailableForWeight)),
             backgroundColor: Colors.orange,
           ),
         );
@@ -81,7 +76,6 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
         return;
       }
 
-      // Sélectionner un animal aléatoire
       final animal = animals[_random.nextInt(animals.length)];
 
       setState(() {
@@ -106,15 +100,15 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('❌ Erreur lors du scan'),
+        SnackBar(
+          content: Text(
+              AppLocalizations.of(context).translate(AppStrings.scanError)),
           backgroundColor: Colors.red,
         ),
       );
     }
   }
 
-  /// Sauvegarder la pesée
   Future<void> _saveWeight() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -122,8 +116,9 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
 
     if (_selectedAnimal == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('⚠️ Veuillez scanner un animal'),
+        SnackBar(
+          content: Text(
+              AppLocalizations.of(context).translate(AppStrings.selectAnimal)),
           backgroundColor: Colors.orange,
         ),
       );
@@ -135,7 +130,6 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
     final weightProvider = context.read<WeightProvider>();
     final syncProvider = context.read<SyncProvider>();
 
-    // Créer l'enregistrement
     final record = WeightRecord(
       id: 'weight_${DateTime.now().millisecondsSinceEpoch}',
       animalId: _selectedAnimal!.id,
@@ -149,14 +143,13 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
       createdAt: DateTime.now(),
     );
 
-    // Ajouter au provider
     weightProvider.addWeight(record);
     syncProvider.incrementPendingData();
 
-    // Feedback et retour
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('✅ Pesée enregistrée: ${weight.toStringAsFixed(1)} kg'),
+        content: Text(
+            '✅ ${AppLocalizations.of(context).translate(AppStrings.weightRecorded)}: ${weight.toStringAsFixed(1)} kg'),
         backgroundColor: Colors.green,
       ),
     );
@@ -164,7 +157,6 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
     Navigator.pop(context);
   }
 
-  /// Choisir la date
   Future<void> _selectDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -180,21 +172,44 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
     }
   }
 
+  Widget _buildSectionTitle(BuildContext context, String title, IconData icon) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: Colors.deepPurple),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.deepPurple,
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}/'
+        '${date.month.toString().padLeft(2, '0')}/'
+        '${date.year}';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Nouvelle Pesée'),
+        title: Text(l10n.translate(AppStrings.newWeight)),
       ),
       body: Form(
         key: _formKey,
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            // Étape 1: Scanner l'animal
-            _buildSectionTitle('1. Animal', Icons.pets),
+            _buildSectionTitle(context, '1. Animal', Icons.pets),
             const SizedBox(height: 12),
-
             if (_selectedAnimal == null)
               SizedBox(
                 height: 100,
@@ -206,13 +221,13 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
                   ),
                   child: _isScanning
                       ? const CircularProgressIndicator(color: Colors.white)
-                      : const Column(
+                      : Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.qr_code_scanner, size: 36),
-                            SizedBox(height: 8),
-                            Text('Scanner l\'animal',
-                                style: TextStyle(fontSize: 16)),
+                            const Icon(Icons.qr_code_scanner, size: 36),
+                            const SizedBox(height: 8),
+                            Text(l10n.translate(AppStrings.scanAnimal),
+                                style: const TextStyle(fontSize: 16)),
                           ],
                         ),
                 ),
@@ -235,7 +250,8 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
                     ),
                   ),
                   title: Text(
-                    _selectedAnimal!.officialNumber ?? 'Sans numéro',
+                    _selectedAnimal!.officialNumber ??
+                        l10n.translate(AppStrings.noNumber),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   subtitle: Text(_selectedAnimal!.displayName),
@@ -249,30 +265,29 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
                   ),
                 ),
               ),
-
             const SizedBox(height: 24),
-
-            // Étape 2: Poids
-            _buildSectionTitle('2. Poids', Icons.monitor_weight),
+            _buildSectionTitle(
+                context,
+                '2. ${l10n.translate(AppStrings.weight)}',
+                Icons.monitor_weight),
             const SizedBox(height: 12),
-
             TextFormField(
               controller: _weightController,
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(
-                labelText: 'Poids (kg) *',
+              decoration: InputDecoration(
+                labelText: '${l10n.translate(AppStrings.weight)} (kg) *',
                 hintText: '45.5',
-                prefixIcon: Icon(Icons.monitor_weight),
+                prefixIcon: const Icon(Icons.monitor_weight),
                 suffixText: 'kg',
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return 'Le poids est requis';
+                  return '${l10n.translate(AppStrings.weight)} requis';
                 }
                 final weight = double.tryParse(value.trim());
                 if (weight == null) {
-                  return 'Poids invalide';
+                  return '${l10n.translate(AppStrings.weight)} invalide';
                 }
                 if (weight <= 0 || weight > 300) {
                   return 'Le poids doit être entre 0 et 300 kg';
@@ -280,13 +295,9 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
                 return null;
               },
             ),
-
             const SizedBox(height: 24),
-
-            // Étape 3: Source de mesure
-            _buildSectionTitle('3. Source de mesure', Icons.source),
+            _buildSectionTitle(context, '3. Source de mesure', Icons.source),
             const SizedBox(height: 12),
-
             ...WeightSource.values.map((source) {
               return RadioListTile<WeightSource>(
                 value: source,
@@ -310,17 +321,16 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
                   style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                 ),
               );
-            }).toList(),
-
+            }),
             const SizedBox(height: 24),
-
-            // Étape 4: Date
-            _buildSectionTitle('4. Date de pesée', Icons.calendar_today),
+            _buildSectionTitle(
+                context,
+                '4. ${l10n.translate(AppStrings.selectDate)}',
+                Icons.calendar_today),
             const SizedBox(height: 12),
-
             ListTile(
               leading: const Icon(Icons.calendar_today),
-              title: const Text('Date de pesée'),
+              title: Text(l10n.translate(AppStrings.selectDate)),
               subtitle: Text(_formatDate(_selectedDate)),
               trailing: const Icon(Icons.edit),
               onTap: _selectDate,
@@ -330,32 +340,28 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
                 side: BorderSide(color: Colors.grey.shade300),
               ),
             ),
-
             const SizedBox(height: 24),
-
-            // Étape 5: Notes (optionnel)
-            _buildSectionTitle('5. Notes (optionnel)', Icons.notes),
+            _buildSectionTitle(
+                context,
+                '5. ${l10n.translate(AppStrings.notes)} (${l10n.translate(AppStrings.optional)})',
+                Icons.notes),
             const SizedBox(height: 12),
-
             TextFormField(
               controller: _notesController,
               maxLines: 3,
-              decoration: const InputDecoration(
-                labelText: 'Notes',
+              decoration: InputDecoration(
+                labelText: l10n.translate(AppStrings.notes),
                 hintText: 'Ex: Animal en bonne santé, pesée après tonte...',
-                prefixIcon: Icon(Icons.notes),
+                prefixIcon: const Icon(Icons.notes),
               ),
             ),
-
             const SizedBox(height: 32),
-
-            // Bouton de sauvegarde
             SizedBox(
               height: 56,
               child: ElevatedButton.icon(
                 onPressed: _saveWeight,
                 icon: const Icon(Icons.save),
-                label: const Text('Enregistrer la Pesée'),
+                label: Text(l10n.translate(AppStrings.save)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   foregroundColor: Colors.white,
@@ -366,42 +372,14 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
                 ),
               ),
             ),
-
             const SizedBox(height: 16),
-
-            // Bouton annuler
             OutlinedButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Annuler'),
+              child: Text(l10n.translate(AppStrings.cancel)),
             ),
           ],
         ),
       ),
     );
-  }
-
-  /// Widget: Titre de section
-  Widget _buildSectionTitle(String title, IconData icon) {
-    return Row(
-      children: [
-        Icon(icon, size: 20, color: Colors.deepPurple),
-        const SizedBox(width: 8),
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.deepPurple,
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// Formater une date
-  String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/'
-        '${date.month.toString().padLeft(2, '0')}/'
-        '${date.year}';
   }
 }

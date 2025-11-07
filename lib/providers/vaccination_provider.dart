@@ -6,11 +6,22 @@ import 'auth_provider.dart';
 
 class VaccinationProvider extends ChangeNotifier {
   final AuthProvider _authProvider;
+  String _currentFarmId;
 
-  VaccinationProvider(this._authProvider);
+  VaccinationProvider(this._authProvider)
+      : _currentFarmId = _authProvider.currentFarmId {
+    _authProvider.addListener(_onFarmChanged);
+  }
+
+  void _onFarmChanged() {
+    if (_currentFarmId != _authProvider.currentFarmId) {
+      _currentFarmId = _authProvider.currentFarmId;
+      notifyListeners();
+    }
+  }
 
   // === Données en mémoire (MOCK) ===
-  List<Vaccination> _allVaccinations = [];
+  final List<Vaccination> _allVaccinations = [];
 
   // === Getters ===
 
@@ -99,5 +110,11 @@ class VaccinationProvider extends ChangeNotifier {
   Future<void> syncToServer() async {
     await Future.delayed(const Duration(milliseconds: 100));
     debugPrint('🔄 Sync vaccinations simulée (mode mock)');
+  }
+
+  @override
+  void dispose() {
+    _authProvider.removeListener(_onFarmChanged);
+    super.dispose();
   }
 }

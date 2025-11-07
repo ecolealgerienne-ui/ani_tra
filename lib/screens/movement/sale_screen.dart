@@ -8,6 +8,7 @@ import '../../providers/sync_provider.dart';
 import '../../models/animal.dart';
 import '../../models/movement.dart';
 import '../../i18n/app_localizations.dart';
+import '../../i18n/app_strings.dart';
 
 class SaleScreen extends StatefulWidget {
   const SaleScreen({super.key});
@@ -49,8 +50,9 @@ class _SaleScreenState extends State<SaleScreen> {
       if (animals.isEmpty) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Aucun animal disponible à vendre'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)
+                .translate(AppStrings.noAnimalsAvailable)),
             backgroundColor: Colors.orange,
           ),
         );
@@ -69,10 +71,11 @@ class _SaleScreenState extends State<SaleScreen> {
         HapticFeedback.heavyImpact();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('⚠️ Impossible: Délai de rémanence en cours'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)
+                  .translate(AppStrings.withdrawalPeriodActive)),
               backgroundColor: Colors.red,
-              duration: Duration(seconds: 3),
+              duration: const Duration(seconds: 3),
             ),
           );
         }
@@ -94,8 +97,9 @@ class _SaleScreenState extends State<SaleScreen> {
   void _confirmSale() {
     if (_scannedAnimal == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez scanner un animal'),
+        SnackBar(
+          content: Text(
+              AppLocalizations.of(context).translate(AppStrings.scanAnimal)),
           backgroundColor: Colors.orange,
         ),
       );
@@ -104,8 +108,9 @@ class _SaleScreenState extends State<SaleScreen> {
 
     if (_buyerNameController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez entrer le nom de l\'acheteur'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)
+              .translate(AppStrings.pleaseEnterBuyerName)),
           backgroundColor: Colors.orange,
         ),
       );
@@ -115,8 +120,9 @@ class _SaleScreenState extends State<SaleScreen> {
     final price = double.tryParse(_priceController.text);
     if (price == null || price <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Prix invalide'),
+        SnackBar(
+          content: Text(
+              AppLocalizations.of(context).translate(AppStrings.invalidPrice)),
           backgroundColor: Colors.red,
         ),
       );
@@ -146,7 +152,8 @@ class _SaleScreenState extends State<SaleScreen> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Vente enregistrée: ${price.toStringAsFixed(2)}€'),
+        content: Text(
+            '${AppLocalizations.of(context).translate(AppStrings.saleRecorded)}: ${price.toStringAsFixed(2)}€'),
         backgroundColor: Colors.green,
       ),
     );
@@ -156,18 +163,17 @@ class _SaleScreenState extends State<SaleScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.translate('record_sale')),
+        title:
+            Text(AppLocalizations.of(context).translate(AppStrings.recordSale)),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           // Step 1: Scan Animal
           Text(
-            'Étape 1: Scanner l\'animal',
+            AppLocalizations.of(context).translate(AppStrings.step1ScanAnimal),
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -185,13 +191,15 @@ class _SaleScreenState extends State<SaleScreen> {
                 ),
                 child: _isScanning
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Column(
+                    : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.nfc, size: 36),
-                          SizedBox(height: 8),
-                          Text('Scanner Animal',
-                              style: TextStyle(fontSize: 16)),
+                          const Icon(Icons.nfc, size: 36),
+                          const SizedBox(height: 8),
+                          Text(
+                              AppLocalizations.of(context)
+                                  .translate(AppStrings.scanAnimal),
+                              style: const TextStyle(fontSize: 16)),
                         ],
                       ),
               ),
@@ -219,7 +227,7 @@ class _SaleScreenState extends State<SaleScreen> {
           // Step 2: Buyer Information
           if (_scannedAnimal != null) ...[
             Text(
-              'Étape 2: Informations Acheteur',
+              AppLocalizations.of(context).translate(AppStrings.step2BuyerInfo),
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -228,9 +236,10 @@ class _SaleScreenState extends State<SaleScreen> {
 
             TextField(
               controller: _buyerNameController,
-              decoration: const InputDecoration(
-                labelText: 'Nom de l\'acheteur *',
-                prefixIcon: Icon(Icons.person),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)
+                    .translate(AppStrings.buyerName),
+                prefixIcon: const Icon(Icons.person),
                 hintText: 'Ex: Jean Dupont',
               ),
             ),
@@ -238,9 +247,10 @@ class _SaleScreenState extends State<SaleScreen> {
 
             TextField(
               controller: _buyerIdController,
-              decoration: const InputDecoration(
-                labelText: 'N° Exploitation acheteur (optionnel)',
-                prefixIcon: Icon(Icons.badge),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)
+                    .translate(AppStrings.buyerIdOptional),
+                prefixIcon: const Icon(Icons.badge),
                 hintText: 'Ex: FR123456789',
               ),
             ),
@@ -249,7 +259,7 @@ class _SaleScreenState extends State<SaleScreen> {
 
             // Step 3: Enter Price
             Text(
-              'Étape 3: Prix de vente',
+              AppLocalizations.of(context).translate(AppStrings.step3SalePrice),
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -259,9 +269,10 @@ class _SaleScreenState extends State<SaleScreen> {
             TextField(
               controller: _priceController,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Prix (€) *',
-                prefixIcon: Icon(Icons.euro),
+              decoration: InputDecoration(
+                labelText:
+                    AppLocalizations.of(context).translate(AppStrings.priceEur),
+                prefixIcon: const Icon(Icons.euro),
                 hintText: '120.00',
               ),
             ),
@@ -274,7 +285,8 @@ class _SaleScreenState extends State<SaleScreen> {
               child: ElevatedButton.icon(
                 onPressed: _confirmSale,
                 icon: const Icon(Icons.check),
-                label: Text(l10n.translate('confirm_sale')),
+                label: Text(AppLocalizations.of(context)
+                    .translate(AppStrings.confirmSale)),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   backgroundColor: Colors.green,

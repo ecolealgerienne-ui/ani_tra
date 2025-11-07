@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import '../../models/batch.dart';
 import '../../providers/batch_provider.dart';
 import '0_batch_create_screen.dart';
+import '../../i18n/app_localizations.dart';
+import '../../i18n/app_strings.dart';
 // import '../movement/sale_screen.dart';
 // import '../movement/slaughter_screen.dart';
 
@@ -20,7 +22,7 @@ class BatchListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mes Lots'),
+        title: Text(AppLocalizations.of(context).translate(AppStrings.batches)),
       ),
       body: Consumer<BatchProvider>(
         builder: (context, batchProvider, child) {
@@ -54,7 +56,7 @@ class BatchListScreen extends StatelessWidget {
           );
         },
         icon: const Icon(Icons.add),
-        label: const Text('Nouveau lot'),
+        label: Text(AppLocalizations.of(context).translate(AppStrings.newBatch)),
         backgroundColor: Colors.deepPurple,
       ),
     );
@@ -75,7 +77,7 @@ class BatchListScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              'Aucun lot créé',
+              AppLocalizations.of(context).translate(AppStrings.noBatchesCreated),
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -84,7 +86,7 @@ class BatchListScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              'Créez un lot pour grouper des animaux\net faciliter les actions de masse',
+              AppLocalizations.of(context).translate(AppStrings.batchDescription),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
@@ -102,22 +104,23 @@ class BatchListScreen extends StatelessWidget {
     final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Supprimer le lot ?'),
+        title: Text(AppLocalizations.of(context).translate(AppStrings.deleteBatchTitle)),
         content: Text(
-          'Voulez-vous vraiment supprimer le lot "${batch.name}" '
-          '(${batch.animalCount} animaux) ?',
+          AppLocalizations.of(context).translate(AppStrings.deleteBatchMessage)
+            .replaceAll('{name}', batch.name)
+            .replaceAll('{count}', '${batch.animalCount}'),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Annuler'),
+            child: Text(AppLocalizations.of(context).translate(AppStrings.cancel)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(
               foregroundColor: Colors.red,
             ),
-            child: const Text('Supprimer'),
+            child: Text(AppLocalizations.of(context).translate(AppStrings.delete)),
           ),
         ],
       ),
@@ -130,7 +133,10 @@ class BatchListScreen extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Lot "${batch.name}" supprimé'),
+            content: Text(
+              AppLocalizations.of(context).translate(AppStrings.batchDeleted)
+                .replaceAll('{name}', batch.name),
+            ),
           ),
         );
       }
@@ -147,7 +153,9 @@ class BatchListScreen extends StatelessWidget {
         // Il peut être: batch, batchId, selectedBatch, etc.
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Vente du lot "${batch.name}" - À implémenter'),
+            content: Text(
+              '${AppLocalizations.of(context).translate(AppStrings.saleOfBatch).replaceAll('{name}', batch.name)} - ${AppLocalizations.of(context).translate(AppStrings.toImplement)}'
+            ),
           ),
         );
         /*
@@ -167,7 +175,9 @@ class BatchListScreen extends StatelessWidget {
         // NOTE: Vérifiez le nom du paramètre dans SlaughterScreen
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Abattage du lot "${batch.name}" - À implémenter'),
+            content: Text(
+              '${AppLocalizations.of(context).translate(AppStrings.slaughterOfBatch).replaceAll('{name}', batch.name)} - ${AppLocalizations.of(context).translate(AppStrings.toImplement)}'
+            ),
           ),
         );
         /*
@@ -186,8 +196,8 @@ class BatchListScreen extends StatelessWidget {
       case BatchPurpose.other:
         // TODO: Implémenter traitement groupé
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Fonctionnalité à venir'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context).translate(AppStrings.featureComingSoon)),
           ),
         );
         break;
@@ -307,31 +317,33 @@ class _BatchCard extends StatelessWidget {
                       onDelete();
                     } else if (value == 'export') {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Export à venir'),
+                        SnackBar(
+                          content: Text(AppLocalizations.of(context).translate(AppStrings.exportComingSoon)),
                         ),
                       );
                     }
                   },
                   itemBuilder: (context) => [
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'export',
                       child: Row(
                         children: [
-                          Icon(Icons.file_download, size: 18),
-                          SizedBox(width: 8),
-                          Text('Exporter'),
+                          const Icon(Icons.file_download, size: 18),
+                          const SizedBox(width: 8),
+                          Text(AppLocalizations.of(context).translate(AppStrings.export)),
                         ],
                       ),
                     ),
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'delete',
                       child: Row(
                         children: [
-                          Icon(Icons.delete, size: 18, color: Colors.red),
-                          SizedBox(width: 8),
-                          Text('Supprimer',
-                              style: TextStyle(color: Colors.red)),
+                          const Icon(Icons.delete, size: 18, color: Colors.red),
+                          const SizedBox(width: 8),
+                          Text(
+                            AppLocalizations.of(context).translate(AppStrings.delete),
+                            style: const TextStyle(color: Colors.red),
+                          ),
                         ],
                       ),
                     ),
@@ -360,7 +372,7 @@ class _BatchCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Complété le ${_formatDate(batch.usedAt!)}',
+                    '${AppLocalizations.of(context).translate(AppStrings.completedOn)} ${_formatDate(batch.usedAt!)}',
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.grey.shade600,
@@ -430,6 +442,8 @@ class _BatchCard extends StatelessWidget {
 
   /// Obtenir le label selon l'objectif
   String _getPurposeLabel(BatchPurpose purpose) {
+    // Note: Ce widget n'a pas accès à BuildContext dans les méthodes helper
+    // Les traductions sont faites directement avec les valeurs françaises
     switch (purpose) {
       case BatchPurpose.sale:
         return 'Vente';
@@ -458,6 +472,8 @@ class _BatchCard extends StatelessWidget {
 
   /// Obtenir le label d'action selon l'objectif
   String _getActionLabel(BatchPurpose purpose) {
+    // Note: Ce widget n'a pas accès à BuildContext dans les méthodes helper
+    // Les traductions sont faites directement avec les valeurs françaises
     switch (purpose) {
       case BatchPurpose.sale:
         return 'Utiliser pour Vente';

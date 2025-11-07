@@ -13,8 +13,19 @@ const uuid = Uuid();
 /// Provider de gestion des lots
 class LotProvider extends ChangeNotifier {
   final AuthProvider _authProvider;
+  String _currentFarmId;
 
-  LotProvider(this._authProvider);
+  LotProvider(this._authProvider)
+      : _currentFarmId = _authProvider.currentFarmId {
+    _authProvider.addListener(_onFarmChanged);
+  }
+
+  void _onFarmChanged() {
+    if (_currentFarmId != _authProvider.currentFarmId) {
+      _currentFarmId = _authProvider.currentFarmId;
+      notifyListeners();
+    }
+  }
 
   List<Lot> _allLots = [];
   Lot? _activeLot;
@@ -402,5 +413,11 @@ class LotProvider extends ChangeNotifier {
     final lotWithFarm = lot.copyWith(farmId: _authProvider.currentFarmId);
     _allLots.add(lotWithFarm);
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _authProvider.removeListener(_onFarmChanged);
+    super.dispose();
   }
 }

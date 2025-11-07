@@ -554,7 +554,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
           // Dropdown Group By
           Expanded(
             child: DropdownButtonFormField<GroupByOption>(
-              value: _groupBy,
+              initialValue: _groupBy,
               decoration: InputDecoration(
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 12,
@@ -772,7 +772,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                               ),
                             ),
                             child: Text(
-                              alert.category.icon + ' ' + alert.title,
+                              '${alert.category.icon} ${alert.title}',
                               style: TextStyle(
                                 fontSize: 11,
                                 color: _getAlertColor(alert.type),

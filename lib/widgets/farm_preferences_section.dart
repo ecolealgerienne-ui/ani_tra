@@ -4,16 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/settings_provider.dart';
 import '../data/animal_config.dart';
+import '../i18n/app_localizations.dart';
+import '../i18n/app_strings.dart';
 
-/// Section "Préférences d'élevage" pour l'écran des paramètres
-///
-/// ÉTAPE 4 : Permet de configurer le type et la race par défaut
-/// pour simplifier l'ajout d'animaux.
 class FarmPreferencesSection extends StatelessWidget {
   const FarmPreferencesSection({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Consumer<SettingsProvider>(
       builder: (context, settingsProvider, child) {
         final currentSpecies = AnimalConfig.getSpeciesById(
@@ -30,7 +30,6 @@ class FarmPreferencesSection extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header
                 Row(
                   children: [
                     Icon(
@@ -39,21 +38,21 @@ class FarmPreferencesSection extends StatelessWidget {
                       size: 28,
                     ),
                     const SizedBox(width: 12),
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '🐑 Préférences d\'élevage',
-                            style: TextStyle(
+                            '🐑 ${l10n.translate(AppStrings.farmPreferencesTitle)}',
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: 4),
+                          const SizedBox(height: 4),
                           Text(
-                            'Valeurs pré-remplies lors de l\'ajout d\'un animal',
-                            style: TextStyle(
+                            l10n.translate(AppStrings.farmPreferencesSubtitle),
+                            style: const TextStyle(
                               fontSize: 12,
                               color: Colors.grey,
                             ),
@@ -63,35 +62,28 @@ class FarmPreferencesSection extends StatelessWidget {
                     ),
                   ],
                 ),
-
                 const Divider(height: 32),
-
-                // Type d'animal par défaut
                 _buildSettingTile(
                   context: context,
                   icon: Icons.category,
-                  title: 'Type d\'animal par défaut',
+                  title: l10n.translate(AppStrings.defaultAnimalType),
                   value: currentSpecies != null
                       ? '${currentSpecies.icon} ${currentSpecies.nameFr}'
                       : 'Non défini',
                   onTap: () => _showSpeciesSelector(context, settingsProvider),
                 ),
-
                 const SizedBox(height: 12),
-
-                // Race par défaut
                 _buildSettingTile(
                   context: context,
                   icon: Icons.pets,
-                  title: 'Race par défaut',
-                  value: currentBreed != null ? currentBreed.nameFr : 'Aucune',
+                  title: l10n.translate(AppStrings.defaultBreed),
+                  value: currentBreed != null
+                      ? currentBreed.nameFr
+                      : l10n.translate(AppStrings.noBreedSelected),
                   onTap: () => _showBreedSelector(context, settingsProvider),
                   enabled: settingsProvider.defaultSpeciesId.isNotEmpty,
                 ),
-
                 const SizedBox(height: 16),
-
-                // Info box
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -104,10 +96,10 @@ class FarmPreferencesSection extends StatelessWidget {
                       Icon(Icons.info_outline,
                           color: Colors.blue.shade700, size: 20),
                       const SizedBox(width: 12),
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'Ces valeurs seront automatiquement pré-remplies lors de l\'ajout d\'un nouvel animal. Vous pourrez toujours les modifier.',
-                          style: TextStyle(fontSize: 12),
+                          l10n.translate(AppStrings.farmPreferencesInfo),
+                          style: const TextStyle(fontSize: 12),
                         ),
                       ),
                     ],
@@ -183,20 +175,19 @@ class FarmPreferencesSection extends StatelessWidget {
     );
   }
 
-  // ==================== DIALOGS ====================
-
   void _showSpeciesSelector(
     BuildContext context,
     SettingsProvider settingsProvider,
   ) {
+    final l10n = AppLocalizations.of(context);
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Type d\'animal par défaut'),
+        title: Text(l10n.translate(AppStrings.defaultAnimalType)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: AnimalConfig.availableSpecies.map((species) {
-            final isSelected = species.id == settingsProvider.defaultSpeciesId;
             return RadioListTile<String>(
               title: Text('${species.icon} ${species.nameFr}'),
               value: species.id,
@@ -204,7 +195,6 @@ class FarmPreferencesSection extends StatelessWidget {
               onChanged: (value) {
                 if (value != null) {
                   settingsProvider.setDefaultSpecies(value);
-                  // Réinitialiser la race si on change de type
                   final breeds = AnimalConfig.getBreedsBySpecies(value);
                   if (breeds.isNotEmpty) {
                     settingsProvider.setDefaultBreed(breeds.first.id);
@@ -221,7 +211,7 @@ class FarmPreferencesSection extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
+            child: Text(l10n.translate(AppStrings.cancel)),
           ),
         ],
       ),
@@ -232,14 +222,15 @@ class FarmPreferencesSection extends StatelessWidget {
     BuildContext context,
     SettingsProvider settingsProvider,
   ) {
+    final l10n = AppLocalizations.of(context);
     final breeds = AnimalConfig.getBreedsBySpecies(
       settingsProvider.defaultSpeciesId,
     );
 
     if (breeds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Aucune race disponible pour ce type d\'animal'),
+        SnackBar(
+          content: Text(l10n.translate(AppStrings.noBreedAvailable)),
         ),
       );
       return;
@@ -248,13 +239,13 @@ class FarmPreferencesSection extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Race par défaut'),
+        title: Text(l10n.translate(AppStrings.defaultBreed)),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               RadioListTile<String?>(
-                title: const Text('Aucune (à choisir à chaque fois)'),
+                title: Text(l10n.translate(AppStrings.noneChooseEachTime)),
                 value: null,
                 groupValue: settingsProvider.defaultBreedId,
                 onChanged: (value) {
@@ -290,7 +281,7 @@ class FarmPreferencesSection extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
+            child: Text(l10n.translate(AppStrings.cancel)),
           ),
         ],
       ),

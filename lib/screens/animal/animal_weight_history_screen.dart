@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 
 import '../../models/animal.dart';
 import '../../models/weight_record.dart';
+import '../../i18n/app_localizations.dart';
+import '../../i18n/app_strings.dart';
 import '../../providers/weight_provider.dart';
 import '../weight/weight_record_screen.dart';
 
@@ -26,7 +28,8 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Historique des Pesées'),
+        title: Text(
+            AppLocalizations.of(context).translate(AppStrings.weightHistory)),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
@@ -87,7 +90,7 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
             Icon(Icons.monitor_weight, size: 80, color: Colors.grey.shade400),
             const SizedBox(height: 24),
             Text(
-              'Aucune pesée',
+              AppLocalizations.of(context).translate(AppStrings.noWeights),
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -96,7 +99,8 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              'Cet animal n\'a pas encore été pesé',
+              AppLocalizations.of(context)
+                  .translate(AppStrings.noWeightsMessage),
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
             ),
@@ -113,7 +117,8 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                 );
               },
               icon: const Icon(Icons.add),
-              label: const Text('Ajouter une Pesée'),
+              label: Text(
+                  AppLocalizations.of(context).translate(AppStrings.addWeight)),
             ),
           ],
         ),
@@ -151,7 +156,9 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  animal.officialNumber ?? 'Sans numéro',
+                  animal.officialNumber ??
+                      AppLocalizations.of(context)
+                          .translate(AppStrings.noNumber),
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -215,12 +222,13 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.analytics, size: 20),
-                  SizedBox(width: 8),
+                  const Icon(Icons.analytics, size: 20),
+                  const SizedBox(width: 8),
                   Text(
-                    'Statistiques',
+                    AppLocalizations.of(context)
+                        .translate(AppStrings.statistics),
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -230,7 +238,9 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: _buildStatItem(
-                      'Dernier Poids',
+                      context,
+                      AppLocalizations.of(context)
+                          .translate(AppStrings.lastWeight),
                       latest != null
                           ? '${latest.weight.toStringAsFixed(1)} kg'
                           : 'N/A',
@@ -241,7 +251,9 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildStatItem(
-                      'Nombre de Pesées',
+                      context,
+                      AppLocalizations.of(context)
+                          .translate(AppStrings.weightCount),
                       '${weights.length}',
                       Icons.list,
                       Colors.blue,
@@ -254,7 +266,9 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: _buildStatItem(
-                      'Poids Moyen',
+                      context,
+                      AppLocalizations.of(context)
+                          .translate(AppStrings.averageWeight),
                       average != null
                           ? '${average.toStringAsFixed(1)} kg'
                           : 'N/A',
@@ -265,7 +279,9 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildStatItem(
-                      'Gain Total',
+                      context,
+                      AppLocalizations.of(context)
+                          .translate(AppStrings.totalGain),
                       gain != null ? '${gain.toStringAsFixed(1)} kg' : 'N/A',
                       Icons.trending_up,
                       Colors.purple,
@@ -275,7 +291,8 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               _buildStatItem(
-                'GMQ (Gain Moyen Quotidien)',
+                context,
+                AppLocalizations.of(context).translate(AppStrings.gmq),
                 dailyGain != null
                     ? '${(dailyGain * 1000).toStringAsFixed(0)} g/jour'
                     : 'N/A',
@@ -291,7 +308,12 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
 
   /// Widget: Item de statistique
   Widget _buildStatItem(
-      String label, String value, IconData icon, Color color) {
+    BuildContext context,
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -340,12 +362,13 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.show_chart, size: 20),
-                  SizedBox(width: 8),
+                  const Icon(Icons.show_chart, size: 20),
+                  const SizedBox(width: 8),
                   Text(
-                    'Évolution du Poids',
+                    AppLocalizations.of(context)
+                        .translate(AppStrings.weightEvolution),
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -454,8 +477,9 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                             color: Colors.green,
                             borderRadius: BorderRadius.circular(4),
                           ),
-                          child: const Text(
-                            'ACTUEL',
+                          child: Text(
+                            AppLocalizations.of(context)
+                                .translate(AppStrings.current),
                             style: TextStyle(
                               fontSize: 9,
                               color: Colors.white,

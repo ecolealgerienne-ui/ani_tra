@@ -8,6 +8,7 @@ import '../../providers/animal_provider.dart';
 import '../../models/lot.dart';
 import '../../models/animal.dart';
 import '../../i18n/app_localizations.dart';
+import '../../i18n/app_strings.dart';
 import '../animal/animal_finder_screen.dart';
 import '../lot/lot_finalize_screen.dart';
 //import '../medical/medical_act_screen.dart';
@@ -24,7 +25,8 @@ class LotDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Détail du Lot'),
+        title:
+            Text(AppLocalizations.of(context).translate(AppStrings.lotDetail)),
         actions: [
           PopupMenuButton<String>(
             onSelected: (value) => _handleMenuAction(context, value),
@@ -34,34 +36,40 @@ class LotDetailScreen extends StatelessWidget {
 
               return [
                 if (!lot.completed)
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'rename',
                     child: Row(
                       children: [
-                        Icon(Icons.edit, size: 18),
-                        SizedBox(width: 8),
-                        Text('Renommer'),
+                        const Icon(Icons.edit, size: 18),
+                        const SizedBox(width: 8),
+                        Text(AppLocalizations.of(context)
+                            .translate(AppStrings.rename)),
                       ],
                     ),
                   ),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'duplicate',
                   child: Row(
                     children: [
-                      Icon(Icons.content_copy, size: 18),
-                      SizedBox(width: 8),
-                      Text('Dupliquer'),
+                      const Icon(Icons.content_copy, size: 18),
+                      const SizedBox(width: 8),
+                      Text(AppLocalizations.of(context)
+                          .translate(AppStrings.duplicate)),
                     ],
                   ),
                 ),
                 if (!lot.completed)
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'delete',
                     child: Row(
                       children: [
-                        Icon(Icons.delete, size: 18, color: Colors.red),
-                        SizedBox(width: 8),
-                        Text('Supprimer', style: TextStyle(color: Colors.red)),
+                        const Icon(Icons.delete, size: 18, color: Colors.red),
+                        const SizedBox(width: 8),
+                        Text(
+                          AppLocalizations.of(context)
+                              .translate(AppStrings.delete),
+                          style: const TextStyle(color: Colors.red),
+                        ),
                       ],
                     ),
                   ),
@@ -83,13 +91,13 @@ class LotDetailScreen extends StatelessWidget {
                       size: 64, color: Colors.grey.shade400),
                   const SizedBox(height: 16),
                   Text(
-                    'Lot introuvable',
+                    AppLocalizations.of(context).translate('lotNotFound'),
                     style: TextStyle(fontSize: 18, color: Colors.grey.shade600),
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text('Retour'),
+                    child: Text(AppLocalizations.of(context).translate('back')),
                   ),
                 ],
               ),
@@ -183,7 +191,8 @@ class LotDetailScreen extends StatelessWidget {
     final isCompleted = lot.completed;
     final statusColor = isCompleted ? Colors.grey : Colors.green;
     final statusIcon = isCompleted ? Icons.lock : Icons.lock_open;
-    final statusText = l10n.translate(isCompleted ? 'lot_closed' : 'lot_open');
+    final statusText = AppLocalizations.of(context)
+        .translate(isCompleted ? AppStrings.lotClosed : AppStrings.lotOpened);
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -203,7 +212,7 @@ class LotDetailScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Statut',
+                    AppLocalizations.of(context).translate(AppStrings.status),
                     style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
                   ),
                   const SizedBox(height: 2),
@@ -217,7 +226,7 @@ class LotDetailScreen extends StatelessWidget {
                   ),
                   if (isCompleted && lot.completedAt != null)
                     Text(
-                      'Le ${DateFormat('dd/MM/yyyy').format(lot.completedAt!)}',
+                      '${AppLocalizations.of(context).translate(AppStrings.onThe)} ${DateFormat('dd/MM/yyyy').format(lot.completedAt!)}',
                       style:
                           TextStyle(fontSize: 12, color: Colors.grey.shade600),
                     ),
@@ -244,7 +253,7 @@ class LotDetailScreen extends StatelessWidget {
                   Icon(Icons.category, color: _getTypeColor(lot)),
                   const SizedBox(width: 12),
                   Text(
-                    'Type: ${lot.type!.label}',
+                    '${AppLocalizations.of(context).translate(AppStrings.type)}: ${lot.type!.label}',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -256,11 +265,12 @@ class LotDetailScreen extends StatelessWidget {
 
               // Traitement
               if (lot.type == LotType.treatment && lot.productName != null) ...[
-                _buildInfoRow('Produit', lot.productName!, Icons.medication),
+                _buildInfoRow(AppLocalizations.of(context).translate(AppStrings.product),
+                    lot.productName!, Icons.medication),
                 if (lot.treatmentDate != null) ...[
                   const SizedBox(height: 12),
                   _buildInfoRow(
-                    'Date traitement',
+                    AppLocalizations.of(context).translate(AppStrings.treatmentDate),
                     DateFormat('dd/MM/yyyy').format(lot.treatmentDate!),
                     Icons.calendar_today,
                   ),
@@ -268,18 +278,20 @@ class LotDetailScreen extends StatelessWidget {
                 if (lot.veterinarianName != null) ...[
                   const SizedBox(height: 12),
                   _buildInfoRow(
-                      'Vétérinaire', lot.veterinarianName!, Icons.person),
+                      AppLocalizations.of(context).translate(AppStrings.veterinarian),
+                      lot.veterinarianName!, Icons.person),
                 ],
               ],
 
               // Vente
               if (lot.type == LotType.sale) ...[
                 if (lot.buyerName != null)
-                  _buildInfoRow('Acheteur', lot.buyerName!, Icons.person),
+                  _buildInfoRow(AppLocalizations.of(context).translate(AppStrings.buyer),
+                      lot.buyerName!, Icons.person),
                 if (lot.totalPrice != null) ...[
                   const SizedBox(height: 12),
                   _buildInfoRow(
-                    'Prix total',
+                    AppLocalizations.of(context).translate(AppStrings.totalPrice),
                     '${lot.totalPrice!.toStringAsFixed(2)}€',
                     Icons.euro,
                   ),
@@ -287,7 +299,7 @@ class LotDetailScreen extends StatelessWidget {
                 if (lot.pricePerAnimal != null) ...[
                   const SizedBox(height: 12),
                   _buildInfoRow(
-                    'Prix par animal',
+                    AppLocalizations.of(context).translate(AppStrings.pricePerAnimal),
                     '${lot.pricePerAnimal!.toStringAsFixed(2)}€',
                     Icons.attach_money,
                   ),
@@ -298,11 +310,12 @@ class LotDetailScreen extends StatelessWidget {
               if (lot.type == LotType.slaughter &&
                   lot.slaughterhouseName != null) ...[
                 _buildInfoRow(
-                    'Abattoir', lot.slaughterhouseName!, Icons.factory),
+                    AppLocalizations.of(context).translate(AppStrings.slaughterhouse),
+                    lot.slaughterhouseName!, Icons.factory),
                 if (lot.slaughterDate != null) ...[
                   const SizedBox(height: 12),
                   _buildInfoRow(
-                    'Date',
+                    AppLocalizations.of(context).translate(AppStrings.date),
                     DateFormat('dd/MM/yyyy').format(lot.slaughterDate!),
                     Icons.calendar_today,
                   ),
@@ -313,7 +326,7 @@ class LotDetailScreen extends StatelessWidget {
               if (lot.notes != null && lot.notes!.isNotEmpty) ...[
                 const Divider(height: 24),
                 Text(
-                  'Notes',
+                  AppLocalizations.of(context).translate(AppStrings.notes),
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey.shade700,
@@ -338,7 +351,8 @@ class LotDetailScreen extends StatelessWidget {
         children: [
           Expanded(
             child: _buildStatCard(
-              'Animaux',
+              context,
+              AppLocalizations.of(context).translate(AppStrings.animals),
               '${lot.animalCount}',
               Icons.pets,
               Colors.blue,
@@ -347,7 +361,8 @@ class LotDetailScreen extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: _buildStatCard(
-              'Mâles',
+              context,
+              AppLocalizations.of(context).translate(AppStrings.males),
               '${animals.where((a) => a.sex == AnimalSex.male).length}',
               Icons.male,
               Colors.blue.shade700,
@@ -356,7 +371,8 @@ class LotDetailScreen extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: _buildStatCard(
-              'Femelles',
+              context,
+              AppLocalizations.of(context).translate(AppStrings.females),
               '${animals.where((a) => a.sex == AnimalSex.female).length}',
               Icons.female,
               Colors.pink,
@@ -368,7 +384,7 @@ class LotDetailScreen extends StatelessWidget {
   }
 
   Widget _buildStatCard(
-      String label, String value, IconData icon, Color color) {
+      BuildContext context, String label, String value, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -408,9 +424,9 @@ class LotDetailScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Animaux',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              Text(
+                AppLocalizations.of(context).translate(AppStrings.animals),
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               if (!lot.completed)
                 TextButton.icon(
@@ -418,10 +434,11 @@ class LotDetailScreen extends StatelessWidget {
                     final result = await Navigator.push<List<Animal>>(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const AnimalFinderScreen(
+                        builder: (_) => AnimalFinderScreen(
                           mode: AnimalFinderMode.multiple,
-                          title: 'Scanner les animaux',
-                          allowedStatuses: [AnimalStatus.alive],
+                          title: AppLocalizations.of(context)
+                              .translate(AppStrings.scanAnimals),
+                          allowedStatuses: const [AnimalStatus.alive],
                         ),
                       ),
                     );
@@ -438,14 +455,16 @@ class LotDetailScreen extends StatelessWidget {
 
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('${result.length} animaux ajoutés'),
+                          content: Text(
+                              '${result.length} ${AppLocalizations.of(context).translate(AppStrings.animalsAdded)}'),
                           backgroundColor: Colors.green,
                         ),
                       );
                     }
                   },
                   icon: const Icon(Icons.qr_code_scanner, size: 18),
-                  label: const Text('Scanner'),
+                  label: Text(
+                      AppLocalizations.of(context).translate(AppStrings.scanner)),
                 ),
             ],
           ),
@@ -464,7 +483,7 @@ class LotDetailScreen extends StatelessWidget {
                         size: 48, color: Colors.grey.shade400),
                     const SizedBox(height: 8),
                     Text(
-                      'Aucun animal',
+                      AppLocalizations.of(context).translate(AppStrings.noAnimals),
                       style:
                           TextStyle(fontSize: 14, color: Colors.grey.shade600),
                     ),
@@ -502,8 +521,9 @@ class LotDetailScreen extends StatelessWidget {
                       .read<LotProvider>()
                       .removeAnimalFromLot(lot.id, animal.id);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Animal retiré'),
+                    SnackBar(
+                      content: Text(AppLocalizations.of(context)
+                          .translate(AppStrings.animalRemovedFromLot)),
                       backgroundColor: Colors.orange,
                     ),
                   );
@@ -549,7 +569,8 @@ class LotDetailScreen extends StatelessWidget {
             child: OutlinedButton.icon(
               onPressed: () => Navigator.pop(context),
               icon: const Icon(Icons.close),
-              label: const Text('Fermer'),
+              label: Text(
+                  AppLocalizations.of(context).translate(AppStrings.close)),
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
@@ -615,18 +636,20 @@ class LotDetailScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Renommer le lot'),
+        title: Text(AppLocalizations.of(context).translate(AppStrings.rename)),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(
-            labelText: 'Nouveau nom',
+          decoration: InputDecoration(
+            labelText:
+                AppLocalizations.of(context).translate(AppStrings.newName),
           ),
           autofocus: true,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
+            child:
+                Text(AppLocalizations.of(context).translate(AppStrings.cancel)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -635,13 +658,14 @@ class LotDetailScreen extends StatelessWidget {
                   .renameLot(lot.id, controller.text.trim());
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Lot renommé'),
+                SnackBar(
+                  content: Text(AppLocalizations.of(context)
+                      .translate(AppStrings.lotRenamed)),
                   backgroundColor: Colors.green,
                 ),
               );
             },
-            child: const Text('Renommer'),
+            child: Text(AppLocalizations.of(context).translate(AppStrings.rename)),
           ),
         ],
       ),
@@ -657,24 +681,30 @@ class LotDetailScreen extends StatelessWidget {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: const Text('Dupliquer le lot'),
+          title: Text(
+              AppLocalizations.of(context).translate(AppStrings.duplicate)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(labelText: 'Nouveau nom'),
+                decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)
+                        .translate(AppStrings.newName)),
               ),
               const SizedBox(height: 16),
               CheckboxListTile(
-                title: const Text('Conserver les animaux'),
-                subtitle: Text('${lot.animalCount} animaux'),
+                title: Text(AppLocalizations.of(context)
+                    .translate(AppStrings.keepAnimals)),
+                subtitle: Text(
+                    '${lot.animalCount} ${AppLocalizations.of(context).translate(AppStrings.animals).toLowerCase()}'),
                 value: keepAnimals,
                 onChanged: (val) => setState(() => keepAnimals = val ?? true),
               ),
               if (lot.type != null)
                 CheckboxListTile(
-                  title: const Text('Conserver le type'),
+                  title: Text(AppLocalizations.of(context)
+                      .translate(AppStrings.keepType)),
                   subtitle: Text(lot.type!.label),
                   value: keepType,
                   onChanged: (val) => setState(() => keepType = val ?? false),
@@ -684,7 +714,8 @@ class LotDetailScreen extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Annuler'),
+              child: Text(
+                  AppLocalizations.of(context).translate(AppStrings.cancel)),
             ),
             ElevatedButton(
               onPressed: () {
@@ -704,13 +735,15 @@ class LotDetailScreen extends StatelessWidget {
                 );
 
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Lot dupliqué'),
+                  SnackBar(
+                    content: Text(AppLocalizations.of(context)
+                        .translate(AppStrings.lotDuplicated)),
                     backgroundColor: Colors.green,
                   ),
                 );
               },
-              child: const Text('Dupliquer'),
+              child: Text(
+                  AppLocalizations.of(context).translate(AppStrings.duplicate)),
             ),
           ],
         ),
@@ -722,12 +755,15 @@ class LotDetailScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Supprimer le lot'),
-        content: Text('Supprimer "${lot.name}" ?'),
+        title: Text(AppLocalizations.of(context).translate(AppStrings.delete)),
+        content: Text(AppLocalizations.of(context)
+            .translate(AppStrings.deleteLotConfirm)
+            .replaceAll('{name}', lot.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
+            child:
+                Text(AppLocalizations.of(context).translate(AppStrings.cancel)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -735,14 +771,17 @@ class LotDetailScreen extends StatelessWidget {
               Navigator.pop(context);
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Lot supprimé'),
+                SnackBar(
+                  content: Text(AppLocalizations.of(context)
+                      .translate(AppStrings.batchDeleted)
+                      .replaceAll('{name}', lot.name)),
                   backgroundColor: Colors.red,
                 ),
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Supprimer'),
+            child: Text(
+                AppLocalizations.of(context).translate(AppStrings.delete)),
           ),
         ],
       ),

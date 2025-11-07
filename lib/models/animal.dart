@@ -179,8 +179,9 @@ class Animal implements SyncableEntity {
   /// Priorité : visualId > officialNumber > currentEid > "Sans ID"
   String get displayId {
     if (visualId != null && visualId!.isNotEmpty) return visualId!;
-    if (officialNumber != null && officialNumber!.isNotEmpty)
+    if (officialNumber != null && officialNumber!.isNotEmpty) {
       return officialNumber!;
+    }
     if (currentEid != null && currentEid!.isNotEmpty) return currentEid!;
     return 'Sans ID';
   }
@@ -192,8 +193,9 @@ class Animal implements SyncableEntity {
   String get fullIdentification {
     final parts = <String>[];
     if (visualId != null && visualId!.isNotEmpty) parts.add('ID: $visualId');
-    if (currentEid != null && currentEid!.isNotEmpty)
+    if (currentEid != null && currentEid!.isNotEmpty) {
       parts.add('EID: $currentEid');
+    }
     if (officialNumber != null && officialNumber!.isNotEmpty) {
       parts.add('N°: $officialNumber');
     }

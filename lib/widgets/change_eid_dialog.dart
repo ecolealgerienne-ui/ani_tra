@@ -5,10 +5,9 @@ import 'package:provider/provider.dart';
 import '../models/animal.dart';
 import '../models/eid_change.dart';
 import '../providers/animal_provider.dart';
+import '../i18n/app_localizations.dart';
+import '../i18n/app_strings.dart';
 
-/// Dialog pour changer l'EID d'un animal
-///
-/// Utilisé quand une puce RFID est perdue, cassée ou défectueuse
 class ChangeEidDialog extends StatefulWidget {
   final Animal animal;
 
@@ -60,16 +59,18 @@ class _ChangeEidDialogState extends State<ChangeEidDialog> {
 
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('✅ EID changé avec succès'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)
+                .translate(AppStrings.eidChangedSuccess)),
             backgroundColor: Colors.green,
           ),
         );
         Navigator.pop(context, true);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('❌ Erreur lors du changement d\'EID'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)
+                .translate(AppStrings.eidChangedError)),
             backgroundColor: Colors.red,
           ),
         );
@@ -79,7 +80,8 @@ class _ChangeEidDialogState extends State<ChangeEidDialog> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('❌ Erreur: ${e.toString()}'),
+          content: Text(
+              '❌ ${AppLocalizations.of(context).translate(AppStrings.error)}: ${e.toString()}'),
           backgroundColor: Colors.red,
         ),
       );
@@ -94,13 +96,15 @@ class _ChangeEidDialogState extends State<ChangeEidDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return AlertDialog(
       title: Row(
         children: [
           Icon(Icons.qr_code, color: Theme.of(context).primaryColor),
           const SizedBox(width: 12),
-          const Expanded(
-            child: Text('Changer l\'EID'),
+          Expanded(
+            child: Text(l10n.translate(AppStrings.changeEidTitle)),
           ),
         ],
       ),
@@ -111,7 +115,6 @@ class _ChangeEidDialogState extends State<ChangeEidDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // EID actuel
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -123,7 +126,7 @@ class _ChangeEidDialogState extends State<ChangeEidDialog> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'EID actuel',
+                      l10n.translate(AppStrings.currentEid),
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey.shade600,
@@ -140,38 +143,32 @@ class _ChangeEidDialogState extends State<ChangeEidDialog> {
                   ],
                 ),
               ),
-
               const SizedBox(height: 20),
-
-              // Nouvel EID
               TextFormField(
                 controller: _newEidController,
-                decoration: const InputDecoration(
-                  labelText: 'Nouvel EID *',
+                decoration: InputDecoration(
+                  labelText: l10n.translate(AppStrings.newEidLabel),
                   hintText: 'Ex: 250001234567890',
-                  prefixIcon: Icon(Icons.qr_code_scanner),
-                  border: OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.qr_code_scanner),
+                  border: const OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'EID obligatoire';
+                    return l10n.translate(AppStrings.eidRequired);
                   }
                   if (value.trim() == widget.animal.currentEid) {
-                    return 'Le nouvel EID doit être différent';
+                    return l10n.translate(AppStrings.eidMustBeDifferent);
                   }
                   if (value.length < 10) {
-                    return 'EID trop court';
+                    return l10n.translate(AppStrings.eidTooShort);
                   }
                   return null;
                 },
               ),
-
               const SizedBox(height: 16),
-
-              // Raison
-              const Text(
-                'Raison du changement *',
-                style: TextStyle(
+              Text(
+                l10n.translate(AppStrings.changeReason),
+                style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                 ),
@@ -193,16 +190,13 @@ class _ChangeEidDialogState extends State<ChangeEidDialog> {
                   contentPadding: EdgeInsets.zero,
                 );
               }),
-
               const SizedBox(height: 16),
-
-              // Notes optionnelles
               TextFormField(
                 controller: _notesController,
-                decoration: const InputDecoration(
-                  labelText: 'Notes (optionnel)',
+                decoration: InputDecoration(
+                  labelText: l10n.translate(AppStrings.optionalNotes),
                   hintText: 'Ex: Puce trouvée cassée lors du scan',
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                 ),
                 maxLines: 3,
               ),
@@ -213,7 +207,7 @@ class _ChangeEidDialogState extends State<ChangeEidDialog> {
       actions: [
         TextButton(
           onPressed: _isLoading ? null : () => Navigator.pop(context),
-          child: const Text('Annuler'),
+          child: Text(l10n.translate(AppStrings.cancel)),
         ),
         ElevatedButton(
           onPressed: _isLoading ? null : _handleSubmit,
@@ -223,7 +217,7 @@ class _ChangeEidDialogState extends State<ChangeEidDialog> {
                   height: 20,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Text('Changer l\'EID'),
+              : Text(l10n.translate(AppStrings.changeEidTitle)),
         ),
       ],
     );

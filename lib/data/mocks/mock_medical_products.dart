@@ -13,7 +13,7 @@ class MockMedicalProducts {
 
       MedicalProduct(
         id: 'mp_001',
-        farmId: 'mock-farm-001',
+        farmId: 'farm_default',
         name: 'Amoxicilline 15%',
         commercialName: 'Clamoxyl LA',
         category: 'Antibiotique',
@@ -52,7 +52,7 @@ class MockMedicalProducts {
 
       MedicalProduct(
         id: 'mp_002',
-        farmId: 'mock-farm-001',
+        farmId: 'farm_default',
         name: 'Tulathromycine',
         commercialName: 'Draxxin',
         category: 'Antibiotique',
@@ -86,7 +86,7 @@ class MockMedicalProducts {
 
       MedicalProduct(
         id: 'mp_003',
-        farmId: 'mock-farm-001',
+        farmId: 'farm_default',
         name: 'Pénicilline procaïne',
         commercialName: 'Peni-Kel',
         category: 'Antibiotique',
@@ -126,7 +126,7 @@ class MockMedicalProducts {
 
       MedicalProduct(
         id: 'mp_004',
-        farmId: 'mock-farm-001',
+        farmId: 'farm_default',
         name: 'Ivermectine 1%',
         commercialName: 'Ivomec',
         category: 'Antiparasitaire',
@@ -166,7 +166,7 @@ class MockMedicalProducts {
 
       MedicalProduct(
         id: 'mp_005',
-        farmId: 'mock-farm-001',
+        farmId: 'farm_default',
         name: 'Doramectine',
         commercialName: 'Dectomax',
         category: 'Antiparasitaire',
@@ -202,7 +202,7 @@ class MockMedicalProducts {
 
       MedicalProduct(
         id: 'mp_006',
-        farmId: 'mock-farm-001',
+        farmId: 'farm_default',
         name: 'Vaccin Entérotoxémie',
         commercialName: 'Ovilis Toxipra',
         category: 'Vaccin',
@@ -237,7 +237,7 @@ class MockMedicalProducts {
 
       MedicalProduct(
         id: 'mp_007',
-        farmId: 'mock-farm-001',
+        farmId: 'farm_default',
         name: 'Vaccin Border Disease',
         commercialName: 'Bovilis BVD',
         category: 'Vaccin',
@@ -274,7 +274,7 @@ class MockMedicalProducts {
 
       MedicalProduct(
         id: 'mp_008',
-        farmId: 'mock-farm-001',
+        farmId: 'farm_default',
         name: 'Vaccin BVD',
         commercialName: 'Bovilis BVD',
         category: 'Vaccin',
@@ -308,7 +308,7 @@ class MockMedicalProducts {
 
       MedicalProduct(
         id: 'mp_009',
-        farmId: 'mock-farm-001',
+        farmId: 'farm_default',
         name: 'Vaccin FCO',
         commercialName: 'Bluevac-8',
         category: 'Vaccin',
@@ -345,7 +345,7 @@ class MockMedicalProducts {
 
       MedicalProduct(
         id: 'mp_010',
-        farmId: 'mock-farm-001',
+        farmId: 'farm_default',
         name: 'Méloxicam',
         commercialName: 'Metacam',
         category: 'Anti-inflammatoire',
@@ -386,7 +386,7 @@ class MockMedicalProducts {
 
       MedicalProduct(
         id: 'mp_011',
-        farmId: 'mock-farm-001',
+        farmId: 'farm_default',
         name: 'Oxytocine',
         commercialName: 'Oxytocine Sintex',
         category: 'Hormone',
@@ -425,7 +425,7 @@ class MockMedicalProducts {
 
       MedicalProduct(
         id: 'mp_012',
-        farmId: 'mock-farm-001',
+        farmId: 'farm_default',
         name: 'Calcium injectable',
         commercialName: 'Calcidol',
         category: 'Complément minéral',

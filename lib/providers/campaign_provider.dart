@@ -13,8 +13,20 @@ const uuid = Uuid();
 /// Aucune chaîne destinée à l'utilisateur n'est émise ici (multi-langue côté UI).
 class CampaignProvider extends ChangeNotifier {
   final AuthProvider _authProvider;
+  String _currentFarmId;
 
-  CampaignProvider(this._authProvider);
+  CampaignProvider(this._authProvider)
+      : _currentFarmId = _authProvider.currentFarmId {
+    _authProvider.addListener(_onFarmChanged);
+  }
+
+  void _onFarmChanged() {
+    if (_currentFarmId != _authProvider.currentFarmId) {
+      _currentFarmId = _authProvider.currentFarmId;
+      _activeCampaign = null;
+      notifyListeners();
+    }
+  }
 
   List<Campaign> _allCampaigns = [];
   Campaign? _activeCampaign;
@@ -264,5 +276,11 @@ class CampaignProvider extends ChangeNotifier {
     _allCampaigns.clear();
     _activeCampaign = null;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _authProvider.removeListener(_onFarmChanged);
+    super.dispose();
   }
 }

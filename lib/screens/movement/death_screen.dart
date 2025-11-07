@@ -9,6 +9,7 @@ import '../../providers/sync_provider.dart';
 import '../../models/animal.dart';
 import '../../models/movement.dart';
 import '../../i18n/app_localizations.dart';
+import '../../i18n/app_strings.dart';
 
 class DeathScreen extends StatefulWidget {
   final Animal? animal;
@@ -58,8 +59,9 @@ class _DeathScreenState extends State<DeathScreen> {
       if (animals.isEmpty) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Aucun animal disponible à scanner'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)
+                .translate(AppStrings.noAnimalsAvailable)),
             backgroundColor: Colors.orange,
           ),
         );
@@ -111,8 +113,9 @@ class _DeathScreenState extends State<DeathScreen> {
     if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Mortalité enregistrée'),
+      SnackBar(
+        content: Text(
+            AppLocalizations.of(context).translate(AppStrings.deathRecorded)),
         backgroundColor: Colors.grey,
       ),
     );
@@ -122,12 +125,12 @@ class _DeathScreenState extends State<DeathScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final dateFormat = DateFormat('dd/MM/yyyy');
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.translate('record_death')),
+        title: Text(
+            AppLocalizations.of(context).translate(AppStrings.recordDeath)),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -144,10 +147,11 @@ class _DeathScreenState extends State<DeathScreen> {
               children: [
                 Icon(Icons.warning, color: Colors.red.shade700),
                 const SizedBox(width: 12),
-                const Expanded(
+                Expanded(
                   child: Text(
-                    'Action irréversible. L\'animal sera marqué comme décédé.',
-                    style: TextStyle(fontWeight: FontWeight.w600),
+                    AppLocalizations.of(context)
+                        .translate(AppStrings.irreversibleWarning),
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ),
               ],
@@ -167,13 +171,15 @@ class _DeathScreenState extends State<DeathScreen> {
                 ),
                 child: _isScanning
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Column(
+                    : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.nfc, size: 48),
-                          SizedBox(height: 8),
-                          Text('Scanner Animal',
-                              style: TextStyle(fontSize: 18)),
+                          const Icon(Icons.nfc, size: 48),
+                          const SizedBox(height: 8),
+                          Text(
+                              AppLocalizations.of(context)
+                                  .translate(AppStrings.scanAnimal),
+                              style: const TextStyle(fontSize: 18)),
                         ],
                       ),
               ),
@@ -217,9 +223,11 @@ class _DeathScreenState extends State<DeathScreen> {
                       ),
                       const Divider(height: 24),
                       Text(
-                          'Sexe: ${animal.sex == AnimalSex.female ? "Femelle" : "Mâle"}'),
-                      Text('Âge: ${animal.ageInMonths} mois'),
-                      Text('Naissance: ${dateFormat.format(animal.birthDate)}'),
+                          '${AppLocalizations.of(context).translate(AppStrings.sex)}: ${animal.sex == AnimalSex.female ? "Femelle" : "Mâle"}'),
+                      Text(
+                          '${AppLocalizations.of(context).translate(AppStrings.age)}: ${animal.ageInMonths} ${AppLocalizations.of(context).translate(AppStrings.months)}'),
+                      Text(
+                          '${AppLocalizations.of(context).translate(AppStrings.birthDate)}: ${dateFormat.format(animal.birthDate)}'),
                     ],
                   ),
                 ),
@@ -236,7 +244,8 @@ class _DeathScreenState extends State<DeathScreen> {
               ),
               tileColor: Colors.white,
               leading: const Icon(Icons.calendar_today),
-              title: Text(l10n.translate('date')),
+              title:
+                  Text(AppLocalizations.of(context).translate(AppStrings.date)),
               subtitle: Text(dateFormat.format(_deathDate)),
               trailing: const Icon(Icons.chevron_right),
               onTap: () async {
@@ -258,7 +267,8 @@ class _DeathScreenState extends State<DeathScreen> {
               controller: _notesController,
               maxLines: 3,
               decoration: InputDecoration(
-                labelText: l10n.translate('death_cause'),
+                labelText: AppLocalizations.of(context)
+                    .translate(AppStrings.deathCause),
                 hintText: 'Ex: Maladie, Accident, Prédateur...',
                 alignLabelWithHint: true,
               ),
@@ -271,7 +281,8 @@ class _DeathScreenState extends State<DeathScreen> {
               child: ElevatedButton.icon(
                 onPressed: _confirmDeath,
                 icon: const Icon(Icons.delete_forever),
-                label: Text(l10n.translate('confirm_death')),
+                label: Text(AppLocalizations.of(context)
+                    .translate(AppStrings.confirmDeath)),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   backgroundColor: Colors.grey.shade700,

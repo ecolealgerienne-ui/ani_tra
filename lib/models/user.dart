@@ -6,14 +6,14 @@ class User {
   final String email;
   final String name;
   final String? phone;
-  
+
   // Multi-ferme
   final List<String> farmIds;
   final String currentFarmId;
-  
+
   // Groupe (optionnel)
   final String? groupId;
-  
+
   // Métadonnées
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -29,7 +29,7 @@ class User {
     required this.createdAt,
     required this.updatedAt,
   });
-  
+
   User copyWith({
     String? email,
     String? name,
@@ -72,7 +72,8 @@ class User {
       email: json['email'] as String,
       name: json['name'] as String,
       phone: json['phone'] as String?,
-      farmIds: (json['farmIds'] as List<dynamic>).map((e) => e as String).toList(),
+      farmIds:
+          (json['farmIds'] as List<dynamic>).map((e) => e as String).toList(),
       currentFarmId: json['currentFarmId'] as String,
       groupId: json['groupId'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),

@@ -5,8 +5,19 @@ import 'auth_provider.dart';
 
 class VeterinarianProvider with ChangeNotifier {
   final AuthProvider _authProvider;
+  String _currentFarmId;
 
-  VeterinarianProvider(this._authProvider);
+  VeterinarianProvider(this._authProvider)
+      : _currentFarmId = _authProvider.currentFarmId {
+    _authProvider.addListener(_onFarmChanged);
+  }
+
+  void _onFarmChanged() {
+    if (_currentFarmId != _authProvider.currentFarmId) {
+      _currentFarmId = _authProvider.currentFarmId;
+      notifyListeners();
+    }
+  }
 
   final List<Veterinarian> _allVeterinarians = [];
 
@@ -177,5 +188,11 @@ class VeterinarianProvider with ChangeNotifier {
   List<Veterinarian> getVeterinariansByRating(int minRating) {
     return activeVeterinarians.where((v) => v.rating >= minRating).toList()
       ..sort((a, b) => b.rating.compareTo(a.rating));
+  }
+
+  @override
+  void dispose() {
+    _authProvider.removeListener(_onFarmChanged);
+    super.dispose();
   }
 }

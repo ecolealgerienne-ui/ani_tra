@@ -1,6 +1,4 @@
 // lib/screens/treatment_screen.dart
-// Écran unifié de traitement pour 1 animal, plusieurs animaux ou lot
-// Version unifiée - Combine le meilleur des 2 écrans existants
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -13,24 +11,13 @@ import '../../models/veterinarian.dart';
 import '../../providers/animal_provider.dart';
 import '../../providers/sync_provider.dart';
 import '../../data/mock_data.dart';
+import '../../i18n/app_localizations.dart';
+import '../../i18n/app_strings.dart';
 
-/// Écran unifié de traitement
-///
-/// Gère 3 contextes :
-/// - 1 animal : `animalId` fourni
-/// - N animaux : `animalIds` fourni
-/// - Lot : `animalIds` + `batchId` fournis
 class TreatmentScreen extends StatefulWidget {
-  /// ID d'un animal unique (pour traitement individuel)
   final String? animalId;
-
-  /// Liste d'IDs d'animaux (pour traitement multiple ou lot)
   final List<String>? animalIds;
-
-  /// ID du lot (optionnel, pour contexte)
   final String? batchId;
-
-  /// Nom du lot (optionnel, pour affichage)
   final String? batchName;
 
   const TreatmentScreen({
@@ -57,7 +44,6 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
   Product? _selectedProduct;
   DateTime _treatmentDate = DateTime.now();
 
-  // Vétérinaire
   String? _selectedVetId;
   String? _selectedVetName;
   String? _selectedVetOrg;
@@ -71,7 +57,6 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
     super.dispose();
   }
 
-  /// Liste des IDs d'animaux concernés
   List<String> get _targetAnimalIds {
     if (widget.animalIds != null) {
       return widget.animalIds!;
@@ -79,10 +64,8 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
     return [widget.animalId!];
   }
 
-  /// Nombre d'animaux concernés
   int get _animalCount => _targetAnimalIds.length;
 
-  /// Titre contextuel
   String get _title {
     if (widget.batchName != null) {
       return 'Traitement - ${widget.batchName}';
@@ -93,7 +76,6 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
     return 'Traitement pour $_animalCount animaux';
   }
 
-  /// Rechercher un vétérinaire
   void _searchVeterinarian() {
     showDialog(
       context: context,
@@ -111,7 +93,6 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
     );
   }
 
-  /// Scanner le QR d'un vétérinaire
   Future<void> _scanVeterinarianQR() async {
     final vets = MockData.veterinarians;
     if (vets.isEmpty) return;
@@ -135,7 +116,6 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
     );
   }
 
-  /// Supprimer le vétérinaire sélectionné
   void _removeVeterinarian() {
     setState(() {
       _selectedVetId = null;
@@ -144,13 +124,13 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
     });
   }
 
-  /// Sauvegarder le(s) traitement(s)
   Future<void> _saveTreatment() async {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedProduct == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez sélectionner un produit'),
+        SnackBar(
+          content: Text(
+              AppLocalizations.of(context).translate(AppStrings.selectProduct)),
           backgroundColor: Colors.orange,
         ),
       );
@@ -165,7 +145,6 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
     final dose = double.parse(_doseController.text);
     final notes = _notesController.text.trim();
 
-    // Créer 1 traitement par animal
     for (final animalId in _targetAnimalIds) {
       final treatment = Treatment(
         id: _uuid.v4(),
@@ -195,7 +174,9 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          _animalCount == 1 ? '✅ Soin ajouté' : '✅ $_animalCount soins ajoutés',
+          _animalCount == 1
+              ? '✅ Soin ajouté'
+              : '✅ $_animalCount ${AppLocalizations.of(context).translate(AppStrings.added)}',
         ),
         backgroundColor: Colors.green,
       ),
@@ -242,28 +223,17 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Bandeau d'info contexte
-              _buildContextBanner(),
+              _buildContextBanner(context),
               const SizedBox(height: 24),
-
-              // Produit
-              _buildProductField(products),
+              _buildProductField(context, products),
               const SizedBox(height: 16),
-
-              // Dose
-              _buildDoseField(),
+              _buildDoseField(context),
               const SizedBox(height: 16),
-
-              // Date
-              _buildDateField(dateFormat),
+              _buildDateField(context, dateFormat),
               const SizedBox(height: 24),
-
-              // Vétérinaire
-              _buildVeterinarianSection(),
+              _buildVeterinarianSection(context),
               const SizedBox(height: 24),
-
-              // Notes
-              _buildNotesField(),
+              _buildNotesField(context),
             ],
           ),
         ),
@@ -271,8 +241,7 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
     );
   }
 
-  /// Bandeau d'information contextuel
-  Widget _buildContextBanner() {
+  Widget _buildContextBanner(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -320,10 +289,9 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
     );
   }
 
-  /// Champ sélection produit
-  Widget _buildProductField(List<Product> products) {
+  Widget _buildProductField(BuildContext context, List<Product> products) {
     return DropdownButtonFormField<Product>(
-      value: _selectedProduct,
+      initialValue: _selectedProduct,
       decoration: InputDecoration(
         labelText: 'Produit médical *',
         border: const OutlineInputBorder(),
@@ -356,18 +324,19 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
       onChanged: (value) {
         setState(() => _selectedProduct = value);
       },
-      validator: (value) =>
-          value == null ? 'Veuillez sélectionner un produit' : null,
+      validator: (value) => value == null
+          ? AppLocalizations.of(context).translate(AppStrings.selectProduct)
+          : null,
     );
   }
 
-  /// Champ dose
-  Widget _buildDoseField() {
+  Widget _buildDoseField(BuildContext context) {
     return TextFormField(
       controller: _doseController,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       decoration: InputDecoration(
-        labelText: 'Dose *',
+        labelText:
+            '${AppLocalizations.of(context).translate(AppStrings.dose)} *',
         hintText: 'Ex: 2.5',
         suffixText: 'ml',
         border: const OutlineInputBorder(),
@@ -387,8 +356,7 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
     );
   }
 
-  /// Champ date
-  Widget _buildDateField(DateFormat dateFormat) {
+  Widget _buildDateField(BuildContext context, DateFormat dateFormat) {
     return InkWell(
       onTap: () async {
         final date = await showDatePicker(
@@ -423,8 +391,7 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
     );
   }
 
-  /// Section vétérinaire
-  Widget _buildVeterinarianSection() {
+  Widget _buildVeterinarianSection(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -433,7 +400,7 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
             Icon(Icons.medical_services, color: Colors.blue.shade700),
             const SizedBox(width: 8),
             Text(
-              'Vétérinaire prescripteur',
+              AppLocalizations.of(context).translate(AppStrings.veterinarian),
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -448,7 +415,7 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                'Optionnel',
+                AppLocalizations.of(context).translate(AppStrings.optional),
                 style: TextStyle(
                   fontSize: 11,
                   color: Colors.grey.shade600,
@@ -458,8 +425,6 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
           ],
         ),
         const SizedBox(height: 12),
-
-        // Si aucun vétérinaire sélectionné
         if (_selectedVetId == null) ...[
           Container(
             padding: const EdgeInsets.all(16),
@@ -477,7 +442,8 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Aucun vétérinaire sélectionné',
+                  AppLocalizations.of(context)
+                      .translate(AppStrings.noVeterinarianSelected),
                   style: TextStyle(
                     color: Colors.grey.shade600,
                     fontStyle: FontStyle.italic,
@@ -490,7 +456,8 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                       child: OutlinedButton.icon(
                         onPressed: _searchVeterinarian,
                         icon: const Icon(Icons.search),
-                        label: const Text('Rechercher'),
+                        label: Text(AppLocalizations.of(context)
+                            .translate(AppStrings.search)),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
@@ -501,7 +468,8 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                       child: OutlinedButton.icon(
                         onPressed: _scanVeterinarianQR,
                         icon: const Icon(Icons.qr_code_scanner),
-                        label: const Text('Scanner QR'),
+                        label: Text(AppLocalizations.of(context)
+                            .translate(AppStrings.scanQr)),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
@@ -513,8 +481,6 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
             ),
           ),
         ],
-
-        // Si vétérinaire sélectionné
         if (_selectedVetId != null) ...[
           Container(
             padding: const EdgeInsets.all(16),
@@ -570,13 +536,13 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
     );
   }
 
-  /// Champ notes
-  Widget _buildNotesField() {
+  Widget _buildNotesField(BuildContext context) {
     return TextFormField(
       controller: _notesController,
       maxLines: 3,
       decoration: InputDecoration(
-        labelText: 'Notes (optionnel)',
+        labelText:
+            '${AppLocalizations.of(context).translate(AppStrings.notes)} (${AppLocalizations.of(context).translate(AppStrings.optional)})',
         hintText: 'Observations, symptômes, posologie...',
         border: const OutlineInputBorder(),
         alignLabelWithHint: true,
@@ -591,7 +557,6 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
   }
 }
 
-/// Dialog de recherche de vétérinaire
 class _VeterinarianSearchDialog extends StatefulWidget {
   final List<Veterinarian> veterinarians;
   final Function(Veterinarian) onSelect;
@@ -640,7 +605,8 @@ class _VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Rechercher un vétérinaire'),
+      title: Text(AppLocalizations.of(context)
+          .translate(AppStrings.searchVeterinarian)),
       content: SizedBox(
         width: double.maxFinite,
         child: Column(
@@ -648,17 +614,20 @@ class _VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
           children: [
             TextField(
               controller: _searchController,
-              decoration: const InputDecoration(
-                labelText: 'Rechercher',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText:
+                    AppLocalizations.of(context).translate(AppStrings.search),
+                prefixIcon: const Icon(Icons.search),
+                border: const OutlineInputBorder(),
               ),
               onChanged: _filterVets,
             ),
             const SizedBox(height: 16),
             Flexible(
               child: _filtered.isEmpty
-                  ? const Center(child: Text('Aucun vétérinaire trouvé'))
+                  ? Center(
+                      child: Text(AppLocalizations.of(context)
+                          .translate(AppStrings.noVeterinarianFound)))
                   : ListView.builder(
                       shrinkWrap: true,
                       itemCount: _filtered.length,
@@ -681,7 +650,8 @@ class _VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Annuler'),
+          child:
+              Text(AppLocalizations.of(context).translate(AppStrings.cancel)),
         ),
       ],
     );

@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import '../../models/batch.dart';
 import '../../providers/batch_provider.dart';
 import '0_batch_scan_screen.dart';
+import '../../i18n/app_localizations.dart';
+import '../../i18n/app_strings.dart';
 
 /// Écran de création de lot
 ///
@@ -60,7 +62,8 @@ class _BatchCreateScreenState extends State<BatchCreateScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Préparer un Lot'),
+        title: Text(
+            AppLocalizations.of(context).translate(AppStrings.prepareBatch)),
       ),
       body: Form(
         key: _formKey,
@@ -88,8 +91,7 @@ class _BatchCreateScreenState extends State<BatchCreateScreen> {
 
             // Description
             Text(
-              'Créez un lot pour grouper des animaux et faciliter les actions de masse '
-              '(vente, abattage, traitement).',
+              AppLocalizations.of(context).translate(AppStrings.batchDescription),
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey.shade700,
@@ -102,18 +104,22 @@ class _BatchCreateScreenState extends State<BatchCreateScreen> {
             // Nom du lot
             TextFormField(
               controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Nom du lot *',
-                hintText: 'Ex: Abattage Novembre 2025',
-                prefixIcon: Icon(Icons.label),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)
+                    .translate(AppStrings.batchName),
+                hintText: AppLocalizations.of(context)
+                    .translate(AppStrings.batchNameHint),
+                prefixIcon: const Icon(Icons.label),
               ),
               textCapitalization: TextCapitalization.sentences,
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return 'Le nom du lot est requis';
+                  return AppLocalizations.of(context)
+                      .translate(AppStrings.batchNameRequired);
                 }
                 if (value.trim().length < 3) {
-                  return 'Le nom doit contenir au moins 3 caractères';
+                  return AppLocalizations.of(context)
+                      .translate(AppStrings.minCharacters);
                 }
                 return null;
               },
@@ -122,9 +128,9 @@ class _BatchCreateScreenState extends State<BatchCreateScreen> {
             const SizedBox(height: 24),
 
             // Objectif
-            const Text(
-              'Objectif *',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context).translate(AppStrings.batchPurpose),
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
@@ -143,7 +149,8 @@ class _BatchCreateScreenState extends State<BatchCreateScreen> {
                 _PurposeCard(
                   purpose: BatchPurpose.sale,
                   icon: Icons.sell,
-                  label: 'Vente',
+                  label:
+                      AppLocalizations.of(context).translate(AppStrings.sale),
                   color: Colors.green,
                   isSelected: _selectedPurpose == BatchPurpose.sale,
                   onTap: () {
@@ -155,7 +162,8 @@ class _BatchCreateScreenState extends State<BatchCreateScreen> {
                 _PurposeCard(
                   purpose: BatchPurpose.slaughter,
                   icon: Icons.factory,
-                  label: 'Abattage',
+                  label: AppLocalizations.of(context)
+                      .translate(AppStrings.slaughter),
                   color: Colors.red,
                   isSelected: _selectedPurpose == BatchPurpose.slaughter,
                   onTap: () {
@@ -167,7 +175,8 @@ class _BatchCreateScreenState extends State<BatchCreateScreen> {
                 _PurposeCard(
                   purpose: BatchPurpose.treatment,
                   icon: Icons.medical_services,
-                  label: 'Traitement',
+                  label: AppLocalizations.of(context)
+                      .translate(AppStrings.treatment),
                   color: Colors.blue,
                   isSelected: _selectedPurpose == BatchPurpose.treatment,
                   onTap: () {
@@ -179,7 +188,8 @@ class _BatchCreateScreenState extends State<BatchCreateScreen> {
                 _PurposeCard(
                   purpose: BatchPurpose.other,
                   icon: Icons.category,
-                  label: 'Autre',
+                  label:
+                      AppLocalizations.of(context).translate(AppStrings.other),
                   color: Colors.grey,
                   isSelected: _selectedPurpose == BatchPurpose.other,
                   onTap: () {
@@ -197,7 +207,8 @@ class _BatchCreateScreenState extends State<BatchCreateScreen> {
             ElevatedButton.icon(
               onPressed: _startScan,
               icon: const Icon(Icons.qr_code_scanner),
-              label: const Text('Démarrer le Scan'),
+              label: Text(
+                  AppLocalizations.of(context).translate(AppStrings.startScan)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepPurple,
                 foregroundColor: Colors.white,
@@ -211,7 +222,8 @@ class _BatchCreateScreenState extends State<BatchCreateScreen> {
             // Bouton annuler
             OutlinedButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Annuler'),
+              child: Text(
+                  AppLocalizations.of(context).translate(AppStrings.cancel)),
             ),
           ],
         ),

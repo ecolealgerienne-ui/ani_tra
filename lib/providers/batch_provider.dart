@@ -13,7 +13,20 @@ import 'auth_provider.dart';
 class BatchProvider with ChangeNotifier {
   // ==================== Constantes (clés de messages / logs) ====================
   final AuthProvider _authProvider;
-  BatchProvider(this._authProvider);
+  String _currentFarmId;
+  
+  BatchProvider(this._authProvider)
+      : _currentFarmId = _authProvider.currentFarmId {
+    _authProvider.addListener(_onFarmChanged);
+  }
+
+  void _onFarmChanged() {
+    if (_currentFarmId != _authProvider.currentFarmId) {
+      _currentFarmId = _authProvider.currentFarmId;
+      _activeBatch = null;
+      notifyListeners();
+    }
+  }
 
   static const String kLogBatchCreated = 'log.batch.created';
   static const String kLogBatchNoActive = 'log.batch.no_active';
@@ -385,5 +398,11 @@ class BatchProvider with ChangeNotifier {
     _activeBatch = null;
     notifyListeners();
     debugPrint(kLogBatchReset);
+  }
+
+  @override
+  void dispose() {
+    _authProvider.removeListener(_onFarmChanged);
+    super.dispose();
   }
 }

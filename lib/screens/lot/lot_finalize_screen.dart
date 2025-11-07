@@ -7,9 +7,10 @@ import '../../providers/lot_provider.dart';
 import '../../providers/animal_provider.dart';
 import '../../providers/sync_provider.dart';
 import '../../models/lot.dart';
+import '../../i18n/app_localizations.dart';
+import '../../i18n/app_strings.dart';
 import '../../models/product.dart';
 import '../../models/animal.dart';
-import '../../i18n/app_localizations.dart';
 import '../../models/veterinarian.dart';
 import '../../data/mock_data.dart';
 import '../medical/medical_act_screen.dart';
@@ -32,7 +33,7 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
 
   // Traitement
   Product? _selectedProduct;
-  DateTime _treatmentDate = DateTime.now();
+  final DateTime _treatmentDate = DateTime.now();
 
   // Vétérinaire (v1.2)
   String? _selectedVetId;
@@ -64,7 +65,8 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
           setState(() {
             _selectedVetId = vet.id;
             _selectedVetName = vet.fullName;
-            _selectedVetOrg = vet.clinic ?? 'Non spécifié';
+            _selectedVetOrg = vet.clinic ??
+                AppLocalizations.of(context).translate(AppStrings.notSpecified);
           });
           Navigator.pop(context);
         },
@@ -81,14 +83,17 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
     setState(() {
       _selectedVetId = selectedVet.id;
       _selectedVetName = selectedVet.fullName;
-      _selectedVetOrg = selectedVet.clinic ?? 'Non spécifié';
+      _selectedVetOrg = selectedVet.clinic ??
+          AppLocalizations.of(context).translate(AppStrings.notSpecified);
     });
 
     if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('✅ ${selectedVet.fullName} validé'),
+        content: Text(
+            AppLocalizations.of(context).translate(AppStrings.vetValidated)
+                .replaceAll('{name}', selectedVet.fullName)),
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 2),
       ),
@@ -159,8 +164,9 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
         final pricePerAnimal = double.tryParse(_pricePerAnimalController.text);
         if (pricePerAnimal == null || pricePerAnimal <= 0) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Prix invalide'),
+            SnackBar(
+              content:
+                  Text(AppLocalizations.of(context).translate(AppStrings.invalidPrice)),
               backgroundColor: Colors.red,
             ),
           );
@@ -231,7 +237,7 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            AppLocalizations.of(context).translate('lot_finalized'),
+            AppLocalizations.of(context).translate(AppStrings.lotFinalized),
           ),
           backgroundColor: Colors.green,
         ),
@@ -248,14 +254,16 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
 
     if (lot == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Erreur')),
-        body: const Center(child: Text('Lot introuvable')),
+        appBar: AppBar(
+            title: Text(AppLocalizations.of(context).translate(AppStrings.error))),
+        body: Center(
+            child: Text(AppLocalizations.of(context).translate(AppStrings.lotNotFound))),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.translate('finalize_lot')),
+        title: Text(AppLocalizations.of(context).translate(AppStrings.finalizeLot)),
       ),
       body: _selectedType == null
           ? _buildTypeSelection(context, lot)
@@ -270,7 +278,7 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
       padding: const EdgeInsets.all(24),
       children: [
         Text(
-          l10n.translate('choose_lot_type'),
+          AppLocalizations.of(context).translate(AppStrings.chooseLotType),
           style: const TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
@@ -279,7 +287,7 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          '${lot.animalCount} animaux',
+          '${lot.animalCount} ${AppLocalizations.of(context).translate('animals')}',
           style: TextStyle(
             fontSize: 16,
             color: Colors.grey.shade600,
@@ -291,7 +299,7 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
         // Traitement
         _buildTypeCard(
           icon: '💊',
-          title: l10n.translate('treatment_lot'),
+          title: AppLocalizations.of(context).translate(AppStrings.treatmentLot),
           subtitle: 'Traitement sanitaire groupé',
           color: Colors.blue,
           onTap: () async {
@@ -327,7 +335,7 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      AppLocalizations.of(context).translate('lot_finalized'),
+                      AppLocalizations.of(context).translate(AppStrings.lotFinalized),
                     ),
                     backgroundColor: Colors.green,
                   ),
@@ -341,8 +349,8 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
         // Vente
         _buildTypeCard(
           icon: '💰',
-          title: l10n.translate('sale_lot'),
-          subtitle: 'Vente d\'animaux',
+          title: AppLocalizations.of(context).translate(AppStrings.saleLot),
+          subtitle: AppLocalizations.of(context).translate(AppStrings.saleAnimals),
           color: Colors.green,
           onTap: () {
             setState(() => _selectedType = LotType.sale);
@@ -353,8 +361,9 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
         // Abattage
         _buildTypeCard(
           icon: '🏭',
-          title: l10n.translate('slaughter_lot'),
-          subtitle: 'Préparation pour abattoir',
+          title: AppLocalizations.of(context).translate(AppStrings.slaughterLot),
+          subtitle:
+              AppLocalizations.of(context).translate(AppStrings.slaughterPreparation),
           color: Colors.grey,
           onTap: () {
             setState(() => _selectedType = LotType.slaughter);
@@ -454,7 +463,7 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
                         ),
                       ),
                       Text(
-                        '${lot.animalCount} animaux',
+                        '${lot.animalCount} ${AppLocalizations.of(context).translate(AppStrings.animals)}',
                         style: const TextStyle(fontSize: 14),
                       ),
                     ],
@@ -483,9 +492,10 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
           TextField(
             controller: _notesController,
             maxLines: 3,
-            decoration: const InputDecoration(
-              labelText: 'Notes (optionnel)',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText:
+                  AppLocalizations.of(context).translate(AppStrings.notesOptional),
+              border: const OutlineInputBorder(),
             ),
           ),
 
@@ -497,7 +507,8 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
             child: ElevatedButton.icon(
               onPressed: _finalize,
               icon: const Icon(Icons.check_circle),
-              label: const Text('Finaliser le lot'),
+              label:
+                  Text(AppLocalizations.of(context).translate(AppStrings.finalizeLot)),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 backgroundColor: Colors.green,
@@ -532,7 +543,8 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'Le traitement sera appliqué aux ${lot.animalIds.length} animaux du lot',
+                  AppLocalizations.of(context)
+                      .translate(AppStrings.treatmentWillApplyToAnimals),
                   style: TextStyle(
                     color: Colors.blue.shade900,
                     fontSize: 14,
@@ -580,23 +592,24 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
         // Acheteur
         TextFormField(
           controller: _buyerNameController,
-          decoration: const InputDecoration(
-            labelText: 'Nom de l\'acheteur *',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.person),
+          decoration: InputDecoration(
+            labelText: AppLocalizations.of(context).translate('buyerName'),
+            border: const OutlineInputBorder(),
+            prefixIcon: const Icon(Icons.person),
           ),
-          validator: (value) =>
-              value == null || value.isEmpty ? 'Champ obligatoire' : null,
+          validator: (value) => value == null || value.isEmpty
+              ? AppLocalizations.of(context).translate('buyerNameRequired')
+              : null,
         ),
         const SizedBox(height: 16),
 
         // N° Exploitation
         TextField(
           controller: _buyerFarmIdController,
-          decoration: const InputDecoration(
-            labelText: 'N° Exploitation (optionnel)',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.badge),
+          decoration: InputDecoration(
+            labelText: AppLocalizations.of(context).translate('buyerFarmId'),
+            border: const OutlineInputBorder(),
+            prefixIcon: const Icon(Icons.badge),
           ),
         ),
         const SizedBox(height: 16),
@@ -605,15 +618,17 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
         TextFormField(
           controller: _pricePerAnimalController,
           keyboardType: TextInputType.number,
-          decoration: const InputDecoration(
-            labelText: 'Prix par animal (€) *',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.euro),
+          decoration: InputDecoration(
+            labelText: AppLocalizations.of(context).translate('pricePerAnimal'),
+            border: const OutlineInputBorder(),
+            prefixIcon: const Icon(Icons.euro),
           ),
           validator: (value) {
-            if (value == null || value.isEmpty) return 'Champ obligatoire';
+            if (value == null || value.isEmpty)
+              return AppLocalizations.of(context).translate('requiredField');
             final price = double.tryParse(value);
-            if (price == null || price <= 0) return 'Prix invalide';
+            if (price == null || price <= 0)
+              return AppLocalizations.of(context).translate('invalidPrice');
             return null;
           },
         ),
@@ -627,7 +642,7 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
             side: BorderSide(color: Colors.grey.shade400),
           ),
           leading: const Icon(Icons.calendar_today),
-          title: const Text('Date de vente'),
+          title: Text(AppLocalizations.of(context).translate('saleDate')),
           subtitle: Text(dateFormat.format(_saleDate)),
           trailing: const Icon(Icons.chevron_right),
           onTap: () async {
@@ -655,23 +670,26 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
         // Abattoir
         TextFormField(
           controller: _slaughterhouseNameController,
-          decoration: const InputDecoration(
-            labelText: 'Nom de l\'abattoir *',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.factory),
+          decoration: InputDecoration(
+            labelText:
+                AppLocalizations.of(context).translate('slaughterhouseName'),
+            border: const OutlineInputBorder(),
+            prefixIcon: const Icon(Icons.factory),
           ),
-          validator: (value) =>
-              value == null || value.isEmpty ? 'Champ obligatoire' : null,
+          validator: (value) => value == null || value.isEmpty
+              ? AppLocalizations.of(context).translate('requiredField')
+              : null,
         ),
         const SizedBox(height: 16),
 
         // N° Abattoir
         TextField(
           controller: _slaughterhouseIdController,
-          decoration: const InputDecoration(
-            labelText: 'N° Abattoir (optionnel)',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.badge),
+          decoration: InputDecoration(
+            labelText:
+                AppLocalizations.of(context).translate('slaughterhouseId'),
+            border: const OutlineInputBorder(),
+            prefixIcon: const Icon(Icons.badge),
           ),
         ),
         const SizedBox(height: 16),
@@ -684,7 +702,7 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
             side: BorderSide(color: Colors.grey.shade400),
           ),
           leading: const Icon(Icons.calendar_today),
-          title: const Text('Date d\'abattage'),
+          title: Text(AppLocalizations.of(context).translate('dateSlaughter')),
           subtitle: Text(dateFormat.format(_slaughterDate)),
           trailing: const Icon(Icons.chevron_right),
           onTap: () async {
@@ -767,7 +785,7 @@ class __VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Rechercher un Vétérinaire'),
+      title: Text(AppLocalizations.of(context).translate('searchVeterinarian')),
       contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       content: Container(
         width: double.maxFinite,
@@ -779,7 +797,8 @@ class __VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Nom ou établissement...',
+                hintText: AppLocalizations.of(context)
+                    .translate('nameOrEstablishment'),
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -794,14 +813,15 @@ class __VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
 
             // Résultats
             if (_filteredVets.isEmpty)
-              const Padding(
+              Padding(
                 padding: EdgeInsets.all(32),
                 child: Column(
                   children: [
                     Icon(Icons.search_off, size: 48, color: Colors.grey),
                     SizedBox(height: 16),
                     Text(
-                      'Aucun vétérinaire trouvé',
+                      AppLocalizations.of(context)
+                          .translate('noVeterinarianFound'),
                       style: TextStyle(color: Colors.grey),
                     ),
                   ],
@@ -826,7 +846,9 @@ class __VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(vet.clinic ?? 'Non spécifié'),
+                          Text(vet.clinic ??
+                              AppLocalizations.of(context)
+                                  .translate('notSpecified')),
                           const SizedBox(height: 4),
                           Text(
                             vet.licenseNumber,
@@ -848,7 +870,7 @@ class __VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Annuler'),
+          child: Text(AppLocalizations.of(context).translate('cancel')),
         ),
       ],
     );

@@ -5,8 +5,9 @@ import 'package:provider/provider.dart';
 import '../../providers/vaccination_provider.dart';
 import '../../providers/animal_provider.dart';
 import '../../models/vaccination.dart';
-//import '../../models/animal.dart';
 import '../../models/vaccination_protocol.dart';
+import '../../i18n/app_localizations.dart';
+import '../../i18n/app_strings.dart';
 
 class VaccinationDetailScreen extends StatelessWidget {
   final Vaccination vaccination;
@@ -18,9 +19,11 @@ class VaccinationDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Détail Vaccination'),
+        title: Text(l10n.translate(AppStrings.vaccinationDetail)),
         actions: [
           IconButton(
             icon: const Icon(Icons.delete),
@@ -34,17 +37,17 @@ class VaccinationDetailScreen extends StatelessWidget {
           children: [
             _buildHeaderCard(),
             const SizedBox(height: 8),
-            _buildInfoCard(),
+            _buildInfoCard(context),
             const SizedBox(height: 8),
             _buildAnimalCard(context),
             const SizedBox(height: 8),
-            if (vaccination.nextDueDate != null) _buildReminderCard(),
+            if (vaccination.nextDueDate != null) _buildReminderCard(context),
             const SizedBox(height: 8),
             if (vaccination.notes != null && vaccination.notes!.isNotEmpty)
-              _buildNotesCard(),
+              _buildNotesCard(context),
             if (vaccination.protocolId != null) ...[
               const SizedBox(height: 8),
-              _buildProtocolCard(),
+              _buildProtocolCard(context),
             ],
           ],
         ),
@@ -68,7 +71,8 @@ class VaccinationDetailScreen extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: _getTypeColor(vaccination.type).withOpacity(0.2),
+                    color:
+                        _getTypeColor(vaccination.type).withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -88,7 +92,7 @@ class VaccinationDetailScreen extends StatelessWidget {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.2),
+                      color: Colors.blue.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Row(
@@ -137,7 +141,9 @@ class VaccinationDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoCard() {
+  Widget _buildInfoCard(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       child: Padding(
@@ -145,9 +151,9 @@ class VaccinationDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Informations',
-              style: TextStyle(
+            Text(
+              l10n.translate(AppStrings.information),
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -210,7 +216,7 @@ class VaccinationDetailScreen extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.1),
+                      color: Colors.red.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Row(
@@ -237,6 +243,7 @@ class VaccinationDetailScreen extends StatelessWidget {
   }
 
   Widget _buildAnimalCard(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final animalProvider = context.read<AnimalProvider>();
 
     return Card(
@@ -248,100 +255,69 @@ class VaccinationDetailScreen extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Text(
-                  'Animaux concernés',
-                  style: TextStyle(
+                Icon(
+                  Icons.pets,
+                  size: 20,
+                  color: Colors.teal,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  l10n.translate(AppStrings.animal),
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const Spacer(),
-                if (vaccination.isGroupVaccination)
-                  Text(
-                    '${vaccination.animalCount} animaux',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
               ],
             ),
             const SizedBox(height: 12),
-            if (vaccination.isGroupVaccination) ...[
-              ...vaccination.animalIds.take(5).map((animalId) {
-                final animal = animalProvider.getAnimalById(animalId);
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.pets, size: 16, color: Colors.green),
-                      const SizedBox(width: 8),
-                      Text(
-                        animal?.displayName ?? 'Animal inconnu',
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-              if (vaccination.animalCount > 5)
-                Padding(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: Text(
-                    '... et ${vaccination.animalCount - 5} autres',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.grey[600],
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
+            if (vaccination.isGroupVaccination)
+              Text(
+                'Vaccination de groupe - ${vaccination.animalCount} animaux',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[700],
                 ),
-            ] else ...[
-              Builder(
-                builder: (context) {
-                  final animal = animalProvider.getAnimalById(
-                    vaccination.animalId!,
-                  );
-                  return Row(
-                    children: [
-                      const Icon(Icons.pets, size: 20, color: Colors.green),
-                      const SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            animal?.displayName ?? 'Animal inconnu',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          if (animal?.officialNumber != null)
-                            Text(
-                              animal!.officialNumber!,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                        ],
-                      ),
-                    ],
+              )
+            else if (vaccination.animalId != null &&
+                vaccination.animalId!.isNotEmpty)
+              FutureBuilder(
+                future: Future.value(
+                    animalProvider.getAnimalById(vaccination.animalId!)),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return Text(
+                      'Animal: ${vaccination.animalId}',
+                      style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                    );
+                  }
+                  final animal = snapshot.data;
+                  return Text(
+                    animal?.displayName ?? 'Animal',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[700],
+                      fontWeight: FontWeight.w500,
+                    ),
                   );
                 },
+              )
+            else
+              Text(
+                'Animal inconnu',
+                style: TextStyle(fontSize: 14, color: Colors.grey[700]),
               ),
-            ],
           ],
         ),
       ),
     );
   }
 
-  Widget _buildReminderCard() {
-    final days = vaccination.daysUntilReminder!;
-    final isOverdue = days < 0;
-    final color =
-        isOverdue ? Colors.red : (days <= 7 ? Colors.orange : Colors.blue);
+  Widget _buildReminderCard(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final days = vaccination.nextDueDate?.difference(DateTime.now()).inDays;
+    final isOverdue = days! < 0;
+    final color = isOverdue ? Colors.red : Colors.orange;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -358,9 +334,9 @@ class VaccinationDetailScreen extends StatelessWidget {
                   size: 20,
                 ),
                 const SizedBox(width: 8),
-                const Text(
-                  'Rappel',
-                  style: TextStyle(
+                Text(
+                  l10n.translate(AppStrings.reminder),
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -371,7 +347,7 @@ class VaccinationDetailScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Column(
@@ -406,7 +382,7 @@ class VaccinationDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNotesCard() {
+  Widget _buildNotesCard(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       child: Padding(
@@ -414,13 +390,13 @@ class VaccinationDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               children: [
-                Icon(Icons.note, size: 20, color: Colors.blue),
-                SizedBox(width: 8),
+                const Icon(Icons.note, size: 20, color: Colors.blue),
+                const SizedBox(width: 8),
                 Text(
                   'Notes',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -441,7 +417,7 @@ class VaccinationDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProtocolCard() {
+  Widget _buildProtocolCard(BuildContext context) {
     final protocol = VaccinationProtocols.getProtocolById(
       vaccination.protocolId!,
     );
@@ -455,13 +431,13 @@ class VaccinationDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               children: [
-                Icon(Icons.assignment, size: 20, color: Colors.purple),
-                SizedBox(width: 8),
+                const Icon(Icons.assignment, size: 20, color: Colors.purple),
+                const SizedBox(width: 8),
                 Text(
                   'Protocole',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -580,8 +556,8 @@ class VaccinationDetailScreen extends StatelessWidget {
               context.read<VaccinationProvider>().removeVaccination(
                     vaccination.id,
                   );
-              Navigator.pop(context); // Fermer dialog
-              Navigator.pop(context); // Retour à la liste
+              Navigator.pop(context);
+              Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Vaccination supprimée'),

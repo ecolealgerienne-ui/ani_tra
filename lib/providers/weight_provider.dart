@@ -8,8 +8,19 @@ import 'auth_provider.dart';
 /// Toute validation/erreur côté UI doit passer par vos clés de traduction.
 class WeightProvider extends ChangeNotifier {
   final AuthProvider _authProvider;
+  String _currentFarmId;
 
-  WeightProvider(this._authProvider);
+  WeightProvider(this._authProvider)
+      : _currentFarmId = _authProvider.currentFarmId {
+    _authProvider.addListener(_onFarmChanged);
+  }
+
+  void _onFarmChanged() {
+    if (_currentFarmId != _authProvider.currentFarmId) {
+      _currentFarmId = _authProvider.currentFarmId;
+      notifyListeners();
+    }
+  }
 
   // (Optionnel) Clés techniques si besoin de logs externes
   static const String kLogWeightsSet = 'log.weight.set_list';
@@ -80,5 +91,11 @@ class WeightProvider extends ChangeNotifier {
     final copy = [..._allWeightRecords];
     copy.sort((a, b) => a.recordedAt.compareTo(b.recordedAt));
     return copy;
+  }
+
+  @override
+  void dispose() {
+    _authProvider.removeListener(_onFarmChanged);
+    super.dispose();
   }
 }

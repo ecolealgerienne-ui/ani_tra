@@ -9,6 +9,7 @@ import '../models/mother_stats.dart';
 
 class AnimalProvider extends ChangeNotifier {
   final AuthProvider _authProvider;
+  String _currentFarmId;
 
   // Données principales (NON FILTRÉES - contient toutes les fermes)
   final List<Product> _allProducts = [];
@@ -21,8 +22,20 @@ class AnimalProvider extends ChangeNotifier {
   String _searchQuery = '';
   AnimalStatus? _statusFilter;
 
-  AnimalProvider(this._authProvider) {
+  AnimalProvider(this._authProvider)
+      : _currentFarmId = _authProvider.currentFarmId {
+    _authProvider.addListener(_onFarmChanged);
     _loadMockData();
+  }
+
+  void _onFarmChanged() {
+    if (_currentFarmId != _authProvider.currentFarmId) {
+      _currentFarmId = _authProvider.currentFarmId;
+      _currentAnimal = null;
+      _searchQuery = '';
+      _statusFilter = null;
+      notifyListeners();
+    }
   }
 
   // ==================== Getters FILTRÉS par farmId ====================
@@ -427,5 +440,11 @@ class AnimalProvider extends ChangeNotifier {
       final bornInFarm = a.birthDate.isAfter(DateTime(2020));
       return bornInFarm && a.motherId == null;
     }).toList();
+  }
+
+  @override
+  void dispose() {
+    _authProvider.removeListener(_onFarmChanged);
+    super.dispose();
   }
 }

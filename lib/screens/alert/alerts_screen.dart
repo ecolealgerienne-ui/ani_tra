@@ -165,7 +165,8 @@ class AlertsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Tout va bien avec votre troupeau',
+                  AppLocalizations.of(context)
+                      .translate(AppStrings.allGoodWithHerd),
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.grey.shade600,
@@ -180,7 +181,7 @@ class AlertsScreen extends StatelessWidget {
                       SnackBar(
                         content: Text(AppLocalizations.of(context)
                             .translate(AppStrings.alertsRecalculated)),
-                        duration: Duration(seconds: 1),
+                        duration: const Duration(seconds: 1),
                       ),
                     );
                   },
@@ -289,19 +290,22 @@ class AlertsScreen extends StatelessWidget {
             children: [
               _buildStatBadge(
                 context: context,
-                label: 'Urgentes',
+                label: AppLocalizations.of(context)
+                    .translate(AppStrings.urgentLabel),
                 value: alertProvider.urgentAlertCount,
                 color: Colors.red.shade300,
               ),
               _buildStatBadge(
                 context: context,
-                label: 'Importantes',
+                label: AppLocalizations.of(context)
+                    .translate(AppStrings.importantLabel),
                 value: alertProvider.importantAlertCount,
                 color: Colors.orange.shade300,
               ),
               _buildStatBadge(
                 context: context,
-                label: 'Routine',
+                label: AppLocalizations.of(context)
+                    .translate(AppStrings.routineLabel),
                 value: alertProvider.routineAlerts.length,
                 color: Colors.green.shade300,
               ),
@@ -540,7 +544,11 @@ class AlertsScreen extends StatelessWidget {
             // Animal introuvable
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Animal introuvable : ${alert.entityName}'),
+                content: Text(
+                  AppLocalizations.of(context)
+                      .translate(AppStrings.animalNotFoundAlert)
+                      .replaceAll('{name}', alert.entityName ?? ''),
+                ),
                 duration: const Duration(seconds: 2),
               ),
             );
@@ -557,7 +565,9 @@ class AlertsScreen extends StatelessWidget {
             MaterialPageRoute(
               builder: (_) => AnimalListScreen(
                 filterAnimalIds: alert.animalIds!,
-                customTitle: 'Animaux à peser (${alert.count})',
+                customTitle: AppLocalizations.of(context)
+                    .translate(AppStrings.animalsToWeigh)
+                    .replaceAll('{count}', '${alert.count}'),
               ),
             ),
           );
@@ -587,7 +597,11 @@ class AlertsScreen extends StatelessWidget {
         if (alert.entityId != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Événement incomplet : ${alert.message}'),
+              content: Text(
+                AppLocalizations.of(context)
+                    .translate(AppStrings.incompleteEvent)
+                    .replaceAll('{message}', alert.message),
+              ),
               action: SnackBarAction(
                 label:
                     AppLocalizations.of(context).translate(AppStrings.complete),
@@ -619,7 +633,7 @@ class AlertsScreen extends StatelessWidget {
             SnackBar(
               content: Text(alert.message),
               action: SnackBarAction(
-                label: 'OK',
+                label: AppLocalizations.of(context).translate(AppStrings.ok),
                 onPressed: () {},
               ),
               duration: const Duration(seconds: 3),

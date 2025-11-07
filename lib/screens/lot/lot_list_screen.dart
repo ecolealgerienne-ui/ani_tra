@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../providers/lot_provider.dart';
 import '../../models/lot.dart';
 import '../../i18n/app_localizations.dart';
+import '../../i18n/app_strings.dart';
 import '../lot/lot_detail_screen.dart';
 
 class LotListScreen extends StatefulWidget {
@@ -37,19 +38,19 @@ class _LotListScreenState extends State<LotListScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context).translate('create_lot')),
+        title: Text(AppLocalizations.of(context).translate(AppStrings.createLot)),
         content: TextField(
           controller: nameController,
           decoration: InputDecoration(
-            labelText: AppLocalizations.of(context).translate('lot_name'),
-            hintText: 'Ex: Brebis mai 2025',
+            labelText: AppLocalizations.of(context).translate(AppStrings.lotName),
+            hintText: AppLocalizations.of(context).translate(AppStrings.ewesMonthHint),
           ),
           autofocus: true,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(AppLocalizations.of(context).translate('cancel')),
+            child: Text(AppLocalizations.of(context).translate(AppStrings.cancel)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -71,12 +72,12 @@ class _LotListScreenState extends State<LotListScreen>
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                      AppLocalizations.of(context).translate('lot_created')),
+                      AppLocalizations.of(context).translate(AppStrings.createLot)),
                   backgroundColor: Colors.green,
                 ),
               );
             },
-            child: Text(AppLocalizations.of(context).translate('save')),
+            child: Text(AppLocalizations.of(context).translate(AppStrings.save)),
           ),
         ],
       ),
@@ -84,7 +85,9 @@ class _LotListScreenState extends State<LotListScreen>
   }
 
   void _showDuplicateDialog(Lot lot) {
-    final nameController = TextEditingController(text: '${lot.name} (copie)');
+    final nameController = TextEditingController(
+        text:
+            '${lot.name} ${AppLocalizations.of(context).translate(AppStrings.addCopieToName)}');
     bool keepType = lot.type != null;
     bool keepAnimals = true;
 
@@ -92,7 +95,7 @@ class _LotListScreenState extends State<LotListScreen>
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: Text(AppLocalizations.of(context).translate('duplicate_lot')),
+          title: Text(AppLocalizations.of(context).translate(AppStrings.duplicateLot)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -102,21 +105,22 @@ class _LotListScreenState extends State<LotListScreen>
                 controller: nameController,
                 decoration: InputDecoration(
                   labelText:
-                      AppLocalizations.of(context).translate('new_lot_name'),
+                      AppLocalizations.of(context).translate(AppStrings.newLotName),
                 ),
               ),
               const SizedBox(height: 16),
               CheckboxListTile(
-                title: Text(
-                    AppLocalizations.of(context).translate('keep_animals')),
-                subtitle: Text('${lot.animalCount} animaux'),
+                title:
+                    Text(AppLocalizations.of(context).translate(AppStrings.keepAnimals)),
+                subtitle: Text(
+                    '${lot.animalCount} ${AppLocalizations.of(context).translate(AppStrings.animals)}'),
                 value: keepAnimals,
                 onChanged: (val) => setState(() => keepAnimals = val ?? true),
               ),
               if (lot.type != null)
                 CheckboxListTile(
                   title:
-                      Text(AppLocalizations.of(context).translate('keep_type')),
+                      Text(AppLocalizations.of(context).translate(AppStrings.keepType)),
                   subtitle: Text(lot.type!.label),
                   value: keepType,
                   onChanged: (val) => setState(() => keepType = val ?? false),
@@ -126,7 +130,7 @@ class _LotListScreenState extends State<LotListScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(AppLocalizations.of(context).translate('cancel')),
+              child: Text(AppLocalizations.of(context).translate(AppStrings.cancel)),
             ),
             ElevatedButton(
               onPressed: () {
@@ -151,13 +155,13 @@ class _LotListScreenState extends State<LotListScreen>
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(AppLocalizations.of(context)
-                        .translate('lot_duplicated')),
+                        .translate(AppStrings.lotDuplicated)),
                     backgroundColor: Colors.green,
                   ),
                 );
               },
               child:
-                  Text(AppLocalizations.of(context).translate('duplicate_lot')),
+                  Text(AppLocalizations.of(context).translate(AppStrings.lotDuplicated)),
             ),
           ],
         ),
@@ -169,7 +173,7 @@ class _LotListScreenState extends State<LotListScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context).translate('delete_lot')),
+        title: Text(AppLocalizations.of(context).translate(AppStrings.deleteLot)),
         content: Text('Supprimer "${lot.name}" ?'),
         actions: [
           TextButton(
@@ -182,13 +186,13 @@ class _LotListScreenState extends State<LotListScreen>
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Lot supprimé'),
+                  content: Text('deleteLot'),
                   backgroundColor: Colors.red,
                 ),
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text(AppLocalizations.of(context).translate('delete')),
+            child: Text(AppLocalizations.of(context).translate(AppStrings.delete)),
           ),
         ],
       ),
@@ -202,16 +206,16 @@ class _LotListScreenState extends State<LotListScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.translate('my_lots')),
+        title: Text(AppLocalizations.of(context).translate(AppStrings.myLots)),
         bottom: TabBar(
           controller: _tabController,
           tabs: [
             Tab(
                 text:
-                    '${l10n.translate('open_lots')} (${provider.openLotsCount})'),
+                    '${Text(AppLocalizations.of(context).translate(AppStrings.openLots))} (${provider.openLotsCount})'),
             Tab(
                 text:
-                    '${l10n.translate('closed_lots')} (${provider.closedLotsCount})'),
+                    '${Text(AppLocalizations.of(context).translate(AppStrings.closedLots))} (${provider.closedLotsCount})'),
           ],
         ),
       ),
@@ -225,7 +229,7 @@ class _LotListScreenState extends State<LotListScreen>
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _createLot,
         icon: const Icon(Icons.add),
-        label: Text(l10n.translate('create_lot')),
+        label: Text(AppLocalizations.of(context).translate(AppStrings.createLot)),
       ),
     );
   }
@@ -242,8 +246,11 @@ class _LotListScreenState extends State<LotListScreen>
               color: Colors.grey.shade400,
             ),
             const SizedBox(height: 16),
+            //isOpen ? 'Aucun lot ouvert' : 'Aucun lot terminé',
             Text(
-              isOpen ? 'Aucun lot ouvert' : 'Aucun lot terminé',
+              isOpen
+                  ? AppLocalizations.of(context).translate(AppStrings.noOpenLot)
+                  : AppLocalizations.of(context).translate(AppStrings.noClosedLot),
               style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
             ),
           ],
@@ -346,7 +353,7 @@ class _LotCard extends StatelessWidget {
                           child: Text(
                             lot.type?.label ??
                                 AppLocalizations.of(context)
-                                    .translate('type_not_defined'),
+                                    .translate(AppStrings.typeNotDefined),
                             style: const TextStyle(
                               fontSize: 11,
                               color: Colors.white,
@@ -381,7 +388,7 @@ class _LotCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           AppLocalizations.of(context)
-                              .translate(isOpen ? 'lot_open' : 'lot_closed'),
+                              .translate(isOpen ? 'openLots' : 'closedLots'),
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
@@ -402,7 +409,7 @@ class _LotCard extends StatelessWidget {
                   const Icon(Icons.pets, size: 16, color: Colors.grey),
                   const SizedBox(width: 4),
                   Text(
-                    '${lot.animalCount} animaux',
+                    '${lot.animalCount} ${AppLocalizations.of(context).translate(AppStrings.animals)}',
                     style: const TextStyle(fontSize: 13),
                   ),
                   const SizedBox(width: 16),
@@ -480,7 +487,7 @@ class _LotCard extends StatelessWidget {
                     onPressed: onDuplicate,
                     icon: const Icon(Icons.content_copy, size: 16),
                     label: Text(
-                      AppLocalizations.of(context).translate('duplicate_lot'),
+                      AppLocalizations.of(context).translate(AppStrings.duplicateLot),
                       style: const TextStyle(fontSize: 12),
                     ),
                   ),
@@ -490,7 +497,7 @@ class _LotCard extends StatelessWidget {
                       onPressed: onDelete,
                       icon: const Icon(Icons.delete, size: 16),
                       label: Text(
-                        AppLocalizations.of(context).translate('delete'),
+                        AppLocalizations.of(context).translate(AppStrings.delete),
                         style: const TextStyle(fontSize: 12),
                       ),
                       style: TextButton.styleFrom(

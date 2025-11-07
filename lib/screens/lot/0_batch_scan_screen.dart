@@ -9,6 +9,8 @@ import '../../models/animal.dart';
 import '../../providers/batch_provider.dart';
 import '../../providers/animal_provider.dart';
 import '../../providers/sync_provider.dart';
+import '../../i18n/app_localizations.dart';
+import '../../i18n/app_strings.dart';
 import '0_batch_list_screen.dart';
 
 /// Écran de scan d'animaux pour un lot
@@ -74,8 +76,9 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
     if (animals.isEmpty) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('⚠️ Aucun animal disponible dans le troupeau'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)
+              .translate(AppStrings.noAnimalsAvailableBatch)),
           backgroundColor: Colors.orange,
         ),
       );
@@ -115,7 +118,9 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                '⚠️ ${animal.displayName} déjà scanné',
+                AppLocalizations.of(context)
+                    .translate(AppStrings.animalDuplicate)
+                    .replaceFirst('{}', animal.displayName),
               ),
             ),
           ],
@@ -139,7 +144,9 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                '✅ ${animal.displayName} ajouté',
+                AppLocalizations.of(context)
+                    .translate(AppStrings.animalAdded)
+                    .replaceAll('{name}', animal.displayName),
               ),
             ),
           ],
@@ -159,9 +166,10 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
       _loadScannedAnimals();
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Animal retiré du lot'),
-          duration: Duration(seconds: 1),
+        SnackBar(
+          content: Text(
+              AppLocalizations.of(context).translate(AppStrings.animalRemoved)),
+          duration: const Duration(seconds: 1),
         ),
       );
     }
@@ -171,8 +179,9 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
   Future<void> _saveBatch() async {
     if (_scannedCount == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('⚠️ Le lot est vide. Scannez au moins un animal.'),
+        SnackBar(
+          content: Text(
+              AppLocalizations.of(context).translate(AppStrings.batchEmpty)),
           backgroundColor: Colors.orange,
         ),
       );
@@ -195,7 +204,10 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          '✅ Lot "${widget.batch.name}" sauvegardé ($_scannedCount animaux)',
+          AppLocalizations.of(context)
+              .translate(AppStrings.batchSaved)
+              .replaceAll('{name}', widget.batch.name)
+              .replaceAll('{count}', '$_scannedCount'),
         ),
         backgroundColor: Colors.green,
       ),
@@ -215,21 +227,25 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
     final shouldCancel = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Annuler le lot ?'),
+        title: Text(AppLocalizations.of(context)
+            .translate(AppStrings.cancelBatchTitle)),
         content: Text(
           _scannedCount > 0
-              ? 'Le lot contient $_scannedCount animal(aux). '
-                  'Voulez-vous vraiment annuler ?'
-              : 'Voulez-vous annuler la création du lot ?',
+              ? AppLocalizations.of(context)
+                  .translate(AppStrings.cancelBatchMessage)
+                  .replaceAll('{count}', '$_scannedCount')
+              : AppLocalizations.of(context)
+                  .translate(AppStrings.cancelBatchEmpty),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Non'),
+            child: Text(AppLocalizations.of(context).translate(AppStrings.no)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Oui, annuler'),
+            child: Text(
+                AppLocalizations.of(context).translate(AppStrings.yesCancel)),
           ),
         ],
       ),
@@ -302,8 +318,14 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
                   const SizedBox(height: 16),
                   Text(
                     _scannedCount == 0
-                        ? 'Aucun animal scanné'
-                        : '$_scannedCount animal${_scannedCount > 1 ? 'aux' : ''} scanné${_scannedCount > 1 ? 's' : ''}',
+                        ? AppLocalizations.of(context)
+                            .translate(AppStrings.noAnimalScanned)
+                        : AppLocalizations.of(context)
+                            .translate(AppStrings.animalsScannedCount)
+                            .replaceAll('{count}', '$_scannedCount')
+                            .replaceAll('{plural}', _scannedCount > 1 ? 'aux' : '')
+                            .replaceAll(
+                                '{pluralScanned}', _scannedCount > 1 ? 's' : ''),
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -329,7 +351,8 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
                     ElevatedButton.icon(
                       onPressed: _simulateScan,
                       icon: const Icon(Icons.qr_code_scanner),
-                      label: const Text('Scanner un animal'),
+                      label: Text(AppLocalizations.of(context)
+                          .translate(AppStrings.scanOneAnimal)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.deepPurple,
                         foregroundColor: Colors.white,
@@ -341,7 +364,8 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Scannez les animaux un par un',
+                      AppLocalizations.of(context)
+                          .translate(AppStrings.scanAnimalsOneByOne),
                       style: TextStyle(
                         color: Colors.grey.shade600,
                         fontSize: 14,
@@ -368,7 +392,8 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
                     Padding(
                       padding: const EdgeInsets.all(16),
                       child: Text(
-                        'Animaux scannés',
+                        AppLocalizations.of(context)
+                            .translate(AppStrings.scannedAnimals),
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
@@ -429,7 +454,8 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: _cancel,
-                      child: const Text('Annuler'),
+                      child: Text(AppLocalizations.of(context)
+                          .translate(AppStrings.cancel)),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -438,7 +464,8 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
                     child: ElevatedButton.icon(
                       onPressed: _saveBatch,
                       icon: const Icon(Icons.save),
-                      label: const Text('Sauvegarder'),
+                      label: Text(AppLocalizations.of(context)
+                          .translate(AppStrings.save)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         foregroundColor: Colors.white,

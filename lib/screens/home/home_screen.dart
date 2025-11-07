@@ -7,6 +7,9 @@ import '../../providers/animal_provider.dart';
 import '../../providers/batch_provider.dart';
 import '../../../providers/sync_provider.dart';
 import '../../providers/alert_provider.dart';
+import '../../providers/auth_provider.dart';
+import '../../i18n/app_localizations.dart';
+import '../../i18n/app_strings.dart';
 import '../../models/animal.dart';
 //import '../../models/alert.dart';
 import '../../models/alert_type.dart';
@@ -62,7 +65,11 @@ class _HomeScreenState extends State<HomeScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('❌ Animal "$query" non trouvé'),
+          content: Text(
+            AppLocalizations.of(context)
+                .translate(AppStrings.animalNotFoundSearch)
+                .replaceAll('{query}', query),
+          ),
           backgroundColor: Colors.red,
           duration: const Duration(seconds: 2),
         ),
@@ -74,7 +81,26 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tableau de Bord'),
+        title: Consumer<AuthProvider>(
+          builder: (context, auth, child) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(AppLocalizations.of(context)
+                    .translate(AppStrings.dashboard)),
+                if (auth.currentUserName != null &&
+                    auth.currentFarmName != null)
+                  Text(
+                    '👤 ${auth.currentUserName} | 🏗️ ${auth.currentFarmName}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+              ],
+            );
+          },
+        ),
         actions: [
           // 🆕 Bouton Alertes avec badge
           Consumer<AlertProvider>(
@@ -84,7 +110,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.notifications),
-                    tooltip: 'Alertes',
+                    tooltip: AppLocalizations.of(context)
+                        .translate(AppStrings.alerts),
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -125,7 +152,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.settings),
-            tooltip: 'Paramètres',
+            tooltip:
+                AppLocalizations.of(context).translate(AppStrings.settings),
             onPressed: () {
               Navigator.push(
                 context,
@@ -167,9 +195,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 32),
 
                     // Titre section
-                    const Text(
-                      'Actions Rapides',
-                      style: TextStyle(
+                    Text(
+                      AppLocalizations.of(context)
+                          .translate(AppStrings.quickActions),
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
@@ -182,8 +211,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       context: context,
                       icon: Icons.pets,
                       iconColor: Colors.blue,
-                      title: 'Animaux',
-                      subtitle: 'Gérer mon troupeau',
+                      title: AppLocalizations.of(context)
+                          .translate(AppStrings.animals),
+                      subtitle: AppLocalizations.of(context)
+                          .translate(AppStrings.manageHerd),
                       onTap: () {
                         Navigator.push(
                           context,
@@ -201,8 +232,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       context: context,
                       icon: Icons.inventory_2,
                       iconColor: Colors.orange,
-                      title: 'Mes Lots',
-                      subtitle: 'Campagnes & groupes',
+                      title: AppLocalizations.of(context)
+                          .translate(AppStrings.myLots),
+                      subtitle: AppLocalizations.of(context)
+                          .translate(AppStrings.campaignsGroups),
                       onTap: () {
                         Navigator.push(
                           context,
@@ -220,8 +253,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       context: context,
                       icon: Icons.picture_as_pdf,
                       iconColor: Colors.purple,
-                      title: 'Export Registre',
-                      subtitle: 'PDF pour contrôle',
+                      title: AppLocalizations.of(context)
+                          .translate(AppStrings.exportRegistry),
+                      subtitle: AppLocalizations.of(context)
+                          .translate(AppStrings.pdfControl),
                       onTap: () {
                         Navigator.push(
                           context,
@@ -246,9 +281,10 @@ class _HomeScreenState extends State<HomeScreen> {
           final animal = await Navigator.push<Animal>(
             context,
             MaterialPageRoute(
-              builder: (context) => const AnimalFinderScreen(
+              builder: (context) => AnimalFinderScreen(
                 mode: AnimalFinderMode.single,
-                title: 'Identifier un animal',
+                title: AppLocalizations.of(context)
+                    .translate(AppStrings.identifyAnimal),
               ),
             ),
           );
@@ -266,7 +302,7 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         },
         icon: const Icon(Icons.qr_code_scanner),
-        label: const Text('Scanner'),
+        label: Text(AppLocalizations.of(context).translate(AppStrings.scanner)),
       ),
     );
   }
@@ -390,7 +426,8 @@ class _HomeScreenState extends State<HomeScreen> {
       child: TextField(
         controller: _searchController,
         decoration: InputDecoration(
-          hintText: 'Rechercher EID ou N°...',
+          hintText:
+              AppLocalizations.of(context).translate(AppStrings.searchHint),
           prefixIcon: const Icon(Icons.search, color: Colors.grey),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
@@ -444,9 +481,11 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               child: _StatCard(
                 icon: Icons.pets,
-                label: 'Animaux',
+                label:
+                    AppLocalizations.of(context).translate(AppStrings.animals),
                 value: '$aliveAnimals',
-                subtitle: 'vivants',
+                subtitle: AppLocalizations.of(context)
+                    .translate(AppStrings.aliveStatus),
                 color: Colors.blue,
               ),
             ),
@@ -456,9 +495,10 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               child: _StatCard(
                 icon: Icons.inventory_2,
-                label: 'Lots',
+                label: AppLocalizations.of(context).translate(AppStrings.lots),
                 value: '$activeLots',
-                subtitle: 'actifs',
+                subtitle: AppLocalizations.of(context)
+                    .translate(AppStrings.activeStatus),
                 color: Colors.orange,
               ),
             ),
@@ -468,9 +508,11 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               child: _StatCard(
                 icon: Icons.warning,
-                label: 'Alertes',
+                label:
+                    AppLocalizations.of(context).translate(AppStrings.alerts),
                 value: '$urgentAlerts',
-                subtitle: 'urgentes',
+                subtitle: AppLocalizations.of(context)
+                    .translate(AppStrings.urgentStatus),
                 color: urgentAlerts > 0 ? Colors.red : Colors.green,
               ),
             ),

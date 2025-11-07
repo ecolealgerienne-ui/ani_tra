@@ -9,8 +9,6 @@ import '../../models/scan_result.dart';
 import '../../providers/animal_provider.dart';
 import '../../providers/rfid_scanner_provider.dart';
 import 'universal_scanner_screen.dart';
-import '../../i18n/app_localizations.dart';
-import '../../i18n/app_strings.dart';
 
 enum AnimalFinderMode {
   single,

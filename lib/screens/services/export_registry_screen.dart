@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import '../services/pdf_export_service.dart';
 import '../../providers/animal_provider.dart';
 import '../../providers/settings_provider.dart';
+import '../../i18n/app_localizations.dart';
+import '../../i18n/app_strings.dart';
 
 class ExportRegistryScreen extends StatefulWidget {
   const ExportRegistryScreen({super.key});
@@ -38,17 +40,19 @@ class _ExportRegistryScreenState extends State<ExportRegistryScreen> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('✅ PDF téléchargé'),
+        SnackBar(
+          content: Text(
+              AppLocalizations.of(context).translate(AppStrings.pdfDownloaded)),
           backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
         ),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('❌ Erreur : $e'),
+          content: Text(
+              '❌ ${AppLocalizations.of(context).translate(AppStrings.error)}: $e'),
           backgroundColor: Colors.red,
         ),
       );
@@ -63,7 +67,8 @@ class _ExportRegistryScreenState extends State<ExportRegistryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Exporter les documents'),
+        title: Text(
+            AppLocalizations.of(context).translate(AppStrings.exportDocuments)),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),

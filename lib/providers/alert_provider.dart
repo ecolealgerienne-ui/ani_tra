@@ -167,8 +167,8 @@ class AlertProvider extends ChangeNotifier {
     notifyListeners();
 
     debugPrint('Ã°Å¸â€â€ Alertes recalculÃƒÂ©es : ${_alerts.length} alertes');
-    debugPrint('   Ã°Å¸Å¡Â¨ Urgent: ${urgentAlertCount}');
-    debugPrint('   Ã¢Å¡Â Ã¯Â¸Â Important: ${importantAlertCount}');
+    debugPrint('   Ã°Å¸Å¡Â¨ Urgent: $urgentAlertCount');
+    debugPrint('   Ã¢Å¡Â Ã¯Â¸Â Important: $importantAlertCount');
     debugPrint('   Ã°Å¸â€œâ€¹ Routine: ${routineAlerts.length}');
   }
 
@@ -214,10 +214,9 @@ class AlertProvider extends ChangeNotifier {
 
     for (final animal in animals) {
       // VÃƒÂ©rifier si EID manquant ou invalide
-      if (animal.displayName == null ||
-          animal.displayName!.isEmpty ||
-          animal.displayName!.length < 10 ||
-          animal.displayName!.startsWith('TEMP_')) {
+      if (animal.displayName.isEmpty ||
+          animal.displayName.length < 10 ||
+          animal.displayName.startsWith('TEMP_')) {
         alerts.add(Alert.missingIdentification(
           animalId: animal.id,
           animalName: animal.officialNumber ??
@@ -343,25 +342,13 @@ class AlertProvider extends ChangeNotifier {
       final missingFields = <String>[];
       var completionRate = 1.0;
 
-      // Champs critiques manquants
-      if (animal.birthDate == null) {
-        missingFields.add('Date de naissance');
-        completionRate -= 0.2;
-      }
-
-      if (animal.sex == null) {
-        missingFields.add('Sexe');
-        completionRate -= 0.1;
-      }
-
       if (animal.speciesId == null || animal.speciesId!.isEmpty) {
         missingFields.add('Type');
         completionRate -= 0.3;
       }
 
-      if (animal.displayName == null ||
-          animal.displayName!.isEmpty ||
-          animal.displayName!.length < 10) {
+      if (animal.displayName.isEmpty ||
+          animal.displayName.length < 10) {
         missingFields.add('EID valide');
         completionRate -= 0.4;
       }

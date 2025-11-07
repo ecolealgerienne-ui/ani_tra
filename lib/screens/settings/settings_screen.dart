@@ -1,13 +1,15 @@
 // lib/screens/settings_screen.dart
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import '../../providers/locale_provider.dart';
 import '../../providers/sync_provider.dart';
 import '../../providers/veterinarian_provider.dart';
 import '../../models/veterinarian.dart';
 import '../../widgets/farm_preferences_section.dart';
+import '../../widgets//farm_management_section.dart';
 import '../../i18n/app_localizations.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../i18n/app_strings.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -101,18 +103,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.translate('settings')),
+        title: Text(l10n.translate(AppStrings.settings)),
       ),
       body: ListView(
         children: [
           // Account Section
-          const _SectionHeader(title: 'Compte'),
+          _SectionHeader(title: l10n.translate(AppStrings.account)),
 
           ListTile(
             leading: const CircleAvatar(
               child: Icon(Icons.person),
             ),
-            title: const Text('Profil utilisateur'),
+            title: Text(l10n.translate(AppStrings.userProfile)),
             subtitle: const Text('admin@rfid-troupeau.com'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showProfileDialog(context),
@@ -120,7 +122,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           ListTile(
             leading: const Icon(Icons.lock),
-            title: const Text('Changer le mot de passe'),
+            title: Text(l10n.translate(AppStrings.changePassword)),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showChangePasswordDialog(context),
           ),
@@ -132,8 +134,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           const Divider(),
 
+          // Farm Management Section (PHASE 4)
+          const FarmManagementSection(),
+
+          const Divider(),
+
           // Vétérinaire par défaut
-          const _SectionHeader(title: 'Vétérinaire prescripteur'),
+          _SectionHeader(
+              title: l10n.translate(AppStrings.veterinarianPrescriber)),
 
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -157,7 +165,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'Aucun vétérinaire défini',
+                          l10n.translate(AppStrings.noVeterinarianDefined),
                           style: TextStyle(
                             color: Colors.grey.shade600,
                             fontStyle: FontStyle.italic,
@@ -170,7 +178,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               child: OutlinedButton.icon(
                                 onPressed: _searchVeterinarian,
                                 icon: const Icon(Icons.search),
-                                label: const Text('Rechercher'),
+                                label: Text(l10n.translate(AppStrings.search)),
                                 style: OutlinedButton.styleFrom(
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 12),
@@ -182,7 +190,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               child: OutlinedButton.icon(
                                 onPressed: _scanVeterinarianQR,
                                 icon: const Icon(Icons.qr_code_scanner),
-                                label: const Text('Scanner QR'),
+                                label: Text(l10n.translate(AppStrings.scanQr)),
                                 style: OutlinedButton.styleFrom(
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 12),
@@ -220,7 +228,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                _selectedVetName ?? 'Vétérinaire',
+                                _selectedVetName ??
+                                    l10n.translate(AppStrings.veterinarian),
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
@@ -240,7 +249,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         IconButton(
                           onPressed: _removeVeterinarian,
                           icon: const Icon(Icons.close, color: Colors.red),
-                          tooltip: 'Retirer',
+                          tooltip: l10n.translate(AppStrings.remove),
                         ),
                       ],
                     ),
@@ -252,7 +261,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         child: OutlinedButton.icon(
                           onPressed: _searchVeterinarian,
                           icon: const Icon(Icons.search),
-                          label: const Text('Changer'),
+                          label: Text(AppLocalizations.of(context)
+                              .translate(AppStrings.changeVeterinarian)),
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 12),
                           ),
@@ -268,11 +278,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const Divider(),
 
           // Notifications Section
-          const _SectionHeader(title: 'Notifications'),
+          _SectionHeader(title: l10n.translate(AppStrings.notifications)),
 
           SwitchListTile(
-            title: const Text('Activer les notifications'),
-            subtitle: const Text('Recevoir toutes les notifications'),
+            title: Text(l10n.translate(AppStrings.notifications)),
+            subtitle: Text(l10n.translate(AppStrings.receiveAllNotifications)),
             value: _notificationsEnabled,
             secondary: const Icon(Icons.notifications),
             onChanged: (value) {
@@ -287,8 +297,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Column(
                 children: [
                   SwitchListTile(
-                    title: const Text('Rappels de traitement'),
-                    subtitle: const Text('Délais d\'attente et échéances'),
+                    title: Text(l10n.translate(AppStrings.treatmentReminders)),
+                    subtitle: Text(
+                        l10n.translate(AppStrings.waitingPeriodsDeadlines)),
                     value: _treatmentReminders,
                     onChanged: (value) {
                       setState(() => _treatmentReminders = value);
@@ -296,8 +307,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     },
                   ),
                   SwitchListTile(
-                    title: const Text('Alertes de retrait'),
-                    subtitle: const Text('Animaux avec délai d\'attente actif'),
+                    title: Text(l10n.translate(AppStrings.withdrawalAlerts)),
+                    subtitle: Text(l10n
+                        .translate(AppStrings.animalsWithActiveWaitingPeriod)),
                     value: _withdrawalAlerts,
                     onChanged: (value) {
                       setState(() => _withdrawalAlerts = value);
@@ -305,8 +317,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     },
                   ),
                   SwitchListTile(
-                    title: const Text('Notifications de campagne'),
-                    subtitle: const Text('Nouvelles campagnes et rappels'),
+                    title:
+                        Text(l10n.translate(AppStrings.campaignNotifications)),
+                    subtitle:
+                        Text(l10n.translate(AppStrings.newCampaignsReminders)),
                     value: _campaignNotifications,
                     onChanged: (value) {
                       setState(() => _campaignNotifications = value);
@@ -314,7 +328,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     },
                   ),
                   SwitchListTile(
-                    title: const Text('Son'),
+                    title: Text(l10n.translate(AppStrings.sound)),
                     value: _soundEnabled,
                     onChanged: (value) {
                       setState(() => _soundEnabled = value);
@@ -322,7 +336,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     },
                   ),
                   SwitchListTile(
-                    title: const Text('Vibration'),
+                    title: Text(l10n.translate(AppStrings.vibration)),
                     value: _vibrationEnabled,
                     onChanged: (value) {
                       setState(() => _vibrationEnabled = value);
@@ -337,20 +351,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const Divider(),
 
           // Appearance Section
-          const _SectionHeader(title: 'Apparence'),
+          _SectionHeader(title: l10n.translate(AppStrings.appearance)),
 
           SwitchListTile(
-            title: const Text('Mode sombre'),
-            subtitle: const Text('Activer le thème sombre'),
+            title: Text(l10n.translate(AppStrings.darkMode)),
+            subtitle: Text(l10n.translate(AppStrings.enableDarkTheme)),
             value: _darkMode,
             secondary: Icon(_darkMode ? Icons.dark_mode : Icons.light_mode),
             onChanged: (value) {
               setState(() => _darkMode = value);
               _savePreference('dark_mode', value);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Redémarrez l\'app pour appliquer le thème'),
-                  duration: Duration(seconds: 2),
+                SnackBar(
+                  content:
+                      Text(l10n.translate(AppStrings.restartAppToApplyTheme)),
+                  duration: const Duration(seconds: 2),
                 ),
               );
             },
@@ -358,7 +373,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           ListTile(
             leading: const Icon(Icons.format_size),
-            title: const Text('Taille du texte'),
+            title: Text(l10n.translate(AppStrings.textSize)),
             subtitle: Text('${(_textScale * 100).toInt()}%'),
             trailing: SizedBox(
               width: 150,
@@ -380,7 +395,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           ListTile(
             leading: const Icon(Icons.palette),
-            title: const Text('Couleur du thème'),
+            title: Text(l10n.translate(AppStrings.themeColor)),
             subtitle: Text(_getThemeColorName(_themeColor)),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showThemeColorDialog(context),
@@ -419,11 +434,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const Divider(),
 
           // Security Section
-          const _SectionHeader(title: 'Sécurité'),
+          _SectionHeader(title: l10n.translate(AppStrings.security)),
 
           SwitchListTile(
-            title: const Text('Authentification biométrique'),
-            subtitle: const Text('Utiliser empreinte/Face ID'),
+            title: Text(l10n.translate(AppStrings.biometricAuthentication)),
+            subtitle: Text(l10n.translate(AppStrings.useFingerprintFaceId)),
             value: _biometricEnabled,
             secondary: const Icon(Icons.fingerprint),
             onChanged: (value) {
@@ -431,18 +446,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _savePreference('biometric_enabled', value);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(
-                      value ? 'Biométrie activée' : 'Biométrie désactivée'),
+                  content: Text(value
+                      ? l10n.translate(AppStrings.biometryEnabled)
+                      : l10n.translate(AppStrings.biometryDisabled)),
                 ),
               );
             },
           ),
 
           SwitchListTile(
-            title: const Text('Verrouillage automatique'),
+            title: Text(l10n.translate(AppStrings.autoLock)),
             subtitle: Text(_autoLock
-                ? 'Après $_autoLockMinutes minutes d\'inactivité'
-                : 'Désactivé'),
+                ? l10n
+                    .translate(AppStrings.afterMinutesInactivity)
+                    .replaceAll('{minutes}', '$_autoLockMinutes')
+                : l10n.translate(AppStrings.autoLock)),
             value: _autoLock,
             secondary: const Icon(Icons.lock_clock),
             onChanged: (value) {
@@ -455,8 +473,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Padding(
               padding: const EdgeInsets.only(left: 16),
               child: ListTile(
-                title: const Text('Délai de verrouillage'),
-                subtitle: Text('$_autoLockMinutes minutes'),
+                title: Text(l10n.translate(AppStrings.lockDelay)),
+                subtitle: Text(
+                    '$_autoLockMinutes ${l10n.translate(AppStrings.minutes)}'),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => _showAutoLockDialog(context),
               ),
@@ -464,8 +483,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           ListTile(
             leading: const Icon(Icons.vpn_key),
-            title: const Text('Sessions actives'),
-            subtitle: const Text('Gérer les appareils connectés'),
+            title: Text(l10n.translate(AppStrings.activeSessions)),
+            subtitle: Text(l10n.translate(AppStrings.manageConnectedDevices)),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showActiveSessionsDialog(context),
           ),
@@ -473,16 +492,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const Divider(),
 
           // Sync Section
-          const _SectionHeader(title: 'Synchronisation'),
+          _SectionHeader(title: l10n.translate(AppStrings.synchronization)),
 
           Consumer<SyncProvider>(
             builder: (context, syncProvider, _) {
               return SwitchListTile(
-                title: const Text('Mode En Ligne'),
+                title: Text(l10n.translate(AppStrings.onlineMode)),
                 subtitle: Text(
                   syncProvider.isOnline
-                      ? 'Connexion au serveur active'
-                      : 'Mode hors ligne (données locales)',
+                      ? l10n.translate(AppStrings.serverConnectionActive)
+                      : l10n.translate(AppStrings.localDataOnly),
                 ),
                 value: syncProvider.isOnline,
                 onChanged: (value) {
@@ -497,14 +516,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           ListTile(
             leading: const Icon(Icons.sync),
-            title: const Text('Synchronisation automatique'),
-            subtitle: const Text('Synchroniser toutes les 15 minutes'),
+            title: Text(l10n.translate(AppStrings.autoSync)),
+            subtitle: Text(l10n.translate(AppStrings.syncEvery15Minutes)),
             trailing: Switch(
               value: true,
               onChanged: (value) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Fonctionnalité à venir'),
+                  SnackBar(
+                    content: Text(l10n.translate(AppStrings.featureComingSoon)),
                   ),
                 );
               },
@@ -513,8 +532,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           ListTile(
             leading: const Icon(Icons.sync_problem),
-            title: const Text('Voir les détails de synchronisation'),
-            subtitle: const Text('Historique et conflits'),
+            title: Text(l10n.translate(AppStrings.viewSyncDetails)),
+            subtitle: Text(l10n.translate(AppStrings.historyConflicts)),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
               // Navigate to sync_detail_screen.dart
@@ -529,31 +548,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const Divider(),
 
           // Storage & Data Section
-          const _SectionHeader(title: 'Stockage et données'),
+          _SectionHeader(title: l10n.translate(AppStrings.storageData)),
 
           ListTile(
             leading: const Icon(Icons.storage),
-            title: const Text('Stockage utilisé'),
+            title: Text(l10n.translate(AppStrings.usedStorage)),
             subtitle: Text(_cacheSize > 0
                 ? '${(_cacheSize / 1024 / 1024).toStringAsFixed(2)} MB'
-                : 'Calcul en cours...'),
+                : l10n.translate(AppStrings.calculating)),
             trailing: TextButton(
               onPressed: () => _calculateCacheSize(),
-              child: const Text('Actualiser'),
+              child: Text(l10n.translate(AppStrings.deleteCache)),
             ),
           ),
 
           ListTile(
             leading: const Icon(Icons.cleaning_services),
-            title: const Text('Vider le cache'),
-            subtitle: const Text('Libérer de l\'espace'),
+            title: Text(l10n.translate(AppStrings.clearCache)),
+            subtitle: Text(l10n.translate(AppStrings.freeSpace)),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showClearCacheDialog(context),
           ),
 
           SwitchListTile(
-            title: const Text('Sauvegarde automatique'),
-            subtitle: const Text('Backup quotidien des données'),
+            title: Text(l10n.translate(AppStrings.autoBackup)),
+            subtitle: Text(l10n.translate(AppStrings.dailyDataBackup)),
             value: _autoBackup,
             secondary: const Icon(Icons.backup),
             onChanged: (value) {
@@ -564,26 +583,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           ListTile(
             leading: const Icon(Icons.download),
-            title: const Text('Exporter les données'),
-            subtitle: const Text('CSV, XML, Excel'),
+            title: Text(l10n.translate(AppStrings.exportData)),
+            subtitle: Text(l10n.translate(AppStrings.csvExcelXml)),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showExportDialog(context),
           ),
 
           ListTile(
             leading: const Icon(Icons.upload),
-            title: const Text('Importer des données'),
-            subtitle: const Text('Depuis fichier CSV ou Excel'),
+            title: Text(l10n.translate(AppStrings.importData)),
+            subtitle: Text(l10n.translate(AppStrings.fromCsvOrExcel)),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showImportDialog(context),
           ),
 
           ListTile(
             leading: const Icon(Icons.delete_sweep, color: Colors.red),
-            title: const Text('Effacer les données locales',
-                style: TextStyle(color: Colors.red)),
-            subtitle:
-                const Text('Supprimer toutes les données non synchronisées'),
+            title: Text(l10n.translate(AppStrings.clearLocalData),
+                style: const TextStyle(color: Colors.red)),
+            subtitle: Text(l10n.translate(AppStrings.deleteAllUnsyncedData)),
             trailing: const Icon(Icons.chevron_right, color: Colors.red),
             onTap: () => _showClearDataDialog(context),
           ),
@@ -591,17 +609,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const Divider(),
 
           // About Section
-          const _SectionHeader(title: 'À propos'),
+          _SectionHeader(title: l10n.translate(AppStrings.about)),
 
-          const ListTile(
-            leading: Icon(Icons.info),
-            title: Text('Version'),
-            trailing: Text('1.0.0+1 (MVP)'),
+          ListTile(
+            leading: const Icon(Icons.info),
+            title: Text(l10n.translate(AppStrings.version)),
+            trailing: const Text('1.0.0+1 (MVP)'),
           ),
 
           ListTile(
             leading: const Icon(Icons.description),
-            title: const Text('Licences open source'),
+            title: Text(l10n.translate(AppStrings.openSourceLicenses)),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
               showLicensePage(
@@ -614,21 +632,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           ListTile(
             leading: const Icon(Icons.privacy_tip),
-            title: const Text('Politique de confidentialité'),
+            title: Text(l10n.translate(AppStrings.privacyPolicy)),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showPrivacyDialog(context),
           ),
 
           ListTile(
             leading: const Icon(Icons.gavel),
-            title: const Text('Conditions d\'utilisation'),
+            title: Text(l10n.translate(AppStrings.termsOfService)),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showTermsDialog(context),
           ),
 
           ListTile(
             leading: const Icon(Icons.help),
-            title: const Text('Aide et support'),
+            title: Text(l10n.translate(AppStrings.helpSupport)),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showHelpDialog(context),
           ),
@@ -636,17 +654,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const Divider(),
 
           // Debug Section (MVP only)
-          const _SectionHeader(title: 'Debug (MVP)'),
+          _SectionHeader(title: '${l10n.translate(AppStrings.debug)} (MVP)'),
 
           ListTile(
             leading: const Icon(Icons.bug_report),
-            title: const Text('Simuler erreur de synchronisation'),
+            title: Text(l10n.translate(AppStrings.simulateSyncError)),
             onTap: () {
               final syncProvider = context.read<SyncProvider>();
               syncProvider.setOnline(false);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Mode offline activé pour tester les erreurs'),
+                SnackBar(
+                  content:
+                      Text(l10n.translate(AppStrings.offlineModeActivated)),
                   backgroundColor: Colors.orange,
                 ),
               );
@@ -655,7 +674,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           ListTile(
             leading: const Icon(Icons.restore),
-            title: const Text('Réinitialiser les préférences'),
+            title: Text(l10n.translate(AppStrings.resetPreferences)),
             onTap: () => _showResetPreferencesDialog(context),
           ),
 
@@ -679,7 +698,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'RFID Troupeau',
+                  l10n.translate(AppStrings.rfidTroupeau),
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: Colors.grey.shade600,
@@ -687,7 +706,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Système de gestion de troupeau ovin',
+                  l10n.translate(AppStrings.sheepManagementSystem),
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey.shade500,

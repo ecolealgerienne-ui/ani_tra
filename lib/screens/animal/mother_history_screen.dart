@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 
 import '../../models/animal.dart';
 import '../../providers/animal_provider.dart';
+import '../../i18n/app_localizations.dart';
+import '../../i18n/app_strings.dart';
 
 /// Écran d'historique des portées d'une mère
 ///
@@ -25,7 +27,8 @@ class MotherHistoryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Historique reproduction'),
+        title: Text(AppLocalizations.of(context)
+            .translate(AppStrings.reproductionHistory)),
       ),
       body: Consumer<AnimalProvider>(
         builder: (context, animalProvider, child) {
@@ -54,7 +57,7 @@ class MotherHistoryScreen extends StatelessWidget {
               const SizedBox(height: 8),
 
               if (offspring.isEmpty)
-                const Card(
+                Card(
                   child: Padding(
                     padding: EdgeInsets.all(24),
                     child: Center(
@@ -64,7 +67,8 @@ class MotherHistoryScreen extends StatelessWidget {
                               size: 48, color: Colors.grey),
                           SizedBox(height: 8),
                           Text(
-                            'Aucun descendant enregistré',
+                            AppLocalizations.of(context)
+                                .translate(AppStrings.noDescendants),
                             style: TextStyle(color: Colors.grey),
                           ),
                         ],
@@ -118,7 +122,8 @@ class MotherHistoryScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Statistiques de reproduction',
+              AppLocalizations.of(context)
+                  .translate(AppStrings.reproductionStats),
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -129,7 +134,8 @@ class MotherHistoryScreen extends StatelessWidget {
                 Expanded(
                   child: _buildStatItem(
                     context,
-                    'Total naissances',
+                    AppLocalizations.of(context)
+                        .translate(AppStrings.totalBirths),
                     stats.totalBirths.toString(),
                     Colors.blue,
                   ),
@@ -137,7 +143,8 @@ class MotherHistoryScreen extends StatelessWidget {
                 Expanded(
                   child: _buildStatItem(
                     context,
-                    'Vivants',
+                    AppLocalizations.of(context)
+                        .translate(AppStrings.aliveFemales),
                     stats.aliveOffspring.toString(),
                     Colors.green,
                   ),
@@ -150,7 +157,8 @@ class MotherHistoryScreen extends StatelessWidget {
                 Expanded(
                   child: _buildStatItem(
                     context,
-                    'Taux survie',
+                    AppLocalizations.of(context)
+                        .translate(AppStrings.survivalRate),
                     stats.formattedSurvivalRate,
                     Colors.orange,
                   ),
@@ -158,7 +166,8 @@ class MotherHistoryScreen extends StatelessWidget {
                 Expanded(
                   child: _buildStatItem(
                     context,
-                    'Intervalle moyen',
+                    AppLocalizations.of(context)
+                        .translate(AppStrings.avgInterval),
                     stats.formattedInterval,
                     Colors.purple,
                   ),
@@ -187,9 +196,9 @@ class MotherHistoryScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -198,7 +207,7 @@ class MotherHistoryScreen extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: 11,
-              color: color.withOpacity(0.8),
+              color: color.withValues(alpha: 0.8),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -228,7 +237,7 @@ class MotherHistoryScreen extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: statusColor.withOpacity(0.2),
+          backgroundColor: statusColor.withValues(alpha: 0.2),
           child: Icon(
             child.sex == AnimalSex.male ? Icons.male : Icons.female,
             color: statusColor,
@@ -242,7 +251,7 @@ class MotherHistoryScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Né le ${DateFormat('dd/MM/yyyy').format(child.birthDate)}'),
-            Text('$age mois • ${_getStatusLabel(child.status)}'),
+            Text('$age mois • ${_getStatusLabel(context, child.status)}'),
           ],
         ),
         trailing: const Icon(Icons.chevron_right),
@@ -253,16 +262,16 @@ class MotherHistoryScreen extends StatelessWidget {
     );
   }
 
-  String _getStatusLabel(AnimalStatus status) {
+  String _getStatusLabel(BuildContext context, AnimalStatus status) {
     switch (status) {
       case AnimalStatus.alive:
-        return 'Vivant';
+        return AppLocalizations.of(context).translate(AppStrings.alive);
       case AnimalStatus.sold:
-        return 'Vendu';
+        return AppLocalizations.of(context).translate(AppStrings.sold);
       case AnimalStatus.dead:
-        return 'Mort';
+        return AppLocalizations.of(context).translate(AppStrings.dead);
       case AnimalStatus.slaughtered:
-        return 'Abattu';
+        return AppLocalizations.of(context).translate(AppStrings.slaughtered);
     }
   }
 }

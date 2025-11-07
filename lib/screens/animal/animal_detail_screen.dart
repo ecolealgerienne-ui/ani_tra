@@ -32,9 +32,9 @@ class AnimalDetailScreen extends StatefulWidget {
   final Animal? preloadedAnimal;
 
   const AnimalDetailScreen({
-    Key? key,
+    super.key,
     this.preloadedAnimal,
-  }) : super(key: key);
+  });
 
   @override
   State<AnimalDetailScreen> createState() => _AnimalDetailScreenState();
@@ -1067,7 +1067,7 @@ class _VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
 class AlertsSection extends StatelessWidget {
   final String animalId;
 
-  const AlertsSection({required this.animalId});
+  const AlertsSection({super.key, required this.animalId});
 
   @override
   Widget build(BuildContext context) {

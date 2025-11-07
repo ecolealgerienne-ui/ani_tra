@@ -8,8 +8,19 @@ import 'auth_provider.dart';
 /// Mode MOCK : Données en mémoire uniquement
 class DocumentProvider extends ChangeNotifier {
   final AuthProvider _authProvider;
+  String _currentFarmId;
 
-  DocumentProvider(this._authProvider);
+  DocumentProvider(this._authProvider)
+      : _currentFarmId = _authProvider.currentFarmId {
+    _authProvider.addListener(_onFarmChanged);
+  }
+
+  void _onFarmChanged() {
+    if (_currentFarmId != _authProvider.currentFarmId) {
+      _currentFarmId = _authProvider.currentFarmId;
+      notifyListeners();
+    }
+  }
 
   // === Données en mémoire (MOCK) ===
   List<Document> _allDocuments = [];
@@ -222,5 +233,11 @@ class DocumentProvider extends ChangeNotifier {
   void _markAsSynced(String id, String serverVersion) {
     // TODO: Implémenter quand serveur prêt
     debugPrint('✅ Document $id marqué comme synced (mode mock)');
+  }
+
+  @override
+  void dispose() {
+    _authProvider.removeListener(_onFarmChanged);
+    super.dispose();
   }
 }

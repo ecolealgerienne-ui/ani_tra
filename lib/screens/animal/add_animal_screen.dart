@@ -411,7 +411,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
 
             // Dropdown Type d'animal
             DropdownButtonFormField<String>(
-              value: _selectedSpeciesId,
+              initialValue: _selectedSpeciesId,
               decoration: InputDecoration(
                 labelText: 'Type d\'animal *',
                 prefixIcon: Icon(
@@ -452,7 +452,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
 
             // Dropdown Race
             DropdownButtonFormField<String>(
-              value: _selectedBreedId,
+              initialValue: _selectedBreedId,
               decoration: InputDecoration(
                 labelText: 'Race (optionnelle)',
                 prefixIcon: Icon(
@@ -580,7 +580,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
 
             // Origine
             DropdownButtonFormField<String>(
-              value: _selectedOrigin,
+              initialValue: _selectedOrigin,
               decoration: const InputDecoration(
                 labelText: 'Origine *',
                 prefixIcon: Icon(Icons.location_on),

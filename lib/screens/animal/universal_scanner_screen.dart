@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../models/scan_result.dart';
+import '../../i18n/app_localizations.dart';
+import '../../i18n/app_strings.dart';
 
 class UniversalScannerScreen extends StatefulWidget {
   final String? mode;
@@ -102,7 +104,7 @@ class _UniversalScannerScreenState extends State<UniversalScannerScreen> {
               padding: const EdgeInsets.all(16),
               margin: const EdgeInsets.symmetric(horizontal: 32),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.7),
+                color: Colors.black.withValues(alpha: 0.7),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -117,7 +119,10 @@ class _UniversalScannerScreenState extends State<UniversalScannerScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    _isProcessing ? 'Traitement en cours...' : widget.hint,
+                    _isProcessing
+                        ? AppLocalizations.of(context)
+                            .translate(AppStrings.processing)
+                        : widget.hint,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,

@@ -8,8 +8,19 @@ import 'auth_provider.dart';
 /// Mode MOCK : Données en mémoire uniquement
 class BreedingProvider extends ChangeNotifier {
   final AuthProvider _authProvider;
+  String _currentFarmId;
 
-  BreedingProvider(this._authProvider);
+  BreedingProvider(this._authProvider)
+      : _currentFarmId = _authProvider.currentFarmId {
+    _authProvider.addListener(_onFarmChanged);
+  }
+
+  void _onFarmChanged() {
+    if (_currentFarmId != _authProvider.currentFarmId) {
+      _currentFarmId = _authProvider.currentFarmId;
+      notifyListeners();
+    }
+  }
 
   // === Données en mémoire (MOCK) ===
   List<Breeding> _allBreedings = [];
@@ -291,5 +302,11 @@ class BreedingProvider extends ChangeNotifier {
   void _markAsSynced(String id, String serverVersion) {
     // TODO: Implémenter quand serveur prêt
     debugPrint('✅ Breeding $id marqué comme synced (mode mock)');
+  }
+
+  @override
+  void dispose() {
+    _authProvider.removeListener(_onFarmChanged);
+    super.dispose();
   }
 }

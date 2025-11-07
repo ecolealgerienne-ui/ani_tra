@@ -3,8 +3,9 @@
 import 'package:flutter/material.dart';
 import '../models/eid_change.dart';
 import 'package:intl/intl.dart';
+import '../i18n/app_localizations.dart';
+import '../i18n/app_strings.dart';
 
-/// Widget pour afficher l'historique des changements d'EID
 class EidHistoryCard extends StatelessWidget {
   final List<EidChange> history;
 
@@ -19,6 +20,8 @@ class EidHistoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     if (history.isEmpty) {
       return Card(
         child: Padding(
@@ -28,7 +31,7 @@ class EidHistoryCard extends StatelessWidget {
               Icon(Icons.info_outline, color: Colors.grey.shade400),
               const SizedBox(width: 12),
               Text(
-                'Aucun changement d\'EID',
+                l10n.translate(AppStrings.noEidChanges),
                 style: TextStyle(
                   color: Colors.grey.shade600,
                   fontStyle: FontStyle.italic,
@@ -54,10 +57,10 @@ class EidHistoryCard extends StatelessWidget {
                   size: 24,
                 ),
                 const SizedBox(width: 12),
-                const Expanded(
+                Expanded(
                   child: Text(
-                    'Historique des changements',
-                    style: TextStyle(
+                    l10n.translate(AppStrings.eidHistory),
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -69,7 +72,8 @@ class EidHistoryCard extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                    color:
+                        Theme.of(context).primaryColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -95,12 +99,13 @@ class EidHistoryCard extends StatelessWidget {
   }
 
   Widget _buildHistoryItem(BuildContext context, EidChange change) {
+    final l10n = AppLocalizations.of(context);
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Timeline indicator
           Column(
             children: [
               Container(
@@ -120,8 +125,6 @@ class EidHistoryCard extends StatelessWidget {
             ],
           ),
           const SizedBox(width: 12),
-
-          // Content
           Expanded(
             child: Container(
               padding: const EdgeInsets.all(12),
@@ -133,7 +136,6 @@ class EidHistoryCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Raison
                   Text(
                     EidChangeReason.getLabel(change.reason),
                     style: const TextStyle(
@@ -142,8 +144,6 @@ class EidHistoryCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-
-                  // Changement
                   Row(
                     children: [
                       Expanded(
@@ -151,7 +151,7 @@ class EidHistoryCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Ancien EID',
+                              l10n.translate(AppStrings.oldEid),
                               style: TextStyle(
                                 fontSize: 11,
                                 color: Colors.grey.shade600,
@@ -173,7 +173,7 @@ class EidHistoryCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Nouvel EID',
+                              l10n.translate(AppStrings.newEid),
                               style: TextStyle(
                                 fontSize: 11,
                                 color: Colors.grey.shade600,
@@ -193,10 +193,7 @@ class EidHistoryCard extends StatelessWidget {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 8),
-
-                  // Date
                   Row(
                     children: [
                       Icon(
@@ -214,8 +211,6 @@ class EidHistoryCard extends StatelessWidget {
                       ),
                     ],
                   ),
-
-                  // Notes
                   if (change.notes != null && change.notes!.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     Container(

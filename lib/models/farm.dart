@@ -5,17 +5,17 @@ class Farm {
   final String id;
   final String name;
   final String location;
-  
+
   // Propriétaire
   final String ownerId;
-  
+
   // Numéro de cheptel
   final String? cheptelNumber;
-  
+
   // Groupe (optionnel)
   final String? groupId;
   final String? groupName;
-  
+
   // Métadonnées
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -31,7 +31,7 @@ class Farm {
     required this.createdAt,
     required this.updatedAt,
   });
-  
+
   Farm copyWith({
     String? name,
     String? location,
