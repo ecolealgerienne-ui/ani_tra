@@ -158,7 +158,7 @@ class AlertsScreen extends StatelessWidget {
                 Text(
                   AppLocalizations.of(context)
                       .translate(AppStrings.noAlertsTitle),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
@@ -264,11 +264,11 @@ class AlertsScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.notifications_active, color: Colors.white, size: 28),
-              SizedBox(width: 12),
+              const Icon(Icons.notifications_active, color: Colors.white, size: 28),
+              const SizedBox(width: 12),
               Text(
                 AppLocalizations.of(context).translate(AppStrings.overview),
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,

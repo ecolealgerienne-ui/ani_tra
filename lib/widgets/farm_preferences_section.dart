@@ -185,28 +185,30 @@ class FarmPreferencesSection extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.translate(AppStrings.defaultAnimalType)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: AnimalConfig.availableSpecies.map((species) {
-            return RadioListTile<String>(
-              title: Text('${species.icon} ${species.nameFr}'),
-              value: species.id,
-              groupValue: settingsProvider.defaultSpeciesId,
-              onChanged: (value) {
-                if (value != null) {
-                  settingsProvider.setDefaultSpecies(value);
-                  final breeds = AnimalConfig.getBreedsBySpecies(value);
-                  if (breeds.isNotEmpty) {
-                    settingsProvider.setDefaultBreed(breeds.first.id);
-                  } else {
-                    settingsProvider.setDefaultBreed(null);
-                  }
-                  Navigator.pop(context);
-                }
-              },
-              activeColor: Theme.of(context).primaryColor,
-            );
-          }).toList(),
+        content: RadioGroup<String>(
+          groupValue: settingsProvider.defaultSpeciesId,
+          onChanged: (value) {
+            if (value != null) {
+              settingsProvider.setDefaultSpecies(value);
+              final breeds = AnimalConfig.getBreedsBySpecies(value);
+              if (breeds.isNotEmpty) {
+                settingsProvider.setDefaultBreed(breeds.first.id);
+              } else {
+                settingsProvider.setDefaultBreed(null);
+              }
+              Navigator.pop(context);
+            }
+          },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: AnimalConfig.availableSpecies.map((species) {
+              return RadioListTile<String>(
+                title: Text('${species.icon} ${species.nameFr}'),
+                value: species.id,
+                activeColor: Theme.of(context).primaryColor,
+              );
+            }).toList(),
+          ),
         ),
         actions: [
           TextButton(
@@ -240,42 +242,37 @@ class FarmPreferencesSection extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.translate(AppStrings.defaultBreed)),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              RadioListTile<String?>(
-                title: Text(l10n.translate(AppStrings.noneChooseEachTime)),
-                value: null,
-                groupValue: settingsProvider.defaultBreedId,
-                onChanged: (value) {
-                  settingsProvider.setDefaultBreed(null);
-                  Navigator.pop(context);
-                },
-                activeColor: Theme.of(context).primaryColor,
-              ),
-              const Divider(),
-              ...breeds.map((breed) {
-                return RadioListTile<String>(
-                  title: Text(breed.nameFr),
-                  subtitle: breed.description != null
-                      ? Text(
-                          breed.description!,
-                          style: const TextStyle(fontSize: 11),
-                        )
-                      : null,
-                  value: breed.id,
-                  groupValue: settingsProvider.defaultBreedId,
-                  onChanged: (value) {
-                    if (value != null) {
-                      settingsProvider.setDefaultBreed(value);
-                      Navigator.pop(context);
-                    }
-                  },
+        content: RadioGroup<String?>(
+          groupValue: settingsProvider.defaultBreedId,
+          onChanged: (value) {
+            settingsProvider.setDefaultBreed(value);
+            Navigator.pop(context);
+          },
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                RadioListTile<String?>(
+                  title: Text(l10n.translate(AppStrings.noneChooseEachTime)),
+                  value: null,
                   activeColor: Theme.of(context).primaryColor,
-                );
-              }),
-            ],
+                ),
+                const Divider(),
+                ...breeds.map((breed) {
+                  return RadioListTile<String?>(
+                    title: Text(breed.nameFr),
+                    subtitle: breed.description != null
+                        ? Text(
+                            breed.description!,
+                            style: const TextStyle(fontSize: 11),
+                          )
+                        : null,
+                    value: breed.id,
+                    activeColor: Theme.of(context).primaryColor,
+                  );
+                }),
+              ],
+            ),
           ),
         ),
         actions: [

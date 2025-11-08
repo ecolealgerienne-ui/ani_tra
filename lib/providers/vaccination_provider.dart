@@ -109,7 +109,6 @@ class VaccinationProvider extends ChangeNotifier {
 
   Future<void> syncToServer() async {
     await Future.delayed(const Duration(milliseconds: 100));
-    debugPrint('🔄 Sync vaccinations simulée (mode mock)');
   }
 
   @override

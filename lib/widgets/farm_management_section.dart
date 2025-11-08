@@ -85,24 +85,26 @@ class FarmManagementSection extends StatelessWidget {
         title: Text(
           AppLocalizations.of(context).translate(AppStrings.availableFarms),
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: auth.farms.map((farm) {
-            final isActive = farm.id == auth.currentFarmId;
-            return RadioListTile<String>(
-              title: Text(farm.name),
-              subtitle: Text(farm.location),
-              value: farm.id,
-              groupValue: auth.currentFarmId,
-              selected: isActive,
-              onChanged: (value) {
-                if (value != null) {
-                  auth.switchFarm(value);
-                  Navigator.pop(context);
-                }
-              },
-            );
-          }).toList(),
+        content: RadioGroup<String>(
+          groupValue: auth.currentFarmId,
+          onChanged: (value) {
+            if (value != null) {
+              auth.switchFarm(value);
+              Navigator.pop(context);
+            }
+          },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: auth.farms.map((farm) {
+              final isActive = farm.id == auth.currentFarmId;
+              return RadioListTile<String>(
+                title: Text(farm.name),
+                subtitle: Text(farm.location),
+                value: farm.id,
+                selected: isActive,
+              );
+            }).toList(),
+          ),
         ),
         actions: [
           TextButton(

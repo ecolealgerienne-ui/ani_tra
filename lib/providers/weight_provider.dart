@@ -39,7 +39,6 @@ class WeightProvider extends ChangeNotifier {
       ..clear()
       ..addAll(items);
     notifyListeners();
-    // debugPrint(kLogWeightsSet); // à activer si vous tracez via des clés
   }
 
   /// Ajoute un enregistrement de poids
@@ -47,7 +46,6 @@ class WeightProvider extends ChangeNotifier {
     final recordWithFarm = record.copyWith(farmId: _authProvider.currentFarmId);
     _allWeightRecords.add(recordWithFarm);
     notifyListeners();
-    // debugPrint(kLogWeightAdded);
   }
 
   /// Met à jour un enregistrement existant (par id)
@@ -56,7 +54,6 @@ class WeightProvider extends ChangeNotifier {
     if (idx != -1) {
       _allWeightRecords[idx] = updated;
       notifyListeners();
-      // debugPrint(kLogWeightUpdated);
     }
   }
 
@@ -66,7 +63,6 @@ class WeightProvider extends ChangeNotifier {
     _allWeightRecords.removeWhere((w) => w.id == id); // removeWhere retourne void
     if (_allWeightRecords.length < before) {
       notifyListeners();
-      // debugPrint(kLogWeightRemoved);
     }
   }
 

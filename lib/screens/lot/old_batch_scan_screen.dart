@@ -11,7 +11,7 @@ import '../../providers/animal_provider.dart';
 import '../../providers/sync_provider.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
-import '0_batch_list_screen.dart';
+import 'old_batch_list_screen.dart';
 
 /// Écran de scan d'animaux pour un lot
 ///
@@ -266,10 +266,13 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        await _cancel();
-        return false;
+    return PopScope(
+      canPop: false, // Équivalent à "return false"
+      onPopInvokedWithResult: (bool didPop, dynamic result) async {
+        // didPop sera false car canPop = false
+        if (!didPop) {
+          await _cancel();
+        }
       },
       child: Scaffold(
         appBar: AppBar(
@@ -323,9 +326,10 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
                         : AppLocalizations.of(context)
                             .translate(AppStrings.animalsScannedCount)
                             .replaceAll('{count}', '$_scannedCount')
-                            .replaceAll('{plural}', _scannedCount > 1 ? 'aux' : '')
                             .replaceAll(
-                                '{pluralScanned}', _scannedCount > 1 ? 's' : ''),
+                                '{plural}', _scannedCount > 1 ? 'aux' : '')
+                            .replaceAll('{pluralScanned}',
+                                _scannedCount > 1 ? 's' : ''),
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,

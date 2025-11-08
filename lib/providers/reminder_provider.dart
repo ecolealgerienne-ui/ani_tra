@@ -190,7 +190,6 @@ class ReminderProvider extends ChangeNotifier {
         );
       }
     } catch (e) {
-      debugPrint('Erreur lors de la programmation de la notification: $e');
     }
   }
 

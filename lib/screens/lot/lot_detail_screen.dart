@@ -187,7 +187,6 @@ class LotDetailScreen extends StatelessWidget {
   }
 
   Widget _buildStatusSection(BuildContext context, Lot lot) {
-    final l10n = AppLocalizations.of(context);
     final isCompleted = lot.completed;
     final statusColor = isCompleted ? Colors.grey : Colors.green;
     final statusIcon = isCompleted ? Icons.lock : Icons.lock_open;
@@ -265,12 +264,15 @@ class LotDetailScreen extends StatelessWidget {
 
               // Traitement
               if (lot.type == LotType.treatment && lot.productName != null) ...[
-                _buildInfoRow(AppLocalizations.of(context).translate(AppStrings.product),
-                    lot.productName!, Icons.medication),
+                _buildInfoRow(
+                    AppLocalizations.of(context).translate(AppStrings.product),
+                    lot.productName!,
+                    Icons.medication),
                 if (lot.treatmentDate != null) ...[
                   const SizedBox(height: 12),
                   _buildInfoRow(
-                    AppLocalizations.of(context).translate(AppStrings.treatmentDate),
+                    AppLocalizations.of(context)
+                        .translate(AppStrings.treatmentDate),
                     DateFormat('dd/MM/yyyy').format(lot.treatmentDate!),
                     Icons.calendar_today,
                   ),
@@ -278,20 +280,25 @@ class LotDetailScreen extends StatelessWidget {
                 if (lot.veterinarianName != null) ...[
                   const SizedBox(height: 12),
                   _buildInfoRow(
-                      AppLocalizations.of(context).translate(AppStrings.veterinarian),
-                      lot.veterinarianName!, Icons.person),
+                      AppLocalizations.of(context)
+                          .translate(AppStrings.veterinarian),
+                      lot.veterinarianName!,
+                      Icons.person),
                 ],
               ],
 
               // Vente
               if (lot.type == LotType.sale) ...[
                 if (lot.buyerName != null)
-                  _buildInfoRow(AppLocalizations.of(context).translate(AppStrings.buyer),
-                      lot.buyerName!, Icons.person),
+                  _buildInfoRow(
+                      AppLocalizations.of(context).translate(AppStrings.buyer),
+                      lot.buyerName!,
+                      Icons.person),
                 if (lot.totalPrice != null) ...[
                   const SizedBox(height: 12),
                   _buildInfoRow(
-                    AppLocalizations.of(context).translate(AppStrings.totalPrice),
+                    AppLocalizations.of(context)
+                        .translate(AppStrings.totalPrice),
                     '${lot.totalPrice!.toStringAsFixed(2)}€',
                     Icons.euro,
                   ),
@@ -299,7 +306,8 @@ class LotDetailScreen extends StatelessWidget {
                 if (lot.pricePerAnimal != null) ...[
                   const SizedBox(height: 12),
                   _buildInfoRow(
-                    AppLocalizations.of(context).translate(AppStrings.pricePerAnimal),
+                    AppLocalizations.of(context)
+                        .translate(AppStrings.pricePerAnimal),
                     '${lot.pricePerAnimal!.toStringAsFixed(2)}€',
                     Icons.attach_money,
                   ),
@@ -310,8 +318,10 @@ class LotDetailScreen extends StatelessWidget {
               if (lot.type == LotType.slaughter &&
                   lot.slaughterhouseName != null) ...[
                 _buildInfoRow(
-                    AppLocalizations.of(context).translate(AppStrings.slaughterhouse),
-                    lot.slaughterhouseName!, Icons.factory),
+                    AppLocalizations.of(context)
+                        .translate(AppStrings.slaughterhouse),
+                    lot.slaughterhouseName!,
+                    Icons.factory),
                 if (lot.slaughterDate != null) ...[
                   const SizedBox(height: 12),
                   _buildInfoRow(
@@ -383,8 +393,8 @@ class LotDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatCard(
-      BuildContext context, String label, String value, IconData icon, Color color) {
+  Widget _buildStatCard(BuildContext context, String label, String value,
+      IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -426,7 +436,8 @@ class LotDetailScreen extends StatelessWidget {
             children: [
               Text(
                 AppLocalizations.of(context).translate(AppStrings.animals),
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               if (!lot.completed)
                 TextButton.icon(
@@ -463,8 +474,8 @@ class LotDetailScreen extends StatelessWidget {
                     }
                   },
                   icon: const Icon(Icons.qr_code_scanner, size: 18),
-                  label: Text(
-                      AppLocalizations.of(context).translate(AppStrings.scanner)),
+                  label: Text(AppLocalizations.of(context)
+                      .translate(AppStrings.scanner)),
                 ),
             ],
           ),
@@ -483,7 +494,8 @@ class LotDetailScreen extends StatelessWidget {
                         size: 48, color: Colors.grey.shade400),
                     const SizedBox(height: 8),
                     Text(
-                      AppLocalizations.of(context).translate(AppStrings.noAnimals),
+                      AppLocalizations.of(context)
+                          .translate(AppStrings.noAnimals),
                       style:
                           TextStyle(fontSize: 14, color: Colors.grey.shade600),
                     ),
@@ -665,7 +677,8 @@ class LotDetailScreen extends StatelessWidget {
                 ),
               );
             },
-            child: Text(AppLocalizations.of(context).translate(AppStrings.rename)),
+            child:
+                Text(AppLocalizations.of(context).translate(AppStrings.rename)),
           ),
         ],
       ),
@@ -780,8 +793,8 @@ class LotDetailScreen extends StatelessWidget {
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text(
-                AppLocalizations.of(context).translate(AppStrings.delete)),
+            child:
+                Text(AppLocalizations.of(context).translate(AppStrings.delete)),
           ),
         ],
       ),

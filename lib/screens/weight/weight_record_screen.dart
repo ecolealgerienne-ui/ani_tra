@@ -298,30 +298,35 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
             const SizedBox(height: 24),
             _buildSectionTitle(context, '3. Source de mesure', Icons.source),
             const SizedBox(height: 12),
-            ...WeightSource.values.map((source) {
-              return RadioListTile<WeightSource>(
-                value: source,
-                groupValue: _selectedSource,
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() {
-                      _selectedSource = value;
-                    });
-                  }
-                },
-                title: Row(
-                  children: [
-                    Text(source.icon),
-                    const SizedBox(width: 8),
-                    Text(source.frenchName),
-                  ],
-                ),
-                subtitle: Text(
-                  'Fiabilité: ${(source.reliability * 100).toInt()}%',
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                ),
-              );
-            }),
+            RadioGroup<WeightSource>(
+              groupValue: _selectedSource,
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() {
+                    _selectedSource = value;
+                  });
+                }
+              },
+              child: Column(
+                children: WeightSource.values.map((source) {
+                  return RadioListTile<WeightSource>(
+                    value: source,
+                    title: Row(
+                      children: [
+                        Text(source.icon),
+                        const SizedBox(width: 8),
+                        Text(source.frenchName),
+                      ],
+                    ),
+                    subtitle: Text(
+                      'Fiabilité: ${(source.reliability * 100).toInt()}%',
+                      style:
+                          TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
             const SizedBox(height: 24),
             _buildSectionTitle(
                 context,

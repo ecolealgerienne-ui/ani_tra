@@ -38,10 +38,16 @@ class VeterinarianProvider with ChangeNotifier {
       .where((v) => v.emergencyService && v.isAvailable && v.isActive)
       .toList();
 
-  Veterinarian? get defaultVeterinarian => _allVeterinarians.firstWhere(
+  // ✅ CORRECTION : Utiliser cast() au lieu de orElse avec null as Type
+  Veterinarian? get defaultVeterinarian {
+    try {
+      return _allVeterinarians.firstWhere(
         (v) => v.isDefault && v.isActive,
-        orElse: () => null as Veterinarian,
       );
+    } catch (e) {
+      return null;
+    }
+  }
 
   // ==================== Mock Data ====================
 

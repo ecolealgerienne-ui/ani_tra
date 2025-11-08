@@ -391,14 +391,6 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
           final filtered = _getFilteredAnimals(animalProvider.animals);
           final grouped = _getGroupedAnimals(filtered);
 
-          // 🐛 DEBUG
-          print('🐛 DEBUG: filtered.length = ${filtered.length}');
-          print('🐛 DEBUG: grouped.keys = ${grouped.keys}');
-          grouped.forEach((key, value) {
-            print('🐛 DEBUG: $key has ${value.length} animals');
-          });
-          print('🐛 DEBUG: _expandedSections = $_expandedSections');
-
           // 🆕 Tri des groupes pour mettre les alertes en premier
           final sortedKeys = grouped.keys.toList();
           if (_groupBy == GroupByOption.alerts) {
@@ -956,16 +948,20 @@ class _GroupBySheet extends StatelessWidget {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
-          ...GroupByOption.values.map((option) {
-            return RadioListTile<GroupByOption>(
-              title: Text(option.label),
-              value: option,
-              groupValue: currentValue,
-              onChanged: (value) {
-                if (value != null) onSelected(value);
-              },
-            );
-          }),
+          RadioGroup<GroupByOption>(
+            groupValue: currentValue,
+            onChanged: (value) {
+              if (value != null) onSelected(value);
+            },
+            child: Column(
+              children: GroupByOption.values.map((option) {
+                return RadioListTile<GroupByOption>(
+                  title: Text(option.label),
+                  value: option,
+                );
+              }).toList(),
+            ),
+          ),
         ],
       ),
     );
@@ -1214,23 +1210,25 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                     // Rémanence
                     const Text('Rémanence',
                         style: TextStyle(fontWeight: FontWeight.w600)),
-                    RadioListTile<bool?>(
-                      title: const Text('Tous'),
-                      value: null,
+                    RadioGroup<bool?>(
                       groupValue: _withdrawal,
                       onChanged: (value) => setState(() => _withdrawal = value),
-                    ),
-                    RadioListTile<bool?>(
-                      title: const Text('Active'),
-                      value: true,
-                      groupValue: _withdrawal,
-                      onChanged: (value) => setState(() => _withdrawal = value),
-                    ),
-                    RadioListTile<bool?>(
-                      title: const Text('Inactive'),
-                      value: false,
-                      groupValue: _withdrawal,
-                      onChanged: (value) => setState(() => _withdrawal = value),
+                      child: const Column(
+                        children: [
+                          RadioListTile<bool?>(
+                            title: Text('Tous'),
+                            value: null,
+                          ),
+                          RadioListTile<bool?>(
+                            title: Text('Active'),
+                            value: true,
+                          ),
+                          RadioListTile<bool?>(
+                            title: Text('Inactive'),
+                            value: false,
+                          ),
+                        ],
+                      ),
                     ),
 
                     const Divider(),

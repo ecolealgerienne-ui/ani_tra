@@ -229,7 +229,7 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                   Text(
                     AppLocalizations.of(context)
                         .translate(AppStrings.statistics),
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -369,7 +369,7 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                   Text(
                     AppLocalizations.of(context)
                         .translate(AppStrings.weightEvolution),
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -480,7 +480,7 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                           child: Text(
                             AppLocalizations.of(context)
                                 .translate(AppStrings.current),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 9,
                               color: Colors.white,
                               fontWeight: FontWeight.bold,

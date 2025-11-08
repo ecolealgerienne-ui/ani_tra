@@ -255,7 +255,7 @@ class VaccinationDetailScreen extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.pets,
                   size: 20,
                   color: Colors.teal,
@@ -390,13 +390,13 @@ class VaccinationDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            const Row(
               children: [
-                const Icon(Icons.note, size: 20, color: Colors.blue),
-                const SizedBox(width: 8),
+                Icon(Icons.note, size: 20, color: Colors.blue),
+                SizedBox(width: 8),
                 Text(
                   'Notes',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -431,13 +431,13 @@ class VaccinationDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            const Row(
               children: [
-                const Icon(Icons.assignment, size: 20, color: Colors.purple),
-                const SizedBox(width: 8),
+                Icon(Icons.assignment, size: 20, color: Colors.purple),
+                SizedBox(width: 8),
                 Text(
                   'Protocole',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),

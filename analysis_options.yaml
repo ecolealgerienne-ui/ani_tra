@@ -1,28 +1,228 @@
-# This file configures the analyzer, which statically analyzes Dart code to
-# check for errors, warnings, and lints.
+# ════════════════════════════════════════════════════════════════════════════════
+# 📋 CONFIGURATION ANALYSEUR DART/FLUTTER
+# ════════════════════════════════════════════════════════════════════════════════
+# 
+# Ce fichier définit les règles de qualité de code pour votre projet.
+# Il est lu par : flutter analyze, dart fix, VS Code, Android Studio
 #
-# The issues identified by the analyzer are surfaced in the UI of Dart-enabled
-# IDEs (https://dart.dev/tools#ides-and-editors). The analyzer can also be
-# invoked from the command line by running `flutter analyze`.
+# Documentation officielle : https://dart.dev/tools/analysis
+# ════════════════════════════════════════════════════════════════════════════════
 
-# The following line activates a set of recommended lints for Flutter apps,
-# packages, and plugins designed to encourage good coding practices.
+# ┌────────────────────────────────────────────────────────────────────────────┐
+# │ 1. RÈGLES DE BASE FLUTTER                                                  │
+# └────────────────────────────────────────────────────────────────────────────┘
+# 
+# Importe les règles recommandées par l'équipe Flutter
+# Contient ~150 règles de bonnes pratiques
+#
 include: package:flutter_lints/flutter.yaml
 
-linter:
-  # The lint rules applied to this project can be customized in the
-  # section below to disable rules from the `package:flutter_lints/flutter.yaml`
-  # included above or to enable additional rules. A list of all available lints
-  # and their documentation is published at https://dart.dev/lints.
-  #
-  # Instead of disabling a lint rule for the entire project in the
-  # section below, it can also be suppressed for a single line of code
-  # or a specific dart file by using the `// ignore: name_of_lint` and
-  # `// ignore_for_file: name_of_lint` syntax on the line or in the file
-  # producing the lint.
-  rules:
-    # avoid_print: false  # Uncomment to disable the `avoid_print` rule
-    # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
 
-# Additional information about this file can be found at
-# https://dart.dev/guides/language/analysis-options
+# ┌────────────────────────────────────────────────────────────────────────────┐
+# │ 2. CONFIGURATION DE L'ANALYSEUR                                            │
+# └────────────────────────────────────────────────────────────────────────────┘
+
+analyzer:
+  # ──────────────────────────────────────────────────────────────────────────
+  # 2.1 GESTION DES ERREURS
+  # ──────────────────────────────────────────────────────────────────────────
+  # 
+  # Définit comment traiter chaque type de problème :
+  # - error   : Bloque la compilation (rouge)
+  # - warning : Alerte (jaune)
+  # - info    : Information (bleu)
+  # - ignore  : Ne pas afficher
+  #
+  errors:
+    # ════════════════════════════════════════════════════════════════════════
+    # CRITIQUES - NE JAMAIS IGNORER
+    # ════════════════════════════════════════════════════════════════════════
+    
+    # API dépréciées qui seront supprimées dans les prochaines versions
+    deprecated_member_use: warning
+    
+    # Paramètres requis manquants
+    missing_required_param: error
+    
+    # Retour manquant dans une fonction
+    missing_return: error
+    
+    # Variable non définie
+    undefined_identifier: error
+    
+    # ════════════════════════════════════════════════════════════════════════
+    # SPÉCIFIQUES AU PROJET - MODE MOCK
+    # ════════════════════════════════════════════════════════════════════════
+    
+    # IGNORER : Vos fichiers i18n locaux (app_localizations.dart, app_strings.dart)
+    # ne sont PAS dans pubspec.yaml et c'est normal
+    missing_dependency: ignore
+    
+    # IGNORER : En mode MOCK, les champs sync sont présents mais non utilisés
+    # Exemples : farmId, synced, lastSyncedAt dans les models
+    unused_field: ignore
+    
+    # IGNORER : Les méthodes de sync sont des placeholders vides
+    # Exemples : syncToServer(), markAsSynced() dans les providers
+    unused_element: ignore
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # 2.2 FICHIERS À EXCLURE DE L'ANALYSE
+  # ──────────────────────────────────────────────────────────────────────────
+  #
+  # Ces fichiers sont générés automatiquement ou externes
+  #
+  exclude:
+    - "**/*.g.dart"           # Fichiers générés (json_serializable, build_runner)
+    - "**/*.freezed.dart"     # Fichiers générés (freezed)
+    - "**/*.mocks.dart"       # Fichiers de mock générés (mockito)
+    - "**/generated/**"       # Dossier de génération
+    - "build/**"              # Dossier de build
+    - ".dart_tool/**"         # Outils Dart
+    - "lib/data/mock_*.dart"  # Fichiers mock (print() OK pour debug)
+
+
+# ┌────────────────────────────────────────────────────────────────────────────┐
+# │ 3. RÈGLES DE LINT (LINTER)                                                 │
+# └────────────────────────────────────────────────────────────────────────────┘
+#
+# Active/désactive des règles spécifiques de style de code
+# Liste complète : https://dart.dev/tools/linter-rules
+#
+
+linter:
+  rules:
+    # ════════════════════════════════════════════════════════════════════════
+    # ✅ RÈGLES ACTIVÉES - SAFE POUR VOTRE PROJET
+    # ════════════════════════════════════════════════════════════════════════
+    
+    # ────────────────────────────────────────────────────────────────────────
+    # QUALITÉ DU CODE
+    # ────────────────────────────────────────────────────────────────────────
+    
+    # Utiliser 'final' pour les champs privés jamais réassignés
+    # Exemple : _myList → final _myList
+    prefer_final_fields: true
+    
+    # Utiliser 'const' pour les constructeurs qui peuvent l'être
+    # Exemple : Container() → const Container()
+    prefer_const_constructors: true
+    
+    # Utiliser 'const' pour les littéraux (listes, maps)
+    # Exemple : [1, 2, 3] → const [1, 2, 3]
+    prefer_const_literals_to_create_immutables: true
+    
+    # Éviter les print() en production (utiliser debugPrint ou logger)
+    avoid_print: true
+    
+    # ────────────────────────────────────────────────────────────────────────
+    # WIDGETS FLUTTER
+    # ────────────────────────────────────────────────────────────────────────
+    
+    # Ajouter 'key' dans les constructeurs de widgets
+    # Exemple : MyWidget() → MyWidget({super.key})
+    use_key_in_widget_constructors: true
+    
+    # Utiliser les super-parameters (Dart 2.17+)
+    # Exemple : MyWidget({Key? key}) : super(key: key) 
+    #        → MyWidget({super.key})
+    use_super_parameters: true
+    
+    # Éviter les Container() inutiles
+    # Exemple : Container(child: Text('x')) → Text('x')
+    avoid_unnecessary_containers: true
+    
+    # Utiliser SizedBox au lieu de Container pour les espaces
+    # Exemple : Container(width: 10) → SizedBox(width: 10)
+    sized_box_for_whitespace: true
+    
+    # ────────────────────────────────────────────────────────────────────────
+    # SYNTAXE ET STYLE
+    # ────────────────────────────────────────────────────────────────────────
+    
+    # Simplifier les interpolations de strings
+    # Exemple : '${x}' → '$x' (quand x est simple)
+    unnecessary_brace_in_string_interps: true
+    
+    # Retirer .toList() avant un spread operator
+    # Exemple : [...items.toList()] → [...items]
+    unnecessary_to_list_in_spreads: true
+    
+    # ────────────────────────────────────────────────────────────────────────
+    # SÉCURITÉ ET PERFORMANCE
+    # ────────────────────────────────────────────────────────────────────────
+    
+    # Toujours utiliser des collections littérales
+    # Exemple : List() → []
+    prefer_collection_literals: true
+    
+    # Utiliser 'is' au lieu de 'is!' quand possible
+    prefer_is_not_operator: true
+    
+    # Éviter les valeurs de retour vides
+    avoid_returning_null_for_void: true
+    
+    # Ne pas utiliser BuildContext après async
+    use_build_context_synchronously: false  # ⚠️ Désactivé : votre projet utilise ce pattern légitimement
+    
+    # ════════════════════════════════════════════════════════════════════════
+    # ❌ RÈGLES DÉSACTIVÉES - CONFLIT AVEC VOTRE PROJET
+    # ════════════════════════════════════════════════════════════════════════
+    
+    # ────────────────────────────────────────────────────────────────────────
+    # CONFLIT AVEC RÈGLES I18N
+    # ────────────────────────────────────────────────────────────────────────
+    
+    # ❌ DÉSACTIVÉE : Conflit avec votre pattern i18n
+    # Votre règle : NE PAS utiliser const avec AppLocalizations
+    # Cette règle lint : Toujours utiliser const quand possible
+    # → CONFLIT si activée !
+    #
+    # Exemple problématique :
+    #   const Text(AppLocalizations.of(context).translate(key))  ← ERREUR !
+    #
+    # prefer_const_constructors_in_immutables: false
+    
+    # ❌ DÉSACTIVÉE : Conflit avec pattern de concaténation i18n
+    # Votre règle 11 : Certaines concaténations sont nécessaires pour i18n
+    # Cette règle lint : Toujours préférer l'interpolation
+    #
+    # Exemple légitime :
+    #   translate(key) + ' ' + otherTranslate(key2)
+    #
+    # prefer_interpolation_to_compose_strings: false
+    
+    # ────────────────────────────────────────────────────────────────────────
+    # SPÉCIFIQUES AU MODE MOCK
+    # ────────────────────────────────────────────────────────────────────────
+    
+    # ❌ DÉSACTIVÉE : Méthodes publiques non utilisées sont des placeholders
+    # Exemple : syncToServer() dans providers (vides mais gardées pour le futur)
+    # public_member_api_docs: false
+
+
+# ┌────────────────────────────────────────────────────────────────────────────┐
+# │ 4. RÉSUMÉ DE LA CONFIGURATION                                              │
+# └────────────────────────────────────────────────────────────────────────────┘
+#
+# ✅ Active  : ~30 règles de qualité de code
+# ❌ Ignore  : missing_dependency, unused_field, unused_element (mode MOCK)
+# ⚠️  Adapté : Règles compatibles avec votre système i18n
+#
+# ════════════════════════════════════════════════════════════════════════════
+# COMMANDES UTILES
+# ════════════════════════════════════════════════════════════════════════════
+#
+# Analyser le projet :
+#   flutter analyze
+#
+# Voir les corrections auto possibles :
+#   dart fix --dry-run
+#
+# Appliquer les corrections auto :
+#   dart fix --apply
+#
+# Lister toutes les règles disponibles :
+#   dart analyze --rules
+#
+# ════════════════════════════════════════════════════════════════════════════

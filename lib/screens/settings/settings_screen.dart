@@ -404,7 +404,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const Divider(),
 
           // Language Section
-          _SectionHeader(title: 'Langue / Language / اللغة'),
+          const _SectionHeader(title: 'Langue / Language / اللغة'),
 
           _LanguageTile(
             title: 'Français',
@@ -751,23 +751,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Profil utilisateur'),
-        content: Column(
+        content: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const CircleAvatar(
+            CircleAvatar(
               radius: 40,
               child: Icon(Icons.person, size: 40),
             ),
-            const SizedBox(height: 16),
-            const TextField(
+            SizedBox(height: 16),
+            TextField(
               decoration: InputDecoration(
                 labelText: 'Nom complet',
                 border: OutlineInputBorder(),
               ),
               enabled: false,
             ),
-            const SizedBox(height: 12),
-            const TextField(
+            SizedBox(height: 12),
+            TextField(
               decoration: InputDecoration(
                 labelText: 'Email',
                 border: OutlineInputBorder(),
@@ -801,9 +801,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Changer le mot de passe'),
-        content: Column(
+        content: const Column(
           mainAxisSize: MainAxisSize.min,
-          children: const [
+          children: [
             TextField(
               decoration: InputDecoration(
                 labelText: 'Mot de passe actuel',
@@ -856,14 +856,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Choisir une couleur'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _ColorOption('Bleu', 'blue', Colors.blue),
-            _ColorOption('Vert', 'green', Colors.green),
-            _ColorOption('Violet', 'purple', Colors.purple),
-            _ColorOption('Orange', 'orange', Colors.orange),
-          ],
+        content: RadioGroup<String>(
+          groupValue: _themeColor,
+          onChanged: (newValue) {
+            setState(() => _themeColor = newValue!);
+            _savePreference('theme_color', newValue!);
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Redémarrez l\'app pour appliquer la couleur'),
+              ),
+            );
+          },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _colorOption('Bleu', 'blue', Colors.blue),
+              _colorOption('Vert', 'green', Colors.green),
+              _colorOption('Violet', 'purple', Colors.purple),
+              _colorOption('Orange', 'orange', Colors.orange),
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -875,25 +888,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _ColorOption(String label, String value, Color color) {
+  Widget _colorOption(String label, String value, Color color) {
     return RadioListTile<String>(
       title: Text(label),
       value: value,
-      groupValue: _themeColor,
+      // groupValue et onChanged retirés (gérés par RadioGroup parent)
       secondary: CircleAvatar(
         backgroundColor: color,
         radius: 12,
       ),
-      onChanged: (newValue) {
-        setState(() => _themeColor = newValue!);
-        _savePreference('theme_color', newValue!);
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Redémarrez l\'app pour appliquer la couleur'),
-          ),
-        );
-      },
     );
   }
 
@@ -902,50 +905,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Délai de verrouillage'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            RadioListTile<int>(
-              title: const Text('1 minute'),
-              value: 1,
-              groupValue: _autoLockMinutes,
-              onChanged: (value) {
-                setState(() => _autoLockMinutes = value!);
-                _savePreference('auto_lock_minutes', value!);
-                Navigator.pop(context);
-              },
-            ),
-            RadioListTile<int>(
-              title: const Text('5 minutes'),
-              value: 5,
-              groupValue: _autoLockMinutes,
-              onChanged: (value) {
-                setState(() => _autoLockMinutes = value!);
-                _savePreference('auto_lock_minutes', value!);
-                Navigator.pop(context);
-              },
-            ),
-            RadioListTile<int>(
-              title: const Text('15 minutes'),
-              value: 15,
-              groupValue: _autoLockMinutes,
-              onChanged: (value) {
-                setState(() => _autoLockMinutes = value!);
-                _savePreference('auto_lock_minutes', value!);
-                Navigator.pop(context);
-              },
-            ),
-            RadioListTile<int>(
-              title: const Text('30 minutes'),
-              value: 30,
-              groupValue: _autoLockMinutes,
-              onChanged: (value) {
-                setState(() => _autoLockMinutes = value!);
-                _savePreference('auto_lock_minutes', value!);
-                Navigator.pop(context);
-              },
-            ),
-          ],
+        content: RadioGroup<int>(
+          groupValue: _autoLockMinutes,
+          onChanged: (value) {
+            setState(() => _autoLockMinutes = value!);
+            _savePreference('auto_lock_minutes', value!);
+            Navigator.pop(context);
+          },
+          child: const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadioListTile<int>(
+                title: Text('1 minute'),
+                value: 1,
+              ),
+              RadioListTile<int>(
+                title: Text('5 minutes'),
+                value: 5,
+              ),
+              RadioListTile<int>(
+                title: Text('15 minutes'),
+                value: 15,
+              ),
+              RadioListTile<int>(
+                title: Text('30 minutes'),
+                value: 30,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -959,11 +946,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ListTile(
-              leading: const Icon(Icons.phone_android),
-              title: const Text('Cet appareil'),
-              subtitle: const Text('Actif maintenant'),
-              trailing: const Chip(
+            const ListTile(
+              leading: Icon(Icons.phone_android),
+              title: Text('Cet appareil'),
+              subtitle: Text('Actif maintenant'),
+              trailing: Chip(
                 label: Text('Actuel'),
                 backgroundColor: Colors.green,
               ),
@@ -1319,35 +1306,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Aide et support'),
-        content: Column(
+        content: const Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Besoin d\'aide ?',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             ListTile(
-              leading: const Icon(Icons.email),
-              title: const Text('Email'),
-              subtitle: const Text('support@rfid-troupeau.com'),
+              leading: Icon(Icons.email),
+              title: Text('Email'),
+              subtitle: Text('support@rfid-troupeau.com'),
               dense: true,
             ),
             ListTile(
-              leading: const Icon(Icons.phone),
-              title: const Text('Téléphone'),
-              subtitle: const Text('+33 1 23 45 67 89'),
+              leading: Icon(Icons.phone),
+              title: Text('Téléphone'),
+              subtitle: Text('+33 1 23 45 67 89'),
               dense: true,
             ),
             ListTile(
-              leading: const Icon(Icons.language),
-              title: const Text('Site web'),
-              subtitle: const Text('www.rfid-troupeau.com'),
+              leading: Icon(Icons.language),
+              title: Text('Site web'),
+              subtitle: Text('www.rfid-troupeau.com'),
               dense: true,
             ),
-            const SizedBox(height: 12),
-            const Text(
+            SizedBox(height: 12),
+            Text(
               'Horaires: Lun-Ven 9h-18h',
               style: TextStyle(fontSize: 12, color: Colors.grey),
             ),

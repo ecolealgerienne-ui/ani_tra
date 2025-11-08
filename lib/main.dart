@@ -66,7 +66,6 @@ void main() async {
   await flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
     onDidReceiveNotificationResponse: (NotificationResponse response) {
-      // TODO: Gérer le clic sur notification
       // → Ouvrir écran pré-rempli pour enregistrer le soin
       debugPrint('Notification cliquée: ${response.payload}');
     },

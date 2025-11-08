@@ -174,22 +174,26 @@ class _ChangeEidDialogState extends State<ChangeEidDialog> {
                 ),
               ),
               const SizedBox(height: 8),
-              ...EidChangeReason.all.map((reason) {
-                return RadioListTile<String>(
-                  title: Text(EidChangeReason.getLabel(reason)),
-                  value: reason,
-                  groupValue: _selectedReason,
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() {
-                        _selectedReason = value;
-                      });
-                    }
-                  },
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
-                );
-              }),
+              RadioGroup<String>(
+                groupValue: _selectedReason,
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      _selectedReason = value;
+                    });
+                  }
+                },
+                child: Column(
+                  children: EidChangeReason.all.map((reason) {
+                    return RadioListTile<String>(
+                      title: Text(EidChangeReason.getLabel(reason)),
+                      value: reason,
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                    );
+                  }).toList(),
+                ),
+              ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _notesController,

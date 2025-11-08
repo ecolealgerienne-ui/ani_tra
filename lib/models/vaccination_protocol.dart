@@ -98,7 +98,7 @@ class VaccinationProtocol {
 
 class VaccinationProtocols {
   static final List<VaccinationProtocol> ovineProtocols = [
-    VaccinationProtocol(
+    const VaccinationProtocol(
       id: 'ovine_enterotoxemie',
       name: 'Entérotoxémie',
       description: 'Vaccination contre Clostridium perfringens',
@@ -114,7 +114,7 @@ class VaccinationProtocols {
       recommendedPeriod: 'Mars-Avril',
       notes: 'Rappel annuel. Vacciner 4-6 semaines avant mise à l\'herbe.',
     ),
-    VaccinationProtocol(
+    const VaccinationProtocol(
       id: 'ovine_pasteurellose',
       name: 'Pasteurellose',
       description: 'Vaccination contre Pasteurella',
@@ -130,7 +130,7 @@ class VaccinationProtocols {
       recommendedPeriod: 'Septembre-Octobre',
       notes: 'Vaccination avant rentrée en bergerie.',
     ),
-    VaccinationProtocol(
+    const VaccinationProtocol(
       id: 'ovine_fievre_q',
       name: 'Fièvre Q',
       description: 'Vaccination contre Coxiella burnetii',
@@ -148,7 +148,7 @@ class VaccinationProtocols {
   ];
 
   static final List<VaccinationProtocol> bovineProtocols = [
-    VaccinationProtocol(
+    const VaccinationProtocol(
       id: 'bovine_bvd',
       name: 'BVD',
       description: 'Vaccination contre la Diarrhée Virale Bovine',
@@ -163,7 +163,7 @@ class VaccinationProtocols {
       reminderIntervalDays: 365,
       notes: 'Vacciner génisses avant première saillie.',
     ),
-    VaccinationProtocol(
+    const VaccinationProtocol(
       id: 'bovine_ibr',
       name: 'IBR',
       description: 'Vaccination contre la Rhinotrachéite Infectieuse Bovine',
@@ -178,7 +178,7 @@ class VaccinationProtocols {
       reminderIntervalDays: 180,
       notes: 'Rappel tous les 6 mois pour reproductrices.',
     ),
-    VaccinationProtocol(
+    const VaccinationProtocol(
       id: 'bovine_fievre_aphteuse',
       name: 'Fièvre Aphteuse',
       description: 'Vaccination contre le virus aphteux',
@@ -196,7 +196,7 @@ class VaccinationProtocols {
   ];
 
   static final List<VaccinationProtocol> caprineProtocols = [
-    VaccinationProtocol(
+    const VaccinationProtocol(
       id: 'caprine_enterotoxemie',
       name: 'Entérotoxémie',
       description: 'Vaccination contre Clostridium perfringens',
@@ -212,7 +212,7 @@ class VaccinationProtocols {
       recommendedPeriod: 'Mars-Avril',
       notes: 'Rappel annuel. Vacciner avant mise à l\'herbe.',
     ),
-    VaccinationProtocol(
+    const VaccinationProtocol(
       id: 'caprine_caev',
       name: 'CAEV',
       description: 'Dépistage Arthrite Encéphalite Caprine',

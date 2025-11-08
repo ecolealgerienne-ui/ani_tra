@@ -530,50 +530,46 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: RadioListTile<AnimalSex>(
-                    title: const Text('Mâle'),
-                    value: AnimalSex.male,
-                    groupValue: _selectedSex,
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedSex = value;
-                      });
-                    },
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      side: BorderSide(
-                        color: _selectedSex == AnimalSex.male
-                            ? Colors.blue
-                            : Colors.grey.shade300,
+            RadioGroup<AnimalSex>(
+              groupValue: _selectedSex,
+              onChanged: (value) {
+                setState(() {
+                  _selectedSex = value;
+                });
+              },
+              child: Row(
+                children: [
+                  Expanded(
+                    child: RadioListTile<AnimalSex>(
+                      title: const Text('Mâle'),
+                      value: AnimalSex.male,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(
+                          color: _selectedSex == AnimalSex.male
+                              ? Colors.blue
+                              : Colors.grey.shade300,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: RadioListTile<AnimalSex>(
-                    title: const Text('Femelle'),
-                    value: AnimalSex.female,
-                    groupValue: _selectedSex,
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedSex = value;
-                      });
-                    },
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      side: BorderSide(
-                        color: _selectedSex == AnimalSex.female
-                            ? Colors.pink
-                            : Colors.grey.shade300,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: RadioListTile<AnimalSex>(
+                      title: const Text('Femelle'),
+                      value: AnimalSex.female,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(
+                          color: _selectedSex == AnimalSex.female
+                              ? Colors.pink
+                              : Colors.grey.shade300,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
 
             const SizedBox(height: 16),
@@ -729,7 +725,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                               color: Colors.white,
                             ),
                           )
-                        : Row(
+                        : const Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(Icons.save, size: 20),
@@ -833,7 +829,7 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Row(
+      title: const Row(
         children: [
           Icon(Icons.qr_code_scanner, color: Colors.green),
           SizedBox(width: 8),
@@ -1050,7 +1046,7 @@ class _ScanEIDDialogState extends State<_ScanEIDDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Row(
+      title: const Row(
         children: [
           Icon(Icons.qr_code_scanner, color: Colors.blue),
           SizedBox(width: 8),

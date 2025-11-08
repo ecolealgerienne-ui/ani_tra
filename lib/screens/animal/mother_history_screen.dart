@@ -59,17 +59,17 @@ class MotherHistoryScreen extends StatelessWidget {
               if (offspring.isEmpty)
                 Card(
                   child: Padding(
-                    padding: EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(24),
                     child: Center(
                       child: Column(
                         children: [
-                          Icon(Icons.info_outline,
+                          const Icon(Icons.info_outline,
                               size: 48, color: Colors.grey),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           Text(
                             AppLocalizations.of(context)
                                 .translate(AppStrings.noDescendants),
-                            style: TextStyle(color: Colors.grey),
+                            style: const TextStyle(color: Colors.grey),
                           ),
                         ],
                       ),

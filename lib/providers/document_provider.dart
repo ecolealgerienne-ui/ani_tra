@@ -226,13 +226,11 @@ class DocumentProvider extends ChangeNotifier {
   Future<void> syncToServer() async {
     // TODO: Implémenter quand serveur prêt
     await Future.delayed(const Duration(milliseconds: 100));
-    debugPrint('🔄 Sync documents simulée (mode mock)');
   }
 
   /// Marquer comme synchronisé (placeholder)
   void _markAsSynced(String id, String serverVersion) {
     // TODO: Implémenter quand serveur prêt
-    debugPrint('✅ Document $id marqué comme synced (mode mock)');
   }
 
   @override

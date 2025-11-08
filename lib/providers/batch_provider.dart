@@ -106,9 +106,7 @@ class BatchProvider with ChangeNotifier {
 
     notifyListeners();
 
-    // Logs via clés (multi-langue gérée au-dessus si besoin)
-    debugPrint('$kLogBatchCreated|name=$name|purpose=${purpose.name}');
-
+    
     return batch;
   }
 
@@ -119,13 +117,12 @@ class BatchProvider with ChangeNotifier {
   /// Retourne true si ajouté avec succès, false si doublon
   bool addAnimalToBatch(String animalId) {
     if (_activeBatch == null) {
-      debugPrint(kLogBatchNoActive);
+      
       return false;
     }
 
     // Vérifier doublon
     if (_activeBatch!.animalIds.contains(animalId)) {
-      debugPrint('$kLogBatchAnimalAlreadyIn|animalId=$animalId');
       return false;
     }
 
@@ -150,9 +147,6 @@ class BatchProvider with ChangeNotifier {
 
     notifyListeners();
 
-    debugPrint(
-        '$kLogBatchAnimalAdded|animalId=$animalId|count=${updatedBatch.animalCount}');
-
     return true;
   }
 
@@ -163,12 +157,10 @@ class BatchProvider with ChangeNotifier {
   /// Retourne true si retiré avec succès
   bool removeAnimalFromBatch(String animalId) {
     if (_activeBatch == null) {
-      debugPrint(kLogBatchNoActive);
       return false;
     }
 
     if (!_activeBatch!.animalIds.contains(animalId)) {
-      debugPrint('$kLogBatchAnimalAlreadyIn|not_present|animalId=$animalId');
       return false;
     }
 
@@ -195,10 +187,6 @@ class BatchProvider with ChangeNotifier {
     }
 
     notifyListeners();
-
-    debugPrint(
-        '$kLogBatchAnimalRemoved|animalId=$animalId|count=${updatedBatch.animalCount}');
-
     return true;
   }
 
@@ -219,7 +207,6 @@ class BatchProvider with ChangeNotifier {
     final index = _allBatches.indexWhere((b) => b.id == batchId);
 
     if (index == -1) {
-      debugPrint('$kLogBatchNotFound|id=$batchId');
       return;
     }
 
@@ -244,8 +231,6 @@ class BatchProvider with ChangeNotifier {
     }
 
     notifyListeners();
-
-    debugPrint('$kLogBatchCompleted|name=${batch.name}');
   }
 
   /// Supprimer un lot
@@ -255,7 +240,6 @@ class BatchProvider with ChangeNotifier {
     final index = _allBatches.indexWhere((b) => b.id == batchId);
 
     if (index == -1) {
-      debugPrint('$kLogBatchNotFound|id=$batchId');
       return;
     }
 
@@ -269,14 +253,11 @@ class BatchProvider with ChangeNotifier {
     }
 
     notifyListeners();
-
-    debugPrint('$kLogBatchDeleted|name=${batch.name}');
   }
 
   /// Réinitialiser le lot actif (abandon de création)
   void clearActiveBatch() {
     if (_activeBatch != null) {
-      debugPrint('$kLogBatchActiveReset|name=${_activeBatch!.name}');
       _activeBatch = null;
       notifyListeners();
     }
@@ -292,15 +273,12 @@ class BatchProvider with ChangeNotifier {
     );
 
     if (batch.completed) {
-      // On garde un log neutre (clé), et on ne réactive pas
-      debugPrint(kErrCannotReactivateCompleted);
       return;
     }
 
     _activeBatch = batch;
     notifyListeners();
 
-    debugPrint('$kLogBatchActivated|name=${batch.name}');
   }
 
   /// Obtenir un lot par son ID
@@ -334,8 +312,7 @@ class BatchProvider with ChangeNotifier {
   ///
   /// À implémenter avec la base de données SQLite
   Future<void> loadBatches() async {
-    // TODO: Implémenter chargement depuis SQLite
-    debugPrint(kLogBatchLoading);
+    // TODO: Implémenter chargement depuis SQLite    
 
     // Pour l'instant, on garde les données en mémoire
     notifyListeners();
@@ -346,7 +323,6 @@ class BatchProvider with ChangeNotifier {
   /// À implémenter avec la base de données SQLite
   Future<void> saveBatches() async {
     // TODO: Implémenter sauvegarde vers SQLite
-    debugPrint(kLogBatchSaving);
   }
 
   /// Initialiser avec des données de test (mock)
@@ -354,7 +330,6 @@ class BatchProvider with ChangeNotifier {
     _allBatches = mockBatches;
     notifyListeners();
 
-    debugPrint('$kLogBatchMockLoaded|count=${mockBatches.length}');
   }
 
   // ==================== Méthodes Privées ====================
@@ -397,7 +372,6 @@ class BatchProvider with ChangeNotifier {
     _allBatches.clear();
     _activeBatch = null;
     notifyListeners();
-    debugPrint(kLogBatchReset);
   }
 
   @override

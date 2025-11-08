@@ -91,9 +91,9 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-            AppLocalizations.of(context).translate(AppStrings.vetValidated)
-                .replaceAll('{name}', selectedVet.fullName)),
+        content: Text(AppLocalizations.of(context)
+            .translate(AppStrings.vetValidated)
+            .replaceAll('{name}', selectedVet.fullName)),
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 2),
       ),
@@ -165,8 +165,8 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
         if (pricePerAnimal == null || pricePerAnimal <= 0) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content:
-                  Text(AppLocalizations.of(context).translate(AppStrings.invalidPrice)),
+              content: Text(AppLocalizations.of(context)
+                  .translate(AppStrings.invalidPrice)),
               backgroundColor: Colors.red,
             ),
           );
@@ -247,7 +247,6 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final lotProvider = context.watch<LotProvider>();
     final animalProvider = context.watch<AnimalProvider>();
     final lot = lotProvider.getLotById(widget.lotId);
@@ -255,15 +254,18 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
     if (lot == null) {
       return Scaffold(
         appBar: AppBar(
-            title: Text(AppLocalizations.of(context).translate(AppStrings.error))),
+            title:
+                Text(AppLocalizations.of(context).translate(AppStrings.error))),
         body: Center(
-            child: Text(AppLocalizations.of(context).translate(AppStrings.lotNotFound))),
+            child: Text(AppLocalizations.of(context)
+                .translate(AppStrings.lotNotFound))),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context).translate(AppStrings.finalizeLot)),
+        title: Text(
+            AppLocalizations.of(context).translate(AppStrings.finalizeLot)),
       ),
       body: _selectedType == null
           ? _buildTypeSelection(context, lot)
@@ -272,8 +274,6 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
   }
 
   Widget _buildTypeSelection(BuildContext context, Lot lot) {
-    final l10n = AppLocalizations.of(context);
-
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
@@ -299,7 +299,8 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
         // Traitement
         _buildTypeCard(
           icon: '💊',
-          title: AppLocalizations.of(context).translate(AppStrings.treatmentLot),
+          title:
+              AppLocalizations.of(context).translate(AppStrings.treatmentLot),
           subtitle: 'Traitement sanitaire groupé',
           color: Colors.blue,
           onTap: () async {
@@ -335,7 +336,8 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      AppLocalizations.of(context).translate(AppStrings.lotFinalized),
+                      AppLocalizations.of(context)
+                          .translate(AppStrings.lotFinalized),
                     ),
                     backgroundColor: Colors.green,
                   ),
@@ -350,7 +352,8 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
         _buildTypeCard(
           icon: '💰',
           title: AppLocalizations.of(context).translate(AppStrings.saleLot),
-          subtitle: AppLocalizations.of(context).translate(AppStrings.saleAnimals),
+          subtitle:
+              AppLocalizations.of(context).translate(AppStrings.saleAnimals),
           color: Colors.green,
           onTap: () {
             setState(() => _selectedType = LotType.sale);
@@ -361,9 +364,10 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
         // Abattage
         _buildTypeCard(
           icon: '🏭',
-          title: AppLocalizations.of(context).translate(AppStrings.slaughterLot),
-          subtitle:
-              AppLocalizations.of(context).translate(AppStrings.slaughterPreparation),
+          title:
+              AppLocalizations.of(context).translate(AppStrings.slaughterLot),
+          subtitle: AppLocalizations.of(context)
+              .translate(AppStrings.slaughterPreparation),
           color: Colors.grey,
           onTap: () {
             setState(() => _selectedType = LotType.slaughter);
@@ -493,8 +497,8 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
             controller: _notesController,
             maxLines: 3,
             decoration: InputDecoration(
-              labelText:
-                  AppLocalizations.of(context).translate(AppStrings.notesOptional),
+              labelText: AppLocalizations.of(context)
+                  .translate(AppStrings.notesOptional),
               border: const OutlineInputBorder(),
             ),
           ),
@@ -507,8 +511,8 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
             child: ElevatedButton.icon(
               onPressed: _finalize,
               icon: const Icon(Icons.check_circle),
-              label:
-                  Text(AppLocalizations.of(context).translate(AppStrings.finalizeLot)),
+              label: Text(AppLocalizations.of(context)
+                  .translate(AppStrings.finalizeLot)),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 backgroundColor: Colors.green,
@@ -624,11 +628,13 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
             prefixIcon: const Icon(Icons.euro),
           ),
           validator: (value) {
-            if (value == null || value.isEmpty)
+            if (value == null || value.isEmpty) {
               return AppLocalizations.of(context).translate('requiredField');
+            }
             final price = double.tryParse(value);
-            if (price == null || price <= 0)
+            if (price == null || price <= 0) {
               return AppLocalizations.of(context).translate('invalidPrice');
+            }
             return null;
           },
         ),
@@ -814,15 +820,15 @@ class __VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
             // Résultats
             if (_filteredVets.isEmpty)
               Padding(
-                padding: EdgeInsets.all(32),
+                padding: const EdgeInsets.all(32),
                 child: Column(
                   children: [
-                    Icon(Icons.search_off, size: 48, color: Colors.grey),
-                    SizedBox(height: 16),
+                    const Icon(Icons.search_off, size: 48, color: Colors.grey),
+                    const SizedBox(height: 16),
                     Text(
                       AppLocalizations.of(context)
                           .translate('noVeterinarianFound'),
-                      style: TextStyle(color: Colors.grey),
+                      style: const TextStyle(color: Colors.grey),
                     ),
                   ],
                 ),

@@ -203,10 +203,6 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
 
   /// Gérer la sélection d'un produit
   void _onProductSelected(MedicalProduct product) {
-    print('🔍 DEBUG: product=${product.commercialName}');
-    print('   widget.mode=${widget.mode}');
-    print('   _animal=${_animal?.eid}');
-    print('   _animalWeight=$_animalWeight');
     setState(() {
       _selectedProduct = product;
       _selectedRoute = product.defaultAdministrationRoute;
@@ -217,16 +213,11 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
           _animal != null &&
           _animalWeight != null) {
         _calculatedDosage = product.calculateDosage(_animalWeight!);
-        print('   ✅ _calculatedDosage=$_calculatedDosage');
         // Pré-remplir pour les vaccins ET les traitements
         if (_calculatedDosage != null &&
             (product.type == ProductType.vaccine ||
                 product.type == ProductType.treatment)) {
           _dosageController.text = _calculatedDosage!.toStringAsFixed(1);
-          print('   ✅ Dosage rempli: ${_dosageController.text}');
-        } else {
-          print(
-              '   ❌ Pas de remplissage: _calculatedDosage=$_calculatedDosage, type=${product.type}');
         }
       }
     });
