@@ -27,6 +27,7 @@ import '../vaccination/vaccination_detail_screen.dart';
 import '../medical/medical_act_screen.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
+import '../../utils/constants.dart';
 
 class AnimalDetailScreen extends StatefulWidget {
   final Animal? preloadedAnimal;
@@ -59,9 +60,10 @@ class _AnimalDetailScreenState extends State<AnimalDetailScreen> {
 
     if (animals.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Aucun animal disponible'),
-          backgroundColor: Colors.orange,
+        SnackBar(
+          content: Text(AppLocalizations.of(context)
+              .translate(AppStrings.noAnimalAvailable)),
+          backgroundColor: AppConstants.warningOrange,
         ),
       );
       return;
@@ -88,7 +90,8 @@ class _AnimalDetailScreenState extends State<AnimalDetailScreen> {
               ElevatedButton.icon(
                 onPressed: _simulateScan,
                 icon: const Icon(Icons.camera_alt),
-                label: const Text('Scanner un animal'),
+                label: Text(AppLocalizations.of(context)
+                    .translate(AppStrings.scanAnimal)),
                 style: ElevatedButton.styleFrom(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
@@ -105,11 +108,20 @@ class _AnimalDetailScreenState extends State<AnimalDetailScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(_scannedAnimal!.displayName),
-          bottom: const TabBar(
+          bottom: TabBar(
             tabs: [
-              Tab(icon: Icon(Icons.info), text: 'Infos'),
-              Tab(icon: Icon(Icons.medical_services), text: 'Soins'),
-              Tab(icon: Icon(Icons.family_restroom), text: 'Généalogie'),
+              Tab(
+                  icon: const Icon(Icons.info),
+                  text:
+                      AppLocalizations.of(context).translate(AppStrings.infos)),
+              Tab(
+                  icon: const Icon(Icons.medical_services),
+                  text:
+                      AppLocalizations.of(context).translate(AppStrings.care)),
+              Tab(
+                  icon: const Icon(Icons.family_restroom),
+                  text: AppLocalizations.of(context)
+                      .translate(AppStrings.genealogy)),
             ],
           ),
         ),
@@ -170,7 +182,7 @@ class _AnimalHeader extends StatelessWidget {
                       fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  '${animal.sex == AnimalSex.male ? '♂️ Mâle' : '♀️ Femelle'} · ${_getAgeFormatted()}',
+                  '${animal.sex == AnimalSex.male ? '♂️ \${AppLocalizations.of(context).translate(AppStrings.male)}' : '♀️ \${AppLocalizations.of(context).translate(AppStrings.female)}'} · ${_getAgeFormatted()}',
                   style: TextStyle(color: Colors.grey[700]),
                 ),
                 // ÉTAPE 7 : Afficher Type et Race
@@ -208,28 +220,30 @@ class _StatusBadge extends StatelessWidget {
 
     switch (status) {
       case AnimalStatus.alive:
-        color = Colors.green;
-        label = '🟢 Vivant';
+        color = AppConstants.successGreen;
+        label = AppLocalizations.of(context).translate(AppStrings.statusAlive);
         break;
       case AnimalStatus.sold:
-        color = Colors.orange;
-        label = '🟠 Vendu';
+        color = AppConstants.warningOrange;
+        label = AppLocalizations.of(context).translate(AppStrings.statusSold);
         break;
       case AnimalStatus.dead:
-        color = Colors.red;
-        label = '🔴 Mort';
+        color = AppConstants.statusDanger;
+        label = AppLocalizations.of(context).translate(AppStrings.statusDead);
         break;
       case AnimalStatus.slaughtered:
         color = Colors.red[900]!;
-        label = '🔴 Abattu';
+        label = AppLocalizations.of(context)
+            .translate(AppStrings.statusSlaughtered);
         break;
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppConstants.spacingSmall, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(12),
+        color: color.withValues(alpha: AppConstants.opacityMedium),
+        borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
         border: Border.all(color: color),
       ),
       child: Text(label,
@@ -256,15 +270,17 @@ class _InfosTab extends StatelessWidget {
           controller: weightController,
           keyboardType: TextInputType.number,
           autofocus: true,
-          decoration: const InputDecoration(
-            labelText: 'Poids (kg)',
-            suffixText: 'kg',
+          decoration: InputDecoration(
+            labelText:
+                AppLocalizations.of(context).translate(AppStrings.weightInKg),
+            suffixText: AppLocalizations.of(context).translate(AppStrings.kg),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
+            child:
+                Text(AppLocalizations.of(context).translate(AppStrings.cancel)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -356,13 +372,30 @@ class _InfosTab extends StatelessWidget {
               _InfoRow(
                   label: 'Sexe',
                   value: currentAnimal.sex == AnimalSex.male
-                      ? '♂️ Mâle'
-                      : '♀️ Femelle'),
+                      ? '♂️ \${AppLocalizations.of(context).translate(AppStrings.male)}'
+                      : '♀️ \${AppLocalizations.of(context).translate(AppStrings.female)}'),
               _InfoRow(
-                  label: 'Statut',
-                  value: _getStatusLabel(currentAnimal.status)),
+                  label: AppLocalizations.of(context)
+                      .translate(AppStrings.statusAnimal),
+                  value: () {
+                    switch (currentAnimal.status) {
+                      case AnimalStatus.alive:
+                        return AppLocalizations.of(context)
+                            .translate(AppStrings.statusAlive);
+                      case AnimalStatus.sold:
+                        return AppLocalizations.of(context)
+                            .translate(AppStrings.statusSold);
+                      case AnimalStatus.dead:
+                        return AppLocalizations.of(context)
+                            .translate(AppStrings.statusDead);
+                      case AnimalStatus.slaughtered:
+                        return AppLocalizations.of(context)
+                            .translate(AppStrings.statusSlaughtered);
+                    }
+                  }()),
               _InfoRow(
-                  label: 'Date de naissance',
+                  label: AppLocalizations.of(context)
+                      .translate(AppStrings.birthDate),
                   value: _formatDate(currentAnimal.birthDate)),
               _InfoRow(label: 'Âge', value: _getAgeFormatted()),
             ],
@@ -375,18 +408,21 @@ class _InfosTab extends StatelessWidget {
               title: '🐑 Type et Race',
               children: [
                 _InfoRow(
-                  label: 'Type',
+                  label: AppLocalizations.of(context)
+                      .translate(AppStrings.species),
                   value: currentAnimal.speciesNameFr,
                   icon: currentAnimal.speciesIcon,
                 ),
                 if (currentAnimal.hasBreed)
                   _InfoRow(
-                    label: 'Race',
+                    label: AppLocalizations.of(context)
+                        .translate(AppStrings.breed),
                     value: currentAnimal.breedNameFr,
                   )
                 else
                   _InfoRow(
-                    label: 'Race',
+                    label: AppLocalizations.of(context)
+                        .translate(AppStrings.breed),
                     value: 'Non définie',
                     valueStyle: TextStyle(
                       color: Colors.grey[600],
@@ -403,12 +439,14 @@ class _InfosTab extends StatelessWidget {
             title: '🏷️ Identification RFID',
             trailing: IconButton(
               icon: const Icon(Icons.edit),
-              tooltip: 'Changer l\'EID',
+              tooltip:
+                  AppLocalizations.of(context).translate(AppStrings.changeEid),
               onPressed: () => _showChangeEidDialog(context, currentAnimal),
             ),
             children: [
               _InfoRow(
-                label: 'EID actuel',
+                label: AppLocalizations.of(context)
+                    .translate(AppStrings.currentEid),
                 value: currentAnimal.safeEid,
               ),
               if (currentAnimal.eidHistory != null &&
@@ -475,7 +513,9 @@ class _InfosTab extends StatelessWidget {
                   ),
                 ),
               ] else
-                const Center(child: Text('Aucune pesée enregistrée')),
+                Center(
+                    child: Text(AppLocalizations.of(context)
+                        .translate(AppStrings.noWeightRecorded))),
             ],
           ),
           const SizedBox(height: 16),
@@ -532,7 +572,8 @@ class _InfosTab extends StatelessWidget {
                     );
                   },
             icon: const Icon(Icons.dangerous),
-            label: const Text('Déclarer mort'),
+            label: Text(AppLocalizations.of(context)
+                .translate(AppStrings.declareDeath)),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size.fromHeight(48),
               foregroundColor: currentAnimal.status == AnimalStatus.dead
@@ -554,19 +595,6 @@ class _InfosTab extends StatelessWidget {
 
   String _formatDate(DateTime date) {
     return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
-  }
-
-  String _getStatusLabel(AnimalStatus status) {
-    switch (status) {
-      case AnimalStatus.alive:
-        return '🟢 Vivant';
-      case AnimalStatus.sold:
-        return '🟠 Vendu';
-      case AnimalStatus.dead:
-        return '🔴 Mort';
-      case AnimalStatus.slaughtered:
-        return '🔴 Abattu';
-    }
   }
 
   // void _showAddTreatmentDialog(BuildContext context, String animalId) {
@@ -617,9 +645,10 @@ class _SoinsTab extends StatelessWidget {
                           const Icon(Icons.vaccines,
                               color: Colors.green, size: 20),
                           const SizedBox(width: 8),
-                          const Text(
-                            'Vaccinations',
-                            style: TextStyle(
+                          Text(
+                            AppLocalizations.of(context)
+                                .translate(AppStrings.vaccinations),
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
@@ -824,8 +853,9 @@ class _GenealogieTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Mère',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Text(AppLocalizations.of(context).translate(AppStrings.mother),
+              style:
+                  const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           if (mother != null)
             ListTile(
@@ -1057,7 +1087,8 @@ class _VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
       actions: [
         TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler')),
+            child: Text(
+                AppLocalizations.of(context).translate(AppStrings.cancel))),
       ],
     );
   }
@@ -1383,8 +1414,12 @@ class _VaccinationCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         vaccination.daysUntilReminder! < 0
-                            ? 'Rappel en retard'
-                            : 'Rappel dans ${vaccination.daysUntilReminder}j',
+                            ? AppLocalizations.of(context)
+                                .translate(AppStrings.reminderLate)
+                            : AppLocalizations.of(context)
+                                .translate(AppStrings.reminderInDays)
+                                .replaceAll('{days}',
+                                    '\${vaccination.daysUntilReminder}'),
                         style: TextStyle(
                           fontSize: 12,
                           color: vaccination.isReminderDue

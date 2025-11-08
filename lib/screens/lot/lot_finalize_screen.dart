@@ -9,6 +9,7 @@ import '../../providers/sync_provider.dart';
 import '../../models/lot.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
+import '../../utils/constants.dart';
 import '../../models/product.dart';
 import '../../models/animal.dart';
 import '../../models/veterinarian.dart';
@@ -94,8 +95,8 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
         content: Text(AppLocalizations.of(context)
             .translate(AppStrings.vetValidated)
             .replaceAll('{name}', selectedVet.fullName)),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 2),
+        backgroundColor: AppConstants.successGreen,
+        duration: AppConstants.snackBarDurationMedium,
       ),
     );
   }
@@ -167,7 +168,7 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
             SnackBar(
               content: Text(AppLocalizations.of(context)
                   .translate(AppStrings.invalidPrice)),
-              backgroundColor: Colors.red,
+              backgroundColor: AppConstants.statusDanger,
             ),
           );
           return;
@@ -239,7 +240,7 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
           content: Text(
             AppLocalizations.of(context).translate(AppStrings.lotFinalized),
           ),
-          backgroundColor: Colors.green,
+          backgroundColor: AppConstants.successGreen,
         ),
       );
     }
@@ -275,34 +276,35 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
 
   Widget _buildTypeSelection(BuildContext context, Lot lot) {
     return ListView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppConstants.spacingLarge),
       children: [
         Text(
           AppLocalizations.of(context).translate(AppStrings.chooseLotType),
           style: const TextStyle(
-            fontSize: 22,
+            fontSize: AppConstants.fontSizeLargeTitle,
             fontWeight: FontWeight.bold,
           ),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppConstants.spacingSmall),
         Text(
-          '${lot.animalCount} ${AppLocalizations.of(context).translate('animals')}',
+          '${lot.animalCount} ${AppLocalizations.of(context).translate(AppStrings.animals)}',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: AppConstants.fontSizeBody,
             color: Colors.grey.shade600,
           ),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 32),
+        const SizedBox(height: AppConstants.spacingLarge),
 
         // Traitement
         _buildTypeCard(
           icon: '💊',
           title:
               AppLocalizations.of(context).translate(AppStrings.treatmentLot),
-          subtitle: 'Traitement sanitaire groupé',
-          color: Colors.blue,
+          subtitle: AppLocalizations.of(context)
+              .translate(AppStrings.groupedHealthTreatment),
+          color: AppConstants.primaryBlue,
           onTap: () async {
             await Navigator.push(
               context,
@@ -339,14 +341,14 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
                       AppLocalizations.of(context)
                           .translate(AppStrings.lotFinalized),
                     ),
-                    backgroundColor: Colors.green,
+                    backgroundColor: AppConstants.successGreen,
                   ),
                 );
               }
             }
           },
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppConstants.spacingMedium),
 
         // Vente
         _buildTypeCard(
@@ -354,12 +356,12 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
           title: AppLocalizations.of(context).translate(AppStrings.saleLot),
           subtitle:
               AppLocalizations.of(context).translate(AppStrings.saleAnimals),
-          color: Colors.green,
+          color: AppConstants.successGreen,
           onTap: () {
             setState(() => _selectedType = LotType.sale);
           },
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppConstants.spacingMedium),
 
         // Abattage
         _buildTypeCard(
@@ -368,7 +370,7 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
               AppLocalizations.of(context).translate(AppStrings.slaughterLot),
           subtitle: AppLocalizations.of(context)
               .translate(AppStrings.slaughterPreparation),
-          color: Colors.grey,
+          color: AppConstants.statusGrey,
           onTap: () {
             setState(() => _selectedType = LotType.slaughter);
           },
@@ -388,23 +390,26 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
       elevation: 2,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(AppConstants.spacingLarge),
           child: Row(
             children: [
               Container(
-                width: 60,
-                height: 60,
+                width: AppConstants.typeCardIconSize,
+                height: AppConstants.typeCardIconSize,
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
+                  color: color.withValues(alpha: AppConstants.opacityLight),
+                  borderRadius:
+                      BorderRadius.circular(AppConstants.borderRadiusMedium),
                 ),
                 child: Center(
-                  child: Text(icon, style: const TextStyle(fontSize: 32)),
+                  child: Text(icon,
+                      style: const TextStyle(
+                          fontSize: AppConstants.typeCardIconFontSize)),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: AppConstants.spacingMedium),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -412,16 +417,16 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
                     Text(
                       title,
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: AppConstants.fontSizeImportant,
                         fontWeight: FontWeight.bold,
                         color: color,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppConstants.spacingTiny),
                     Text(
                       subtitle,
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: AppConstants.fontSizeSubtitle,
                         color: Colors.grey.shade600,
                       ),
                     ),
@@ -441,19 +446,23 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
     return Form(
       key: _formKey,
       child: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppConstants.spacingMedium),
         children: [
           // Header
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppConstants.spacingMedium),
             decoration: BoxDecoration(
-              color: _getTypeColor().withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              color:
+                  _getTypeColor().withValues(alpha: AppConstants.opacityLight),
+              borderRadius:
+                  BorderRadius.circular(AppConstants.borderRadiusMedium),
             ),
             child: Row(
               children: [
-                Text(_selectedType!.icon, style: const TextStyle(fontSize: 32)),
-                const SizedBox(width: 12),
+                Text(_selectedType!.icon,
+                    style: const TextStyle(
+                        fontSize: AppConstants.typeCardIconFontSize)),
+                const SizedBox(width: AppConstants.spacingSmall),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -461,14 +470,15 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
                       Text(
                         _selectedType!.label,
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: AppConstants.fontSizeImportant,
                           fontWeight: FontWeight.bold,
                           color: _getTypeColor(),
                         ),
                       ),
                       Text(
                         '${lot.animalCount} ${AppLocalizations.of(context).translate(AppStrings.animals)}',
-                        style: const TextStyle(fontSize: 14),
+                        style: const TextStyle(
+                            fontSize: AppConstants.fontSizeSubtitle),
                       ),
                     ],
                   ),
@@ -482,7 +492,7 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppConstants.spacingLarge),
 
           // Formulaire selon type
           if (_selectedType == LotType.treatment)
@@ -490,7 +500,7 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
           if (_selectedType == LotType.sale) _buildSaleForm(),
           if (_selectedType == LotType.slaughter) _buildSlaughterForm(),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: AppConstants.spacingLarge),
 
           // Notes
           TextField(
@@ -503,7 +513,7 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
             ),
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: AppConstants.spacingLarge),
 
           // Bouton Finaliser
           SizedBox(
@@ -514,8 +524,9 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
               label: Text(AppLocalizations.of(context)
                   .translate(AppStrings.finalizeLot)),
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: Colors.green,
+                padding: const EdgeInsets.symmetric(
+                    vertical: AppConstants.spacingMedium),
+                backgroundColor: AppConstants.successGreen,
                 foregroundColor: Colors.white,
               ),
             ),
@@ -535,30 +546,31 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppConstants.spacingMedium),
           decoration: BoxDecoration(
             color: Colors.blue.shade50,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius:
+                BorderRadius.circular(AppConstants.borderRadiusMedium),
             border: Border.all(color: Colors.blue.shade200),
           ),
           child: Row(
             children: [
               Icon(Icons.info_outline, color: Colors.blue.shade700),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppConstants.spacingSmall),
               Expanded(
                 child: Text(
                   AppLocalizations.of(context)
                       .translate(AppStrings.treatmentWillApplyToAnimals),
                   style: TextStyle(
                     color: Colors.blue.shade900,
-                    fontSize: 14,
+                    fontSize: AppConstants.fontSizeSubtitle,
                   ),
                 ),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppConstants.spacingMedium),
         ElevatedButton.icon(
           onPressed: () {
             Navigator.push(
@@ -572,14 +584,16 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
               ),
             );
           },
-          icon: const Icon(Icons.medical_services, size: 24),
-          label: const Text(
-            'Traiter le lot',
-            style: TextStyle(fontSize: 16),
+          icon: const Icon(Icons.medical_services,
+              size: AppConstants.iconSizeMedium),
+          label: Text(
+            AppLocalizations.of(context).translate(AppStrings.treatLot),
+            style: const TextStyle(fontSize: AppConstants.fontSizeBody),
           ),
           style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            backgroundColor: Colors.blue,
+            padding: const EdgeInsets.symmetric(
+                vertical: AppConstants.spacingMedium),
+            backgroundColor: AppConstants.primaryBlue,
             foregroundColor: Colors.white,
           ),
         ),
@@ -597,65 +611,73 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
         TextFormField(
           controller: _buyerNameController,
           decoration: InputDecoration(
-            labelText: AppLocalizations.of(context).translate('buyerName'),
+            labelText:
+                AppLocalizations.of(context).translate(AppStrings.buyerName),
             border: const OutlineInputBorder(),
             prefixIcon: const Icon(Icons.person),
           ),
           validator: (value) => value == null || value.isEmpty
-              ? AppLocalizations.of(context).translate('buyerNameRequired')
+              ? AppLocalizations.of(context)
+                  .translate(AppStrings.buyerNameRequired)
               : null,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppConstants.spacingMedium),
 
         // N° Exploitation
         TextField(
           controller: _buyerFarmIdController,
           decoration: InputDecoration(
-            labelText: AppLocalizations.of(context).translate('buyerFarmId'),
+            labelText:
+                AppLocalizations.of(context).translate(AppStrings.buyerFarmId),
             border: const OutlineInputBorder(),
             prefixIcon: const Icon(Icons.badge),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppConstants.spacingMedium),
 
         // Prix par animal
         TextFormField(
           controller: _pricePerAnimalController,
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
-            labelText: AppLocalizations.of(context).translate('pricePerAnimal'),
+            labelText: AppLocalizations.of(context)
+                .translate(AppStrings.pricePerAnimal),
             border: const OutlineInputBorder(),
             prefixIcon: const Icon(Icons.euro),
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return AppLocalizations.of(context).translate('requiredField');
+              return AppLocalizations.of(context)
+                  .translate(AppStrings.fieldRequired);
             }
             final price = double.tryParse(value);
             if (price == null || price <= 0) {
-              return AppLocalizations.of(context).translate('invalidPrice');
+              return AppLocalizations.of(context)
+                  .translate(AppStrings.invalidPrice);
             }
             return null;
           },
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppConstants.spacingMedium),
 
         // Date vente
         ListTile(
           contentPadding: EdgeInsets.zero,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppConstants.borderRadiusSmall),
             side: BorderSide(color: Colors.grey.shade400),
           ),
           leading: const Icon(Icons.calendar_today),
-          title: Text(AppLocalizations.of(context).translate('saleDate')),
+          title:
+              Text(AppLocalizations.of(context).translate(AppStrings.saleDate)),
           subtitle: Text(dateFormat.format(_saleDate)),
           trailing: const Icon(Icons.chevron_right),
           onTap: () async {
             final date = await showDatePicker(
               context: context,
               initialDate: _saleDate,
-              firstDate: DateTime.now().subtract(const Duration(days: 30)),
+              firstDate: DateTime.now()
+                  .subtract(const Duration(days: AppConstants.maxPastDays)),
               lastDate: DateTime.now(),
             );
             if (date != null) {
@@ -677,38 +699,39 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
         TextFormField(
           controller: _slaughterhouseNameController,
           decoration: InputDecoration(
-            labelText:
-                AppLocalizations.of(context).translate('slaughterhouseName'),
+            labelText: AppLocalizations.of(context)
+                .translate(AppStrings.slaughterhouseName),
             border: const OutlineInputBorder(),
             prefixIcon: const Icon(Icons.factory),
           ),
           validator: (value) => value == null || value.isEmpty
-              ? AppLocalizations.of(context).translate('requiredField')
+              ? AppLocalizations.of(context).translate(AppStrings.fieldRequired)
               : null,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppConstants.spacingMedium),
 
         // N° Abattoir
         TextField(
           controller: _slaughterhouseIdController,
           decoration: InputDecoration(
-            labelText:
-                AppLocalizations.of(context).translate('slaughterhouseId'),
+            labelText: AppLocalizations.of(context)
+                .translate(AppStrings.slaughterhouseId),
             border: const OutlineInputBorder(),
             prefixIcon: const Icon(Icons.badge),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppConstants.spacingMedium),
 
         // Date abattage
         ListTile(
           contentPadding: EdgeInsets.zero,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppConstants.borderRadiusSmall),
             side: BorderSide(color: Colors.grey.shade400),
           ),
           leading: const Icon(Icons.calendar_today),
-          title: Text(AppLocalizations.of(context).translate('dateSlaughter')),
+          title: Text(
+              AppLocalizations.of(context).translate(AppStrings.dateSlaughter)),
           subtitle: Text(dateFormat.format(_slaughterDate)),
           trailing: const Icon(Icons.chevron_right),
           onTap: () async {
@@ -716,7 +739,8 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
               context: context,
               initialDate: _slaughterDate,
               firstDate: DateTime.now(),
-              lastDate: DateTime.now().add(const Duration(days: 60)),
+              lastDate: DateTime.now()
+                  .add(const Duration(days: AppConstants.maxFutureDays)),
             );
             if (date != null) {
               setState(() => _slaughterDate = date);
@@ -730,13 +754,13 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
   Color _getTypeColor() {
     switch (_selectedType) {
       case LotType.treatment:
-        return Colors.blue;
+        return AppConstants.primaryBlue;
       case LotType.sale:
-        return Colors.green;
+        return AppConstants.successGreen;
       case LotType.slaughter:
-        return Colors.grey;
+        return AppConstants.statusGrey;
       case null:
-        return Colors.orange;
+        return AppConstants.warningOrange;
     }
   }
 }
@@ -791,11 +815,14 @@ class __VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(AppLocalizations.of(context).translate('searchVeterinarian')),
-      contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      title: Text(AppLocalizations.of(context)
+          .translate(AppStrings.searchVeterinarian)),
+      contentPadding: const EdgeInsets.fromLTRB(AppConstants.spacingLarge,
+          AppConstants.spacingLarge, AppConstants.spacingLarge, 0),
       content: Container(
         width: double.maxFinite,
-        constraints: const BoxConstraints(maxHeight: 500),
+        constraints:
+            const BoxConstraints(maxHeight: AppConstants.dialogMaxHeight),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -804,10 +831,11 @@ class __VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
               controller: _searchController,
               decoration: InputDecoration(
                 hintText: AppLocalizations.of(context)
-                    .translate('nameOrEstablishment'),
+                    .translate(AppStrings.nameOrEstablishment),
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius:
+                      BorderRadius.circular(AppConstants.borderRadiusSmall),
                 ),
                 filled: true,
                 fillColor: Colors.grey.shade100,
@@ -815,19 +843,21 @@ class __VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
               onChanged: _filterVets,
               autofocus: true,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppConstants.spacingMedium),
 
             // Résultats
             if (_filteredVets.isEmpty)
               Padding(
-                padding: const EdgeInsets.all(32),
+                padding: const EdgeInsets.all(AppConstants.spacingLarge),
                 child: Column(
                   children: [
-                    const Icon(Icons.search_off, size: 48, color: Colors.grey),
-                    const SizedBox(height: 16),
+                    const Icon(Icons.search_off,
+                        size: AppConstants.iconSizeMediumLarge,
+                        color: Colors.grey),
+                    const SizedBox(height: AppConstants.spacingMedium),
                     Text(
                       AppLocalizations.of(context)
-                          .translate('noVeterinarianFound'),
+                          .translate(AppStrings.noVeterinarianFound),
                       style: const TextStyle(color: Colors.grey),
                     ),
                   ],
@@ -854,12 +884,12 @@ class __VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
                         children: [
                           Text(vet.clinic ??
                               AppLocalizations.of(context)
-                                  .translate('notSpecified')),
-                          const SizedBox(height: 4),
+                                  .translate(AppStrings.notSpecified)),
+                          const SizedBox(height: AppConstants.spacingTiny),
                           Text(
                             vet.licenseNumber,
                             style: TextStyle(
-                              fontSize: 11,
+                              fontSize: AppConstants.fontSizeTiny,
                               color: Colors.grey.shade600,
                             ),
                           ),
@@ -876,7 +906,8 @@ class __VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(AppLocalizations.of(context).translate('cancel')),
+          child:
+              Text(AppLocalizations.of(context).translate(AppStrings.cancel)),
         ),
       ],
     );

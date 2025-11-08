@@ -8,6 +8,7 @@ import '../../providers/animal_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
+import '../../utils/constants.dart';
 
 class ExportRegistryScreen extends StatefulWidget {
   const ExportRegistryScreen({super.key});
@@ -33,7 +34,9 @@ class _ExportRegistryScreenState extends State<ExportRegistryScreen> {
         case 'inventaire':
           await pdfService.generateInventoryPdf(
             animals: animalProvider.animals,
-            farmName: settings.farmName ?? 'Mon Élevage',
+            farmName: settings.farmName ??
+                AppLocalizations.of(context).translate(AppStrings.myFarm),
+            translations: _getPdfTranslations(context),
           );
           break;
       }
@@ -44,7 +47,7 @@ class _ExportRegistryScreenState extends State<ExportRegistryScreen> {
           content: Text(
               AppLocalizations.of(context).translate(AppStrings.pdfDownloaded)),
           backgroundColor: Colors.green,
-          duration: const Duration(seconds: 2),
+          duration: AppConstants.snackBarDurationMedium,
         ),
       );
     } catch (e) {
@@ -63,6 +66,27 @@ class _ExportRegistryScreenState extends State<ExportRegistryScreen> {
     }
   }
 
+  Map<String, String> _getPdfTranslations(BuildContext context) {
+    return {
+      'animalInventory':
+          AppLocalizations.of(context).translate(AppStrings.animalInventory),
+      'date': AppLocalizations.of(context).translate(AppStrings.date),
+      'total': AppLocalizations.of(context).translate(AppStrings.total),
+      'animalsCount':
+          AppLocalizations.of(context).translate(AppStrings.animalsCount),
+      'officialNumber':
+          AppLocalizations.of(context).translate(AppStrings.officialNumber),
+      'eid': AppLocalizations.of(context).translate(AppStrings.eidLabel),
+      'sex': AppLocalizations.of(context).translate(AppStrings.sex),
+      'breed': AppLocalizations.of(context).translate(AppStrings.breed),
+      'age': AppLocalizations.of(context).translate(AppStrings.age),
+      'male': AppLocalizations.of(context).translate(AppStrings.maleShort),
+      'female': AppLocalizations.of(context).translate(AppStrings.femaleShort),
+      'cannotAccessDownloads': AppLocalizations.of(context)
+          .translate(AppStrings.cannotAccessDownloads),
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,8 +102,10 @@ class _ExportRegistryScreenState extends State<ExportRegistryScreen> {
             id: 'registre_complet',
             icon: Icons.description,
             iconColor: Colors.blue,
-            title: 'Registre complet',
-            subtitle: 'Inventaire du cheptel',
+            title: AppLocalizations.of(context)
+                .translate(AppStrings.completeRegistry),
+            subtitle: AppLocalizations.of(context)
+                .translate(AppStrings.herdInventory),
             enabled: true,
           ),
           const SizedBox(height: 12),
@@ -88,8 +114,10 @@ class _ExportRegistryScreenState extends State<ExportRegistryScreen> {
             id: 'inventaire',
             icon: Icons.list_alt,
             iconColor: Colors.green,
-            title: 'Inventaire des animaux',
-            subtitle: 'Liste complète du cheptel',
+            title: AppLocalizations.of(context)
+                .translate(AppStrings.animalInventory),
+            subtitle: AppLocalizations.of(context)
+                .translate(AppStrings.completeHerdList),
             enabled: true,
           ),
         ],

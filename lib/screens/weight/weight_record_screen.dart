@@ -12,6 +12,7 @@ import '../../providers/weight_provider.dart';
 import '../../providers/sync_provider.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
+import '../../utils/constants.dart';
 
 /// Écran d'enregistrement d'une nouvelle pesée
 class WeightRecordScreen extends StatefulWidget {
@@ -89,9 +90,11 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('✅ Animal scanné: ${animal.displayName}'),
+          content: Text(
+            '✅ ${AppLocalizations.of(context).translate(AppStrings.animalScanned).replaceAll('{name}', animal.displayName)}',
+          ),
           backgroundColor: Colors.green,
-          duration: const Duration(seconds: 2),
+          duration: AppConstants.snackBarDurationMedium,
         ),
       );
     } catch (e) {
@@ -149,7 +152,7 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-            '✅ ${AppLocalizations.of(context).translate(AppStrings.weightRecorded)}: ${weight.toStringAsFixed(1)} kg'),
+            '✅ ${AppLocalizations.of(context).translate(AppStrings.weightRecorded)}: ${weight.toStringAsFixed(1)} ${AppLocalizations.of(context).translate(AppStrings.unitKg)}'),
         backgroundColor: Colors.green,
       ),
     );
@@ -175,12 +178,13 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
   Widget _buildSectionTitle(BuildContext context, String title, IconData icon) {
     return Row(
       children: [
-        Icon(icon, size: 20, color: Colors.deepPurple),
+        Icon(icon,
+            size: AppConstants.iconSizeRegular, color: Colors.deepPurple),
         const SizedBox(width: 8),
         Text(
           title,
           style: const TextStyle(
-            fontSize: 16,
+            fontSize: AppConstants.fontSizeSectionTitle,
             fontWeight: FontWeight.bold,
             color: Colors.deepPurple,
           ),
@@ -208,11 +212,15 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            _buildSectionTitle(context, '1. Animal', Icons.pets),
+            _buildSectionTitle(
+              context,
+              l10n.translate(AppStrings.stepOneAnimal),
+              Icons.pets,
+            ),
             const SizedBox(height: 12),
             if (_selectedAnimal == null)
               SizedBox(
-                height: 100,
+                height: AppConstants.scanButtonHeight,
                 child: ElevatedButton(
                   onPressed: _isScanning ? null : _scanAnimal,
                   style: ElevatedButton.styleFrom(
@@ -224,10 +232,13 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
                       : Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(Icons.qr_code_scanner, size: 36),
+                            const Icon(Icons.qr_code_scanner,
+                                size: AppConstants.iconSizeExtraLarge),
                             const SizedBox(height: 8),
                             Text(l10n.translate(AppStrings.scanAnimal),
-                                style: const TextStyle(fontSize: 16)),
+                                style: const TextStyle(
+                                    fontSize:
+                                        AppConstants.fontSizeSectionTitle)),
                           ],
                         ),
                 ),
@@ -267,36 +278,47 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
               ),
             const SizedBox(height: 24),
             _buildSectionTitle(
-                context,
-                '2. ${l10n.translate(AppStrings.weight)}',
-                Icons.monitor_weight),
+              context,
+              l10n
+                  .translate(AppStrings.stepTwoWeight)
+                  .replaceAll('{weight}', l10n.translate(AppStrings.weight)),
+              Icons.monitor_weight,
+            ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _weightController,
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
               decoration: InputDecoration(
-                labelText: '${l10n.translate(AppStrings.weight)} (kg) *',
-                hintText: '45.5',
+                labelText:
+                    '${l10n.translate(AppStrings.weight)} (${l10n.translate(AppStrings.unitKg)}) *',
+                hintText: l10n.translate(AppStrings.weightHintExample),
                 prefixIcon: const Icon(Icons.monitor_weight),
-                suffixText: 'kg',
+                suffixText: l10n.translate(AppStrings.unitKg),
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return '${l10n.translate(AppStrings.weight)} requis';
+                  return l10n.translate(AppStrings.weightRequired).replaceAll(
+                      '{weight}', l10n.translate(AppStrings.weight));
                 }
                 final weight = double.tryParse(value.trim());
                 if (weight == null) {
-                  return '${l10n.translate(AppStrings.weight)} invalide';
+                  return l10n.translate(AppStrings.invalidWeight).replaceAll(
+                      '{weight}', l10n.translate(AppStrings.weight));
                 }
-                if (weight <= 0 || weight > 300) {
-                  return 'Le poids doit être entre 0 et 300 kg';
+                if (weight <= 0 || weight > AppConstants.maxWeightKg) {
+                  return l10n.translate(AppStrings.weightRangeError).replaceAll(
+                      '{max}', AppConstants.maxWeightKg.toInt().toString());
                 }
                 return null;
               },
             ),
             const SizedBox(height: 24),
-            _buildSectionTitle(context, '3. Source de mesure', Icons.source),
+            _buildSectionTitle(
+              context,
+              l10n.translate(AppStrings.stepThreeSource),
+              Icons.source,
+            ),
             const SizedBox(height: 12),
             RadioGroup<WeightSource>(
               groupValue: _selectedSource,
@@ -319,9 +341,12 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
                       ],
                     ),
                     subtitle: Text(
-                      'Fiabilité: ${(source.reliability * 100).toInt()}%',
-                      style:
-                          TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                      l10n.translate(AppStrings.reliability).replaceAll(
+                          '{percent}',
+                          (source.reliability * 100).toInt().toString()),
+                      style: TextStyle(
+                          fontSize: AppConstants.fontSizeSmall,
+                          color: Colors.grey.shade600),
                     ),
                   );
                 }).toList(),
@@ -329,9 +354,12 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
             ),
             const SizedBox(height: 24),
             _buildSectionTitle(
-                context,
-                '4. ${l10n.translate(AppStrings.selectDate)}',
-                Icons.calendar_today),
+              context,
+              l10n
+                  .translate(AppStrings.stepFourDate)
+                  .replaceAll('{date}', l10n.translate(AppStrings.selectDate)),
+              Icons.calendar_today,
+            ),
             const SizedBox(height: 12),
             ListTile(
               leading: const Icon(Icons.calendar_today),
@@ -341,28 +369,34 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
               onTap: _selectDate,
               tileColor: Colors.grey.shade50,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius:
+                    BorderRadius.circular(AppConstants.borderRadiusMedium),
                 side: BorderSide(color: Colors.grey.shade300),
               ),
             ),
             const SizedBox(height: 24),
             _buildSectionTitle(
-                context,
-                '5. ${l10n.translate(AppStrings.notes)} (${l10n.translate(AppStrings.optional)})',
-                Icons.notes),
+              context,
+              l10n
+                  .translate(AppStrings.stepFiveNotes)
+                  .replaceAll('{notes}', l10n.translate(AppStrings.notes))
+                  .replaceAll(
+                      '{optional}', l10n.translate(AppStrings.optional)),
+              Icons.notes,
+            ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _notesController,
               maxLines: 3,
               decoration: InputDecoration(
                 labelText: l10n.translate(AppStrings.notes),
-                hintText: 'Ex: Animal en bonne santé, pesée après tonte...',
+                hintText: l10n.translate(AppStrings.notesHintWeight),
                 prefixIcon: const Icon(Icons.notes),
               ),
             ),
             const SizedBox(height: 32),
             SizedBox(
-              height: 56,
+              height: AppConstants.primaryButtonHeight,
               child: ElevatedButton.icon(
                 onPressed: _saveWeight,
                 icon: const Icon(Icons.save),
@@ -371,7 +405,7 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
                   backgroundColor: Colors.green,
                   foregroundColor: Colors.white,
                   textStyle: const TextStyle(
-                    fontSize: 16,
+                    fontSize: AppConstants.fontSizeSectionTitle,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

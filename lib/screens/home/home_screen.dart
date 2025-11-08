@@ -10,6 +10,7 @@ import '../../providers/alert_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
+import '../../utils/constants.dart';
 import '../../models/animal.dart';
 //import '../../models/alert.dart';
 import '../../models/alert_type.dart';
@@ -71,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 .replaceAll('{query}', query),
           ),
           backgroundColor: Colors.red,
-          duration: const Duration(seconds: 2),
+          duration: AppConstants.snackBarDurationMedium,
         ),
       );
     }
@@ -172,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: RefreshIndicator(
               onRefresh: () async {
-                await Future.delayed(const Duration(seconds: 1));
+                await Future.delayed(AppConstants.snackBarDurationShort);
                 if (!mounted) return;
                 // Forcer le recalcul des alertes
                 context.read<AlertProvider>().refresh();

@@ -9,6 +9,9 @@ import '../../models/scan_result.dart';
 import '../../providers/animal_provider.dart';
 import '../../providers/rfid_scanner_provider.dart';
 import 'universal_scanner_screen.dart';
+import '../../i18n/app_localizations.dart';
+import '../../i18n/app_strings.dart';
+import '../../utils/constants.dart';
 
 enum AnimalFinderMode {
   single,
@@ -25,7 +28,7 @@ class AnimalFinderScreen extends StatefulWidget {
     super.key,
     this.mode = AnimalFinderMode.multiple,
     this.initialSelection = const [],
-    this.title = 'Identifier animaux',
+    this.title = '',
     this.allowedStatuses,
   });
 
@@ -105,14 +108,16 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
         content: Row(
           children: [
             const Icon(Icons.warning, color: Colors.white),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppConstants.spacingSmall),
             Expanded(
-              child: Text('⚠️ ${animal.displayName} déjà scanné'),
+              child: Text(AppLocalizations.of(context)
+                  .translate(AppStrings.animalAlreadyScanned)
+                  .replaceAll('{name}', animal.displayName)),
             ),
           ],
         ),
-        backgroundColor: Colors.orange,
-        duration: const Duration(seconds: 1),
+        backgroundColor: AppConstants.warningOrange,
+        duration: AppConstants.snackBarDurationShort,
       ),
     );
   }
@@ -123,14 +128,16 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
         content: Row(
           children: [
             const Icon(Icons.check_circle, color: Colors.white),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppConstants.spacingSmall),
             Expanded(
-              child: Text('✅ ${animal.displayName} ajouté'),
+              child: Text(AppLocalizations.of(context)
+                  .translate(AppStrings.animalAdded)
+                  .replaceAll('{name}', animal.displayName)),
             ),
           ],
         ),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 1),
+        backgroundColor: AppConstants.successGreen,
+        duration: AppConstants.snackBarDurationShort,
       ),
     );
   }
@@ -149,9 +156,10 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
 
     if (availableAnimals.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('⚠️ Aucun animal disponible'),
-          backgroundColor: Colors.orange,
+        SnackBar(
+          content: Text(AppLocalizations.of(context)
+              .translate(AppStrings.noAnimalAvailable)),
+          backgroundColor: AppConstants.warningOrange,
         ),
       );
       return;
@@ -186,9 +194,10 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
         _onAnimalFound(animal);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('❌ Animal non trouvé'),
-            backgroundColor: Colors.red,
+          SnackBar(
+            content: Text(AppLocalizations.of(context)
+                .translate(AppStrings.animalNotFound)),
+            backgroundColor: AppConstants.statusDanger,
           ),
         );
       }
@@ -203,22 +212,27 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
   Widget build(BuildContext context) {
     final rfidProvider = context.watch<RFIDScannerProvider>();
     final theme = Theme.of(context);
+    final title = widget.title.isEmpty
+        ? AppLocalizations.of(context).translate(AppStrings.identifyAnimals)
+        : widget.title;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(title),
         actions: [
           if (_selectedAnimals.isNotEmpty &&
               widget.mode == AnimalFinderMode.multiple)
             Center(
               child: Padding(
-                padding: const EdgeInsets.only(right: 16),
+                padding:
+                    const EdgeInsets.only(right: AppConstants.spacingMedium),
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppConstants.spacingSmall, vertical: 6),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius:
+                        BorderRadius.circular(AppConstants.spacingMedium),
                   ),
                   child: Text(
                     '${_selectedAnimals.length}',
@@ -234,13 +248,13 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
       ),
       body: Column(
         children: [
-          // Barre de recherche
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppConstants.spacingMedium),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Rechercher EID, N° officiel, ID visuel...',
+                hintText: AppLocalizations.of(context)
+                    .translate(AppStrings.searchEidOfficialVisual),
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
@@ -258,55 +272,22 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
               },
             ),
           ),
-
-          // Indicateur RFID actif
-          if (rfidProvider.isScanning)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              color: Colors.blue.shade100,
-              child: Row(
-                children: [
-                  const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      '📡 Lecteur RFID actif - Scannez les animaux',
-                      style: TextStyle(
-                        color: Colors.blue.shade900,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-          // Zone centrale
           Expanded(
             child: Column(
               children: [
-                // Animaux sélectionnés (si mode multiple)
                 if (_selectedAnimals.isNotEmpty &&
                     widget.mode == AnimalFinderMode.multiple)
-                  _buildSelectedAnimalsSection(),
-
-                // Résultats de recherche ou état vide
+                  _buildSelectedAnimalsSection(context),
                 Expanded(
                   child: _searchQuery.isEmpty && _selectedAnimals.isEmpty
-                      ? _buildEmptyState()
-                      : _buildSearchResults(),
+                      ? _buildEmptyState(context)
+                      : _buildSearchResults(context),
                 ),
               ],
             ),
           ),
-
-          // Boutons scan
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppConstants.spacingMedium),
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [
@@ -328,23 +309,31 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
                           : Icons.bluetooth_searching,
                     ),
                     label: Text(
-                      rfidProvider.isScanning ? 'ARRÊTER' : 'SCAN RFID',
+                      rfidProvider.isScanning
+                          ? AppLocalizations.of(context)
+                              .translate(AppStrings.stop)
+                          : AppLocalizations.of(context)
+                              .translate(AppStrings.scanRfid),
                     ),
                     style: FilledButton.styleFrom(
-                      backgroundColor:
-                          rfidProvider.isScanning ? Colors.red : Colors.blue,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      backgroundColor: rfidProvider.isScanning
+                          ? AppConstants.statusDanger
+                          : AppConstants.primaryBlue,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: AppConstants.spacingMedium),
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppConstants.spacingSmall),
                 Expanded(
                   child: FilledButton.icon(
                     onPressed: _startCameraScan,
                     icon: const Icon(Icons.camera_alt),
-                    label: const Text('CAMÉRA'),
+                    label: Text(AppLocalizations.of(context)
+                        .translate(AppStrings.camera)),
                     style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: AppConstants.spacingMedium),
                     ),
                   ),
                 ),
@@ -358,28 +347,30 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
           ? FloatingActionButton.extended(
               onPressed: _complete,
               icon: const Icon(Icons.check),
-              label: Text('TERMINÉ (${_selectedAnimals.length})'),
+              label: Text(
+                  '${AppLocalizations.of(context).translate(AppStrings.done)} (${_selectedAnimals.length})'),
             )
           : null,
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
             Icons.qr_code_scanner,
-            size: 80,
+            size: AppConstants.logoSize,
             color: Colors.grey.shade400,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppConstants.spacingLarge),
           Text(
-            'Scanner ou rechercher\ndes animaux',
+            AppLocalizations.of(context)
+                .translate(AppStrings.scanOrSearchAnimals),
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: AppConstants.fontSizeMedium,
               color: Colors.grey.shade600,
             ),
           ),
@@ -388,19 +379,21 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
     );
   }
 
-  Widget _buildSelectedAnimalsSection() {
+  Widget _buildSelectedAnimalsSection(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppConstants.spacingMedium),
       color: Colors.green.shade50,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.check_circle, color: Colors.green.shade700, size: 20),
+              Icon(Icons.check_circle,
+                  color: Colors.green.shade700,
+                  size: AppConstants.iconSizeRegular),
               const SizedBox(width: 8),
               Text(
-                'Sélectionnés (${_selectedAnimals.length})',
+                '${AppLocalizations.of(context).translate(AppStrings.selected)} (${_selectedAnimals.length})',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.green.shade900,
@@ -414,12 +407,14 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
             runSpacing: 8,
             children: _selectedAnimals.map((animal) {
               return Chip(
-                avatar: const Icon(Icons.pets, size: 16),
+                avatar:
+                    const Icon(Icons.pets, size: AppConstants.spacingMedium),
                 label: Text(
                   animal.displayName,
-                  style: const TextStyle(fontSize: 12),
+                  style: const TextStyle(fontSize: AppConstants.fontSizeSmall),
                 ),
-                deleteIcon: const Icon(Icons.close, size: 16),
+                deleteIcon:
+                    const Icon(Icons.close, size: AppConstants.spacingMedium),
                 onDeleted: () => _removeAnimal(animal),
                 backgroundColor: Colors.white,
               );
@@ -430,7 +425,7 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
     );
   }
 
-  Widget _buildSearchResults() {
+  Widget _buildSearchResults(BuildContext context) {
     final availableAnimals = _getAvailableAnimals();
 
     if (availableAnimals.isEmpty) {
@@ -440,22 +435,23 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
           children: [
             Icon(
               Icons.search_off,
-              size: 64,
+              size: AppConstants.iconSizeLarge,
               color: Colors.grey.shade400,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppConstants.spacingMedium),
             Text(
-              'Aucun animal trouvé',
+              AppLocalizations.of(context).translate(AppStrings.noAnimalFound),
               style: TextStyle(
-                fontSize: 16,
+                fontSize: AppConstants.fontSizeMedium,
                 color: Colors.grey.shade600,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Essayez avec un autre identifiant',
+              AppLocalizations.of(context)
+                  .translate(AppStrings.tryAnotherIdentifier),
               style: TextStyle(
-                fontSize: 14,
+                fontSize: AppConstants.fontSizeBody,
                 color: Colors.grey.shade500,
               ),
             ),
@@ -465,7 +461,7 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppConstants.spacingMedium),
       itemCount: availableAnimals.length,
       itemBuilder: (context, index) {
         final animal = availableAnimals[index];
@@ -486,10 +482,12 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
             ),
             subtitle: Text(
               [
-                if (animal.currentEid != null) 'EID: ${animal.currentEid}',
+                if (animal.currentEid != null)
+                  '${AppLocalizations.of(context).translate(AppStrings.eidLabel)}: ${animal.currentEid}',
                 if (animal.officialNumber != null)
-                  'N°: ${animal.officialNumber}',
-                if (animal.visualId != null) 'ID: ${animal.visualId}',
+                  '${AppLocalizations.of(context).translate(AppStrings.numberShort)}: ${animal.officialNumber}',
+                if (animal.visualId != null)
+                  '${AppLocalizations.of(context).translate(AppStrings.idLabel)}: ${animal.visualId}',
               ].join(' • '),
             ),
             trailing: isSelected
@@ -502,26 +500,31 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
     );
   }
 
-  Widget _buildAnimalTable() {
+  Widget _buildAnimalTable(BuildContext context) {
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppConstants.spacingMedium),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Animaux sélectionnés',
+              AppLocalizations.of(context)
+                  .translate(AppStrings.selectedAnimals),
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppConstants.spacingSmall),
             Card(
               child: DataTable(
-                columns: const [
-                  DataColumn(label: Text('EID')),
-                  DataColumn(label: Text('ID visuel')),
-                  DataColumn(label: Text('')),
+                columns: [
+                  DataColumn(
+                      label: Text(AppLocalizations.of(context)
+                          .translate(AppStrings.eidLabel))),
+                  DataColumn(
+                      label: Text(AppLocalizations.of(context)
+                          .translate(AppStrings.visualId))),
+                  const DataColumn(label: Text('')),
                 ],
                 rows: _selectedAnimals.map((animal) {
                   return DataRow(
@@ -531,7 +534,8 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
                       DataCell(Text(animal.visualId ?? '-')),
                       DataCell(
                         IconButton(
-                          icon: const Icon(Icons.close, size: 18),
+                          icon: const Icon(Icons.close,
+                              size: AppConstants.iconSizeSmall),
                           onPressed: () => _removeAnimal(animal),
                         ),
                       ),

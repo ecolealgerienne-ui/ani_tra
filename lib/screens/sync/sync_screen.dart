@@ -7,6 +7,7 @@ import '../../providers/animal_provider.dart';
 import '../../providers/campaign_provider.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
+import '../../utils/constants.dart';
 
 class SyncScreen extends StatelessWidget {
   const SyncScreen({super.key});
@@ -32,14 +33,14 @@ class SyncScreen extends StatelessWidget {
                 SnackBar(
                   content: Text(
                     syncProvider.isOnline
-                        ? 'Mode En Ligne activé'
+                        ? l10n.translate(AppStrings.onlineModeActivated)
                         : l10n.translate(AppStrings.offlineMode),
                   ),
-                  duration: const Duration(seconds: 1),
+                  duration: AppConstants.snackBarDurationShort,
                 ),
               );
             },
-            tooltip: 'Basculer Online/Offline',
+            tooltip: l10n.translate(AppStrings.toggleOnlineOffline),
           ),
         ],
       ),
@@ -67,7 +68,7 @@ class SyncScreen extends StatelessWidget {
                       color: syncProvider.isOnline
                           ? Colors.green.shade700
                           : Colors.orange.shade700,
-                      size: 48,
+                      size: AppConstants.iconSizeMediumLarge,
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -76,20 +77,20 @@ class SyncScreen extends StatelessWidget {
                         children: [
                           Text(
                             syncProvider.isOnline
-                                ? 'Connecté au serveur'
+                                ? l10n.translate(AppStrings.connectedToServer)
                                 : l10n.translate(AppStrings.offlineMode),
                             style: const TextStyle(
-                              fontSize: 18,
+                              fontSize: AppConstants.fontSizeImportant,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             syncProvider.isOnline
-                                ? 'Synchronisation disponible'
-                                : 'Les données seront synchronisées plus tard',
+                                ? l10n.translate(AppStrings.syncAvailable)
+                                : l10n.translate(AppStrings.dataWillSyncLater),
                             style: TextStyle(
-                              fontSize: 13,
+                              fontSize: AppConstants.fontSizeSubtitle,
                               color: Colors.grey.shade700,
                             ),
                           ),
@@ -117,10 +118,10 @@ class SyncScreen extends StatelessWidget {
                   child: _StatCard(
                     context: context,
                     icon: Icons.update,
-                    label: 'Dernière synchro',
+                    label: l10n.translate(AppStrings.lastSync),
                     value: syncProvider.lastSyncDate != null
-                        ? _formatLastSync(syncProvider.lastSyncDate!)
-                        : 'Jamais',
+                        ? _formatLastSync(context, syncProvider.lastSyncDate!)
+                        : l10n.translate(AppStrings.never),
                     color: Colors.blue,
                   ),
                 ),
@@ -130,7 +131,7 @@ class SyncScreen extends StatelessWidget {
             if (syncProvider.pendingDataCount > 0)
               SizedBox(
                 width: double.infinity,
-                height: 120,
+                height: AppConstants.syncButtonHeight,
                 child: ElevatedButton(
                   onPressed: syncProvider.isSyncing || !syncProvider.isOnline
                       ? null
@@ -142,7 +143,7 @@ class SyncScreen extends StatelessWidget {
                                 content: Text(
                                   success
                                       ? l10n.translate(AppStrings.syncSuccess)
-                                      : 'Échec de la synchronisation',
+                                      : l10n.translate(AppStrings.syncFailed),
                                 ),
                                 backgroundColor:
                                     success ? Colors.green : Colors.red,
@@ -156,27 +157,31 @@ class SyncScreen extends StatelessWidget {
                     disabledBackgroundColor: Colors.grey.shade300,
                   ),
                   child: syncProvider.isSyncing
-                      ? const Column(
+                      ? Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            CircularProgressIndicator(color: Colors.white),
-                            SizedBox(height: 12),
-                            Text('Synchronisation en cours...'),
+                            const CircularProgressIndicator(
+                                color: Colors.white),
+                            const SizedBox(height: 12),
+                            Text(l10n.translate(AppStrings.syncInProgress)),
                           ],
                         )
                       : Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(Icons.sync, size: 48),
+                            const Icon(Icons.sync,
+                                size: AppConstants.iconSizeMediumLarge),
                             const SizedBox(height: 8),
                             Text(
                               l10n.translate(AppStrings.syncNow),
-                              style: const TextStyle(fontSize: 18),
+                              style: const TextStyle(
+                                  fontSize: AppConstants.fontSizeImportant),
                             ),
                             if (!syncProvider.isOnline)
-                              const Text(
-                                '(Nécessite connexion)',
-                                style: TextStyle(fontSize: 12),
+                              Text(
+                                l10n.translate(AppStrings.requiresConnection),
+                                style: const TextStyle(
+                                    fontSize: AppConstants.fontSizeSmall),
                               ),
                           ],
                         ),
@@ -195,13 +200,13 @@ class SyncScreen extends StatelessWidget {
                     Icon(
                       Icons.check_circle,
                       color: Colors.green.shade700,
-                      size: 64,
+                      size: AppConstants.iconSizeLarge,
                     ),
                     const SizedBox(height: 12),
-                    const Text(
-                      'Toutes les données sont synchronisées',
-                      style: TextStyle(
-                        fontSize: 16,
+                    Text(
+                      l10n.translate(AppStrings.allDataSynchronized),
+                      style: const TextStyle(
+                        fontSize: AppConstants.fontSizeSectionTitle,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.center,
@@ -226,14 +231,15 @@ class SyncScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Erreur de synchronisation',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                          Text(
+                            l10n.translate(AppStrings.syncError),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             syncProvider.syncError!,
-                            style: const TextStyle(fontSize: 12),
+                            style: const TextStyle(
+                                fontSize: AppConstants.fontSizeSmall),
                           ),
                         ],
                       ),
@@ -250,7 +256,7 @@ class SyncScreen extends StatelessWidget {
             ],
             const SizedBox(height: 24),
             Text(
-              'Résumé des données locales',
+              l10n.translate(AppStrings.localDataSummary),
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -258,12 +264,12 @@ class SyncScreen extends StatelessWidget {
             const SizedBox(height: 12),
             _SummaryCard(
               icon: Icons.pets,
-              label: 'Animaux',
+              label: l10n.translate(AppStrings.animals),
               value: animalProvider.stats['total'].toString(),
             ),
             _SummaryCard(
               icon: Icons.medical_services,
-              label: 'Traitements',
+              label: l10n.translate(AppStrings.treatments),
               value: animalProvider
                   .getActiveWithdrawalTreatments()
                   .length
@@ -271,7 +277,7 @@ class SyncScreen extends StatelessWidget {
             ),
             _SummaryCard(
               icon: Icons.campaign,
-              label: 'Campagnes',
+              label: l10n.translate(AppStrings.campaigns),
               value: campaignProvider.campaigns.length.toString(),
             ),
           ],
@@ -280,16 +286,21 @@ class SyncScreen extends StatelessWidget {
     );
   }
 
-  String _formatLastSync(DateTime dateTime) {
+  String _formatLastSync(BuildContext context, DateTime dateTime) {
+    final l10n = AppLocalizations.of(context);
     final now = DateTime.now();
     final difference = now.difference(dateTime);
 
     if (difference.inMinutes < 1) {
-      return 'À l\'instant';
+      return l10n.translate(AppStrings.justNow);
     } else if (difference.inHours < 1) {
-      return 'Il y a ${difference.inMinutes}min';
+      return l10n
+          .translate(AppStrings.minutesAgo)
+          .replaceAll('{minutes}', difference.inMinutes.toString());
     } else if (difference.inDays < 1) {
-      return 'Il y a ${difference.inHours}h';
+      return l10n
+          .translate(AppStrings.hoursAgo)
+          .replaceAll('{hours}', difference.inHours.toString());
     } else {
       return DateFormat('dd/MM à HH:mm').format(dateTime);
     }
@@ -318,7 +329,7 @@ class _StatCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Icon(icon, color: color, size: 32),
+            Icon(icon, color: color, size: AppConstants.iconSizeMedium),
             const SizedBox(height: 8),
             Text(
               value,
@@ -361,7 +372,7 @@ class _SummaryCard extends StatelessWidget {
         trailing: Text(
           value,
           style: const TextStyle(
-            fontSize: 18,
+            fontSize: AppConstants.fontSizeImportant,
             fontWeight: FontWeight.bold,
           ),
         ),

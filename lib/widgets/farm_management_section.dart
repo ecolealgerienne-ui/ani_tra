@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
+import '../../utils/constants.dart';
 
 /// Section gestion de ferme pour Settings
 ///
@@ -52,7 +53,8 @@ class FarmManagementSection extends StatelessWidget {
                       AppLocalizations.of(context)
                           .translate(AppStrings.switchFarm),
                     ),
-                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    trailing: const Icon(Icons.arrow_forward_ios,
+                        size: AppConstants.iconSizeTiny),
                     onTap: () => _showFarmSwitchDialog(context, auth),
                   ),
                 ] else ...[
@@ -63,7 +65,7 @@ class FarmManagementSection extends StatelessWidget {
                       AppLocalizations.of(context)
                           .translate(AppStrings.farmPhase4Note),
                       style: const TextStyle(
-                        fontSize: 12,
+                        fontSize: AppConstants.fontSizeSmall,
                         fontStyle: FontStyle.italic,
                         color: Colors.grey,
                       ),

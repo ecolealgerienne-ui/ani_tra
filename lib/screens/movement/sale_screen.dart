@@ -9,6 +9,7 @@ import '../../models/animal.dart';
 import '../../models/movement.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
+import '../../utils/constants.dart';
 
 class SaleScreen extends StatefulWidget {
   const SaleScreen({super.key});
@@ -37,7 +38,7 @@ class _SaleScreenState extends State<SaleScreen> {
     setState(() => _isScanning = true);
 
     HapticFeedback.mediumImpact();
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(AppConstants.longAnimation);
 
     final animalProvider = context.read<AnimalProvider>();
 
@@ -75,7 +76,7 @@ class _SaleScreenState extends State<SaleScreen> {
               content: Text(AppLocalizations.of(context)
                   .translate(AppStrings.withdrawalPeriodActive)),
               backgroundColor: Colors.red,
-              duration: const Duration(seconds: 3),
+              duration: AppConstants.snackBarDurationLong,
             ),
           );
         }
@@ -141,7 +142,8 @@ class _SaleScreenState extends State<SaleScreen> {
       price: price,
       toFarmId:
           _buyerIdController.text.isNotEmpty ? _buyerIdController.text : null,
-      notes: 'Acheteur: ${_buyerNameController.text}',
+      notes:
+          '${AppLocalizations.of(context).translate(AppStrings.buyer)}: ${_buyerNameController.text}',
       createdAt: DateTime.now(),
     );
 
@@ -209,7 +211,8 @@ class _SaleScreenState extends State<SaleScreen> {
               color: Colors.green.shade50,
               child: ListTile(
                 leading: const Icon(Icons.check_circle, color: Colors.green),
-                title: Text(_scannedAnimal!.officialNumber ?? 'N/A'),
+                title: Text(_scannedAnimal!.officialNumber ??
+                    AppConstants.notAvailable),
                 subtitle: Text(_scannedAnimal!.displayName),
                 trailing: IconButton(
                   icon: const Icon(Icons.close),
@@ -240,7 +243,8 @@ class _SaleScreenState extends State<SaleScreen> {
                 labelText: AppLocalizations.of(context)
                     .translate(AppStrings.buyerName),
                 prefixIcon: const Icon(Icons.person),
-                hintText: 'Ex: Jean Dupont',
+                hintText: AppLocalizations.of(context)
+                    .translate(AppStrings.buyerNameHint),
               ),
             ),
             const SizedBox(height: 12),
@@ -251,7 +255,8 @@ class _SaleScreenState extends State<SaleScreen> {
                 labelText: AppLocalizations.of(context)
                     .translate(AppStrings.buyerIdOptional),
                 prefixIcon: const Icon(Icons.badge),
-                hintText: 'Ex: FR123456789',
+                hintText: AppLocalizations.of(context)
+                    .translate(AppStrings.buyerIdHint),
               ),
             ),
 
@@ -273,7 +278,8 @@ class _SaleScreenState extends State<SaleScreen> {
                 labelText:
                     AppLocalizations.of(context).translate(AppStrings.priceEur),
                 prefixIcon: const Icon(Icons.euro),
-                hintText: '120.00',
+                hintText: AppLocalizations.of(context)
+                    .translate(AppStrings.priceHint),
               ),
             ),
 

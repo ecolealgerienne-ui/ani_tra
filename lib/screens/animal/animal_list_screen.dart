@@ -21,6 +21,7 @@ import 'add_animal_screen.dart';
 import 'animal_finder_screen.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
+//import '../../utils/constants.dart';
 
 class AnimalListScreen extends StatefulWidget {
   /// Liste d'IDs à afficher uniquement (pour filtrer depuis une alerte)
@@ -202,7 +203,11 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
           final animalAlerts = alertProvider.getAlertsForAnimal(animal.id);
 
           if (animalAlerts.isEmpty) {
-            groups.putIfAbsent('✅ Sans alerte', () => []).add(animal);
+            groups
+                .putIfAbsent(
+                    AppLocalizations.of(context).translate(AppStrings.noAlert),
+                    () => [])
+                .add(animal);
           } else {
             // Trouver l'alerte la plus urgente
             final maxUrgency = animalAlerts
@@ -210,11 +215,25 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                 .reduce((a, b) => a < b ? a : b);
 
             if (maxUrgency == AlertType.urgent.priority) {
-              groups.putIfAbsent('🚨 URGENTS', () => []).add(animal);
+              groups
+                  .putIfAbsent(
+                      AppLocalizations.of(context).translate(AppStrings.urgent),
+                      () => [])
+                  .add(animal);
             } else if (maxUrgency == AlertType.important.priority) {
-              groups.putIfAbsent('⚠️ À SURVEILLER', () => []).add(animal);
+              groups
+                  .putIfAbsent(
+                      AppLocalizations.of(context)
+                          .translate(AppStrings.toMonitor),
+                      () => [])
+                  .add(animal);
             } else {
-              groups.putIfAbsent('📋 Routine', () => []).add(animal);
+              groups
+                  .putIfAbsent(
+                      AppLocalizations.of(context)
+                          .translate(AppStrings.routine),
+                      () => [])
+                  .add(animal);
             }
           }
         }
@@ -394,13 +413,15 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
           // 🆕 Tri des groupes pour mettre les alertes en premier
           final sortedKeys = grouped.keys.toList();
           if (_groupBy == GroupByOption.alerts) {
+            final Map<String, int> priority = {
+              // ← Déclarer AVANT
+              AppLocalizations.of(context).translate(AppStrings.urgent): 1,
+              AppLocalizations.of(context).translate(AppStrings.toMonitor): 2,
+              AppLocalizations.of(context).translate(AppStrings.routine): 3,
+              AppLocalizations.of(context).translate(AppStrings.noAlert): 4,
+            };
+
             sortedKeys.sort((a, b) {
-              const priority = {
-                '🚨 URGENTS': 1,
-                '⚠️ À SURVEILLER': 2,
-                '📋 Routine': 3,
-                '✅ Sans alerte': 4,
-              };
               return (priority[a] ?? 99).compareTo(priority[b] ?? 99);
             });
           }
@@ -481,7 +502,8 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
               // Bouton scan (toujours visible)
               IconButton(
                 icon: const Icon(Icons.qr_code_scanner),
-                tooltip: 'Scanner',
+                tooltip:
+                    AppLocalizations.of(context).translate(AppStrings.scanner),
                 onPressed: _scanAnimal,
               ),
             ],
@@ -560,7 +582,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                 return DropdownMenuItem(
                   value: option,
                   child: Text(
-                    option.label,
+                    option.label(context),
                     style: const TextStyle(fontSize: 14),
                   ),
                 );
@@ -901,26 +923,27 @@ enum GroupByOption {
 }
 
 extension GroupByOptionExt on GroupByOption {
-  String get label {
+  String label(BuildContext context) {
+    // ← Ajouter BuildContext
     switch (this) {
       case GroupByOption.alerts:
-        return 'Par Alerte'; // 🆕
+        return AppLocalizations.of(context).translate(AppStrings.byAlert);
       case GroupByOption.none:
-        return 'Aucun';
+        return AppLocalizations.of(context).translate(AppStrings.none);
       case GroupByOption.sex:
-        return 'Par Sexe';
+        return AppLocalizations.of(context).translate(AppStrings.bySex);
       case GroupByOption.age:
-        return 'Par Âge';
+        return AppLocalizations.of(context).translate(AppStrings.byAge);
       case GroupByOption.status:
-        return 'Par Statut';
+        return AppLocalizations.of(context).translate(AppStrings.byStatus);
       case GroupByOption.withdrawal:
-        return 'Par Rémanence';
+        return AppLocalizations.of(context).translate(AppStrings.byWithdrawal);
       case GroupByOption.mother:
-        return 'Par Mère';
+        return AppLocalizations.of(context).translate(AppStrings.byMother);
       case GroupByOption.species:
-        return 'Par Type';
+        return AppLocalizations.of(context).translate(AppStrings.byType);
       case GroupByOption.breed:
-        return 'Par Race';
+        return AppLocalizations.of(context).translate(AppStrings.byBreed);
     }
   }
 }
@@ -943,9 +966,9 @@ class _GroupBySheet extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Grouper par',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          Text(
+            AppLocalizations.of(context).translate(AppStrings.groupBy),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
           RadioGroup<GroupByOption>(
@@ -956,7 +979,7 @@ class _GroupBySheet extends StatelessWidget {
             child: Column(
               children: GroupByOption.values.map((option) {
                 return RadioListTile<GroupByOption>(
-                  title: Text(option.label),
+                  title: Text(option.label(context)),
                   value: option,
                 );
               }).toList(),
@@ -1040,16 +1063,18 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Filtres',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  Text(
+                    AppLocalizations.of(context).translate(AppStrings.filters),
+                    style: const TextStyle(
+                        fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   TextButton(
                     onPressed: () {
                       widget.onReset();
                       Navigator.pop(context);
                     },
-                    child: const Text('Réinitialiser'),
+                    child: Text(AppLocalizations.of(context)
+                        .translate(AppStrings.reset)),
                   ),
                 ],
               ),
@@ -1060,11 +1085,14 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                   controller: scrollController,
                   children: [
                     // Statut
-                    const Text('Statut',
-                        style: TextStyle(fontWeight: FontWeight.w600)),
+                    Text(
+                        AppLocalizations.of(context)
+                            .translate(AppStrings.statusAnimal),
+                        style: const TextStyle(fontWeight: FontWeight.w600)),
                     ...AnimalStatus.values.map((status) {
                       return CheckboxListTile(
-                        title: Text(_getStatusLabel(status)),
+                        title: Text(_getStatusLabel(
+                            context, status)), // ← Ajouter context
                         value: _statuses.contains(status),
                         onChanged: (checked) {
                           setState(() {
@@ -1081,10 +1109,11 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                     const Divider(),
 
                     // Sexe
-                    const Text('Sexe',
-                        style: TextStyle(fontWeight: FontWeight.w600)),
+                    Text(AppLocalizations.of(context).translate(AppStrings.sex),
+                        style: const TextStyle(fontWeight: FontWeight.w600)),
                     CheckboxListTile(
-                      title: const Text('♂️ Mâle'),
+                      title: const Text(
+                          '♂️ \${AppLocalizations.of(context).translate(AppStrings.male)}'),
                       value: _sexes.contains(AnimalSex.male),
                       onChanged: (checked) {
                         setState(() {
@@ -1097,7 +1126,8 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                       },
                     ),
                     CheckboxListTile(
-                      title: const Text('♀️ Femelle'),
+                      title: const Text(
+                          '♀️ \${AppLocalizations.of(context).translate(AppStrings.female)}'),
                       value: _sexes.contains(AnimalSex.female),
                       onChanged: (checked) {
                         setState(() {
@@ -1113,8 +1143,8 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                     const Divider(),
 
                     // Âge
-                    const Text('Âge',
-                        style: TextStyle(fontWeight: FontWeight.w600)),
+                    Text(AppLocalizations.of(context).translate(AppStrings.age),
+                        style: const TextStyle(fontWeight: FontWeight.w600)),
                     ...['< 6m', '6-12m', '1-2 ans', '> 2 ans'].map((range) {
                       return CheckboxListTile(
                         title: Text(range),
@@ -1134,8 +1164,10 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                     const Divider(),
 
                     // NOUVEAU : Type d'animal
-                    const Text('Type d\'animal',
-                        style: TextStyle(fontWeight: FontWeight.w600)),
+                    Text(
+                        AppLocalizations.of(context)
+                            .translate(AppStrings.animalType),
+                        style: const TextStyle(fontWeight: FontWeight.w600)),
                     ...AnimalConfig.availableSpecies.map((species) {
                       return CheckboxListTile(
                         title: Text('${species.icon} ${species.nameFr}'),
@@ -1161,14 +1193,17 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                     const Divider(),
 
                     // NOUVEAU : Race
-                    const Text('Race',
-                        style: TextStyle(fontWeight: FontWeight.w600)),
+                    Text(
+                        AppLocalizations.of(context)
+                            .translate(AppStrings.breed),
+                        style: const TextStyle(fontWeight: FontWeight.w600)),
                     if (_species.isEmpty)
-                      const Padding(
-                        padding: EdgeInsets.all(16),
+                      Padding(
+                        padding: const EdgeInsets.all(16),
                         child: Text(
-                          'Sélectionnez d\'abord un type',
-                          style: TextStyle(
+                          AppLocalizations.of(context)
+                              .translate(AppStrings.selectTypeFirst),
+                          style: const TextStyle(
                             color: Colors.grey,
                             fontStyle: FontStyle.italic,
                           ),
@@ -1208,23 +1243,28 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                     const Divider(),
 
                     // Rémanence
-                    const Text('Rémanence',
-                        style: TextStyle(fontWeight: FontWeight.w600)),
+                    Text(
+                        AppLocalizations.of(context)
+                            .translate(AppStrings.withdrawal),
+                        style: const TextStyle(fontWeight: FontWeight.w600)),
                     RadioGroup<bool?>(
                       groupValue: _withdrawal,
                       onChanged: (value) => setState(() => _withdrawal = value),
-                      child: const Column(
+                      child: Column(
                         children: [
                           RadioListTile<bool?>(
-                            title: Text('Tous'),
+                            title: Text(AppLocalizations.of(context)
+                                .translate(AppStrings.all)),
                             value: null,
                           ),
                           RadioListTile<bool?>(
-                            title: Text('Active'),
+                            title: Text(AppLocalizations.of(context)
+                                .translate(AppStrings.active)),
                             value: true,
                           ),
                           RadioListTile<bool?>(
-                            title: Text('Inactive'),
+                            title: Text(AppLocalizations.of(context)
+                                .translate(AppStrings.inactive)),
                             value: false,
                           ),
                         ],
@@ -1234,16 +1274,19 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                     const Divider(),
 
                     // Mère
-                    const Text('Mère',
-                        style: TextStyle(fontWeight: FontWeight.w600)),
+                    Text(
+                        AppLocalizations.of(context)
+                            .translate(AppStrings.mother),
+                        style: const TextStyle(fontWeight: FontWeight.w600)),
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 8),
                       child: TextField(
                         controller: _motherController,
-                        decoration: const InputDecoration(
-                          hintText: 'EID de la mère',
-                          border: OutlineInputBorder(),
+                        decoration: InputDecoration(
+                          hintText: AppLocalizations.of(context)
+                              .translate(AppStrings.motherEid),
+                          border: const OutlineInputBorder(),
                         ),
                       ),
                     ),
@@ -1257,7 +1300,8 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text('Annuler'),
+                      child: Text(AppLocalizations.of(context)
+                          .translate(AppStrings.cancel)),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -1277,7 +1321,8 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                         );
                         Navigator.pop(context);
                       },
-                      child: const Text('Appliquer'),
+                      child: Text(AppLocalizations.of(context)
+                          .translate(AppStrings.apply)),
                     ),
                   ),
                 ],
@@ -1289,16 +1334,17 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
     );
   }
 
-  String _getStatusLabel(AnimalStatus status) {
+  String _getStatusLabel(BuildContext context, AnimalStatus status) {
     switch (status) {
       case AnimalStatus.alive:
-        return '🟢 Vivant';
+        return AppLocalizations.of(context).translate(AppStrings.statusAlive);
       case AnimalStatus.sold:
-        return '🟠 Vendu';
+        return AppLocalizations.of(context).translate(AppStrings.statusSold);
       case AnimalStatus.dead:
-        return '🔴 Mort';
+        return AppLocalizations.of(context).translate(AppStrings.statusDead);
       case AnimalStatus.slaughtered:
-        return '🏭 Abattu';
+        return AppLocalizations.of(context)
+            .translate(AppStrings.statusSlaughtered);
     }
   }
 }

@@ -11,6 +11,7 @@ import '../../providers/animal_provider.dart';
 import '../../providers/sync_provider.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
+import '../../utils/constants.dart';
 import 'old_batch_list_screen.dart';
 
 /// Écran de scan d'animaux pour un lot
@@ -68,7 +69,8 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
     final batchProvider = context.read<BatchProvider>();
 
     // Simuler un délai de scan
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future.delayed(
+        const Duration(milliseconds: AppConstants.batchScanDelay));
 
     // Obtenir un animal aléatoire de la liste
     final animals = animalProvider.animals;
@@ -79,7 +81,7 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
         SnackBar(
           content: Text(AppLocalizations.of(context)
               .translate(AppStrings.noAnimalsAvailableBatch)),
-          backgroundColor: Colors.orange,
+          backgroundColor: AppConstants.statusWarning,
         ),
       );
       return;
@@ -115,7 +117,7 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
         content: Row(
           children: [
             const Icon(Icons.warning, color: Colors.white),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppConstants.batchScanFeedbackSpacing),
             Expanded(
               child: Text(
                 AppLocalizations.of(context)
@@ -125,8 +127,9 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
             ),
           ],
         ),
-        backgroundColor: Colors.orange,
-        duration: const Duration(seconds: 2),
+        backgroundColor: AppConstants.statusWarning,
+        duration:
+            const Duration(seconds: AppConstants.batchScanDuplicateDuration),
       ),
     );
   }
@@ -141,7 +144,7 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
         content: Row(
           children: [
             const Icon(Icons.check_circle, color: Colors.white),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppConstants.batchScanFeedbackSpacing),
             Expanded(
               child: Text(
                 AppLocalizations.of(context)
@@ -151,8 +154,9 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
             ),
           ],
         ),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 1),
+        backgroundColor: AppConstants.statusSuccess,
+        duration:
+            const Duration(seconds: AppConstants.batchScanSuccessDuration),
       ),
     );
   }
@@ -169,7 +173,8 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
         SnackBar(
           content: Text(
               AppLocalizations.of(context).translate(AppStrings.animalRemoved)),
-          duration: const Duration(seconds: 1),
+          duration:
+              const Duration(seconds: AppConstants.batchScanSuccessDuration),
         ),
       );
     }
@@ -182,7 +187,7 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
         SnackBar(
           content: Text(
               AppLocalizations.of(context).translate(AppStrings.batchEmpty)),
-          backgroundColor: Colors.orange,
+          backgroundColor: AppConstants.statusWarning,
         ),
       );
       return;
@@ -209,7 +214,7 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
               .replaceAll('{name}', widget.batch.name)
               .replaceAll('{count}', '$_scannedCount'),
         ),
-        backgroundColor: Colors.green,
+        backgroundColor: AppConstants.statusSuccess,
       ),
     );
 
@@ -240,12 +245,16 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(AppLocalizations.of(context).translate(AppStrings.no)),
+            child: Text(AppLocalizations.of(context)
+                .translate(AppStrings.continueScanning)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(
+              foregroundColor: AppConstants.statusDanger,
+            ),
             child: Text(
-                AppLocalizations.of(context).translate(AppStrings.yesCancel)),
+                AppLocalizations.of(context).translate(AppStrings.cancelBatch)),
           ),
         ],
       ),
@@ -267,9 +276,8 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false, // Équivalent à "return false"
+      canPop: false,
       onPopInvokedWithResult: (bool didPop, dynamic result) async {
-        // didPop sera false car canPop = false
         if (!didPop) {
           await _cancel();
         }
@@ -286,14 +294,15 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
           children: [
             // Header avec compteur
             Container(
-              padding: const EdgeInsets.all(24),
+              padding:
+                  const EdgeInsets.all(AppConstants.batchScanHeaderPadding),
               color: Colors.deepPurple.shade50,
               child: Column(
                 children: [
                   // Icône + Compteur
                   Container(
-                    width: 100,
-                    height: 100,
+                    width: AppConstants.batchScanCounterSize,
+                    height: AppConstants.batchScanCounterSize,
                     decoration: const BoxDecoration(
                       color: Colors.deepPurple,
                       shape: BoxShape.circle,
@@ -304,21 +313,22 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
                         const Icon(
                           Icons.inventory,
                           color: Colors.white,
-                          size: 32,
+                          size: AppConstants.batchScanCounterIconSize,
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(
+                            height: AppConstants.batchScanCounterSpacing),
                         Text(
                           '$_scannedCount',
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 24,
+                            fontSize: AppConstants.batchScanCounterTextSize,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppConstants.batchScanHeaderSpacing),
                   Text(
                     _scannedCount == 0
                         ? AppLocalizations.of(context)
@@ -331,7 +341,7 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
                             .replaceAll('{pluralScanned}',
                                 _scannedCount > 1 ? 's' : ''),
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: AppConstants.batchScanHeaderTextSize,
                       fontWeight: FontWeight.w500,
                       color: Colors.grey.shade800,
                     ),
@@ -348,10 +358,10 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
                   children: [
                     Icon(
                       Icons.qr_code_scanner,
-                      size: 80,
+                      size: AppConstants.batchScanZoneIconSize,
                       color: Colors.grey.shade400,
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppConstants.batchScanZoneSpacing),
                     ElevatedButton.icon(
                       onPressed: _simulateScan,
                       icon: const Icon(Icons.qr_code_scanner),
@@ -361,18 +371,19 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
                         backgroundColor: Colors.deepPurple,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 32,
-                          vertical: 16,
+                          horizontal: AppConstants.batchScanButtonPaddingH,
+                          vertical: AppConstants.batchScanButtonPaddingV,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(
+                        height: AppConstants.batchScanZoneSpacingSmall),
                     Text(
                       AppLocalizations.of(context)
                           .translate(AppStrings.scanAnimalsOneByOne),
                       style: TextStyle(
                         color: Colors.grey.shade600,
-                        fontSize: 14,
+                        fontSize: AppConstants.batchScanZoneHintSize,
                       ),
                     ),
                   ],
@@ -383,7 +394,8 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
             // Liste des animaux scannés
             if (_scannedAnimals.isNotEmpty)
               Container(
-                constraints: const BoxConstraints(maxHeight: 200),
+                constraints: const BoxConstraints(
+                    maxHeight: AppConstants.batchScanListMaxHeight),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   border: Border(
@@ -394,12 +406,13 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(
+                          AppConstants.batchScanListPadding),
                       child: Text(
                         AppLocalizations.of(context)
                             .translate(AppStrings.scannedAnimals),
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: AppConstants.batchScanListTitleSize,
                           fontWeight: FontWeight.bold,
                           color: Colors.grey.shade700,
                         ),
@@ -413,23 +426,26 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
                           return ListTile(
                             dense: true,
                             leading: CircleAvatar(
-                              backgroundColor: Colors.green.shade100,
+                              backgroundColor: AppConstants.statusSuccess
+                                  .withValues(alpha: 0.1),
                               child: Icon(
                                 animal.sex == AnimalSex.male
                                     ? Icons.male
                                     : Icons.female,
                                 color: animal.sex == AnimalSex.male
-                                    ? Colors.blue
+                                    ? AppConstants.statusInfo
                                     : Colors.pink,
-                                size: 18,
+                                size: AppConstants.batchScanListIconSize,
                               ),
                             ),
                             title: Text(
                               animal.displayName,
-                              style: const TextStyle(fontSize: 14),
+                              style: const TextStyle(
+                                  fontSize: AppConstants.batchScanListTextSize),
                             ),
                             trailing: IconButton(
-                              icon: const Icon(Icons.close, size: 18),
+                              icon: const Icon(Icons.close,
+                                  size: AppConstants.batchScanListIconSize),
                               onPressed: () => _removeAnimal(animal.id),
                             ),
                           );
@@ -442,14 +458,17 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
 
             // Boutons d'action
             Container(
-              padding: const EdgeInsets.all(16),
+              padding:
+                  const EdgeInsets.all(AppConstants.batchScanActionPadding),
               decoration: BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, -2),
+                    color: Colors.black.withValues(
+                        alpha: AppConstants.batchScanActionShadowAlpha),
+                    blurRadius: AppConstants.batchScanActionShadowBlur,
+                    offset: const Offset(
+                        0, AppConstants.batchScanActionShadowOffset),
                   ),
                 ],
               ),
@@ -462,16 +481,16 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
                           .translate(AppStrings.cancel)),
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: AppConstants.batchScanActionSpacing),
                   Expanded(
-                    flex: 2,
+                    flex: AppConstants.batchScanSaveButtonFlex,
                     child: ElevatedButton.icon(
                       onPressed: _saveBatch,
                       icon: const Icon(Icons.save),
                       label: Text(AppLocalizations.of(context)
                           .translate(AppStrings.save)),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
+                        backgroundColor: AppConstants.statusSuccess,
                         foregroundColor: Colors.white,
                       ),
                     ),

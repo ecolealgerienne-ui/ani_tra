@@ -474,4 +474,384 @@ class AppStrings {
 
   // Ajouter suite à des erreurs d'ajout de clés
   static const String notesOptional = 'notesOptional';
+
+  // Ajouter dans la section MEDICAL & EVENTS
+  static const String causeNotSpecified = 'causeNotSpecified';
+  static const String deathCauseHint = 'deathCauseHint';
+  static const String buyerNameHint = 'buyerNameHint';
+  static const String buyerIdHint = 'buyerIdHint';
+  static const String priceHint = 'priceHint';
+
+  // Ajouter dans une nouvelle section MEDICAL ACT SCREEN
+  static const String actType = 'actType';
+  static const String standardCure = 'standardCure';
+  static const String days = 'days';
+  static const String administration = 'administration';
+  static const String single = 'single';
+  static const String dosage = 'dosage';
+  static const String calculatedAccording = 'calculatedAccording';
+  static const String formula = 'formula';
+  static const String weightNotAvailable = 'weightNotAvailable';
+  static const String enterDosage = 'enterDosage';
+  static const String addWeightToCalculate = 'addWeightToCalculate';
+  static const String productDosage = 'productDosage';
+  static const String indicativeCalculation = 'indicativeCalculation';
+  static const String doseIndividually = 'doseIndividually';
+  static const String route = 'route';
+  static const String oral = 'oral';
+  static const String topical = 'topical';
+  static const String site = 'site';
+  static const String neck = 'neck';
+  static const String thigh = 'thigh';
+  static const String flank = 'flank';
+  static const String hindQuarter = 'hindQuarter';
+  static const String jugularVein = 'jugularVein';
+  static const String reminders = 'reminders';
+  static const String sendMeReminders = 'sendMeReminders';
+  static const String reminderTime = 'reminderTime';
+  static const String configureReminders = 'configureReminders';
+  static const String to = 'to';
+  static const String configureCustomReminders = 'configureCustomReminders';
+  static const String reminderS = 'reminderS';
+  static const String configureVaccinationReminders =
+      'configureVaccinationReminders';
+  static const String withdrawalPeriods = 'withdrawalPeriods';
+  static const String meat = 'meat';
+  static const String milk = 'milk';
+  static const String additionalNotesOptional = 'additionalNotesOptional';
+  static const String prescribingVeterinarian = 'prescribingVeterinarian';
+  static const String validated = 'validated';
+  static const String pleaseSelectProduct = 'pleaseSelectProduct';
+  static const String pleaseEnterValidDosage = 'pleaseEnterValidDosage';
+  static const String treatmentRecordedSuccess = 'treatmentRecordedSuccess';
+  static const String vaccinationRecordedSuccess = 'vaccinationRecordedSuccess';
+  static const String treat = 'treat';
+  static const String treatBatch = 'treatBatch';
+  static const String vaccination = 'vaccination';
+  static const String batch = 'batch';
+  static const String species = 'species';
+
+  // Ajouter dans la section EXPORT & PDF
+  static const String myFarm = 'myFarm';
+  static const String animalInventory = 'animalInventory';
+  static const String total = 'total';
+  static const String animalsCount = 'animalsCount';
+  static const String eidLabel = 'eidLabel';
+  static const String maleShort = 'maleShort';
+  static const String femaleShort = 'femaleShort';
+  static const String cannotAccessDownloads = 'cannotAccessDownloads';
+  static const String completeRegistry = 'completeRegistry';
+  static const String herdInventory = 'herdInventory';
+  static const String completeHerdList = 'completeHerdList';
+
+  // Ajouter dans la section SYNC SCREEN (compléter la section existante)
+  static const String onlineModeActivated = 'onlineModeActivated';
+  static const String toggleOnlineOffline = 'toggleOnlineOffline';
+  static const String connectedToServer = 'connectedToServer';
+  static const String syncAvailable = 'syncAvailable';
+  static const String dataWillSyncLater = 'dataWillSyncLater';
+  static const String lastSync = 'lastSync';
+  static const String never = 'never';
+  static const String syncFailed = 'syncFailed';
+  static const String syncInProgress = 'syncInProgress';
+  static const String requiresConnection = 'requiresConnection';
+  static const String allDataSynchronized = 'allDataSynchronized';
+  static const String syncError = 'syncError';
+  static const String localDataSummary = 'localDataSummary';
+  static const String treatments = 'treatments';
+  static const String campaigns = 'campaigns';
+  static const String justNow = 'justNow';
+  static const String minutesAgo = 'minutesAgo';
+  static const String hoursAgo = 'hoursAgo';
+
+  // Ajouter dans la section OLD TREATMENT SCREEN
+  static const String treatmentDash = 'treatmentDash';
+  static const String addCare = 'addCare';
+  static const String treatmentForAnimals = 'treatmentForAnimals';
+  static const String careAdded = 'careAdded';
+  static const String individualTreatment = 'individualTreatment';
+  static const String groupTreatment = 'groupTreatment';
+  static const String oneAnimalConcerned = 'oneAnimalConcerned';
+  static const String animalsConcerned = 'animalsConcerned';
+  static const String medicalProduct = 'medicalProduct';
+  static const String withdrawalDelay = 'withdrawalDelay';
+  static const String meatDays = 'meatDays';
+  static const String doseExample = 'doseExample';
+  static const String unitMl = 'unitMl';
+  static const String pleaseEnterDose = 'pleaseEnterDose';
+  static const String invalidDose = 'invalidDose';
+  static const String treatmentDateLabel = 'treatmentDateLabel';
+  static const String notesHintTreatment = 'notesHintTreatment';
+
+  // Ajouter dans la section VACCINATION DETAIL SCREEN
+  static const String animalsLowercase = 'animalsLowercase';
+  static const String vaccinationDate = 'vaccinationDate';
+  static const String doseLabel = 'doseLabel';
+  static const String administrationRoute = 'administrationRoute';
+  static const String lotNumber = 'lotNumber';
+  static const String expirationDate = 'expirationDate';
+  static const String veterinarianLabel = 'veterinarianLabel';
+  static const String withdrawalPeriodLabel = 'withdrawalPeriodLabel';
+  static const String daysRemaining = 'daysRemaining';
+  static const String groupVaccination = 'groupVaccination';
+  static const String animalPrefix = 'animalPrefix';
+  static const String unknownAnimal = 'unknownAnimal';
+  static const String lateByDays = 'lateByDays';
+  static const String today = 'today';
+  static const String inDays = 'inDays';
+  static const String nextReminder = 'nextReminder';
+  static const String notesLabel = 'notesLabel';
+  static const String protocolLabel = 'protocolLabel';
+  static const String name = 'name';
+  static const String description = 'description';
+  static const String reminderFrequency = 'reminderFrequency';
+  static const String recommendedPeriod = 'recommendedPeriod';
+  static const String protocolNotes = 'protocolNotes';
+  static const String deleteVaccination = 'deleteVaccination';
+  static const String deleteVaccinationConfirm = 'deleteVaccinationConfirm';
+  static const String vaccinationDeleted = 'vaccinationDeleted';
+
+  // Ajouter dans la section WEIGHT RECORD SCREEN
+  static const String animalScanned = 'animalScanned';
+  static const String stepOneAnimal = 'stepOneAnimal';
+  static const String stepTwoWeight = 'stepTwoWeight';
+  static const String stepThreeSource = 'stepThreeSource';
+  static const String stepFourDate = 'stepFourDate';
+  static const String stepFiveNotes = 'stepFiveNotes';
+  static const String weightRequired = 'weightRequired';
+  static const String invalidWeight = 'invalidWeight';
+  static const String weightRangeError = 'weightRangeError';
+  static const String measurementSource = 'measurementSource';
+  static const String reliability = 'reliability';
+  static const String weightHintExample = 'weightHintExample';
+  static const String unitKg = 'unitKg';
+  static const String notesHintWeight = 'notesHintWeight';
+
+  // Ajouter dans la section EID CHANGE & HISTORY
+  static const String newEidHint = 'newEidHint';
+  static const String notesHintEid = 'notesHintEid';
+
+  // Ajouter dans la section FARM MANAGEMENT & PREFERENCES
+  static const String notDefined = 'notDefined';
+  static const String farmEmojiSheep = 'farmEmojiSheep';
+
+  // ========== SETTINGS SCREEN ==========
+  static const String adminEmail = 'adminEmail';
+  static const String languageSection = 'languageSection';
+  static const String french = 'french';
+  static const String arabic = 'arabic';
+  static const String english = 'english';
+  static const String colorBlue = 'colorBlue';
+  static const String colorGreen = 'colorGreen';
+  static const String colorPurple = 'colorPurple';
+  static const String colorOrange = 'colorOrange';
+  static const String appVersion = 'appVersion';
+  static const String mvpOnly = 'mvpOnly';
+  static const String openSyncScreen = 'openSyncScreen';
+  static const String fullName = 'fullName';
+  static const String profileEditComingSoon = 'profileEditComingSoon';
+  static const String modify = 'modify';
+  static const String currentPassword = 'currentPassword';
+  static const String newPassword = 'newPassword';
+  static const String confirmPassword = 'confirmPassword';
+  static const String passwordChangedSuccess = 'passwordChangedSuccess';
+  static const String chooseColor = 'chooseColor';
+  static const String restartAppForColor = 'restartAppForColor';
+  static const String oneMinute = 'oneMinute';
+  static const String fiveMinutes = 'fiveMinutes';
+  static const String fifteenMinutes = 'fifteenMinutes';
+  static const String thirtyMinutes = 'thirtyMinutes';
+  static const String thisDevice = 'thisDevice';
+  static const String activeNow = 'activeNow';
+  static const String tabletSamsung = 'tabletSamsung';
+  static const String twoHoursAgo = 'twoHoursAgo';
+  static const String sessionDisconnected = 'sessionDisconnected';
+  static const String clearCacheDescription = 'clearCacheDescription';
+  static const String cacheCleared = 'cacheCleared';
+  static const String clear = 'clear';
+  static const String csvFile = 'csvFile';
+  static const String importFromCsv = 'importFromCsv';
+  static const String importCsvComingSoon = 'importCsvComingSoon';
+  static const String excelFile = 'excelFile';
+  static const String importFromExcel = 'importFromExcel';
+  static const String importExcelComingSoon = 'importExcelComingSoon';
+  static const String exportCsvComingSoon = 'exportCsvComingSoon';
+  static const String exportXmlComingSoon = 'exportXmlComingSoon';
+  static const String exportExcelComingSoon = 'exportExcelComingSoon';
+  static const String clearDataConfirmTitle = 'clearDataConfirmTitle';
+  static const String clearDataConfirmMessage = 'clearDataConfirmMessage';
+  static const String featureDisabledMvp = 'featureDisabledMvp';
+  static const String veterinarianSetDefault = 'veterinarianSetDefault';
+  static const String veterinarianValidated = 'veterinarianValidated';
+  static const String selectDefaultVeterinarian = 'selectDefaultVeterinarian';
+  static const String privacyPolicyContent = 'privacyPolicyContent';
+  static const String termsOfServiceContent = 'termsOfServiceContent';
+  static const String needHelp = 'needHelp';
+  static const String supportEmail = 'supportEmail';
+  static const String supportPhone = 'supportPhone';
+  static const String supportWebsite = 'supportWebsite';
+  static const String businessHours = 'businessHours';
+  static const String sendEmailComingSoon = 'sendEmailComingSoon';
+  static const String contactUs = 'contactUs';
+  static const String resetPreferencesMessage = 'resetPreferencesMessage';
+  static const String preferencesReset = 'preferencesReset';
+  static const String reset = 'reset';
+  static const String email = 'email';
+  static const String phone = 'phone';
+  static const String website = 'website';
+
+  // ========== LOT SCREENS ==========
+  static const String treatLot = 'treatLot';
+  static const String saleDate = 'saleDate';
+  static const String buyerNameRequired = 'buyerNameRequired';
+  static const String dateSlaughter = 'dateSlaughter';
+  static const String nameOrEstablishment = 'nameOrEstablishment';
+  static const String lotCreated = 'lotCreated';
+  static const String source = 'source';
+  static const String deleteLotQuestion = 'deleteLotQuestion';
+  static const String lotDeleted = 'lotDeleted';
+  static const String back = 'back';
+  static const String copySuffix = 'copySuffix';
+  static const String buyerFarmId = 'buyerFarmId';
+  static const String slaughterhouseName = 'slaughterhouseName';
+  static const String slaughterhouseId = 'slaughterhouseId';
+
+  // ANIMAL FINDER
+  static const String identifyAnimals = 'identifyAnimals';
+  static const String animalAlreadyScanned = 'animalAlreadyScanned';
+  static const String noAnimalAvailable = 'noAnimalAvailable';
+  static const String searchEidOfficialVisual = 'searchEidOfficialVisual';
+  static const String stop = 'stop';
+  static const String scanRfid = 'scanRfid';
+  static const String camera = 'camera';
+  static const String done = 'done';
+  static const String scanOrSearchAnimals = 'scanOrSearchAnimals';
+  static const String selected = 'selected';
+  static const String noAnimalFound = 'noAnimalFound';
+  static const String tryAnotherIdentifier = 'tryAnotherIdentifier';
+  static const String numberShort = 'numberShort';
+  static const String idLabel = 'idLabel';
+  static const String selectedAnimals = 'selectedAnimals';
+  static const String scanMother = 'scanMother';
+
+// ADD ANIMAL
+  static const String identification = 'identification';
+  static const String eidElectronic = 'eidElectronic';
+  static const String atLeastOneIdRequired = 'atLeastOneIdRequired';
+  static const String officialNumberOptional = 'officialNumberOptional';
+  static const String visualIdOptional = 'visualIdOptional';
+  static const String toIdentifyEasily = 'toIdentifyEasily';
+  static const String typeAndBreed = 'typeAndBreed';
+  static const String animalType = 'animalType';
+  static const String animalTypeRequired = 'animalTypeRequired';
+  static const String noBreed = 'noBreed';
+  static const String selectTypeFirst = 'selectTypeFirst';
+  static const String characteristics = 'characteristics';
+  static const String origin = 'origin';
+  static const String originRequired = 'originRequired';
+  static const String birth = 'birth';
+  static const String purchase = 'purchase';
+  static const String provenance = 'provenance';
+  static const String farmOrBreederName = 'farmOrBreederName';
+  static const String purchasePrice = 'purchasePrice';
+  static const String observationsRemarks = 'observationsRemarks';
+  static const String saving = 'saving';
+  static const String idScanned = 'idScanned';
+  static const String motherMustBeFemale = 'motherMustBeFemale';
+  static const String motherSelected = 'motherSelected';
+  static const String atLeastOneIdRequiredError = 'atLeastOneIdRequiredError';
+  static const String selectSexError = 'selectSexError';
+  static const String selectBirthDateError = 'selectBirthDateError';
+  static const String motherNotFound = 'motherNotFound';
+  static const String animalSavedSuccess = 'animalSavedSuccess';
+  static const String errorOccurred = 'errorOccurred';
+  static const String eidOfMother = 'eidOfMother';
+  static const String scanningInProgress = 'scanningInProgress';
+  static const String noFemaleAvailable = 'noFemaleAvailable';
+  static const String add = 'add';
+  static const String motherAdded = 'motherAdded';
+  static const String eidDetected = 'eidDetected';
+  static const String placeRfidNear = 'placeRfidNear';
+  static const String eidDetectedSuccess = 'eidDetectedSuccess';
+  static const String eidScanned = 'eidScanned';
+  static const String validate = 'validate';
+
+// ANIMAL DETAIL
+  static const String infos = 'infos';
+  static const String care = 'care';
+  static const String genealogy = 'genealogy';
+  static const String years = 'years';
+  static const String statusAlive = 'statusAlive';
+  static const String statusSold = 'statusSold';
+  static const String statusDead = 'statusDead';
+  static const String statusSlaughtered = 'statusSlaughtered';
+  static const String weightInKg = 'weightInKg';
+  static const String addWeightButton = 'addWeightButton';
+  static const String weightAddedSuccess = 'weightAddedSuccess';
+  static const String identifiers = 'identifiers';
+  static const String changeEid = 'changeEid';
+  static const String visualIdAnimal = 'visualIdAnimal';
+  static const String show = 'show';
+  static const String noEidHistory = 'noEidHistory';
+  static const String generalInfo = 'generalInfo';
+  static const String statusAnimal = 'statusAnimal';
+  static const String noWeightRecorded = 'noWeightRecorded';
+  static const String seeAll = 'seeAll';
+  static const String kg = 'kg';
+  static const String gain = 'gain';
+  static const String loss = 'loss';
+  static const String actions = 'actions';
+  static const String recordWeight = 'recordWeight';
+  static const String declareDeath = 'declareDeath';
+  static const String noActiveAlert = 'noActiveAlert';
+  static const String vaccinations = 'vaccinations';
+  static const String noVaccination = 'noVaccination';
+  static const String reminderLate = 'reminderLate';
+  static const String reminderInDays = 'reminderInDays';
+  static const String noMotherDeclared = 'noMotherDeclared';
+  static const String seeDetails = 'seeDetails';
+  static const String offspring = 'offspring';
+  static const String noOffspring = 'noOffspring';
+
+  // ANIMAL LIST
+  static const String allAnimals = 'allAnimals';
+  static const String animalList = 'animalList';
+  static const String urgent = 'urgent';
+  static const String toMonitor = 'toMonitor';
+  static const String routine = 'routine';
+  static const String withdrawal = 'withdrawal';
+  static const String apply = 'apply';
+  static const String all = 'all';
+  static const String active = 'active';
+  static const String inactive = 'inactive';
+  static const String motherEid = 'motherEid';
+  static const String noAnimal = 'noAnimal';
+  static const String searchEidOfficial = 'searchEidOfficial';
+  static const String filters = 'filters';
+  static const String groupBy = 'groupBy';
+  static const String none = 'none';
+  static const String withAlertsOnly = 'withAlertsOnly';
+  static const String byAlert = 'byAlert';
+  static const String bySex = 'bySex';
+  static const String byAge = 'byAge';
+  static const String byStatus = 'byStatus';
+  static const String byWithdrawal = 'byWithdrawal';
+  static const String byMother = 'byMother';
+  static const String byType = 'byType';
+  static const String byBreed = 'byBreed';
+
+  // WEIGHT HISTORY
+  static const String fullHistory = 'fullHistory';
+
+  static const String scanQrEidVisual = 'scanQrEidVisual';
+  static const String manualInput = 'manualInput';
+
+  //BATCH
+  static const String animalCount = 'animalCount';
+  static const String continueScanning = 'continueScanning';
+  static const String cancelBatch = 'cancelBatch';
+
+  //section GENERAL ou NAVIGATION)
+  static const String scan = 'scan';
+  static const String home = 'home';
 }

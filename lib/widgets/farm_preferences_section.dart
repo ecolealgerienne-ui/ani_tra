@@ -6,6 +6,7 @@ import '../providers/settings_provider.dart';
 import '../data/animal_config.dart';
 import '../i18n/app_localizations.dart';
 import '../i18n/app_strings.dart';
+import '../utils/constants.dart';
 
 class FarmPreferencesSection extends StatelessWidget {
   const FarmPreferencesSection({super.key});
@@ -35,7 +36,7 @@ class FarmPreferencesSection extends StatelessWidget {
                     Icon(
                       Icons.pets,
                       color: Theme.of(context).primaryColor,
-                      size: 28,
+                      size: AppConstants.iconSizeMediumLarge,
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -43,9 +44,9 @@ class FarmPreferencesSection extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '🐑 ${l10n.translate(AppStrings.farmPreferencesTitle)}',
+                            '${l10n.translate(AppStrings.farmEmojiSheep)} ${l10n.translate(AppStrings.farmPreferencesTitle)}',
                             style: const TextStyle(
-                              fontSize: 18,
+                              fontSize: AppConstants.fontSizeImportant,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -53,7 +54,7 @@ class FarmPreferencesSection extends StatelessWidget {
                           Text(
                             l10n.translate(AppStrings.farmPreferencesSubtitle),
                             style: const TextStyle(
-                              fontSize: 12,
+                              fontSize: AppConstants.fontSizeSmall,
                               color: Colors.grey,
                             ),
                           ),
@@ -69,7 +70,7 @@ class FarmPreferencesSection extends StatelessWidget {
                   title: l10n.translate(AppStrings.defaultAnimalType),
                   value: currentSpecies != null
                       ? '${currentSpecies.icon} ${currentSpecies.nameFr}'
-                      : 'Non défini',
+                      : l10n.translate(AppStrings.notDefined),
                   onTap: () => _showSpeciesSelector(context, settingsProvider),
                 ),
                 const SizedBox(height: 12),
@@ -88,18 +89,21 @@ class FarmPreferencesSection extends StatelessWidget {
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: Colors.blue.shade50,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius:
+                        BorderRadius.circular(AppConstants.borderRadiusMedium),
                     border: Border.all(color: Colors.blue.shade200),
                   ),
                   child: Row(
                     children: [
                       Icon(Icons.info_outline,
-                          color: Colors.blue.shade700, size: 20),
+                          color: Colors.blue.shade700,
+                          size: AppConstants.iconSizeRegular),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
                           l10n.translate(AppStrings.farmPreferencesInfo),
-                          style: const TextStyle(fontSize: 12),
+                          style: const TextStyle(
+                              fontSize: AppConstants.fontSizeSmall),
                         ),
                       ),
                     ],
@@ -123,12 +127,12 @@ class FarmPreferencesSection extends StatelessWidget {
   }) {
     return InkWell(
       onTap: enabled ? onTap : null,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: enabled ? Colors.grey.shade50 : Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
           border: Border.all(color: Colors.grey.shade300),
         ),
         child: Row(
@@ -136,7 +140,7 @@ class FarmPreferencesSection extends StatelessWidget {
             Icon(
               icon,
               color: enabled ? Theme.of(context).primaryColor : Colors.grey,
-              size: 24,
+              size: AppConstants.iconSizeRegular,
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -146,7 +150,7 @@ class FarmPreferencesSection extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: AppConstants.fontSizeBody,
                       fontWeight: FontWeight.w500,
                       color: enabled ? Colors.black87 : Colors.grey,
                     ),
@@ -155,7 +159,7 @@ class FarmPreferencesSection extends StatelessWidget {
                   Text(
                     value,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: AppConstants.fontSizeSectionTitle,
                       fontWeight: FontWeight.bold,
                       color: enabled
                           ? Theme.of(context).primaryColor
@@ -264,7 +268,8 @@ class FarmPreferencesSection extends StatelessWidget {
                     subtitle: breed.description != null
                         ? Text(
                             breed.description!,
-                            style: const TextStyle(fontSize: 11),
+                            style: const TextStyle(
+                                fontSize: AppConstants.fontSizeTiny),
                           )
                         : null,
                     value: breed.id,

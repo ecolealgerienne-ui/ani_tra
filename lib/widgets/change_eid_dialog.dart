@@ -7,6 +7,7 @@ import '../models/eid_change.dart';
 import '../providers/animal_provider.dart';
 import '../i18n/app_localizations.dart';
 import '../i18n/app_strings.dart';
+import '../utils/constants.dart';
 
 class ChangeEidDialog extends StatefulWidget {
   final Animal animal;
@@ -119,7 +120,8 @@ class _ChangeEidDialogState extends State<ChangeEidDialog> {
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius:
+                      BorderRadius.circular(AppConstants.borderRadiusMedium),
                   border: Border.all(color: Colors.grey.shade300),
                 ),
                 child: Column(
@@ -128,7 +130,7 @@ class _ChangeEidDialogState extends State<ChangeEidDialog> {
                     Text(
                       l10n.translate(AppStrings.currentEid),
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: AppConstants.fontSizeSmall,
                         color: Colors.grey.shade600,
                       ),
                     ),
@@ -136,7 +138,7 @@ class _ChangeEidDialogState extends State<ChangeEidDialog> {
                     Text(
                       widget.animal.displayName,
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: AppConstants.fontSizeSectionTitle,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -148,7 +150,7 @@ class _ChangeEidDialogState extends State<ChangeEidDialog> {
                 controller: _newEidController,
                 decoration: InputDecoration(
                   labelText: l10n.translate(AppStrings.newEidLabel),
-                  hintText: 'Ex: 250001234567890',
+                  hintText: l10n.translate(AppStrings.newEidHint),
                   prefixIcon: const Icon(Icons.qr_code_scanner),
                   border: const OutlineInputBorder(),
                 ),
@@ -169,7 +171,7 @@ class _ChangeEidDialogState extends State<ChangeEidDialog> {
               Text(
                 l10n.translate(AppStrings.changeReason),
                 style: const TextStyle(
-                  fontSize: 12,
+                  fontSize: AppConstants.fontSizeSmall,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -199,7 +201,7 @@ class _ChangeEidDialogState extends State<ChangeEidDialog> {
                 controller: _notesController,
                 decoration: InputDecoration(
                   labelText: l10n.translate(AppStrings.optionalNotes),
-                  hintText: 'Ex: Puce trouvée cassée lors du scan',
+                  hintText: l10n.translate(AppStrings.notesHintEid),
                   border: const OutlineInputBorder(),
                 ),
                 maxLines: 3,
@@ -217,8 +219,8 @@ class _ChangeEidDialogState extends State<ChangeEidDialog> {
           onPressed: _isLoading ? null : _handleSubmit,
           child: _isLoading
               ? const SizedBox(
-                  width: 20,
-                  height: 20,
+                  width: AppConstants.loaderSizeSmall,
+                  height: AppConstants.loaderSizeSmall,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               : Text(l10n.translate(AppStrings.changeEidTitle)),

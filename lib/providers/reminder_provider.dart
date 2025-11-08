@@ -19,9 +19,7 @@ class ReminderProvider extends ChangeNotifier {
 
   /// Obtenir les rappels en attente
   List<MedicalReminder> get pendingReminders {
-    return _reminders
-        .where((r) => r.status == ReminderStatus.pending)
-        .toList()
+    return _reminders.where((r) => r.status == ReminderStatus.pending).toList()
       ..sort((a, b) => a.reminderDate.compareTo(b.reminderDate));
   }
 
@@ -48,17 +46,13 @@ class ReminderProvider extends ChangeNotifier {
 
   /// Obtenir les rappels pour un animal
   List<MedicalReminder> getRemindersForAnimal(String animalId) {
-    return _reminders
-        .where((r) => r.animalId == animalId)
-        .toList()
+    return _reminders.where((r) => r.animalId == animalId).toList()
       ..sort((a, b) => a.reminderDate.compareTo(b.reminderDate));
   }
 
   /// Obtenir les rappels pour un acte médical
   List<MedicalReminder> getRemindersForMedicalAct(String actId) {
-    return _reminders
-        .where((r) => r.medicalActId == actId)
-        .toList()
+    return _reminders.where((r) => r.medicalActId == actId).toList()
       ..sort((a, b) => a.reminderDate.compareTo(b.reminderDate));
   }
 
@@ -190,6 +184,8 @@ class ReminderProvider extends ChangeNotifier {
         );
       }
     } catch (e) {
+      // Intentionnel : on ignore cette erreur car l’opération est optionnelle.
+      // ignore: empty_catches
     }
   }
 

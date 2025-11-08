@@ -26,12 +26,14 @@ import 'providers/auth_provider.dart';
 import 'providers/reminder_provider.dart';
 import 'providers/veterinarian_provider.dart';
 import 'i18n/app_localizations.dart';
-import 'screens/home/home_screen.dart'; // ✅ Mis à jour
-import 'screens/animal/animal_detail_screen.dart'; // ✅ Mis à jour
-import 'screens/animal/animal_list_screen.dart'; // ✅ Mis à jour
-import 'screens/animal/animal_finder_screen.dart'; // ✅ Scanner universel
-import 'screens/animal/universal_scanner_screen.dart'; // ✅ Scanner Phase 1
-import 'screens/sync/sync_screen.dart'; // ✅ Mis à jour
+import 'i18n/app_strings.dart';
+import 'utils/constants.dart';
+import 'screens/home/home_screen.dart';
+import 'screens/animal/animal_detail_screen.dart';
+import 'screens/animal/animal_list_screen.dart';
+import 'screens/animal/animal_finder_screen.dart';
+import 'screens/animal/universal_scanner_screen.dart';
+import 'screens/sync/sync_screen.dart';
 import 'data/mock_data.dart';
 import 'data/mocks/mock_vaccination_references.dart';
 import 'data/mocks/mock_veterinarians.dart';
@@ -45,11 +47,11 @@ void main() async {
 
   // Initialiser les fuseaux horaires
   tz.initializeTimeZones();
-  tz.setLocalLocation(tz.getLocation('Europe/Paris'));
+  tz.setLocalLocation(tz.getLocation(AppConstants.defaultTimezone));
 
   // Initialiser les notifications
   const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
+      AndroidInitializationSettings(AppConstants.androidIconPath);
 
   const DarwinInitializationSettings initializationSettingsIOS =
       DarwinInitializationSettings(
@@ -66,7 +68,6 @@ void main() async {
   await flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
     onDidReceiveNotificationResponse: (NotificationResponse response) {
-      // → Ouvrir écran pré-rempli pour enregistrer le soin
       debugPrint('Notification cliquée: ${response.payload}');
     },
   );
@@ -100,7 +101,7 @@ class MyApp extends StatelessWidget {
           create: (_) => ReminderProvider(flutterLocalNotificationsPlugin),
         ),
 
-        // AnimalProvider - ligne ~24
+        // AnimalProvider
         ChangeNotifierProxyProvider<AuthProvider, AnimalProvider>(
           create: (context) {
             final auth = context.read<AuthProvider>();
@@ -116,7 +117,7 @@ class MyApp extends StatelessWidget {
           update: (context, auth, previous) => previous ?? AnimalProvider(auth),
         ),
 
-        // BatchProvider - ligne ~30
+        // BatchProvider
         ChangeNotifierProxyProvider<AuthProvider, BatchProvider>(
           create: (context) {
             final auth = context.read<AuthProvider>();
@@ -219,7 +220,7 @@ class MyApp extends StatelessWidget {
       child: Consumer<LocaleProvider>(
         builder: (context, localeProvider, child) {
           return MaterialApp(
-            title: 'RFID Livestock',
+            title: AppConstants.appTitle,
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
               primarySwatch: Colors.green,
@@ -230,14 +231,16 @@ class MyApp extends StatelessWidget {
                 elevation: 0,
               ),
               cardTheme: CardThemeData(
-                elevation: 2,
+                elevation: AppConstants.mainCardElevation,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius:
+                      BorderRadius.circular(AppConstants.mainCardRadius),
                 ),
               ),
               inputDecorationTheme: InputDecorationTheme(
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius:
+                      BorderRadius.circular(AppConstants.mainInputRadius),
                 ),
                 filled: true,
                 fillColor: Colors.white,
@@ -281,7 +284,7 @@ class _MainNavigationState extends State<MainNavigation> {
       const HomeScreen(),
       _ScanTabScreen(onAnimalSelected: (animal) {
         setState(() {
-          _selectedIndex = 0; // Retour à l'accueil
+          _selectedIndex = 0;
         });
         Navigator.push(
           context,
@@ -313,22 +316,22 @@ class _MainNavigationState extends State<MainNavigation> {
         onTap: _onItemTapped,
         selectedItemColor: Colors.green,
         unselectedItemColor: Colors.grey,
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Accueil',
+            icon: const Icon(Icons.home),
+            label: AppLocalizations.of(context).translate(AppStrings.home),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.qr_code_scanner),
-            label: 'Scan',
+            icon: const Icon(Icons.qr_code_scanner),
+            label: AppLocalizations.of(context).translate(AppStrings.scan),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: 'Animaux',
+            icon: const Icon(Icons.list),
+            label: AppLocalizations.of(context).translate(AppStrings.animals),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.sync),
-            label: 'Sync',
+            icon: const Icon(Icons.sync),
+            label: AppLocalizations.of(context).translate(AppStrings.sync),
           ),
         ],
       ),
@@ -344,15 +347,12 @@ class _ScanTabScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Utiliser un Builder pour avoir accès au bon context
     return Builder(
       builder: (context) {
-        // Auto-navigation vers AnimalFinderScreen
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _navigateToScanner(context);
         });
 
-        // Afficher un écran vide pendant la navigation
         return const Scaffold(
           body: Center(
             child: CircularProgressIndicator(),
@@ -366,9 +366,9 @@ class _ScanTabScreen extends StatelessWidget {
     final animal = await Navigator.push<Animal>(
       context,
       MaterialPageRoute(
-        builder: (context) => const AnimalFinderScreen(
+        builder: (context) => AnimalFinderScreen(
           mode: AnimalFinderMode.single,
-          title: 'Scanner un animal',
+          title: AppLocalizations.of(context).translate(AppStrings.scanAnimal),
         ),
       ),
     );

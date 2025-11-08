@@ -8,6 +8,7 @@ import '../../providers/batch_provider.dart';
 import 'old_batch_scan_screen.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
+import '../../utils/constants.dart';
 
 /// Écran de création de lot
 ///
@@ -68,38 +69,38 @@ class _BatchCreateScreenState extends State<BatchCreateScreen> {
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppConstants.batchCreatePadding),
           children: [
             // Illustration
             Center(
               child: Container(
-                width: 120,
-                height: 120,
+                width: AppConstants.batchCreateIconSize,
+                height: AppConstants.batchCreateIconSize,
                 decoration: BoxDecoration(
                   color: Colors.deepPurple.shade50,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.inventory,
-                  size: 60,
+                  size: AppConstants.batchCreateIconInnerSize,
                   color: Colors.deepPurple.shade400,
                 ),
               ),
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: AppConstants.batchCreateSpacingLarge),
 
             // Description
             Text(
               AppLocalizations.of(context).translate(AppStrings.batchDescription),
               style: TextStyle(
-                fontSize: 14,
+                fontSize: AppConstants.batchCreateDescriptionSize,
                 color: Colors.grey.shade700,
               ),
               textAlign: TextAlign.center,
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: AppConstants.batchCreateSpacingLarge),
 
             // Nom du lot
             TextFormField(
@@ -117,7 +118,7 @@ class _BatchCreateScreenState extends State<BatchCreateScreen> {
                   return AppLocalizations.of(context)
                       .translate(AppStrings.batchNameRequired);
                 }
-                if (value.trim().length < 3) {
+                if (value.trim().length < AppConstants.batchNameMinLength) {
                   return AppLocalizations.of(context)
                       .translate(AppStrings.minCharacters);
                 }
@@ -125,33 +126,33 @@ class _BatchCreateScreenState extends State<BatchCreateScreen> {
               },
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: AppConstants.batchCreateSpacingMedium),
 
             // Objectif
             Text(
               AppLocalizations.of(context).translate(AppStrings.batchPurpose),
               style: const TextStyle(
-                fontSize: 16,
+                fontSize: AppConstants.batchCreateTitleSize,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppConstants.batchCreateSpacingSmall),
 
             // Grille de sélection
             GridView.count(
-              crossAxisCount: 2,
+              crossAxisCount: AppConstants.batchCreateGridColumns,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
-              childAspectRatio: 1.8,
+              mainAxisSpacing: AppConstants.batchCreateSpacingSmall,
+              crossAxisSpacing: AppConstants.batchCreateSpacingSmall,
+              childAspectRatio: AppConstants.batchCreateGridAspectRatio,
               children: [
                 _PurposeCard(
                   purpose: BatchPurpose.sale,
                   icon: Icons.sell,
                   label:
                       AppLocalizations.of(context).translate(AppStrings.sale),
-                  color: Colors.green,
+                  color: AppConstants.statusSuccess,
                   isSelected: _selectedPurpose == BatchPurpose.sale,
                   onTap: () {
                     setState(() {
@@ -164,7 +165,7 @@ class _BatchCreateScreenState extends State<BatchCreateScreen> {
                   icon: Icons.factory,
                   label: AppLocalizations.of(context)
                       .translate(AppStrings.slaughter),
-                  color: Colors.red,
+                  color: AppConstants.statusDanger,
                   isSelected: _selectedPurpose == BatchPurpose.slaughter,
                   onTap: () {
                     setState(() {
@@ -177,7 +178,7 @@ class _BatchCreateScreenState extends State<BatchCreateScreen> {
                   icon: Icons.medical_services,
                   label: AppLocalizations.of(context)
                       .translate(AppStrings.treatment),
-                  color: Colors.blue,
+                  color: AppConstants.statusInfo,
                   isSelected: _selectedPurpose == BatchPurpose.treatment,
                   onTap: () {
                     setState(() {
@@ -201,7 +202,7 @@ class _BatchCreateScreenState extends State<BatchCreateScreen> {
               ],
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: AppConstants.batchCreateSpacingLarge),
 
             // Bouton de démarrage
             ElevatedButton.icon(
@@ -212,12 +213,12 @@ class _BatchCreateScreenState extends State<BatchCreateScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepPurple,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                minimumSize: const Size(double.infinity, 50),
+                padding: const EdgeInsets.symmetric(vertical: AppConstants.batchCreateButtonPadding),
+                minimumSize: const Size(double.infinity, AppConstants.batchCreateButtonHeight),
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: AppConstants.batchCreateSpacingMedium),
 
             // Bouton annuler
             OutlinedButton(
@@ -254,21 +255,21 @@ class _PurposeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(AppConstants.batchCreateCardRadius),
       child: Container(
         decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha: 0.1) : Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          color: isSelected ? color.withValues(alpha: AppConstants.batchCreateCardAlpha) : Colors.white,
+          borderRadius: BorderRadius.circular(AppConstants.batchCreateCardRadius),
           border: Border.all(
             color: isSelected ? color : Colors.grey.shade300,
-            width: isSelected ? 2 : 1,
+            width: isSelected ? AppConstants.batchCreateCardBorderSelected : AppConstants.batchCreateCardBorderNormal,
           ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: color.withValues(alpha: 0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
+                    color: color.withValues(alpha: AppConstants.batchCreateCardShadowAlpha),
+                    blurRadius: AppConstants.batchCreateCardShadowBlur,
+                    offset: const Offset(0, AppConstants.batchCreateCardShadowOffset),
                   ),
                 ]
               : null,
@@ -279,24 +280,24 @@ class _PurposeCard extends StatelessWidget {
             Icon(
               icon,
               color: isSelected ? color : Colors.grey.shade600,
-              size: 32,
+              size: AppConstants.batchCreateCardIconSize,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppConstants.batchCreateCardSpacing),
             Text(
               label,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: AppConstants.batchCreateCardTextSize,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 color: isSelected ? color : Colors.grey.shade700,
               ),
             ),
             if (isSelected)
               Container(
-                margin: const EdgeInsets.only(top: 4),
+                margin: const EdgeInsets.only(top: AppConstants.batchCreateCardCheckMargin),
                 child: Icon(
                   Icons.check_circle,
                   color: color,
-                  size: 16,
+                  size: AppConstants.batchCreateCardCheckSize,
                 ),
               ),
           ],

@@ -10,6 +10,7 @@ import '../../models/animal.dart';
 import '../../models/movement.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
+import '../../utils/constants.dart';
 
 class DeathScreen extends StatefulWidget {
   final Animal? animal;
@@ -46,7 +47,7 @@ class _DeathScreenState extends State<DeathScreen> {
     setState(() => _isScanning = true);
 
     HapticFeedback.mediumImpact();
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(AppConstants.longAnimation);
 
     final animalProvider = context.read<AnimalProvider>();
 
@@ -97,7 +98,7 @@ class _DeathScreenState extends State<DeathScreen> {
       type: MovementType.death,
       movementDate: _deathDate,
       notes: _notesController.text.isEmpty
-          ? 'Cause non spécifiée'
+          ? AppLocalizations.of(context).translate(AppStrings.causeNotSpecified)
           : _notesController.text,
       createdAt: DateTime.now(),
     );
@@ -202,7 +203,8 @@ class _DeathScreenState extends State<DeathScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  animal!.officialNumber ?? 'N/A',
+                                  animal!.officialNumber ??
+                                      AppConstants.notAvailable,
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -223,7 +225,7 @@ class _DeathScreenState extends State<DeathScreen> {
                       ),
                       const Divider(height: 24),
                       Text(
-                          '${AppLocalizations.of(context).translate(AppStrings.sex)}: ${animal.sex == AnimalSex.female ? "Femelle" : "Mâle"}'),
+                          '${AppLocalizations.of(context).translate(AppStrings.sex)}: ${animal.sex == AnimalSex.female ? AppLocalizations.of(context).translate(AppStrings.female) : AppLocalizations.of(context).translate(AppStrings.male)}'),
                       Text(
                           '${AppLocalizations.of(context).translate(AppStrings.age)}: ${animal.ageInMonths} ${AppLocalizations.of(context).translate(AppStrings.months)}'),
                       Text(
@@ -269,7 +271,8 @@ class _DeathScreenState extends State<DeathScreen> {
               decoration: InputDecoration(
                 labelText: AppLocalizations.of(context)
                     .translate(AppStrings.deathCause),
-                hintText: 'Ex: Maladie, Accident, Prédateur...',
+                hintText: AppLocalizations.of(context)
+                    .translate(AppStrings.deathCauseHint),
                 alignLabelWithHint: true,
               ),
             ),

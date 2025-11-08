@@ -8,6 +8,7 @@ import '../../providers/batch_provider.dart';
 import 'old_batch_create_screen.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
+import '../../utils/constants.dart';
 // import '../movement/sale_screen.dart';
 // import '../movement/slaughter_screen.dart';
 
@@ -33,7 +34,7 @@ class BatchListScreen extends StatelessWidget {
           }
 
           return ListView.builder(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppConstants.batchListPadding),
             itemCount: batches.length,
             itemBuilder: (context, index) {
               final batch = batches[index];
@@ -56,7 +57,8 @@ class BatchListScreen extends StatelessWidget {
           );
         },
         icon: const Icon(Icons.add),
-        label: Text(AppLocalizations.of(context).translate(AppStrings.newBatch)),
+        label:
+            Text(AppLocalizations.of(context).translate(AppStrings.newBatch)),
         backgroundColor: Colors.deepPurple,
       ),
     );
@@ -66,30 +68,32 @@ class BatchListScreen extends StatelessWidget {
   Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppConstants.batchListEmptyPadding),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               Icons.inventory,
-              size: 80,
+              size: AppConstants.batchListEmptyIconSize,
               color: Colors.grey.shade400,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppConstants.batchListEmptySpacing),
             Text(
-              AppLocalizations.of(context).translate(AppStrings.noBatchesCreated),
+              AppLocalizations.of(context)
+                  .translate(AppStrings.noBatchesCreated),
               style: TextStyle(
-                fontSize: 20,
+                fontSize: AppConstants.batchListEmptyTitleSize,
                 fontWeight: FontWeight.bold,
                 color: Colors.grey.shade700,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppConstants.batchListEmptySpacingSmall),
             Text(
-              AppLocalizations.of(context).translate(AppStrings.batchDescription),
+              AppLocalizations.of(context)
+                  .translate(AppStrings.batchDescription),
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: AppConstants.batchListEmptyTextSize,
                 color: Colors.grey.shade600,
               ),
             ),
@@ -104,23 +108,27 @@ class BatchListScreen extends StatelessWidget {
     final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context).translate(AppStrings.deleteBatchTitle)),
+        title: Text(AppLocalizations.of(context)
+            .translate(AppStrings.deleteBatchTitle)),
         content: Text(
-          AppLocalizations.of(context).translate(AppStrings.deleteBatchMessage)
-            .replaceAll('{name}', batch.name)
-            .replaceAll('{count}', '${batch.animalCount}'),
+          AppLocalizations.of(context)
+              .translate(AppStrings.deleteBatchMessage)
+              .replaceAll('{name}', batch.name)
+              .replaceAll('{count}', '${batch.animalCount}'),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(AppLocalizations.of(context).translate(AppStrings.cancel)),
+            child:
+                Text(AppLocalizations.of(context).translate(AppStrings.cancel)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(
-              foregroundColor: Colors.red,
+              foregroundColor: AppConstants.statusDanger,
             ),
-            child: Text(AppLocalizations.of(context).translate(AppStrings.delete)),
+            child:
+                Text(AppLocalizations.of(context).translate(AppStrings.delete)),
           ),
         ],
       ),
@@ -134,8 +142,9 @@ class BatchListScreen extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              AppLocalizations.of(context).translate(AppStrings.batchDeleted)
-                .replaceAll('{name}', batch.name),
+              AppLocalizations.of(context)
+                  .translate(AppStrings.batchDeleted)
+                  .replaceAll('{name}', batch.name),
             ),
           ),
         );
@@ -148,14 +157,10 @@ class BatchListScreen extends StatelessWidget {
     // TODO: Décommenter et ajuster les imports une fois les screens disponibles
     switch (batch.purpose) {
       case BatchPurpose.sale:
-        // Naviguer vers vente
-        // NOTE: Vérifiez le nom du paramètre dans SaleScreen
-        // Il peut être: batch, batchId, selectedBatch, etc.
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '${AppLocalizations.of(context).translate(AppStrings.saleOfBatch).replaceAll('{name}', batch.name)} - ${AppLocalizations.of(context).translate(AppStrings.toImplement)}'
-            ),
+                '${AppLocalizations.of(context).translate(AppStrings.saleOfBatch).replaceAll('{name}', batch.name)} - ${AppLocalizations.of(context).translate(AppStrings.toImplement)}'),
           ),
         );
         /*
@@ -171,13 +176,10 @@ class BatchListScreen extends StatelessWidget {
         break;
 
       case BatchPurpose.slaughter:
-        // Naviguer vers abattage
-        // NOTE: Vérifiez le nom du paramètre dans SlaughterScreen
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '${AppLocalizations.of(context).translate(AppStrings.slaughterOfBatch).replaceAll('{name}', batch.name)} - ${AppLocalizations.of(context).translate(AppStrings.toImplement)}'
-            ),
+                '${AppLocalizations.of(context).translate(AppStrings.slaughterOfBatch).replaceAll('{name}', batch.name)} - ${AppLocalizations.of(context).translate(AppStrings.toImplement)}'),
           ),
         );
         /*
@@ -194,10 +196,10 @@ class BatchListScreen extends StatelessWidget {
 
       case BatchPurpose.treatment:
       case BatchPurpose.other:
-        // TODO: Implémenter traitement groupé
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context).translate(AppStrings.featureComingSoon)),
+            content: Text(AppLocalizations.of(context)
+                .translate(AppStrings.featureComingSoon)),
           ),
         );
         break;
@@ -221,40 +223,50 @@ class _BatchCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final purposeIcon = _getPurposeIcon(batch.purpose);
     final purposeColor = _getPurposeColor(batch.purpose);
-    final purposeLabel = _getPurposeLabel(batch.purpose);
+    final purposeLabel = _getPurposeLabel(context, batch.purpose);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: AppConstants.batchCardMargin),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: purposeColor.withValues(alpha: 0.3)),
+        borderRadius: BorderRadius.circular(AppConstants.batchCardRadius),
+        border: Border.all(
+            color: purposeColor.withValues(
+                alpha: AppConstants.batchCardBorderAlpha)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: Colors.black
+                .withValues(alpha: AppConstants.batchCardShadowAlpha),
+            blurRadius: AppConstants.batchCardShadowBlur,
+            offset: const Offset(0, AppConstants.batchCardShadowOffset),
           ),
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
+          // En-tête
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppConstants.batchCardPadding),
             child: Row(
               children: [
                 // Icône
-                CircleAvatar(
-                  backgroundColor: purposeColor.withValues(alpha: 0.1),
+                Container(
+                  width: AppConstants.batchCardIconSize,
+                  height: AppConstants.batchCardIconSize,
+                  decoration: BoxDecoration(
+                    color: purposeColor.withValues(
+                        alpha: AppConstants.batchCardIconAlpha),
+                    borderRadius:
+                        BorderRadius.circular(AppConstants.batchCardIconRadius),
+                  ),
                   child: Icon(
                     purposeIcon,
                     color: purposeColor,
-                    size: 24,
+                    size: AppConstants.batchCardIconInnerSize,
                   ),
                 ),
-                const SizedBox(width: 12),
+
+                const SizedBox(width: AppConstants.batchCardSpacing),
 
                 // Infos
                 Expanded(
@@ -264,40 +276,48 @@ class _BatchCard extends StatelessWidget {
                       Text(
                         batch.name,
                         style: const TextStyle(
-                          fontSize: 16,
+                          fontSize: AppConstants.batchCardNameSize,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppConstants.batchCardSpacingTiny),
                       Row(
                         children: [
                           Icon(
                             Icons.pets,
-                            size: 14,
+                            size: AppConstants.batchCardPetIconSize,
                             color: Colors.grey.shade600,
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(
+                              width: AppConstants.batchCardSpacingTiny),
                           Text(
-                            '${batch.animalCount} animal${batch.animalCount > 1 ? 'aux' : ''}',
+                            AppLocalizations.of(context)
+                                .translate(AppStrings.animalCount)
+                                .replaceAll('{count}', '${batch.animalCount}')
+                                .replaceAll('{plural}',
+                                    batch.animalCount > 1 ? 'aux' : ''),
                             style: TextStyle(
-                              fontSize: 13,
+                              fontSize: AppConstants.batchCardInfoSize,
                               color: Colors.grey.shade600,
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(
+                              width: AppConstants.batchCardSpacingSmall),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2,
+                              horizontal: AppConstants.batchCardBadgePaddingH,
+                              vertical: AppConstants.batchCardBadgePaddingV,
                             ),
                             decoration: BoxDecoration(
-                              color: purposeColor.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(4),
+                              color: purposeColor.withValues(
+                                  alpha: AppConstants.batchCardBadgeAlpha),
+                              borderRadius: BorderRadius.circular(
+                                  AppConstants.batchCardBadgeRadius),
                             ),
                             child: Text(
                               purposeLabel,
                               style: TextStyle(
-                                fontSize: 11,
+                                fontSize: AppConstants.batchCardBadgeSize,
                                 fontWeight: FontWeight.w600,
                                 color: purposeColor,
                               ),
@@ -318,7 +338,8 @@ class _BatchCard extends StatelessWidget {
                     } else if (value == 'export') {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(AppLocalizations.of(context).translate(AppStrings.exportComingSoon)),
+                          content: Text(AppLocalizations.of(context)
+                              .translate(AppStrings.exportComingSoon)),
                         ),
                       );
                     }
@@ -328,9 +349,12 @@ class _BatchCard extends StatelessWidget {
                       value: 'export',
                       child: Row(
                         children: [
-                          const Icon(Icons.file_download, size: 18),
-                          const SizedBox(width: 8),
-                          Text(AppLocalizations.of(context).translate(AppStrings.export)),
+                          const Icon(Icons.file_download,
+                              size: AppConstants.batchCardMenuIconSize),
+                          const SizedBox(
+                              width: AppConstants.batchCardMenuSpacing),
+                          Text(AppLocalizations.of(context)
+                              .translate(AppStrings.export)),
                         ],
                       ),
                     ),
@@ -338,11 +362,16 @@ class _BatchCard extends StatelessWidget {
                       value: 'delete',
                       child: Row(
                         children: [
-                          const Icon(Icons.delete, size: 18, color: Colors.red),
-                          const SizedBox(width: 8),
+                          const Icon(Icons.delete,
+                              size: AppConstants.batchCardMenuIconSize,
+                              color: AppConstants.statusDanger),
+                          const SizedBox(
+                              width: AppConstants.batchCardMenuSpacing),
                           Text(
-                            AppLocalizations.of(context).translate(AppStrings.delete),
-                            style: const TextStyle(color: Colors.red),
+                            AppLocalizations.of(context)
+                                .translate(AppStrings.delete),
+                            style: const TextStyle(
+                                color: AppConstants.statusDanger),
                           ),
                         ],
                       ),
@@ -356,7 +385,9 @@ class _BatchCard extends StatelessWidget {
           // Statut
           if (batch.completed)
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppConstants.batchCardPadding,
+                  vertical: AppConstants.batchCardStatusPadding),
               decoration: BoxDecoration(
                 color: Colors.grey.shade100,
                 border: Border(
@@ -367,14 +398,14 @@ class _BatchCard extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.check_circle,
-                    size: 16,
+                    size: AppConstants.batchCardStatusIconSize,
                     color: Colors.grey.shade600,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppConstants.batchCardMenuSpacing),
                   Text(
                     '${AppLocalizations.of(context).translate(AppStrings.completedOn)} ${_formatDate(batch.usedAt!)}',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: AppConstants.batchCardStatusTextSize,
                       color: Colors.grey.shade600,
                     ),
                   ),
@@ -385,7 +416,8 @@ class _BatchCard extends StatelessWidget {
           // Bouton d'action (si non complété)
           if (!batch.completed)
             Container(
-              padding: const EdgeInsets.all(12),
+              padding:
+                  const EdgeInsets.all(AppConstants.batchCardActionPadding),
               decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(color: Colors.grey.shade200),
@@ -397,7 +429,7 @@ class _BatchCard extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: onUse,
                       icon: Icon(_getActionIcon(batch.purpose)),
-                      label: Text(_getActionLabel(batch.purpose)),
+                      label: Text(_getActionLabel(context, batch.purpose)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: purposeColor,
                         foregroundColor: Colors.white,
@@ -430,29 +462,27 @@ class _BatchCard extends StatelessWidget {
   Color _getPurposeColor(BatchPurpose purpose) {
     switch (purpose) {
       case BatchPurpose.sale:
-        return Colors.green;
+        return AppConstants.statusSuccess;
       case BatchPurpose.slaughter:
-        return Colors.red;
+        return AppConstants.statusDanger;
       case BatchPurpose.treatment:
-        return Colors.blue;
+        return AppConstants.statusInfo;
       case BatchPurpose.other:
         return Colors.grey;
     }
   }
 
   /// Obtenir le label selon l'objectif
-  String _getPurposeLabel(BatchPurpose purpose) {
-    // Note: Ce widget n'a pas accès à BuildContext dans les méthodes helper
-    // Les traductions sont faites directement avec les valeurs françaises
+  String _getPurposeLabel(BuildContext context, BatchPurpose purpose) {
     switch (purpose) {
       case BatchPurpose.sale:
-        return 'Vente';
+        return AppLocalizations.of(context).translate(AppStrings.sale);
       case BatchPurpose.slaughter:
-        return 'Abattage';
+        return AppLocalizations.of(context).translate(AppStrings.slaughter);
       case BatchPurpose.treatment:
-        return 'Traitement';
+        return AppLocalizations.of(context).translate(AppStrings.treatment);
       case BatchPurpose.other:
-        return 'Autre';
+        return AppLocalizations.of(context).translate(AppStrings.other);
     }
   }
 
@@ -471,18 +501,18 @@ class _BatchCard extends StatelessWidget {
   }
 
   /// Obtenir le label d'action selon l'objectif
-  String _getActionLabel(BatchPurpose purpose) {
-    // Note: Ce widget n'a pas accès à BuildContext dans les méthodes helper
-    // Les traductions sont faites directement avec les valeurs françaises
+  String _getActionLabel(BuildContext context, BatchPurpose purpose) {
     switch (purpose) {
       case BatchPurpose.sale:
-        return 'Utiliser pour Vente';
+        return AppLocalizations.of(context).translate(AppStrings.useForSale);
       case BatchPurpose.slaughter:
-        return 'Utiliser pour Abattage';
+        return AppLocalizations.of(context)
+            .translate(AppStrings.useForSlaughter);
       case BatchPurpose.treatment:
-        return 'Appliquer Traitement';
+        return AppLocalizations.of(context)
+            .translate(AppStrings.applyTreatment);
       case BatchPurpose.other:
-        return 'Utiliser';
+        return AppLocalizations.of(context).translate(AppStrings.use);
     }
   }
 

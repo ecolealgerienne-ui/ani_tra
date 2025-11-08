@@ -7,6 +7,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../models/scan_result.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
+import '../../utils/constants.dart';
 
 class UniversalScannerScreen extends StatefulWidget {
   final String? mode;
@@ -18,8 +19,8 @@ class UniversalScannerScreen extends StatefulWidget {
     super.key,
     this.mode,
     this.onScanSuccess,
-    this.title = 'Scanner',
-    this.hint = 'Scannez un code-barres, EID ou ID visuel',
+    this.title = '',
+    this.hint = '',
   });
 
   @override
@@ -56,7 +57,8 @@ class _UniversalScannerScreenState extends State<UniversalScannerScreen> {
         Navigator.pop(context, scanResult);
       }
     } catch (e) {
-      _showError('Erreur de scan : $e');
+      _showError(
+          '${AppLocalizations.of(context).translate(AppStrings.scanError)}: $e');
     } finally {
       if (mounted) {
         setState(() => _isProcessing = false);
@@ -69,7 +71,7 @@ class _UniversalScannerScreenState extends State<UniversalScannerScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.red,
+        backgroundColor: AppConstants.statusDanger,
       ),
     );
   }
@@ -78,7 +80,11 @@ class _UniversalScannerScreenState extends State<UniversalScannerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(
+          widget.title.isEmpty
+              ? AppLocalizations.of(context).translate(AppStrings.scanner)
+              : widget.title,
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.flash_on),
@@ -97,15 +103,18 @@ class _UniversalScannerScreenState extends State<UniversalScannerScreen> {
             onDetect: _onDetect,
           ),
           Positioned(
-            bottom: 100,
+            bottom: AppConstants.scannerOverlayBottom,
             left: 0,
             right: 0,
             child: Container(
-              padding: const EdgeInsets.all(16),
-              margin: const EdgeInsets.symmetric(horizontal: 32),
+              padding: const EdgeInsets.all(AppConstants.scannerOverlayPadding),
+              margin: const EdgeInsets.symmetric(
+                  horizontal: AppConstants.scannerOverlayMargin),
               decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.7),
-                borderRadius: BorderRadius.circular(12),
+                color: Colors.black
+                    .withValues(alpha: AppConstants.scannerOverlayAlpha),
+                borderRadius:
+                    BorderRadius.circular(AppConstants.scannerOverlayRadius),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -115,17 +124,20 @@ class _UniversalScannerScreenState extends State<UniversalScannerScreen> {
                         ? Icons.hourglass_empty
                         : Icons.qr_code_scanner,
                     color: Colors.white,
-                    size: 48,
+                    size: AppConstants.scannerIconSize,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppConstants.scannerSpacing),
                   Text(
                     _isProcessing
                         ? AppLocalizations.of(context)
                             .translate(AppStrings.processing)
-                        : widget.hint,
+                        : widget.hint.isEmpty
+                            ? AppLocalizations.of(context)
+                                .translate(AppStrings.scanQrEidVisual)
+                            : widget.hint,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 16,
+                      fontSize: AppConstants.scannerTextSize,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -134,14 +146,15 @@ class _UniversalScannerScreenState extends State<UniversalScannerScreen> {
             ),
           ),
           Positioned(
-            bottom: 24,
+            bottom: AppConstants.scannerButtonBottom,
             left: 0,
             right: 0,
             child: Center(
               child: FilledButton.icon(
                 onPressed: () => Navigator.pop(context),
                 icon: const Icon(Icons.keyboard),
-                label: const Text('Saisie manuelle'),
+                label: Text(AppLocalizations.of(context)
+                    .translate(AppStrings.manualInput)),
               ),
             ),
           ),

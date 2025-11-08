@@ -9,6 +9,7 @@ import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../providers/weight_provider.dart';
 import '../weight/weight_record_screen.dart';
+import '../../utils/constants.dart';
 
 /// Écran d'historique des pesées d'un animal
 ///
@@ -229,7 +230,8 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                   Text(
                     AppLocalizations.of(context)
                         .translate(AppStrings.statistics),
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -369,7 +371,8 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                   Text(
                     AppLocalizations.of(context)
                         .translate(AppStrings.weightEvolution),
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -403,15 +406,17 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.all(16),
+            Padding(
+              padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  Icon(Icons.history, size: 20),
-                  SizedBox(width: 8),
+                  const Icon(Icons.history, size: 20),
+                  const SizedBox(width: 8),
                   Text(
-                    'Historique Complet',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    AppLocalizations.of(context)
+                        .translate(AppStrings.fullHistory),
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -474,7 +479,7 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.green,
+                            color: AppConstants.successGreen,
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(

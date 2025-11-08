@@ -19,6 +19,9 @@ import '../../providers/vaccination_provider.dart';
 import '../../providers/veterinarian_provider.dart';
 import '../../data/mocks/mock_medical_products.dart';
 import '../../data/mock_data.dart';
+import '../../i18n/app_localizations.dart';
+import '../../i18n/app_strings.dart';
+import '../../utils/constants.dart';
 
 /// Mode de l'acte médical
 enum MedicalActMode {
@@ -143,7 +146,8 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
         if (defaultVet != null) {
           _selectedVetId = defaultVet.id;
           _selectedVetName = defaultVet.fullName;
-          _selectedVetOrg = defaultVet.clinic ?? 'Non spécifié';
+          _selectedVetOrg = defaultVet.clinic ??
+              AppLocalizations.of(context).translate(AppStrings.notSpecified);
         }
       }
     } catch (e) {
@@ -233,7 +237,8 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
           setState(() {
             _selectedVetId = vet.id;
             _selectedVetName = vet.fullName;
-            _selectedVetOrg = vet.clinic ?? 'Non spécifié';
+            _selectedVetOrg = vet.clinic ??
+                AppLocalizations.of(context).translate(AppStrings.notSpecified);
           });
           Navigator.pop(context);
         },
@@ -251,16 +256,18 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
     setState(() {
       _selectedVetId = selectedVet.id;
       _selectedVetName = selectedVet.fullName;
-      _selectedVetOrg = selectedVet.clinic ?? 'Non spécifié';
+      _selectedVetOrg = selectedVet.clinic ??
+          AppLocalizations.of(context).translate(AppStrings.notSpecified);
     });
 
     if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('✅ ${selectedVet.fullName} validé'),
+        content: Text(
+            '✅ ${selectedVet.fullName} ${AppLocalizations.of(context).translate(AppStrings.validated)}'),
         backgroundColor: Colors.green,
-        duration: const Duration(seconds: 2),
+        duration: AppConstants.snackBarDurationMedium,
       ),
     );
   }
@@ -278,8 +285,9 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
   Future<void> _saveAct() async {
     if (_selectedProduct == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez sélectionner un produit'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)
+              .translate(AppStrings.pleaseSelectProduct)),
           backgroundColor: Colors.red,
         ),
       );
@@ -292,8 +300,9 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
       final parsedDose = double.tryParse(_dosageController.text);
       if (parsedDose == null || parsedDose <= 0) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Veuillez saisir un dosage valide'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)
+                .translate(AppStrings.pleaseEnterValidDosage)),
             backgroundColor: Colors.red,
           ),
         );
@@ -408,8 +417,10 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
         SnackBar(
           content: Text(
             _selectedType == ProductType.treatment
-                ? 'Traitement enregistré avec succès'
-                : 'Vaccination enregistrée avec succès',
+                ? AppLocalizations.of(context)
+                    .translate(AppStrings.treatmentRecordedSuccess)
+                : AppLocalizations.of(context)
+                    .translate(AppStrings.vaccinationRecordedSuccess),
           ),
           backgroundColor: Colors.green,
         ),
@@ -426,8 +437,8 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
       appBar: AppBar(
         title: Text(
           widget.mode == MedicalActMode.singleAnimal
-              ? 'Traiter ${_animal?.currentEid ?? _animal?.officialNumber ?? "animal"}'
-              : 'Traiter le lot',
+              ? '${AppLocalizations.of(context).translate(AppStrings.treat)} ${_animal?.currentEid ?? _animal?.officialNumber ?? AppLocalizations.of(context).translate(AppStrings.animal)}'
+              : AppLocalizations.of(context).translate(AppStrings.treatBatch),
         ),
       ),
       body: _animal == null && widget.mode == MedicalActMode.singleAnimal
@@ -505,23 +516,25 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Type d\'acte',
+          AppLocalizations.of(context).translate(AppStrings.actType),
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 12),
         SegmentedButton<ProductType>(
-          segments: const [
+          segments: [
             ButtonSegment(
               value: ProductType.treatment,
-              label: Text('Traitement'),
-              icon: Icon(Icons.medication),
+              label: Text(
+                  AppLocalizations.of(context).translate(AppStrings.treatment)),
+              icon: const Icon(Icons.medication),
             ),
             ButtonSegment(
               value: ProductType.vaccine,
-              label: Text('Vaccination'),
-              icon: Icon(Icons.vaccines),
+              label: Text(AppLocalizations.of(context)
+                  .translate(AppStrings.vaccination)),
+              icon: const Icon(Icons.vaccines),
             ),
           ],
           selected: {_selectedType},
@@ -552,18 +565,20 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                   const Icon(Icons.pets, size: 20),
                   const SizedBox(width: 8),
                   Text(
-                    'Animal: ${_animal!.currentEid ?? _animal!.officialNumber ?? "Sans ID"}',
+                    '${AppLocalizations.of(context).translate(AppStrings.animal)}: ${_animal!.currentEid ?? _animal!.officialNumber ?? AppLocalizations.of(context).translate(AppStrings.noId)}',
                     style: theme.textTheme.titleSmall,
                   ),
                 ],
               ),
               if (_animalWeight != null) ...[
                 const SizedBox(height: 8),
-                Text('Poids: ${_animalWeight!.toStringAsFixed(1)} kg'),
+                Text(
+                    '${AppLocalizations.of(context).translate(AppStrings.weight)}: ${_animalWeight!.toStringAsFixed(1)} kg'),
               ],
               if (_animal!.speciesId != null) ...[
                 const SizedBox(height: 8),
-                Text('Espèce: ${_animal!.speciesId}'),
+                Text(
+                    '${AppLocalizations.of(context).translate(AppStrings.species)}: ${_animal!.speciesId}'),
               ],
             ] else if (widget.mode == MedicalActMode.batch &&
                 _batchAnimals != null) ...[
@@ -572,14 +587,15 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                   const Icon(Icons.group, size: 20),
                   const SizedBox(width: 8),
                   Text(
-                    'Lot: ${_batchAnimals!.length} animaux',
+                    '${AppLocalizations.of(context).translate(AppStrings.batch)}: ${_batchAnimals!.length} ${AppLocalizations.of(context).translate(AppStrings.animals)}',
                     style: theme.textTheme.titleSmall,
                   ),
                 ],
               ),
               if (_averageWeight != null) ...[
                 const SizedBox(height: 8),
-                Text('Poids moyen: ${_averageWeight!.toStringAsFixed(1)} kg'),
+                Text(
+                    '${AppLocalizations.of(context).translate(AppStrings.averageWeight)}: ${_averageWeight!.toStringAsFixed(1)} kg'),
               ],
             ],
           ],
@@ -594,7 +610,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Produit',
+          AppLocalizations.of(context).translate(AppStrings.product),
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -602,9 +618,10 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
         const SizedBox(height: 12),
         DropdownButtonFormField<MedicalProduct>(
           initialValue: _selectedProduct,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            hintText: 'Sélectionner un produit',
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(),
+            hintText: AppLocalizations.of(context)
+                .translate(AppStrings.selectProduct),
           ),
           items: _getFilteredProducts().map((product) {
             return DropdownMenuItem(
@@ -636,15 +653,15 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
             if (_selectedType == ProductType.treatment) ...[
               if (_selectedProduct!.standardCureDays != null)
                 Text(
-                    'ℹ️ Cure standard: ${_selectedProduct!.standardCureDays} jours'),
+                    'ℹ️ ${AppLocalizations.of(context).translate(AppStrings.standardCure)}: ${_selectedProduct!.standardCureDays} ${AppLocalizations.of(context).translate(AppStrings.days)}'),
               if (_selectedProduct!.administrationFrequency != null) ...[
                 const SizedBox(height: 4),
                 Text(
-                    'ℹ️ Administration: ${_selectedProduct!.administrationFrequency}'),
+                    'ℹ️ ${AppLocalizations.of(context).translate(AppStrings.administration)}: ${_selectedProduct!.administrationFrequency}'),
               ],
             ] else if (_selectedType == ProductType.vaccine) ...[
               Text(
-                  'ℹ️ Protocole: ${_selectedProduct!.vaccinationProtocol ?? "Unique"}'),
+                  'ℹ️ ${AppLocalizations.of(context).translate(AppStrings.protocol)}: ${_selectedProduct!.vaccinationProtocol ?? AppLocalizations.of(context).translate(AppStrings.single)}'),
               const SizedBox(height: 4),
               Text(_selectedProduct!.getProtocolDescription()),
             ],
@@ -660,7 +677,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Dosage',
+          AppLocalizations.of(context).translate(AppStrings.dosage),
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -675,9 +692,10 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
               suffixText: _selectedProduct?.stockUnit ?? 'ml',
               helperText: _selectedProduct?.dosageFormula != null
                   ? _calculatedDosage != null
-                      ? 'Calculé selon ${_selectedProduct!.dosageFormula} (${_animalWeight?.toStringAsFixed(1) ?? "?"} kg)'
-                      : 'Formule: ${_selectedProduct!.dosageFormula} ${_animalWeight == null ? "(Poids non disponible)" : ""}'
-                  : 'Saisir le dosage',
+                      ? '${AppLocalizations.of(context).translate(AppStrings.calculatedAccording)} ${_selectedProduct!.dosageFormula} (${_animalWeight?.toStringAsFixed(1) ?? "?"} kg)'
+                      : '${AppLocalizations.of(context).translate(AppStrings.formula)}: ${_selectedProduct!.dosageFormula} ${_animalWeight == null ? "(${AppLocalizations.of(context).translate(AppStrings.weightNotAvailable)})" : ""}'
+                  : AppLocalizations.of(context)
+                      .translate(AppStrings.enterDosage),
             ),
           ),
           if (_calculatedDosage == null &&
@@ -697,7 +715,8 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Ajoutez un poids pour calculer automatiquement le dosage',
+                      AppLocalizations.of(context)
+                          .translate(AppStrings.addWeightToCalculate),
                       style: TextStyle(
                           fontSize: 12, color: Colors.orange.shade900),
                     ),
@@ -716,9 +735,10 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                 children: [
                   if (_selectedProduct!.dosageFormula != null)
                     Text(
-                        'ℹ️ Dosage produit: ${_selectedProduct!.dosageFormula}'),
+                        'ℹ️ ${AppLocalizations.of(context).translate(AppStrings.productDosage)}: ${_selectedProduct!.dosageFormula}'),
                   const SizedBox(height: 8),
-                  const Text('💡 Calcul indicatif:'),
+                  Text(
+                      '💡 ${AppLocalizations.of(context).translate(AppStrings.indicativeCalculation)}:'),
                   if (_averageWeight != null &&
                       _selectedProduct!.dosageFormula != null) ...[
                     const SizedBox(height: 4),
@@ -728,9 +748,9 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                         '   • ${_averageWeight!.toStringAsFixed(0)}kg → ${_selectedProduct!.calculateDosage(_averageWeight!)?.toStringAsFixed(1)} ml'),
                   ],
                   const SizedBox(height: 8),
-                  const Text(
-                    '⚠️ Doser individuellement selon poids',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  Text(
+                    '⚠️ ${AppLocalizations.of(context).translate(AppStrings.doseIndividually)}',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -750,7 +770,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Voie',
+                AppLocalizations.of(context).translate(AppStrings.route),
                 style: theme.textTheme.titleSmall,
               ),
               const SizedBox(height: 8),
@@ -759,7 +779,14 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                 ),
-                items: ['IM', 'SC', 'IV', 'ID', 'Orale', 'Topique']
+                items: [
+                  'IM',
+                  'SC',
+                  'IV',
+                  'ID',
+                  AppLocalizations.of(context).translate(AppStrings.oral),
+                  AppLocalizations.of(context).translate(AppStrings.topical)
+                ]
                     .map((route) => DropdownMenuItem(
                           value: route,
                           child: Text(route),
@@ -778,7 +805,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Site',
+                AppLocalizations.of(context).translate(AppStrings.site),
                 style: theme.textTheme.titleSmall,
               ),
               const SizedBox(height: 8),
@@ -788,11 +815,12 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                   border: OutlineInputBorder(),
                 ),
                 items: [
-                  'Encolure',
-                  'Cuisse',
-                  'Flanc',
-                  'Arrière-cuisse',
-                  'Veine jugulaire'
+                  AppLocalizations.of(context).translate(AppStrings.neck),
+                  AppLocalizations.of(context).translate(AppStrings.thigh),
+                  AppLocalizations.of(context).translate(AppStrings.flank),
+                  AppLocalizations.of(context)
+                      .translate(AppStrings.hindQuarter),
+                  AppLocalizations.of(context).translate(AppStrings.jugularVein)
                 ]
                     .map((site) => DropdownMenuItem(
                           value: site,
@@ -816,7 +844,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Date',
+          AppLocalizations.of(context).translate(AppStrings.date),
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -861,7 +889,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                 const Icon(Icons.notifications_active, size: 20),
                 const SizedBox(width: 8),
                 Text(
-                  'Rappels',
+                  AppLocalizations.of(context).translate(AppStrings.reminders),
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -870,8 +898,9 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
             ),
             const SizedBox(height: 12),
             SwitchListTile(
-              title: const Text('M\'envoyer des rappels'),
-              subtitle: Text(_getReminderDescription()),
+              title: Text(AppLocalizations.of(context)
+                  .translate(AppStrings.sendMeReminders)),
+              subtitle: Text(_getReminderDescription(context)),
               value: _enableReminders,
               onChanged: (value) {
                 setState(() => _enableReminders = value);
@@ -880,7 +909,8 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
             if (_enableReminders) ...[
               const SizedBox(height: 12),
               ListTile(
-                title: const Text('Heure des rappels'),
+                title: Text(AppLocalizations.of(context)
+                    .translate(AppStrings.reminderTime)),
                 trailing: TextButton.icon(
                   onPressed: () async {
                     final time = await showTimePicker(
@@ -905,24 +935,29 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
   }
 
   /// Obtenir la description des rappels
-  String _getReminderDescription() {
-    if (_selectedProduct == null) return 'Configurez vos rappels';
+  String _getReminderDescription(BuildContext context) {
+    if (_selectedProduct == null) {
+      return AppLocalizations.of(context)
+          .translate(AppStrings.configureReminders);
+    }
 
     if (_selectedType == ProductType.treatment) {
       if (_selectedProduct!.standardCureDays != null &&
           _selectedProduct!.standardCureDays! > 1) {
         final days = _selectedProduct!.standardCureDays! - 1;
-        return 'J2 à J${_selectedProduct!.standardCureDays} ($days rappels)';
+        return 'J2 ${AppLocalizations.of(context).translate(AppStrings.to)} J${_selectedProduct!.standardCureDays} ($days ${AppLocalizations.of(context).translate(AppStrings.reminders)})';
       } else {
-        return 'Configurez des rappels personnalisés';
+        return AppLocalizations.of(context)
+            .translate(AppStrings.configureCustomReminders);
       }
     } else {
       if (_selectedProduct!.reminderDays != null &&
           _selectedProduct!.reminderDays!.isNotEmpty) {
         final days = _selectedProduct!.reminderDays!;
-        return '${days.length} rappel(s): ${days.map((d) => "J$d").join(", ")}';
+        return '${days.length} ${AppLocalizations.of(context).translate(AppStrings.reminderS)}: ${days.map((d) => "J$d").join(", ")}';
       } else {
-        return 'Configurez des rappels de vaccination';
+        return AppLocalizations.of(context)
+            .translate(AppStrings.configureVaccinationReminders);
       }
     }
   }
@@ -939,15 +974,17 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Délais d\'attente',
+              AppLocalizations.of(context)
+                  .translate(AppStrings.withdrawalPeriods),
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
-            Text('Viande: ${_selectedProduct!.withdrawalPeriodMeat} jours'),
             Text(
-                'Lait: ${_selectedProduct!.withdrawalPeriodMilk > 0 ? "${_selectedProduct!.withdrawalPeriodMilk} heures" : "0"}'),
+                '${AppLocalizations.of(context).translate(AppStrings.meat)}: ${_selectedProduct!.withdrawalPeriodMeat} ${AppLocalizations.of(context).translate(AppStrings.days)}'),
+            Text(
+                '${AppLocalizations.of(context).translate(AppStrings.milk)}: ${_selectedProduct!.withdrawalPeriodMilk > 0 ? "${_selectedProduct!.withdrawalPeriodMilk} ${AppLocalizations.of(context).translate(AppStrings.hours)}" : "0"}'),
           ],
         ),
       ),
@@ -960,7 +997,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Notes',
+          AppLocalizations.of(context).translate(AppStrings.notes),
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -969,9 +1006,10 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
         TextField(
           controller: _notesController,
           maxLines: 3,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            hintText: 'Notes supplémentaires (optionnel)',
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(),
+            hintText: AppLocalizations.of(context)
+                .translate(AppStrings.additionalNotesOptional),
           ),
         ),
       ],
@@ -990,7 +1028,8 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                 Icon(Icons.medical_services, color: Colors.blue.shade700),
                 const SizedBox(width: 8),
                 Text(
-                  'Vétérinaire prescripteur',
+                  AppLocalizations.of(context)
+                      .translate(AppStrings.prescribingVeterinarian),
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -1006,7 +1045,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    'Optionnel',
+                    AppLocalizations.of(context).translate(AppStrings.optional),
                     style: TextStyle(
                       fontSize: 11,
                       color: Colors.grey.shade600,
@@ -1035,7 +1074,8 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Aucun vétérinaire sélectionné',
+                      AppLocalizations.of(context)
+                          .translate(AppStrings.noVeterinarianSelected),
                       style: TextStyle(
                         color: Colors.grey.shade600,
                         fontStyle: FontStyle.italic,
@@ -1048,7 +1088,8 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                           child: OutlinedButton.icon(
                             onPressed: _searchVeterinarian,
                             icon: const Icon(Icons.search),
-                            label: const Text('Rechercher'),
+                            label: Text(AppLocalizations.of(context)
+                                .translate(AppStrings.search)),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 12),
                             ),
@@ -1059,7 +1100,8 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                           child: OutlinedButton.icon(
                             onPressed: _scanVeterinarianQR,
                             icon: const Icon(Icons.qr_code_scanner),
-                            label: const Text('Scanner QR'),
+                            label: Text(AppLocalizations.of(context)
+                                .translate(AppStrings.scanQr)),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 12),
                             ),
@@ -1118,7 +1160,8 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                     IconButton(
                       onPressed: _removeVeterinarian,
                       icon: const Icon(Icons.close, color: Colors.red),
-                      tooltip: 'Retirer',
+                      tooltip: AppLocalizations.of(context)
+                          .translate(AppStrings.remove),
                     ),
                   ],
                 ),
@@ -1137,14 +1180,16 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
         Expanded(
           child: OutlinedButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Annuler'),
+            child:
+                Text(AppLocalizations.of(context).translate(AppStrings.cancel)),
           ),
         ),
         const SizedBox(width: 16),
         Expanded(
           child: FilledButton(
             onPressed: _saveAct,
-            child: const Text('Enregistrer'),
+            child:
+                Text(AppLocalizations.of(context).translate(AppStrings.save)),
           ),
         ),
       ],
@@ -1201,7 +1246,8 @@ class _VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Rechercher un vétérinaire'),
+      title: Text(AppLocalizations.of(context)
+          .translate(AppStrings.searchVeterinarian)),
       content: SizedBox(
         width: double.maxFinite,
         child: Column(
@@ -1209,17 +1255,20 @@ class _VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
           children: [
             TextField(
               controller: _searchController,
-              decoration: const InputDecoration(
-                labelText: 'Rechercher',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText:
+                    AppLocalizations.of(context).translate(AppStrings.search),
+                prefixIcon: const Icon(Icons.search),
+                border: const OutlineInputBorder(),
               ),
               onChanged: _filterVets,
             ),
             const SizedBox(height: 16),
             Flexible(
               child: _filtered.isEmpty
-                  ? const Center(child: Text('Aucun vétérinaire trouvé'))
+                  ? Center(
+                      child: Text(AppLocalizations.of(context)
+                          .translate(AppStrings.noVeterinarianFound)))
                   : ListView.builder(
                       shrinkWrap: true,
                       itemCount: _filtered.length,
@@ -1230,7 +1279,9 @@ class _VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
                             child: Text(vet.fullName[0]),
                           ),
                           title: Text(vet.fullName),
-                          subtitle: Text(vet.clinic ?? 'Non spécifié'),
+                          subtitle: Text(vet.clinic ??
+                              AppLocalizations.of(context)
+                                  .translate(AppStrings.notSpecified)),
                           onTap: () => widget.onSelect(vet),
                         );
                       },
@@ -1242,7 +1293,8 @@ class _VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Annuler'),
+          child:
+              Text(AppLocalizations.of(context).translate(AppStrings.cancel)),
         ),
       ],
     );

@@ -17,6 +17,7 @@ import '../../data/animal_config.dart';
 import 'animal_finder_screen.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
+import '../../utils/constants.dart';
 //import 'mother_history_screen.dart';
 
 /// Écran d'ajout rapide d'un animal
@@ -48,7 +49,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
   // État du formulaire
   DateTime? _selectedBirthDate;
   AnimalSex? _selectedSex;
-  String _selectedOrigin = 'Naissance'; // Naissance / Achat / Autre
+  String _selectedOrigin = 'Naissance';
   String? _selectedMotherId;
   String? _selectedMotherDisplay;
 
@@ -97,9 +98,9 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
     final animal = await Navigator.push<Animal>(
       context,
       MaterialPageRoute(
-        builder: (context) => const AnimalFinderScreen(
+        builder: (context) => AnimalFinderScreen(
           mode: AnimalFinderMode.single,
-          title: 'Scanner l\'animal',
+          title: AppLocalizations.of(context).translate(AppStrings.scanAnimal),
         ),
       ),
     );
@@ -119,8 +120,10 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('✅ Identification scannée: ${animal.displayName}'),
-          backgroundColor: Colors.green,
+          content: Text(AppLocalizations.of(context)
+              .translate(AppStrings.idScanned)
+              .replaceAll('{name}', animal.displayName)),
+          backgroundColor: AppConstants.successGreen,
         ),
       );
     }
@@ -131,10 +134,10 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
     final mother = await Navigator.push<Animal>(
       context,
       MaterialPageRoute(
-        builder: (context) => const AnimalFinderScreen(
+        builder: (context) => AnimalFinderScreen(
           mode: AnimalFinderMode.single,
-          title: 'Scanner la mère',
-          allowedStatuses: [AnimalStatus.alive],
+          title: AppLocalizations.of(context).translate(AppStrings.scanMother),
+          allowedStatuses: const [AnimalStatus.alive],
         ),
       ),
     );
@@ -143,7 +146,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
       // Vérifier que c'est une femelle
       if (mother.sex != AnimalSex.female) {
         if (mounted) {
-          _showError('⚠️ La mère doit être une femelle');
+          _showError(AppLocalizations.of(context)
+              .translate(AppStrings.motherMustBeFemale));
         }
         return;
       }
@@ -156,8 +160,10 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('✅ Mère sélectionnée: ${mother.displayName}'),
-            backgroundColor: Colors.green,
+            content: Text(AppLocalizations.of(context)
+                .translate(AppStrings.motherSelected)
+                .replaceAll('{name}', mother.displayName)),
+            backgroundColor: AppConstants.successGreen,
           ),
         );
       }
@@ -172,9 +178,10 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
       firstDate: DateTime(2015),
       lastDate: DateTime.now(),
       locale: const Locale('fr', 'FR'),
-      helpText: 'Date de naissance',
-      cancelText: 'Annuler',
-      confirmText: 'Valider',
+      helpText:
+          AppLocalizations.of(context).translate(AppStrings.birthDateRequired),
+      cancelText: AppLocalizations.of(context).translate(AppStrings.cancel),
+      confirmText: AppLocalizations.of(context).translate(AppStrings.validate),
     );
 
     if (picked != null) {
@@ -198,18 +205,20 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
     final hasVisualId = _visualIdController.text.trim().isNotEmpty;
 
     if (!hasEid && !hasOfficialNumber && !hasVisualId) {
-      _showError(
-          '⚠️ Au moins un identifiant requis (EID, N° officiel ou ID visuel)');
+      _showError(AppLocalizations.of(context)
+          .translate(AppStrings.atLeastOneIdRequiredError));
       return;
     }
 
     if (_selectedSex == null) {
-      _showError('⚠️ Veuillez sélectionner le sexe');
+      _showError(
+          AppLocalizations.of(context).translate(AppStrings.selectSexError));
       return;
     }
 
     if (_selectedBirthDate == null) {
-      _showError('⚠️ Veuillez sélectionner la date de naissance');
+      _showError(AppLocalizations.of(context)
+          .translate(AppStrings.selectBirthDateError));
       return;
     }
 
@@ -219,7 +228,9 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
       final mother = animalProvider.getAnimalById(_selectedMotherId!);
 
       if (mother == null) {
-        _showError('⚠️ Mère introuvable', isError: true);
+        _showError(
+            AppLocalizations.of(context).translate(AppStrings.motherNotFound),
+            isError: true);
         return;
       }
 
@@ -266,7 +277,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
       // 2. Créer le mouvement correspondant
       Movement? movement;
 
-      if (_selectedOrigin == 'Naissance') {
+      if (_selectedOrigin ==
+          AppLocalizations.of(context).translate(AppStrings.birth)) {
         movement = Movement(
           id: _generateId(),
           type: MovementType.birth,
@@ -278,7 +290,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
           synced: false,
           createdAt: DateTime.now(),
         );
-      } else if (_selectedOrigin == 'Achat') {
+      } else if (_selectedOrigin ==
+          AppLocalizations.of(context).translate(AppStrings.purchase)) {
         movement = Movement(
           id: _generateId(),
           type: MovementType.purchase,
@@ -311,10 +324,11 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
 
       // 4. Message de succès
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('✅ Animal enregistré avec succès'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)
+              .translate(AppStrings.animalSavedSuccess)),
+          backgroundColor: AppConstants.successGreen,
+          duration: const Duration(seconds: 2),
         ),
       );
 
@@ -323,7 +337,11 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
     } catch (e) {
       if (!mounted) return;
 
-      _showError('❌ Erreur: ${e.toString()}', isError: true);
+      _showError(
+          AppLocalizations.of(context)
+              .translate(AppStrings.errorOccurred)
+              .replaceAll('{error}', e.toString()),
+          isError: true);
     } finally {
       if (mounted) {
         setState(() {
@@ -338,7 +356,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: isError ? Colors.red : Colors.orange,
+        backgroundColor:
+            isError ? AppConstants.statusDanger : AppConstants.warningOrange,
       ),
     );
   }
@@ -349,7 +368,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
       appBar: AppBar(
         title:
             Text(AppLocalizations.of(context).translate(AppStrings.addAnimal)),
-        backgroundColor: Colors.green,
+        backgroundColor: AppConstants.successGreen,
         foregroundColor: Colors.white,
       ),
       body: Form(
@@ -365,12 +384,14 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
             TextFormField(
               controller: _primaryIdController,
               decoration: InputDecoration(
-                labelText: 'EID (Numéro électronique)',
+                labelText: AppLocalizations.of(context)
+                    .translate(AppStrings.eidElectronic),
                 hintText: 'FR1234567890123',
                 prefixIcon: const Icon(Icons.qr_code),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.qr_code_scanner),
-                  tooltip: 'Scanner',
+                  tooltip: AppLocalizations.of(context)
+                      .translate(AppStrings.scanner),
                   onPressed: _simulateScan,
                 ),
                 helperText:
@@ -383,10 +404,11 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
             // Numéro officiel
             TextFormField(
               controller: _officialNumberController,
-              decoration: const InputDecoration(
-                labelText: 'Numéro officiel (optionnel)',
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)
+                    .translate(AppStrings.officialNumberOptional),
                 hintText: 'Ex: 123456',
-                prefixIcon: Icon(Icons.numbers),
+                prefixIcon: const Icon(Icons.numbers),
               ),
             ),
 
@@ -395,10 +417,11 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
             // ID visuel
             TextFormField(
               controller: _visualIdController,
-              decoration: const InputDecoration(
-                labelText: 'ID visuel (optionnel)',
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)
+                    .translate(AppStrings.visualIdOptional),
                 hintText: 'Rouge-42, Tache-Blanche...',
-                prefixIcon: Icon(Icons.visibility),
+                prefixIcon: const Icon(Icons.visibility),
                 helperText: 'Pour identifier facilement l\'animal',
               ),
             ),
@@ -413,7 +436,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
             DropdownButtonFormField<String>(
               initialValue: _selectedSpeciesId,
               decoration: InputDecoration(
-                labelText: 'Type d\'animal *',
+                labelText: AppLocalizations.of(context)
+                    .translate(AppStrings.animalType),
                 prefixIcon: Icon(
                   Icons.pets,
                   color: Theme.of(context).primaryColor,
@@ -442,7 +466,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
               },
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Type d\'animal obligatoire';
+                  return AppLocalizations.of(context)
+                      .translate(AppStrings.animalTypeRequired);
                 }
                 return null;
               },
@@ -454,7 +479,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
             DropdownButtonFormField<String>(
               initialValue: _selectedBreedId,
               decoration: InputDecoration(
-                labelText: 'Race (optionnelle)',
+                labelText: AppLocalizations.of(context)
+                    .translate(AppStrings.breedOptional),
                 prefixIcon: Icon(
                   Icons.category,
                   color: Theme.of(context).primaryColor,
@@ -462,9 +488,10 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
               ),
               items: _selectedSpeciesId != null
                   ? [
-                      const DropdownMenuItem(
+                      DropdownMenuItem(
                         value: null,
-                        child: Text('-- Aucune race --'),
+                        child: Text(AppLocalizations.of(context)
+                            .translate(AppStrings.noBreed)),
                       ),
                       ...AnimalConfig.getBreedsBySpecies(_selectedSpeciesId!)
                           .map((breed) {
@@ -475,9 +502,10 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                       }),
                     ]
                   : [
-                      const DropdownMenuItem(
+                      DropdownMenuItem(
                         value: null,
-                        child: Text('Sélectionnez d\'abord un type'),
+                        child: Text(AppLocalizations.of(context)
+                            .translate(AppStrings.selectTypeFirst)),
                       ),
                     ],
               onChanged: _selectedSpeciesId != null
@@ -495,11 +523,13 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
             ListTile(
               contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.cake),
-              title: const Text('Date de naissance *'),
+              title: Text(
+                  AppLocalizations.of(context).translate(AppStrings.birthDate)),
               subtitle: Text(
                 _selectedBirthDate != null
                     ? _formatDate(_selectedBirthDate!)
-                    : 'Non définie',
+                    : AppLocalizations.of(context)
+                        .translate(AppStrings.notDefined),
                 style: TextStyle(
                   color:
                       _selectedBirthDate != null ? Colors.black87 : Colors.grey,
@@ -522,9 +552,9 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
             const SizedBox(height: 16),
 
             // Sexe
-            const Text(
-              'Sexe *',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context).translate(AppStrings.sexRequired),
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
@@ -541,7 +571,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                 children: [
                   Expanded(
                     child: RadioListTile<AnimalSex>(
-                      title: const Text('Mâle'),
+                      title: Text(AppLocalizations.of(context)
+                          .translate(AppStrings.male)),
                       value: AnimalSex.male,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -556,7 +587,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: RadioListTile<AnimalSex>(
-                      title: const Text('Femelle'),
+                      title: Text(AppLocalizations.of(context)
+                          .translate(AppStrings.female)),
                       value: AnimalSex.female,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -577,22 +609,29 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
             // Origine
             DropdownButtonFormField<String>(
               initialValue: _selectedOrigin,
-              decoration: const InputDecoration(
-                labelText: 'Origine *',
-                prefixIcon: Icon(Icons.location_on),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)
+                    .translate(AppStrings.originRequired),
+                prefixIcon: const Icon(Icons.location_on),
               ),
-              items: const [
+              items: [
                 DropdownMenuItem(
-                  value: 'Naissance',
-                  child: Text('Naissance'),
+                  value:
+                      AppLocalizations.of(context).translate(AppStrings.birth),
+                  child: Text(
+                      AppLocalizations.of(context).translate(AppStrings.birth)),
                 ),
                 DropdownMenuItem(
-                  value: 'Achat',
-                  child: Text('Achat'),
+                  value: AppLocalizations.of(context)
+                      .translate(AppStrings.purchase),
+                  child: Text(AppLocalizations.of(context)
+                      .translate(AppStrings.purchase)),
                 ),
                 DropdownMenuItem(
-                  value: 'Autre',
-                  child: Text('Autre'),
+                  value:
+                      AppLocalizations.of(context).translate(AppStrings.other),
+                  child: Text(
+                      AppLocalizations.of(context).translate(AppStrings.other)),
                 ),
               ],
               onChanged: (value) {
@@ -610,14 +649,18 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
             const SizedBox(height: 16),
 
             // Champs conditionnels selon l'origine
-            if (_selectedOrigin == 'Naissance') ...[
+            if (_selectedOrigin ==
+                AppLocalizations.of(context).translate(AppStrings.birth)) ...[
               // Mère
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.family_restroom),
-                title: const Text('Mère (optionnel)'),
+                title: Text(AppLocalizations.of(context)
+                    .translate(AppStrings.motherOptional)),
                 subtitle: Text(
-                  _selectedMotherDisplay ?? 'Non définie',
+                  _selectedMotherDisplay ??
+                      AppLocalizations.of(context)
+                          .translate(AppStrings.notDefined),
                   style: TextStyle(
                     color: _selectedMotherDisplay != null
                         ? Colors.black87
@@ -630,7 +673,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                     if (_selectedMotherId != null)
                       IconButton(
                         icon: const Icon(Icons.close),
-                        tooltip: 'Retirer',
+                        tooltip: AppLocalizations.of(context)
+                            .translate(AppStrings.remove),
                         onPressed: () {
                           setState(() {
                             _selectedMotherId = null;
@@ -640,7 +684,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                       ),
                     IconButton(
                       icon: const Icon(Icons.qr_code_scanner),
-                      tooltip: 'Scanner',
+                      tooltip: AppLocalizations.of(context)
+                          .translate(AppStrings.scanner),
                       onPressed: _scanMother,
                     ),
                   ],
@@ -652,14 +697,17 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
               ),
             ],
 
-            if (_selectedOrigin == 'Achat') ...[
+            if (_selectedOrigin ==
+                AppLocalizations.of(context)
+                    .translate(AppStrings.purchase)) ...[
               // Provenance
               TextFormField(
                 controller: _provenanceController,
-                decoration: const InputDecoration(
-                  labelText: 'Provenance',
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)
+                      .translate(AppStrings.provenance),
                   hintText: 'Nom de la ferme ou éleveur',
-                  prefixIcon: Icon(Icons.place),
+                  prefixIcon: const Icon(Icons.place),
                 ),
               ),
 
@@ -668,10 +716,11 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
               // Prix d'achat
               TextFormField(
                 controller: _priceController,
-                decoration: const InputDecoration(
-                  labelText: 'Prix d\'achat',
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)
+                      .translate(AppStrings.purchasePrice),
                   hintText: '0.00',
-                  prefixIcon: Icon(Icons.euro),
+                  prefixIcon: const Icon(Icons.euro),
                   suffixText: '€',
                 ),
                 keyboardType:
@@ -687,10 +736,11 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
             // Notes
             TextFormField(
               controller: _notesController,
-              decoration: const InputDecoration(
-                labelText: 'Notes (optionnel)',
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)
+                    .translate(AppStrings.notesOptional),
                 hintText: 'Observations, remarques...',
-                prefixIcon: Icon(Icons.note),
+                prefixIcon: const Icon(Icons.note),
               ),
               maxLines: 3,
               maxLength: 500,
@@ -704,7 +754,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: _isLoading ? null : () => Navigator.pop(context),
-                    child: const Text('Annuler'),
+                    child: Text(AppLocalizations.of(context)
+                        .translate(AppStrings.cancel)),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -713,7 +764,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _saveAnimal,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
+                      backgroundColor: AppConstants.successGreen,
                       foregroundColor: Colors.white,
                     ),
                     child: _isLoading
@@ -725,12 +776,13 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                               color: Colors.white,
                             ),
                           )
-                        : const Row(
+                        : Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.save, size: 20),
-                              SizedBox(width: 8),
-                              Text('Enregistrer'),
+                              const Icon(Icons.save, size: 20),
+                              const SizedBox(width: 8),
+                              Text(AppLocalizations.of(context)
+                                  .translate(AppStrings.save)),
                             ],
                           ),
                   ),
@@ -752,7 +804,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
       style: const TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.bold,
-        color: Colors.green,
+        color: AppConstants.successGreen,
       ),
     );
   }
@@ -810,7 +862,8 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
       if (females.isEmpty) {
         setState(() {
           _isScanning = false;
-          _errorMessage = 'Aucune femelle disponible dans le troupeau';
+          _errorMessage = AppLocalizations.of(context)
+              .translate(AppStrings.noFemaleAvailable);
         });
         return;
       }
@@ -829,11 +882,11 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Row(
+      title: Row(
         children: [
-          Icon(Icons.qr_code_scanner, color: Colors.green),
-          SizedBox(width: 8),
-          Text('Scanner la mère'),
+          const Icon(Icons.qr_code_scanner, color: AppConstants.successGreen),
+          const SizedBox(width: 8),
+          Text(AppLocalizations.of(context).translate(AppStrings.scanMother)),
         ],
       ),
       content: SizedBox(
@@ -845,11 +898,12 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
             // Champ EID
             TextField(
               controller: _eidController,
-              decoration: const InputDecoration(
-                labelText: 'EID de la mère',
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)
+                    .translate(AppStrings.eidOfMother),
                 hintText: 'FRxxxxxxxxxxxx',
-                prefixIcon: Icon(Icons.tag),
-                border: OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.tag),
+                border: const OutlineInputBorder(),
               ),
               enabled: !_isScanning,
               readOnly: true,
@@ -870,9 +924,12 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
                       ),
                     )
                   : const Icon(Icons.qr_code_scanner),
-              label: Text(_isScanning ? 'Scan en cours...' : 'Scanner'),
+              label: Text(_isScanning
+                  ? AppLocalizations.of(context)
+                      .translate(AppStrings.scanningInProgress)
+                  : AppLocalizations.of(context).translate(AppStrings.scanner)),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
+                backgroundColor: AppConstants.successGreen,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 12),
               ),
@@ -964,7 +1021,8 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Annuler'),
+          child:
+              Text(AppLocalizations.of(context).translate(AppStrings.cancel)),
         ),
         ElevatedButton(
           onPressed: _scannedMother == null
@@ -983,16 +1041,16 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
                       content: Text(
                         '✅ Mère ajoutée: ${_scannedMother!.officialNumber ?? _scannedMother!.eid ?? _scannedMother!.visualId ?? 'Animal ${_scannedMother!.id.substring(0, 8)}'}',
                       ),
-                      backgroundColor: Colors.green,
+                      backgroundColor: AppConstants.successGreen,
                       duration: const Duration(seconds: 2),
                     ),
                   );
                 },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,
+            backgroundColor: AppConstants.successGreen,
             foregroundColor: Colors.white,
           ),
-          child: const Text('Ajouter'),
+          child: Text(AppLocalizations.of(context).translate(AppStrings.add)),
         ),
       ],
     );
@@ -1046,11 +1104,11 @@ class _ScanEIDDialogState extends State<_ScanEIDDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Row(
+      title: Row(
         children: [
-          Icon(Icons.qr_code_scanner, color: Colors.blue),
-          SizedBox(width: 8),
-          Text('Scanner l\'EID'),
+          const Icon(Icons.qr_code_scanner, color: Colors.blue),
+          const SizedBox(width: 8),
+          Text(AppLocalizations.of(context).translate(AppStrings.scanAnimal)),
         ],
       ),
       content: SizedBox(
@@ -1072,11 +1130,12 @@ class _ScanEIDDialogState extends State<_ScanEIDDialog> {
             // Champ EID
             TextField(
               controller: _eidController,
-              decoration: const InputDecoration(
-                labelText: 'EID détecté',
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)
+                    .translate(AppStrings.eidDetected),
                 hintText: 'FR1234567890123',
-                prefixIcon: Icon(Icons.tag),
-                border: OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.tag),
+                border: const OutlineInputBorder(),
               ),
               enabled: !_isScanning,
               readOnly: true,
@@ -1097,7 +1156,10 @@ class _ScanEIDDialogState extends State<_ScanEIDDialog> {
                       ),
                     )
                   : const Icon(Icons.qr_code_scanner),
-              label: Text(_isScanning ? 'Scan en cours...' : 'Scanner'),
+              label: Text(_isScanning
+                  ? AppLocalizations.of(context)
+                      .translate(AppStrings.scanningInProgress)
+                  : AppLocalizations.of(context).translate(AppStrings.scanner)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
                 foregroundColor: Colors.white,
@@ -1123,9 +1185,10 @@ class _ScanEIDDialogState extends State<_ScanEIDDialog> {
                         Icon(Icons.check_circle,
                             color: Colors.green.shade700, size: 20),
                         const SizedBox(width: 8),
-                        const Text(
-                          'EID détecté avec succès',
-                          style: TextStyle(
+                        Text(
+                          AppLocalizations.of(context)
+                              .translate(AppStrings.eidDetectedSuccess),
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
@@ -1160,7 +1223,8 @@ class _ScanEIDDialogState extends State<_ScanEIDDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Annuler'),
+          child:
+              Text(AppLocalizations.of(context).translate(AppStrings.cancel)),
         ),
         ElevatedButton(
           onPressed: _scannedEID == null
@@ -1170,8 +1234,10 @@ class _ScanEIDDialogState extends State<_ScanEIDDialog> {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('✅ EID scanné: $_scannedEID'),
-                      backgroundColor: Colors.green,
+                      content: Text(AppLocalizations.of(context)
+                          .translate(AppStrings.eidScanned)
+                          .replaceAll('{eid}', _scannedEID!)),
+                      backgroundColor: AppConstants.successGreen,
                       duration: const Duration(seconds: 2),
                     ),
                   );
@@ -1180,7 +1246,7 @@ class _ScanEIDDialogState extends State<_ScanEIDDialog> {
             backgroundColor: Colors.blue,
             foregroundColor: Colors.white,
           ),
-          child: const Text('Ajouter'),
+          child: Text(AppLocalizations.of(context).translate(AppStrings.add)),
         ),
       ],
     );

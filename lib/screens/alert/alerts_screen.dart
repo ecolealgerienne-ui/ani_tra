@@ -12,6 +12,7 @@ import '../animal/animal_list_screen.dart';
 import '../sync/sync_screen.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
+import '../../utils/constants.dart';
 
 /// Écran de détails des alertes
 ///
@@ -70,7 +71,7 @@ class AlertsScreen extends StatelessWidget {
           return RefreshIndicator(
             onRefresh: () async {
               alertProvider.refresh();
-              await Future.delayed(const Duration(milliseconds: 500));
+              await Future.delayed(AppConstants.longAnimation);
             },
             child: ListView(
               padding: const EdgeInsets.all(16),
@@ -181,7 +182,7 @@ class AlertsScreen extends StatelessWidget {
                       SnackBar(
                         content: Text(AppLocalizations.of(context)
                             .translate(AppStrings.alertsRecalculated)),
-                        duration: const Duration(seconds: 1),
+                        duration: AppConstants.snackBarDurationShort,
                       ),
                     );
                   },
@@ -279,7 +280,7 @@ class AlertsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            alertProvider.getSummary(context), // ← Ajouter context ici
+            alertProvider.getSummary(context),
             style: const TextStyle(
               color: Colors.white,
               fontSize: 16,
@@ -522,7 +523,7 @@ class AlertsScreen extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) =>
-                    AnimalDetailScreen(preloadedAnimal: animal), // APRÈS
+                    AnimalDetailScreen(preloadedAnimal: animal),
               ),
             );
           }
@@ -550,7 +551,7 @@ class AlertsScreen extends StatelessWidget {
                       .translate(AppStrings.animalNotFoundAlert)
                       .replaceAll('{name}', alert.entityName ?? ''),
                 ),
-                duration: const Duration(seconds: 2),
+                duration: AppConstants.snackBarDurationMedium,
               ),
             );
           }
@@ -577,7 +578,7 @@ class AlertsScreen extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(alert.message),
-              duration: const Duration(seconds: 2),
+              duration: AppConstants.snackBarDurationMedium,
             ),
           );
         }
@@ -608,7 +609,7 @@ class AlertsScreen extends StatelessWidget {
                     AppLocalizations.of(context).translate(AppStrings.complete),
                 onPressed: () {},
               ),
-              duration: const Duration(seconds: 3),
+              duration: AppConstants.snackBarDurationLong,
             ),
           );
         }
@@ -637,7 +638,7 @@ class AlertsScreen extends StatelessWidget {
                 label: AppLocalizations.of(context).translate(AppStrings.ok),
                 onPressed: () {},
               ),
-              duration: const Duration(seconds: 3),
+              duration: AppConstants.snackBarDurationLong,
             ),
           );
         }
@@ -650,7 +651,7 @@ class AlertsScreen extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('${alert.title}\n${alert.message}'),
-            duration: const Duration(seconds: 3),
+            duration: AppConstants.snackBarDurationLong,
           ),
         );
         break;

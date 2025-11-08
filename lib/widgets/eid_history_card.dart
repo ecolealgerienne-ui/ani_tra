@@ -5,6 +5,7 @@ import '../models/eid_change.dart';
 import 'package:intl/intl.dart';
 import '../i18n/app_localizations.dart';
 import '../i18n/app_strings.dart';
+import '../utils/constants.dart';
 
 class EidHistoryCard extends StatelessWidget {
   final List<EidChange> history;
@@ -54,14 +55,14 @@ class EidHistoryCard extends StatelessWidget {
                 Icon(
                   Icons.history,
                   color: Theme.of(context).primaryColor,
-                  size: 24,
+                  size: AppConstants.iconSizeRegular,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     l10n.translate(AppStrings.eidHistory),
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: AppConstants.fontSizeSectionTitle,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -72,16 +73,18 @@ class EidHistoryCard extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color:
-                        Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
+                    color: Theme.of(context)
+                        .primaryColor
+                        .withValues(alpha: AppConstants.opacityLight),
+                    borderRadius:
+                        BorderRadius.circular(AppConstants.badgeBorderRadius),
                   ),
                   child: Text(
                     '${history.length}',
                     style: TextStyle(
                       color: Theme.of(context).primaryColor,
                       fontWeight: FontWeight.bold,
-                      fontSize: 12,
+                      fontSize: AppConstants.fontSizeSmall,
                     ),
                   ),
                 ),
@@ -109,8 +112,8 @@ class EidHistoryCard extends StatelessWidget {
           Column(
             children: [
               Container(
-                width: 12,
-                height: 12,
+                width: AppConstants.timelineCircleSize,
+                height: AppConstants.timelineCircleSize,
                 decoration: BoxDecoration(
                   color: Theme.of(context).primaryColor,
                   shape: BoxShape.circle,
@@ -118,8 +121,8 @@ class EidHistoryCard extends StatelessWidget {
               ),
               if (history.last != change)
                 Container(
-                  width: 2,
-                  height: 50,
+                  width: AppConstants.timelineLineWidth,
+                  height: AppConstants.timelineLineHeight,
                   color: Colors.grey.shade300,
                 ),
             ],
@@ -130,7 +133,8 @@ class EidHistoryCard extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius:
+                    BorderRadius.circular(AppConstants.borderRadiusMedium),
                 border: Border.all(color: Colors.grey.shade200),
               ),
               child: Column(
@@ -140,7 +144,7 @@ class EidHistoryCard extends StatelessWidget {
                     EidChangeReason.getLabel(change.reason),
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 14,
+                      fontSize: AppConstants.fontSizeBody,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -153,21 +157,22 @@ class EidHistoryCard extends StatelessWidget {
                             Text(
                               l10n.translate(AppStrings.oldEid),
                               style: TextStyle(
-                                fontSize: 11,
+                                fontSize: AppConstants.fontSizeTiny,
                                 color: Colors.grey.shade600,
                               ),
                             ),
                             Text(
                               change.oldEid,
                               style: const TextStyle(
-                                fontSize: 12,
+                                fontSize: AppConstants.fontSizeSmall,
                                 fontFamily: 'monospace',
                               ),
                             ),
                           ],
                         ),
                       ),
-                      const Icon(Icons.arrow_forward, size: 16),
+                      const Icon(Icons.arrow_forward,
+                          size: AppConstants.iconSizeTiny),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,14 +180,14 @@ class EidHistoryCard extends StatelessWidget {
                             Text(
                               l10n.translate(AppStrings.newEid),
                               style: TextStyle(
-                                fontSize: 11,
+                                fontSize: AppConstants.fontSizeTiny,
                                 color: Colors.grey.shade600,
                               ),
                             ),
                             Text(
                               change.newEid,
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: AppConstants.fontSizeSmall,
                                 fontFamily: 'monospace',
                                 color: Theme.of(context).primaryColor,
                                 fontWeight: FontWeight.bold,
@@ -198,14 +203,14 @@ class EidHistoryCard extends StatelessWidget {
                     children: [
                       Icon(
                         Icons.access_time,
-                        size: 14,
+                        size: AppConstants.iconSizeTiny,
                         color: Colors.grey.shade600,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         _formatDate(change.changedAt),
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: AppConstants.fontSizeTiny,
                           color: Colors.grey.shade600,
                         ),
                       ),
@@ -217,14 +222,15 @@ class EidHistoryCard extends StatelessWidget {
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: Colors.blue.shade50,
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(
+                            AppConstants.borderRadiusSmall),
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Icon(
                             Icons.note,
-                            size: 14,
+                            size: AppConstants.iconSizeTiny,
                             color: Colors.blue.shade700,
                           ),
                           const SizedBox(width: 6),
@@ -232,7 +238,7 @@ class EidHistoryCard extends StatelessWidget {
                             child: Text(
                               change.notes!,
                               style: TextStyle(
-                                fontSize: 11,
+                                fontSize: AppConstants.fontSizeTiny,
                                 color: Colors.blue.shade900,
                               ),
                             ),

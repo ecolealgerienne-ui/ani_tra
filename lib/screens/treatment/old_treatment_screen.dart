@@ -13,6 +13,7 @@ import '../../providers/sync_provider.dart';
 import '../../data/mock_data.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
+import '../../utils/constants.dart';
 
 class TreatmentScreen extends StatefulWidget {
   final String? animalId;
@@ -66,14 +67,18 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
 
   int get _animalCount => _targetAnimalIds.length;
 
-  String get _title {
+  String _getTitle(BuildContext context) {
     if (widget.batchName != null) {
-      return 'Traitement - ${widget.batchName}';
+      return AppLocalizations.of(context)
+          .translate(AppStrings.treatmentDash)
+          .replaceAll('{batchName}', widget.batchName!);
     }
     if (_animalCount == 1) {
-      return 'Ajouter un soin';
+      return AppLocalizations.of(context).translate(AppStrings.addCare);
     }
-    return 'Traitement pour $_animalCount animaux';
+    return AppLocalizations.of(context)
+        .translate(AppStrings.treatmentForAnimals)
+        .replaceAll('{count}', _animalCount.toString());
   }
 
   void _searchVeterinarian() {
@@ -85,7 +90,8 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
           setState(() {
             _selectedVetId = vet.id;
             _selectedVetName = vet.fullName;
-            _selectedVetOrg = vet.clinic ?? 'Non spécifié';
+            _selectedVetOrg = vet.clinic ??
+                AppLocalizations.of(context).translate(AppStrings.notSpecified);
           });
           Navigator.pop(context);
         },
@@ -102,16 +108,18 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
     setState(() {
       _selectedVetId = selectedVet.id;
       _selectedVetName = selectedVet.fullName;
-      _selectedVetOrg = selectedVet.clinic ?? 'Non spécifié';
+      _selectedVetOrg = selectedVet.clinic ??
+          AppLocalizations.of(context).translate(AppStrings.notSpecified);
     });
 
     if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('✅ ${selectedVet.fullName} validé'),
+        content: Text(
+            '✅ ${selectedVet.fullName} ${AppLocalizations.of(context).translate(AppStrings.validated)}'),
         backgroundColor: Colors.green,
-        duration: const Duration(seconds: 2),
+        duration: AppConstants.snackBarDurationMedium,
       ),
     );
   }
@@ -175,7 +183,7 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
       SnackBar(
         content: Text(
           _animalCount == 1
-              ? '✅ Soin ajouté'
+              ? '✅ ${AppLocalizations.of(context).translate(AppStrings.careAdded)}'
               : '✅ $_animalCount ${AppLocalizations.of(context).translate(AppStrings.added)}',
         ),
         backgroundColor: Colors.green,
@@ -191,15 +199,15 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_title),
+        title: Text(_getTitle(context)),
         actions: [
           if (!_isSaving)
             TextButton.icon(
               onPressed: _saveTreatment,
               icon: const Icon(Icons.check, color: Colors.white),
-              label: const Text(
-                'Enregistrer',
-                style: TextStyle(color: Colors.white),
+              label: Text(
+                AppLocalizations.of(context).translate(AppStrings.save),
+                style: const TextStyle(color: Colors.white),
               ),
             ),
           if (_isSaving)
@@ -254,7 +262,7 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
           Icon(
             _animalCount == 1 ? Icons.pets : Icons.groups,
             color: Colors.blue.shade700,
-            size: 32,
+            size: AppConstants.iconSizeMedium,
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -263,10 +271,12 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
               children: [
                 Text(
                   _animalCount == 1
-                      ? 'Traitement individuel'
-                      : 'Traitement groupé',
+                      ? AppLocalizations.of(context)
+                          .translate(AppStrings.individualTreatment)
+                      : AppLocalizations.of(context)
+                          .translate(AppStrings.groupTreatment),
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: AppConstants.fontSizeSectionTitle,
                     fontWeight: FontWeight.bold,
                     color: Colors.blue.shade900,
                   ),
@@ -274,10 +284,13 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                 const SizedBox(height: 4),
                 Text(
                   _animalCount == 1
-                      ? '1 animal concerné'
-                      : '$_animalCount animaux concernés',
+                      ? AppLocalizations.of(context)
+                          .translate(AppStrings.oneAnimalConcerned)
+                      : AppLocalizations.of(context)
+                          .translate(AppStrings.animalsConcerned)
+                          .replaceAll('{count}', _animalCount.toString()),
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: AppConstants.fontSizeBody,
                     color: Colors.grey.shade700,
                   ),
                 ),
@@ -293,7 +306,8 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
     return DropdownButtonFormField<Product>(
       initialValue: _selectedProduct,
       decoration: InputDecoration(
-        labelText: 'Produit médical *',
+        labelText:
+            AppLocalizations.of(context).translate(AppStrings.medicalProduct),
         border: const OutlineInputBorder(),
         prefixIcon: const Icon(Icons.medication),
         filled: true,
@@ -311,9 +325,9 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                 style: const TextStyle(fontWeight: FontWeight.w600),
               ),
               Text(
-                'Délai: ${product.withdrawalDaysMeat}j viande',
+                '${AppLocalizations.of(context).translate(AppStrings.withdrawalDelay)}: ${AppLocalizations.of(context).translate(AppStrings.meatDays).replaceAll('{days}', product.withdrawalDaysMeat.toString())}',
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: AppConstants.fontSizeSmall,
                   color: Colors.grey.shade600,
                 ),
               ),
@@ -337,8 +351,9 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
       decoration: InputDecoration(
         labelText:
             '${AppLocalizations.of(context).translate(AppStrings.dose)} *',
-        hintText: 'Ex: 2.5',
-        suffixText: 'ml',
+        hintText:
+            AppLocalizations.of(context).translate(AppStrings.doseExample),
+        suffixText: AppLocalizations.of(context).translate(AppStrings.unitMl),
         border: const OutlineInputBorder(),
         prefixIcon: const Icon(Icons.science),
         filled: true,
@@ -346,10 +361,11 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Veuillez entrer une dose';
+          return AppLocalizations.of(context)
+              .translate(AppStrings.pleaseEnterDose);
         }
         if (double.tryParse(value) == null) {
-          return 'Dose invalide';
+          return AppLocalizations.of(context).translate(AppStrings.invalidDose);
         }
         return null;
       },
@@ -371,7 +387,8 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
       },
       child: InputDecorator(
         decoration: InputDecoration(
-          labelText: 'Date du traitement',
+          labelText: AppLocalizations.of(context)
+              .translate(AppStrings.treatmentDateLabel),
           border: const OutlineInputBorder(),
           prefixIcon: const Icon(Icons.calendar_today),
           filled: true,
@@ -382,7 +399,8 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
           children: [
             Text(
               dateFormat.format(_treatmentDate),
-              style: const TextStyle(fontSize: 16),
+              style:
+                  const TextStyle(fontSize: AppConstants.fontSizeSectionTitle),
             ),
             const Icon(Icons.chevron_right),
           ],
@@ -402,7 +420,7 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
             Text(
               AppLocalizations.of(context).translate(AppStrings.veterinarian),
               style: TextStyle(
-                fontSize: 16,
+                fontSize: AppConstants.fontSizeSectionTitle,
                 fontWeight: FontWeight.w600,
                 color: Colors.grey.shade800,
               ),
@@ -417,7 +435,7 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
               child: Text(
                 AppLocalizations.of(context).translate(AppStrings.optional),
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: AppConstants.fontSizeTiny,
                   color: Colors.grey.shade600,
                 ),
               ),
@@ -437,7 +455,7 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
               children: [
                 Icon(
                   Icons.person_search,
-                  size: 48,
+                  size: AppConstants.iconSizeMediumLarge,
                   color: Colors.grey.shade400,
                 ),
                 const SizedBox(height: 12),
@@ -497,7 +515,7 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                   child: Icon(
                     Icons.verified_user,
                     color: Colors.green.shade700,
-                    size: 28,
+                    size: AppConstants.iconSizeMedium,
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -509,14 +527,14 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                         _selectedVetName ?? '',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                          fontSize: AppConstants.fontSizeSectionTitle,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         _selectedVetOrg ?? '',
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: AppConstants.fontSizeSubtitle,
                           color: Colors.grey.shade600,
                         ),
                       ),
@@ -526,7 +544,8 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                 IconButton(
                   onPressed: _removeVeterinarian,
                   icon: const Icon(Icons.close, color: Colors.red),
-                  tooltip: 'Retirer',
+                  tooltip:
+                      AppLocalizations.of(context).translate(AppStrings.remove),
                 ),
               ],
             ),
@@ -543,7 +562,8 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
       decoration: InputDecoration(
         labelText:
             '${AppLocalizations.of(context).translate(AppStrings.notes)} (${AppLocalizations.of(context).translate(AppStrings.optional)})',
-        hintText: 'Observations, symptômes, posologie...',
+        hintText: AppLocalizations.of(context)
+            .translate(AppStrings.notesHintTreatment),
         border: const OutlineInputBorder(),
         alignLabelWithHint: true,
         prefixIcon: const Padding(
@@ -638,7 +658,9 @@ class _VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
                             child: Text(vet.fullName[0]),
                           ),
                           title: Text(vet.fullName),
-                          subtitle: Text(vet.clinic ?? 'Non spécifié'),
+                          subtitle: Text(vet.clinic ??
+                              AppLocalizations.of(context)
+                                  .translate(AppStrings.notSpecified)),
                           onTap: () => widget.onSelect(vet),
                         );
                       },
