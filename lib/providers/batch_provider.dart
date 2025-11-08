@@ -14,7 +14,7 @@ class BatchProvider with ChangeNotifier {
   // ==================== Constantes (clés de messages / logs) ====================
   final AuthProvider _authProvider;
   String _currentFarmId;
-  
+
   BatchProvider(this._authProvider)
       : _currentFarmId = _authProvider.currentFarmId {
     _authProvider.addListener(_onFarmChanged);
@@ -106,7 +106,6 @@ class BatchProvider with ChangeNotifier {
 
     notifyListeners();
 
-    
     return batch;
   }
 
@@ -117,7 +116,6 @@ class BatchProvider with ChangeNotifier {
   /// Retourne true si ajouté avec succès, false si doublon
   bool addAnimalToBatch(String animalId) {
     if (_activeBatch == null) {
-      
       return false;
     }
 
@@ -243,7 +241,7 @@ class BatchProvider with ChangeNotifier {
       return;
     }
 
-    final batch = _allBatches[index];
+    //final batch = _allBatches[index];
 
     _allBatches.removeAt(index);
 
@@ -278,7 +276,6 @@ class BatchProvider with ChangeNotifier {
 
     _activeBatch = batch;
     notifyListeners();
-
   }
 
   /// Obtenir un lot par son ID
@@ -312,7 +309,7 @@ class BatchProvider with ChangeNotifier {
   ///
   /// À implémenter avec la base de données SQLite
   Future<void> loadBatches() async {
-    // TODO: Implémenter chargement depuis SQLite    
+    // TODO: Implémenter chargement depuis SQLite
 
     // Pour l'instant, on garde les données en mémoire
     notifyListeners();
@@ -329,7 +326,6 @@ class BatchProvider with ChangeNotifier {
   void initializeWithMockData(List<Batch> mockBatches) {
     _allBatches = mockBatches;
     notifyListeners();
-
   }
 
   // ==================== Méthodes Privées ====================

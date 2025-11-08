@@ -199,6 +199,51 @@ const Map<String, String> stringsFr = {
   'batchAnimals': 'Animaux du lot',
   'animalNotFoundAlert': 'Animal introuvable : {name}',
 
+  // ========== ALERTS - MESSAGES (21 nouvelles traductions) ==========
+  'withdrawalDeadlineExceeded': 'Délai abattage dépassé',
+  'withdrawalInProgress': 'Rémanence en cours',
+  'seeAnimal': 'Voir l\'animal',
+  'eidMissing': 'EID manquant',
+  'mandatoryIdentification': 'Identification obligatoire',
+  'addEid': 'Ajouter EID',
+  'eventToFinalize': 'Événement à finaliser',
+  'criticalSync': 'Synchronisation critique',
+  'syncRequired': 'Synchronisation requise',
+  'synchronize': 'Synchroniser',
+  'recommendedWeighing': 'Pesée recommandée',
+  'seeAnimals': 'Voir les animaux',
+  'treatmentToRenew': 'Traitement à renouveler',
+  'renew': 'Renouveler',
+  'lotToFinalize': 'Lot à finaliser',
+  'finalize': 'Finaliser',
+  'motherNotDeclared': 'Mère non déclarée',
+  'declareMother': 'Déclarer la mère',
+  'invalidMother': 'Mère invalide',
+  'correct': 'Corriger',
+  'noAlert': 'Aucune alerte 🎉',
+
+  // ========== ALERT CATEGORIES (20 nouvelles traductions) ==========
+  'categoryWithdrawal': 'Rémanence',
+  'categoryIdentification': 'Identification',
+  'categoryRegistry': 'Registre',
+  'categorySynchronization': 'Synchronisation',
+  'categoryWeighing': 'Pesée',
+  'categoryTreatment': 'Traitement',
+  'categoryBatch': 'Lot',
+  'categoryBirth': 'Naissance',
+  'categoryMortality': 'Mortalité',
+  'categoryOther': 'Autre',
+  'delayBeforeSlaughter': 'Délai avant abattage/vente',
+  'eidAndTraceability': 'EID et traçabilité',
+  'registryUpdate': 'Mise à jour registre',
+  'dataSave': 'Sauvegarde des données',
+  'weightTracking': 'Suivi pondéral',
+  'veterinaryCare': 'Soins vétérinaires',
+  'batchManagement': 'Gestion de lots',
+  'birthDeclaration': 'Déclaration naissance',
+  'mortalityManagement': 'Gestion mortalité',
+  'otherAlerts': 'Autres alertes',
+
   // ============ ANIMAL SCREENS (27) ============
   'animals': 'Animaux',
   'addAnimal': 'Ajouter un animal',
@@ -224,6 +269,17 @@ const Map<String, String> stringsFr = {
   'breedOptional': 'Race (optionnelle)',
   'status': 'Statut',
   'observations': 'Observations',
+
+  // ========== ANIMAL VALIDATION (9 nouvelles traductions) ==========
+  'animalNotFemale': 'L\'animal n\'est pas une femelle',
+  'animalNotAlive': 'L\'animal n\'est plus vivant',
+  'animalTooYoung': 'L\'animal est trop jeune (min. {months} mois)',
+  'noId': 'Sans ID',
+  'noIdentification': 'Sans identification',
+  'idPrefix': 'ID: ',
+  'eidPrefix': 'EID: ',
+  'numberPrefix': 'N°: ',
+  'notAvailable': 'N/A',
 
   // ============ WEIGHT HISTORY SCREEN (15) ============
   'weightHistory': 'Historique des Pesées',
@@ -417,4 +473,6 @@ const Map<String, String> stringsFr = {
   'scanQrCode': 'Scanner QR',
   'exportDocuments': 'Exporter les documents',
   'pdfDownloaded': '✅ PDF téléchargé',
+
+  // Ajouter suite à des erreurs d'ajout de clés
 };

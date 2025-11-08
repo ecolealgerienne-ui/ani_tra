@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 import '../models/lot.dart';
 import 'auth_provider.dart';
 
+import '../utils/constants.dart';
 import '../models/treatment.dart';
 import '../models/movement.dart';
 
@@ -339,7 +340,7 @@ class LotProvider extends ChangeNotifier {
         movementDate: lot.saleDate ?? DateTime.now(),
         toFarmId: lot.buyerFarmId,
         price: lot.pricePerAnimal,
-        notes: 'Acheteur: ${lot.buyerName ?? "N/A"}',
+        notes: 'Acheteur: ${lot.buyerName ?? AppConstants.notAvailable}',
         synced: false,
         createdAt: DateTime.now(),
       );
@@ -356,7 +357,7 @@ class LotProvider extends ChangeNotifier {
         animalId: animalId,
         type: MovementType.slaughter,
         movementDate: lot.slaughterDate ?? DateTime.now(),
-        notes: 'Abattoir: ${lot.slaughterhouseName ?? "N/A"}',
+        notes: 'Abattoir: ${lot.slaughterhouseName ?? AppConstants.notAvailable}',
         synced: false,
         createdAt: DateTime.now(),
       );

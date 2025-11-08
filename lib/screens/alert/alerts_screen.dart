@@ -264,7 +264,8 @@ class AlertsScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.notifications_active, color: Colors.white, size: 28),
+              const Icon(Icons.notifications_active,
+                  color: Colors.white, size: 28),
               const SizedBox(width: 12),
               Text(
                 AppLocalizations.of(context).translate(AppStrings.overview),
@@ -278,7 +279,7 @@ class AlertsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            alertProvider.getSummary(),
+            alertProvider.getSummary(context), // ← Ajouter context ici
             style: const TextStyle(
               color: Colors.white,
               fontSize: 16,

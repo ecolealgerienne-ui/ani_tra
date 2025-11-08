@@ -176,7 +176,7 @@ class AppStrings {
   static const String noBreedAvailable = 'noBreedAvailable';
   static const String noneChooseEachTime = 'noneChooseEachTime';
 
-  // ============ ALERTS SCREEN (23) ============
+  // ============ ALERTS (24) ============
   static const String alerts = 'alerts';
   static const String noAlertsTitle = 'noAlertsTitle';
   static const String noAlertsSubtitle = 'noAlertsSubtitle';
@@ -200,6 +200,51 @@ class AppStrings {
   static const String complete = 'complete';
   static const String batchAnimals = 'batchAnimals';
   static const String animalNotFoundAlert = 'animalNotFoundAlert';
+
+  // ========== ALERTS - MESSAGES (21 nouvelles clés) ==========
+  static const String withdrawalDeadlineExceeded = 'withdrawalDeadlineExceeded';
+  static const String withdrawalInProgress = 'withdrawalInProgress';
+  static const String seeAnimal = 'seeAnimal';
+  static const String eidMissing = 'eidMissing';
+  static const String mandatoryIdentification = 'mandatoryIdentification';
+  static const String addEid = 'addEid';
+  static const String eventToFinalize = 'eventToFinalize';
+  static const String criticalSync = 'criticalSync';
+  static const String syncRequired = 'syncRequired';
+  static const String synchronize = 'synchronize';
+  static const String recommendedWeighing = 'recommendedWeighing';
+  static const String seeAnimals = 'seeAnimals';
+  static const String treatmentToRenew = 'treatmentToRenew';
+  static const String renew = 'renew';
+  static const String lotToFinalize = 'lotToFinalize';
+  static const String finalize = 'finalize';
+  static const String motherNotDeclared = 'motherNotDeclared';
+  static const String declareMother = 'declareMother';
+  static const String invalidMother = 'invalidMother';
+  static const String correct = 'correct';
+  static const String noAlert = 'noAlert';
+
+  // ========== ALERT CATEGORIES (20 nouvelles clés) ==========
+  static const String categoryWithdrawal = 'categoryWithdrawal';
+  static const String categoryIdentification = 'categoryIdentification';
+  static const String categoryRegistry = 'categoryRegistry';
+  static const String categorySynchronization = 'categorySynchronization';
+  static const String categoryWeighing = 'categoryWeighing';
+  static const String categoryTreatment = 'categoryTreatment';
+  static const String categoryBatch = 'categoryBatch';
+  static const String categoryBirth = 'categoryBirth';
+  static const String categoryMortality = 'categoryMortality';
+  static const String categoryOther = 'categoryOther';
+  static const String delayBeforeSlaughter = 'delayBeforeSlaughter';
+  static const String eidAndTraceability = 'eidAndTraceability';
+  static const String registryUpdate = 'registryUpdate';
+  static const String dataSave = 'dataSave';
+  static const String weightTracking = 'weightTracking';
+  static const String veterinaryCare = 'veterinaryCare';
+  static const String batchManagement = 'batchManagement';
+  static const String birthDeclaration = 'birthDeclaration';
+  static const String mortalityManagement = 'mortalityManagement';
+  static const String otherAlerts = 'otherAlerts';
 
   // ============ ANIMAL SCREENS (27) ============
   static const String animals = 'animals';
@@ -226,6 +271,17 @@ class AppStrings {
   static const String breedOptional = 'breedOptional';
   static const String status = 'status';
   static const String observations = 'observations';
+
+  // ========== ANIMAL VALIDATION (9 nouvelles clés) ==========
+  static const String animalNotFemale = 'animalNotFemale';
+  static const String animalNotAlive = 'animalNotAlive';
+  static const String animalTooYoung = 'animalTooYoung';
+  static const String noId = 'noId';
+  static const String noIdentification = 'noIdentification';
+  static const String idPrefix = 'idPrefix';
+  static const String eidPrefix = 'eidPrefix';
+  static const String numberPrefix = 'numberPrefix';
+  static const String notAvailable = 'notAvailable';
 
   // ============ WEIGHT HISTORY SCREEN (15) ============
   static const String weightHistory = 'weightHistory';
@@ -379,7 +435,6 @@ class AppStrings {
   static const String lotFinalized = 'lotFinalized';
   static const String saleAnimals = 'saleAnimals';
   static const String slaughterPreparation = 'slaughterPreparation';
-  static const String notesOptional = 'notesOptional';
   static const String treatmentWillApplyToAnimals =
       'treatmentWillApplyToAnimals';
   static const String typeNotDefined = 'typeNotDefined';
@@ -416,4 +471,7 @@ class AppStrings {
   static const String scanQrCode = 'scanQrCode';
   static const String exportDocuments = 'exportDocuments';
   static const String pdfDownloaded = 'pdfDownloaded';
+
+  // Ajouter suite à des erreurs d'ajout de clés
+  static const String notesOptional = 'notesOptional';
 }

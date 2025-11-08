@@ -8,6 +8,11 @@ enum VaccinationType {
   obligatoire, // Vaccination obligatoire
   recommandee, // Vaccination recommandée
   optionnelle, // Vaccination optionnelle
+
+/// ⚠️ IMPORTANT : Les labels FR sont hardcodés ici car VaccinationPriority
+/// est un ENUM sans accès au BuildContext.
+///
+/// La traduction se fera au niveau Provider/UI qui a accès au context.
 }
 
 extension VaccinationTypeExtension on VaccinationType {

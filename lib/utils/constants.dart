@@ -47,4 +47,22 @@ class AppConstants {
   static const int maxNotesLength = 500;
   static const int maxNameLength = 100;
   static const int maxCampaignNameLength = 50;
+
+  // ========== IDENTIFIERS (nouvelles constantes) ==========
+  static const String tempIdPrefix = 'TEMP_';
+  static const String qrPrefixAnimal = 'QR_ANIMAL_';
+  static const String qrPrefixVet = 'QR_VET_';
+  static const String qrInvalidPrefix = 'QR_INVALID_';
+
+  // ========== ANIMAL CONSTRAINTS (nouvelles constantes) ==========
+  static const int minReproductionAgeMonths = 12; // Âge min pour reproduction
+  static const int maxIdSubstringLength = 8; // Pour affichage tronqué d'ID
+
+  // ========== NOTIFICATION CHANNELS (nouvelles constantes) ==========
+  static const String notificationChannelId = 'medical_reminders';
+  static const String notificationChannelName = 'Rappels médicaux';
+  static const String notificationChannelDesc =
+      'Rappels pour traitements et vaccinations';
+
+  static const String notAvailable = 'N/A';
 }

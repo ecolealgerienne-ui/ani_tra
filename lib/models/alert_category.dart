@@ -83,6 +83,11 @@ enum AlertCategory {
 }
 
 /// Extension pour obtenir les propriétés visuelles
+///
+/// ⚠️ IMPORTANT : Les labels FR sont hardcodés ici car AlertCategory
+/// est un ENUM sans accès au BuildContext.
+///
+/// La traduction se fera au niveau Provider/UI qui a accès au context.
 extension AlertCategoryExtension on AlertCategory {
   /// Icône selon la catégorie
   String get icon {
@@ -110,7 +115,10 @@ extension AlertCategoryExtension on AlertCategory {
     }
   }
 
-  /// Label en français
+  /// Label en français (hardcodé dans le model)
+  ///
+  /// Pour une vraie traduction i18n, utiliser AppStrings.categoryXxx
+  /// au niveau Provider/UI qui a accès au BuildContext
   String get labelFr {
     switch (this) {
       case AlertCategory.remanence:
@@ -136,7 +144,7 @@ extension AlertCategoryExtension on AlertCategory {
     }
   }
 
-  /// Label en anglais
+  /// Label en anglais (gardé tel quel - pas de i18n demandé)
   String get labelEn {
     switch (this) {
       case AlertCategory.remanence:
@@ -162,7 +170,10 @@ extension AlertCategoryExtension on AlertCategory {
     }
   }
 
-  /// Description courte en français
+  /// Description courte en français (hardcodée dans le model)
+  ///
+  /// Pour une vraie traduction i18n, utiliser AppStrings.delayBeforeSlaughter etc.
+  /// au niveau Provider/UI qui a accès au BuildContext
   String get descriptionFr {
     switch (this) {
       case AlertCategory.remanence:

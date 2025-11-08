@@ -16,6 +16,10 @@ enum LotType {
 
 /// Extensions pour LotType
 extension LotTypeExt on LotType {
+  /// ⚠️ IMPORTANT : Les labels FR sont hardcodés ici car LotType
+  /// est un ENUM sans accès au BuildContext.
+  ///
+  /// La traduction se fera au niveau Provider/UI qui a accès au context.
   /// Label en français
   String get label {
     switch (this) {

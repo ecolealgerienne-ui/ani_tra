@@ -75,10 +75,13 @@ class Alert {
     this.dueDate,
     this.actionLabel,
     this.count,
-    this.animalIds, // 🆕 AJOUTÉ
+    this.animalIds,
   }) : createdAt = createdAt ?? DateTime.now();
 
   /// Constructeur : Alerte de rémanence
+  ///
+  /// ⚠️ IMPORTANT : Ce constructeur crée des messages HARDCODÉS
+  /// qui seront traduits au niveau UI (AlertProvider)
   factory Alert.remanence({
     required String animalId,
     required String animalName,
@@ -91,6 +94,8 @@ class Alert {
             ? AlertType.important
             : AlertType.routine;
 
+    // Messages hardcodés pour l'instant
+    // Traduction faite au niveau Provider/UI
     return Alert(
       id: 'remanence_$animalId',
       type: type,
@@ -105,7 +110,7 @@ class Alert {
       entityName: animalName,
       dueDate: DateTime.now().add(Duration(days: daysRemaining)),
       actionLabel: 'Voir l\'animal',
-      animalIds: [animalId], // 🆕 Liste avec 1 ID
+      animalIds: [animalId],
     );
   }
 
@@ -125,7 +130,7 @@ class Alert {
       entityType: 'animal',
       entityName: animalName,
       actionLabel: 'Ajouter EID',
-      animalIds: [animalId], // 🆕 Liste avec 1 ID
+      animalIds: [animalId],
     );
   }
 

@@ -23,6 +23,10 @@ class Batch implements SyncableEntity {
   /// Objectif du lot
   final BatchPurpose purpose;
 
+  /// ⚠️ IMPORTANT : Les labels FR sont hardcodés ici car BatchPurpose
+  /// est un ENUM sans accès au BuildContext.
+  ///
+  /// La traduction se fera au niveau Provider/UI qui a accès au context.
   /// Liste des IDs d'animaux dans le lot
   final List<String> animalIds;
 
