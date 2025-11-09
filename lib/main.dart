@@ -37,6 +37,8 @@ import 'screens/sync/sync_screen.dart';
 import 'data/mock_data.dart';
 import 'data/mocks/mock_vaccination_references.dart';
 import 'data/mocks/mock_veterinarians.dart';
+import 'drift/database.dart';
+import 'repositories/animal_repository.dart';
 
 // Instance globale du plugin de notifications
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -71,17 +73,33 @@ void main() async {
       debugPrint('Notification cliquée: ${response.payload}');
     },
   );
+  // Initialize Database & Repository
+  final database = AppDatabase();
+  final animalRepository = AnimalRepository(database);
 
-  runApp(const MyApp());
+  runApp(MyApp(
+    database: database,
+    animalRepository: animalRepository,
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final AppDatabase database;
+  final AnimalRepository animalRepository;
+
+  const MyApp({
+    super.key,
+    required this.database,
+    required this.animalRepository,
+  });
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        // AJOUTER ces 2 providers AVANT les autres
+        Provider<AppDatabase>.value(value: database),
+        Provider<AnimalRepository>.value(value: animalRepository),
         // 1. AuthProvider EN PREMIER
         ChangeNotifierProvider(create: (_) => AuthProvider()),
 
@@ -105,7 +123,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProxyProvider<AuthProvider, AnimalProvider>(
           create: (context) {
             final auth = context.read<AuthProvider>();
-            final provider = AnimalProvider(auth);
+            final provider =
+                AnimalProvider(auth, context.read<AnimalRepository>());
             provider.initializeWithMockData(
               MockData.generateAnimals(),
               MockData.generateProducts(),
@@ -114,7 +133,9 @@ class MyApp extends StatelessWidget {
             );
             return provider;
           },
-          update: (context, auth, previous) => previous ?? AnimalProvider(auth),
+          update: (context, auth, previous) =>
+              previous ??
+              AnimalProvider(auth, context.read<AnimalRepository>()),
         ),
 
         // BatchProvider

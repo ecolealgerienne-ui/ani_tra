@@ -382,3 +382,15 @@ class AppConstants {
   static const double mainCardRadius = 12.0;
   static const double mainInputRadius = 8.0;
 }
+
+// ==================== DATABASE ====================
+class DatabaseConstants {
+  static const String dbName = 'animal_trace.db';
+  static const int schemaVersion = 1;
+}
+
+// ==================== SYNC ====================
+class SyncConstants {
+  static const int maxRetries = 3;
+  static const int retryDelaySeconds = 60;
+}

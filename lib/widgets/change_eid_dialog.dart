@@ -45,16 +45,16 @@ class _ChangeEidDialogState extends State<ChangeEidDialog> {
     });
 
     try {
-      final animalProvider = context.read<AnimalProvider>();
+      //final animalProvider = context.read<AnimalProvider>();
 
-      final success = animalProvider.changeAnimalEid(
-        animalId: widget.animal.id,
-        newEid: _newEidController.text.trim(),
-        reason: _selectedReason,
-        notes: _notesController.text.trim().isEmpty
-            ? null
-            : _notesController.text.trim(),
-      );
+      final success = await context.read<AnimalProvider>().changeAnimalEid(
+            animalId: widget.animal.id,
+            newEid: _newEidController.text.trim(),
+            reason: _selectedReason,
+            notes: _notesController.text.trim().isEmpty
+                ? null
+                : _notesController.text.trim(),
+          );
 
       if (!mounted) return;
 

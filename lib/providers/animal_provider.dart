@@ -4,28 +4,36 @@ import '../models/animal.dart';
 import '../models/treatment.dart';
 import '../models/movement.dart';
 import '../models/product.dart';
-import 'auth_provider.dart';
 import '../models/mother_stats.dart';
+import 'auth_provider.dart';
+import '../repositories/animal_repository.dart';
 
+/// AnimalProvider - Phase 1A
+/// CHANGEMENT: Utilise Repository pour Animals (SQLite)
+/// IDENTIQUE: Treatment/Movement/Product restent en mock
 class AnimalProvider extends ChangeNotifier {
   final AuthProvider _authProvider;
+  final AnimalRepository _repository;
   String _currentFarmId;
 
   // Données principales (NON FILTRÉES - contient toutes les fermes)
   final List<Product> _allProducts = [];
-  final List<Animal> _allAnimals = [];
+  final List<Animal> _allAnimals = []; // ← Cache local, alimenté par Repository
   final List<Treatment> _allTreatments = [];
   final List<Movement> _allMovements = [];
+
+  // Loading state (nouveau)
+  bool _isLoading = false;
 
   // État courant / filtres
   Animal? _currentAnimal;
   String _searchQuery = '';
   AnimalStatus? _statusFilter;
 
-  AnimalProvider(this._authProvider)
+  AnimalProvider(this._authProvider, this._repository)
       : _currentFarmId = _authProvider.currentFarmId {
     _authProvider.addListener(_onFarmChanged);
-    _loadMockData();
+    _loadAnimalsFromRepository(); // ← Charge depuis SQLite au démarrage
   }
 
   void _onFarmChanged() {
@@ -34,7 +42,7 @@ class AnimalProvider extends ChangeNotifier {
       _currentAnimal = null;
       _searchQuery = '';
       _statusFilter = null;
-      notifyListeners();
+      _loadAnimalsFromRepository(); // ← Recharge depuis SQLite
     }
   }
 
@@ -55,6 +63,7 @@ class AnimalProvider extends ChangeNotifier {
   Animal? get currentAnimal => _currentAnimal;
   String get searchQuery => _searchQuery;
   AnimalStatus? get statusFilter => _statusFilter;
+  bool get isLoading => _isLoading; // ← Nouveau getter
 
   /// Animaux filtrés selon recherche et statut
   List<Animal> get filteredAnimals {
@@ -83,15 +92,37 @@ class AnimalProvider extends ChangeNotifier {
 
   // ==================== Initialisation ====================
 
+  /// Charge les animaux depuis SQLite (appelé au démarrage et au changement de ferme)
+  Future<void> _loadAnimalsFromRepository() async {
+    if (_currentFarmId.isEmpty) return;
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      // Charger TOUS les animaux de la database (toutes fermes)
+      // Note: getAll filtre déjà par farmId, mais on pourrait charger toutes les fermes
+      final farmAnimals = await _repository.getAll(_currentFarmId);
+
+      // Remplacer les animaux de cette ferme dans le cache
+      _allAnimals.removeWhere((a) => a.farmId == _currentFarmId);
+      _allAnimals.addAll(farmAnimals);
+    } catch (e) {
+      debugPrint('❌ Error loading animals from repository: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Initialise avec mock data (compatibilité - pour Treatment/Movement/Product)
   void initializeWithMockData(
     List<Animal> animals,
     List<Product> products,
     List<Treatment> treatments,
     List<Movement> movements,
   ) {
-    _allAnimals
-      ..clear()
-      ..addAll(animals);
+    // Products, Treatments, Movements restent en mock
     _allProducts
       ..clear()
       ..addAll(products);
@@ -102,16 +133,24 @@ class AnimalProvider extends ChangeNotifier {
       ..clear()
       ..addAll(movements);
 
-    if (_currentAnimal != null) {
-      _currentAnimal = animals.firstWhere((a) => a.id == _currentAnimal!.id,
-          orElse: () => _currentAnimal!);
-    }
+    // Animals: on les sauvegarde dans SQLite puis on recharge
+    _migrateAnimalsToRepository(animals);
+  }
 
-    notifyListeners();
+  /// Migre les animaux mock vers SQLite (appelé par initializeWithMockData)
+  Future<void> _migrateAnimalsToRepository(List<Animal> animals) async {
+    for (final animal in animals) {
+      try {
+        await _repository.create(animal, animal.farmId);
+      } catch (e) {
+        debugPrint('⚠️ Animal ${animal.id} already exists or error: $e');
+      }
+    }
+    await _loadAnimalsFromRepository();
   }
 
   void _loadMockData() {
-    // no-op
+    // no-op - gardé pour compatibilité
   }
 
   // ==================== Sélection / Filtres ====================
@@ -175,36 +214,66 @@ class AnimalProvider extends ChangeNotifier {
   }
 
   // ==================== CRUD: Animals ====================
+  // ⚠️ CHANGEMENT: Ces méthodes sont maintenant ASYNC et utilisent Repository
 
-  void addAnimal(Animal animal) {
+  Future<void> addAnimal(Animal animal) async {
     final withFarm = animal.copyWith(farmId: _authProvider.currentFarmId);
-    _allAnimals.add(withFarm);
-    notifyListeners();
-  }
 
-  void updateAnimal(Animal updated) {
-    final i = _allAnimals.indexWhere((a) => a.id == updated.id);
-    if (i != -1) {
-      _allAnimals[i] = updated;
-      if (_currentAnimal?.id == updated.id) {
-        _currentAnimal = updated;
-      }
+    try {
+      // Sauvegarder dans SQLite
+      await _repository.create(withFarm, _authProvider.currentFarmId);
+
+      // Mettre à jour le cache local
+      _allAnimals.add(withFarm);
       notifyListeners();
+    } catch (e) {
+      debugPrint('❌ Error adding animal: $e');
+      rethrow;
     }
   }
 
-  void removeAnimal(String id) {
-    final before = _allAnimals.length;
-    _allAnimals.removeWhere((a) => a.id == id);
-    if (_allAnimals.length < before) {
-      if (_currentAnimal?.id == id) {
-        _currentAnimal = null;
+  Future<void> updateAnimal(Animal updated) async {
+    try {
+      // Mettre à jour dans SQLite
+      await _repository.update(updated, _authProvider.currentFarmId);
+
+      // Mettre à jour le cache local
+      final i = _allAnimals.indexWhere((a) => a.id == updated.id);
+      if (i != -1) {
+        _allAnimals[i] = updated;
+        if (_currentAnimal?.id == updated.id) {
+          _currentAnimal = updated;
+        }
+        notifyListeners();
       }
-      notifyListeners();
+    } catch (e) {
+      debugPrint('❌ Error updating animal: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> removeAnimal(String id) async {
+    try {
+      // Supprimer de SQLite (soft-delete)
+      await _repository.delete(id, _authProvider.currentFarmId);
+
+      // Supprimer du cache local
+      final before = _allAnimals.length;
+      _allAnimals.removeWhere((a) => a.id == id);
+      if (_allAnimals.length < before) {
+        if (_currentAnimal?.id == id) {
+          _currentAnimal = null;
+        }
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('❌ Error removing animal: $e');
+      rethrow;
     }
   }
 
   // ==================== CRUD: Treatments ====================
+  // ⚠️ IDENTIQUE: Restent synchrones avec mock lists
 
   void addTreatment(Treatment t) {
     final withFarm = t.copyWith(farmId: _authProvider.currentFarmId);
@@ -229,6 +298,7 @@ class AnimalProvider extends ChangeNotifier {
   }
 
   // ==================== CRUD: Movements ====================
+  // ⚠️ IDENTIQUE: Restent synchrones avec mock lists
 
   void addMovement(Movement m) {
     final withFarm = m.copyWith(farmId: _authProvider.currentFarmId);
@@ -253,6 +323,7 @@ class AnimalProvider extends ChangeNotifier {
   }
 
   // ==================== Produits ====================
+  // ⚠️ IDENTIQUE: Restent synchrones avec mock lists
 
   void setProducts(List<Product> items) {
     _allProducts
@@ -302,11 +373,12 @@ class AnimalProvider extends ChangeNotifier {
     };
   }
 
-  void updateAnimalStatus(String animalId, AnimalStatus newStatus) {
+  Future<void> updateAnimalStatus(
+      String animalId, AnimalStatus newStatus) async {
     final animal = getAnimalById(animalId);
     if (animal != null) {
       final updated = animal.copyWith(status: newStatus);
-      updateAnimal(updated);
+      await updateAnimal(updated);
     }
   }
 
@@ -365,12 +437,12 @@ class AnimalProvider extends ChangeNotifier {
 
   // ==================== Changement EID ====================
 
-  bool changeAnimalEid({
+  Future<bool> changeAnimalEid({
     required String animalId,
     required String newEid,
     required String reason,
     String? notes,
-  }) {
+  }) async {
     final animal = getAnimalById(animalId);
     if (animal == null) return false;
 
@@ -380,8 +452,12 @@ class AnimalProvider extends ChangeNotifier {
       notes: notes,
     );
 
-    updateAnimal(updated);
-    return true;
+    try {
+      await updateAnimal(updated);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   // ==================== 🆕 PART3 - VALIDATION MÈRE ====================
@@ -440,6 +516,13 @@ class AnimalProvider extends ChangeNotifier {
       final bornInFarm = a.birthDate.isAfter(DateTime(2020));
       return bornInFarm && a.motherId == null;
     }).toList();
+  }
+
+  // ==================== Refresh ====================
+
+  /// Rafraîchit les données depuis SQLite (pour pull-to-refresh)
+  Future<void> refresh() async {
+    await _loadAnimalsFromRepository();
   }
 
   @override
