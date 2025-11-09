@@ -16,10 +16,10 @@ import 'tables/farms_table.dart';
 import 'tables/animals_table.dart';
 
 // Transaction Tables (depend on main entities)
-// import 'tables/treatments_table.dart';
-// import 'tables/vaccinations_table.dart';
-// import 'tables/weights_table.dart';
-// import 'tables/movements_table.dart';
+import 'tables/treatments_table.dart';
+import 'tables/vaccinations_table.dart';
+import 'tables/weights_table.dart';
+import 'tables/movements_table.dart';
 
 // Referential Tables
 import 'tables/species_table.dart';
@@ -29,9 +29,9 @@ import 'tables/vaccines_table.dart';
 import 'tables/veterinarians_table.dart';
 
 // Complex Tables
-// import 'tables/batches_table.dart';
-// import 'tables/lots_table.dart';
-// import 'tables/campaigns_table.dart';
+import 'tables/batches_table.dart';
+import 'tables/lots_table.dart';
+import 'tables/campaigns_table.dart';
 
 // Sync Table (Phase 2)
 // import 'tables/sync_queue_table.dart';
@@ -46,10 +46,10 @@ import 'daos/farm_dao.dart';
 import 'daos/animal_dao.dart';
 
 // Transaction DAOs
-// import 'daos/treatment_dao.dart';
-// import 'daos/vaccination_dao.dart';
-// import 'daos/weight_dao.dart';
-// import 'daos/movement_dao.dart';
+import 'daos/treatment_dao.dart';
+import 'daos/vaccination_dao.dart';
+import 'daos/weight_dao.dart';
+import 'daos/movement_dao.dart';
 
 // Referential DAOs
 import 'daos/species_dao.dart';
@@ -59,9 +59,9 @@ import 'daos/vaccine_dao.dart';
 import 'daos/veterinarian_dao.dart';
 
 // Complex DAOs
-// import 'daos/batch_dao.dart';
-// import 'daos/lot_dao.dart';
-// import 'daos/campaign_dao.dart';
+import 'daos/batch_dao.dart';
+import 'daos/lot_dao.dart';
+import 'daos/campaign_dao.dart';
 
 // Sync DAO (Phase 2)
 // import 'daos/sync_queue_dao.dart';
@@ -89,10 +89,10 @@ part 'database.g.dart';
     // ────────────────────────────────────────────────────────
     // TRANSACTION TABLES (depend on main entities)
     // ────────────────────────────────────────────────────────
-    // TreatmentsTable,
-    // VaccinationsTable,
-    // WeightsTable,
-    // MovementsTable,
+    TreatmentsTable,
+    VaccinationsTable,
+    WeightsTable,
+    MovementsTable,
 
     // ────────────────────────────────────────────────────────
     // REFERENTIAL TABLES
@@ -106,9 +106,9 @@ part 'database.g.dart';
     // ────────────────────────────────────────────────────────
     // COMPLEX TABLES
     // ────────────────────────────────────────────────────────
-    // BatchesTable,
-    // LotsTable,
-    // CampaignsTable,
+    BatchesTable,
+    LotsTable,
+    CampaignsTable,
 
     // ────────────────────────────────────────────────────────
     // SYNC TABLE (Phase 2)
@@ -129,10 +129,10 @@ part 'database.g.dart';
     // ────────────────────────────────────────────────────────
     // TRANSACTION DAOs
     // ────────────────────────────────────────────────────────
-    // TreatmentDao,
-    // VaccinationDao,
-    // WeightDao,
-    // MovementDao,
+    TreatmentDao,
+    VaccinationDao,
+    WeightDao,
+    MovementDao,
 
     // ────────────────────────────────────────────────────────
     // REFERENTIAL DAOs
@@ -146,9 +146,9 @@ part 'database.g.dart';
     // ────────────────────────────────────────────────────────
     // COMPLEX DAOs
     // ────────────────────────────────────────────────────────
-    // BatchDao,
-    // LotDao,
-    // CampaignDao,
+    BatchDao,
+    LotDao,
+    CampaignDao,
 
     // ────────────────────────────────────────────────────────
     // SYNC DAO (Phase 2)
@@ -187,10 +187,10 @@ class AppDatabase extends _$AppDatabase {
           // ───────────────────────────────────────────────────
           // INDEXES - TRANSACTION TABLES
           // ───────────────────────────────────────────────────
-          // await _createTreatmentsIndexes();
-          // await _createVaccinationsIndexes();
-          // await _createWeightsIndexes();
-          // await _createMovementsIndexes();
+          await _createTreatmentsIndexes();
+          await _createVaccinationsIndexes();
+          await _createWeightsIndexes();
+          await _createMovementsIndexes();
 
           // ───────────────────────────────────────────────────
           // INDEXES - REFERENTIAL TABLES
@@ -204,9 +204,9 @@ class AppDatabase extends _$AppDatabase {
           // ───────────────────────────────────────────────────
           // INDEXES - COMPLEX TABLES
           // ───────────────────────────────────────────────────
-          // await _createBatchesIndexes();
-          // await _createLotsIndexes();
-          // await _createCampaignsIndexes();
+          await _createBatchesIndexes();
+          await _createLotsIndexes();
+          await _createCampaignsIndexes();
 
           // ───────────────────────────────────────────────────
           // INDEXES - SYNC TABLE (Phase 2)
@@ -411,23 +411,354 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
-  // ───────────────────────────────────────────────────────────
-  // TREATMENTS INDEXES (example for future)
-  // ───────────────────────────────────────────────────────────
-  // Future<void> _createTreatmentsIndexes() async {
-  //   await customStatement(
-  //     'CREATE INDEX IF NOT EXISTS idx_treatments_farm_id ON treatments(farm_id)',
-  //   );
-  //   await customStatement(
-  //     'CREATE INDEX IF NOT EXISTS idx_treatments_animal_id ON treatments(animal_id)',
-  //   );
-  //   await customStatement(
-  //     'CREATE INDEX IF NOT EXISTS idx_treatments_start_date ON treatments(start_date)',
-  //   );
-  //   await customStatement(
-  //     'CREATE INDEX IF NOT EXISTS idx_treatments_product_id ON treatments(product_id)',
-  //   );
-  // }
+  /// Crée les indexes pour la table treatments
+  ///
+  /// Indexes optimisés pour:
+  /// - Filtrage par farmId (multi-tenancy)
+  /// - Filtrage par animal (historique médical)
+  /// - Filtrage par produit (usage produits)
+  /// - Filtrage par campagne
+  /// - Recherche par date de traitement
+  /// - Filtrage délai d'attente actif
+  Future<void> _createTreatmentsIndexes() async {
+    // Index principal: farmId (queries fréquentes par ferme)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_treatments_farm_id '
+      'ON treatments(farm_id);',
+    );
+
+    // Index: animalId (historique médical par animal)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_treatments_animal_id '
+      'ON treatments(animal_id);',
+    );
+
+    // Index: productId (usage des produits)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_treatments_product_id '
+      'ON treatments(product_id);',
+    );
+
+    // Index: campaignId (traitements d'une campagne)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_treatments_campaign_id '
+      'ON treatments(campaign_id);',
+    );
+
+    // Index: treatmentDate (recherche par date)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_treatments_treatment_date '
+      'ON treatments(treatment_date);',
+    );
+
+    // Index: withdrawalEndDate (délais d'attente actifs)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_treatments_withdrawal_end_date '
+      'ON treatments(withdrawal_end_date);',
+    );
+
+    // Index composite: farmId + animalId (query très fréquente)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_treatments_farm_animal '
+      'ON treatments(farm_id, animal_id);',
+    );
+
+    // Index composite: farmId + treatmentDate (listing chronologique)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_treatments_farm_date '
+      'ON treatments(farm_id, treatment_date);',
+    );
+
+    // Index composite: farmId + withdrawalEndDate (délais actifs par ferme)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_treatments_farm_withdrawal '
+      'ON treatments(farm_id, withdrawal_end_date);',
+    );
+  }
+
+  /// Crée les indexes pour la table vaccinations
+  ///
+  /// Indexes optimisés pour:
+  /// - Filtrage par farmId (multi-tenancy)
+  /// - Filtrage par animal (historique vaccinal)
+  /// - Filtrage par type de vaccination
+  /// - Filtrage par maladie
+  /// - Recherche par date de vaccination
+  /// - Filtrage rappels à venir/en retard
+  Future<void> _createVaccinationsIndexes() async {
+    // Index principal: farmId (queries fréquentes par ferme)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_vaccinations_farm_id '
+      'ON vaccinations(farm_id);',
+    );
+
+    // Index: animalId (historique vaccinal par animal)
+    // Note: animalId est nullable (vaccination de groupe)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_vaccinations_animal_id '
+      'ON vaccinations(animal_id);',
+    );
+
+    // Index: type (filtrage par type: obligatoire, recommandee, optionnelle)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_vaccinations_type '
+      'ON vaccinations(type);',
+    );
+
+    // Index: disease (recherche par maladie ciblée)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_vaccinations_disease '
+      'ON vaccinations(disease);',
+    );
+
+    // Index: vaccinationDate (recherche par date)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_vaccinations_vaccination_date '
+      'ON vaccinations(vaccination_date);',
+    );
+
+    // Index: nextDueDate (rappels à venir/en retard)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_vaccinations_next_due_date '
+      'ON vaccinations(next_due_date);',
+    );
+
+    // Index composite: farmId + animalId (query très fréquente)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_vaccinations_farm_animal '
+      'ON vaccinations(farm_id, animal_id);',
+    );
+
+    // Index composite: farmId + type (filtrage type par ferme)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_vaccinations_farm_type '
+      'ON vaccinations(farm_id, type);',
+    );
+
+    // Index composite: farmId + vaccinationDate (listing chronologique)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_vaccinations_farm_date '
+      'ON vaccinations(farm_id, vaccination_date);',
+    );
+
+    // Index composite: farmId + nextDueDate (rappels par ferme)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_vaccinations_farm_reminder '
+      'ON vaccinations(farm_id, next_due_date);',
+    );
+  }
+
+  /// Crée les indexes pour la table weights
+  ///
+  /// Indexes optimisés pour:
+  /// - Filtrage par farmId (multi-tenancy)
+  /// - Filtrage par animal (historique de croissance)
+  /// - Recherche par date de pesée
+  /// - Filtrage par source (balance, estimation, etc.)
+  Future<void> _createWeightsIndexes() async {
+    // Index principal: farmId (queries fréquentes par ferme)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_weights_farm_id '
+      'ON weights(farm_id);',
+    );
+
+    // Index: animalId (historique de croissance par animal)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_weights_animal_id '
+      'ON weights(animal_id);',
+    );
+
+    // Index: recordedAt (recherche par date)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_weights_recorded_at '
+      'ON weights(recorded_at);',
+    );
+
+    // Index: source (filtrage par source de pesée)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_weights_source '
+      'ON weights(source);',
+    );
+
+    // Index composite: farmId + animalId (query très fréquente)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_weights_farm_animal '
+      'ON weights(farm_id, animal_id);',
+    );
+
+    // Index composite: farmId + recordedAt (listing chronologique)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_weights_farm_date '
+      'ON weights(farm_id, recorded_at);',
+    );
+
+    // Index composite: animalId + recordedAt (historique animal)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_weights_animal_date '
+      'ON weights(animal_id, recorded_at);',
+    );
+  }
+
+  /// Crée les indexes pour la table movements
+  ///
+  /// Indexes optimisés pour:
+  /// - Filtrage par farmId (multi-tenancy)
+  /// - Filtrage par animal (historique des mouvements)
+  /// - Filtrage par type (births, sales, deaths, etc.)
+  /// - Recherche par date de mouvement
+  /// - Traçabilité fermes origine/destination
+  Future<void> _createMovementsIndexes() async {
+    // Index principal: farmId (queries fréquentes par ferme)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_movements_farm_id '
+      'ON movements(farm_id);',
+    );
+
+    // Index: animalId (historique des mouvements par animal)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_movements_animal_id '
+      'ON movements(animal_id);',
+    );
+
+    // Index: type (filtrage par type: birth, sale, death, etc.)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_movements_type '
+      'ON movements(type);',
+    );
+
+    // Index: movementDate (recherche par date)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_movements_movement_date '
+      'ON movements(movement_date);',
+    );
+
+    // Index: fromFarmId (traçabilité origine)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_movements_from_farm_id '
+      'ON movements(from_farm_id);',
+    );
+
+    // Index: toFarmId (traçabilité destination)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_movements_to_farm_id '
+      'ON movements(to_farm_id);',
+    );
+
+    // Index composite: farmId + animalId (query très fréquente)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_movements_farm_animal '
+      'ON movements(farm_id, animal_id);',
+    );
+
+    // Index composite: farmId + type (filtrage type par ferme)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_movements_farm_type '
+      'ON movements(farm_id, type);',
+    );
+
+    // Index composite: farmId + movementDate (listing chronologique)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_movements_farm_date '
+      'ON movements(farm_id, movement_date);',
+    );
+
+    // Index composite: farmId + type + movementDate (stats par type/période)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_movements_farm_type_date '
+      'ON movements(farm_id, type, movement_date);',
+    );
+  }
+
+  /// Créer les indexes pour la table batches
+  Future<void> _createBatchesIndexes() async {
+    // Index sur farm_id (multi-tenancy - CRITIQUE)
+    await customStatement(
+        'CREATE INDEX idx_batches_farm_id ON batches(farm_id);');
+
+    // Index sur completed (filtrage actifs/complétés)
+    await customStatement(
+        'CREATE INDEX idx_batches_completed ON batches(completed);');
+
+    // Index sur purpose (filtrage par objectif)
+    await customStatement(
+        'CREATE INDEX idx_batches_purpose ON batches(purpose);');
+
+    // Index sur created_at (tri chronologique)
+    await customStatement(
+        'CREATE INDEX idx_batches_created_at ON batches(created_at);');
+
+    // Index composite farm_id + completed (query la plus fréquente)
+    await customStatement(
+        'CREATE INDEX idx_batches_farm_completed ON batches(farm_id, completed);');
+  }
+
+  /// Créer les indexes pour la table lots
+  Future<void> _createLotsIndexes() async {
+    // Index sur farm_id (multi-tenancy - CRITIQUE)
+    await customStatement('CREATE INDEX idx_lots_farm_id ON lots(farm_id);');
+
+    // Index sur completed (filtrage ouverts/complétés)
+    await customStatement(
+        'CREATE INDEX idx_lots_completed ON lots(completed);');
+
+    // Index sur type (filtrage par type de lot)
+    await customStatement('CREATE INDEX idx_lots_type ON lots(type);');
+
+    // Index sur created_at (tri chronologique)
+    await customStatement(
+        'CREATE INDEX idx_lots_created_at ON lots(created_at);');
+
+    // Index composite farm_id + completed (query la plus fréquente)
+    await customStatement(
+        'CREATE INDEX idx_lots_farm_completed ON lots(farm_id, completed);');
+
+    // Index composite farm_id + type (filtrage par type)
+    await customStatement(
+        'CREATE INDEX idx_lots_farm_type ON lots(farm_id, type);');
+
+    // Index sur product_id (recherche lots par produit)
+    await customStatement(
+        'CREATE INDEX idx_lots_product_id ON lots(product_id);');
+
+    // Index sur veterinarian_id (recherche lots par vétérinaire)
+    await customStatement(
+        'CREATE INDEX idx_lots_veterinarian_id ON lots(veterinarian_id);');
+
+    // Index sur withdrawal_end_date (alertes rémanence)
+    await customStatement(
+        'CREATE INDEX idx_lots_withdrawal_end_date ON lots(withdrawal_end_date);');
+  }
+
+  /// Créer les indexes pour la table campaigns
+  Future<void> _createCampaignsIndexes() async {
+    // Index sur farm_id (multi-tenancy - CRITIQUE)
+    await customStatement(
+        'CREATE INDEX idx_campaigns_farm_id ON campaigns(farm_id);');
+
+    // Index sur completed (filtrage actives/complétées)
+    await customStatement(
+        'CREATE INDEX idx_campaigns_completed ON campaigns(completed);');
+
+    // Index sur campaign_date (tri chronologique)
+    await customStatement(
+        'CREATE INDEX idx_campaigns_campaign_date ON campaigns(campaign_date);');
+
+    // Index composite farm_id + completed (query la plus fréquente)
+    await customStatement(
+        'CREATE INDEX idx_campaigns_farm_completed ON campaigns(farm_id, completed);');
+
+    // Index sur product_id (recherche campagnes par produit)
+    await customStatement(
+        'CREATE INDEX idx_campaigns_product_id ON campaigns(product_id);');
+
+    // Index sur veterinarian_id (recherche campagnes par vétérinaire)
+    await customStatement(
+        'CREATE INDEX idx_campaigns_veterinarian_id ON campaigns(veterinarian_id);');
+
+    // Index sur withdrawal_end_date (alertes rémanence)
+    await customStatement(
+        'CREATE INDEX idx_campaigns_withdrawal_end_date ON campaigns(withdrawal_end_date);');
+  }
 
   // ═══════════════════════════════════════════════════════════
   // DAO GETTERS
@@ -448,10 +779,14 @@ class AppDatabase extends _$AppDatabase {
   // ───────────────────────────────────────────────────────────
   // TRANSACTION DAOs
   // ───────────────────────────────────────────────────────────
-  // TreatmentDao get treatmentDao => TreatmentDao(this);
-  // VaccinationDao get vaccinationDao => VaccinationDao(this);
-  // WeightDao get weightDao => WeightDao(this);
-  // MovementDao get movementDao => MovementDao(this);
+  @override
+  TreatmentDao get treatmentDao => TreatmentDao(this);
+  @override
+  VaccinationDao get vaccinationDao => VaccinationDao(this);
+  @override
+  WeightDao get weightDao => WeightDao(this);
+  @override
+  MovementDao get movementDao => MovementDao(this);
 
   // ───────────────────────────────────────────────────────────
   // REFERENTIAL DAOs
@@ -470,9 +805,12 @@ class AppDatabase extends _$AppDatabase {
   // ───────────────────────────────────────────────────────────
   // COMPLEX DAOs
   // ───────────────────────────────────────────────────────────
-  // BatchDao get batchDao => BatchDao(this);
-  // LotDao get lotDao => LotDao(this);
-  // CampaignDao get campaignDao => CampaignDao(this);
+  @override
+  BatchDao get batchDao => BatchDao(this);
+  @override
+  LotDao get lotDao => LotDao(this);
+  @override
+  CampaignDao get campaignDao => CampaignDao(this);
 
   // ───────────────────────────────────────────────────────────
   // SYNC DAO (Phase 2)

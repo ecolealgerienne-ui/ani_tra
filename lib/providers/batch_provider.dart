@@ -5,13 +5,13 @@ import 'auth_provider.dart';
 
 /// Provider pour la gestion des lots d'animaux
 ///
-/// Gère la création, modification et utilisation des lots pour :
-/// - Vente groupée
-/// - Abattage groupé
-/// - Traitement groupé
+/// GÃ¨re la crÃ©ation, modification et utilisation des lots pour :
+/// - Vente groupÃ©e
+/// - Abattage groupÃ©
+/// - Traitement groupÃ©
 /// - Autres actions de masse
 class BatchProvider with ChangeNotifier {
-  // ==================== Constantes (clés de messages / logs) ====================
+  // ==================== Constantes (clÃ©s de messages / logs) ====================
   final AuthProvider _authProvider;
   String _currentFarmId;
 
@@ -43,17 +43,17 @@ class BatchProvider with ChangeNotifier {
   static const String kLogBatchMockLoaded = 'log.batch.mock_loaded';
   static const String kLogBatchReset = 'log.batch.reset';
 
-  // Pour exceptions (clés d’erreur)
+  // Pour exceptions (clÃ©s dâ€™erreur)
   static const String kErrBatchNotFound = 'err.batch.not_found';
   static const String kErrCannotReactivateCompleted =
       'err.batch.cannot_reactivate_completed';
 
-  // ==================== État ====================
+  // ==================== Ã‰tat ====================
 
-  /// Liste de tous les lots (actifs et complétés)
+  /// Liste de tous les lots (actifs et complÃ©tÃ©s)
   List<Batch> _allBatches = [];
 
-  /// Lot actuellement en cours de création (scan en cours)
+  /// Lot actuellement en cours de crÃ©ation (scan en cours)
   Batch? _activeBatch;
 
   // ==================== Getters ====================
@@ -62,14 +62,14 @@ class BatchProvider with ChangeNotifier {
   List<Batch> get batches => List.unmodifiable(
       _allBatches.where((b) => b.farmId == _authProvider.currentFarmId));
 
-  /// Lots non complétés uniquement
+  /// Lots non complÃ©tÃ©s uniquement
   List<Batch> get activeBatches => batches.where((b) => !b.completed).toList();
 
-  /// Lots complétés uniquement
+  /// Lots complÃ©tÃ©s uniquement
   List<Batch> get completedBatches =>
       batches.where((b) => b.completed).toList();
 
-  /// Lot en cours de création/modification
+  /// Lot en cours de crÃ©ation/modification
   Batch? get activeBatch => _activeBatch;
 
   /// Y a-t-il un lot actif ?
@@ -81,14 +81,14 @@ class BatchProvider with ChangeNotifier {
   /// Nombre de lots actifs
   int get activeBatchCount => activeBatches.length;
 
-  // ==================== Méthodes Publiques ====================
+  // ==================== MÃ©thodes Publiques ====================
 
-  /// Créer un nouveau lot et le définir comme actif
+  /// CrÃ©er un nouveau lot et le dÃ©finir comme actif
   ///
   /// [name] : Nom du lot (ex: "Abattage Novembre 2025")
   /// [purpose] : Objectif du lot (vente, abattage, traitement, autre)
   ///
-  /// Retourne le lot créé
+  /// Retourne le lot crÃ©Ã©
   Batch createBatch(String name, BatchPurpose purpose) {
     final batch = Batch(
       id: _generateId(),
@@ -111,20 +111,20 @@ class BatchProvider with ChangeNotifier {
 
   /// Ajouter un animal au lot actif
   ///
-  /// [animalId] : ID de l'animal à ajouter
+  /// [animalId] : ID de l'animal Ã  ajouter
   ///
-  /// Retourne true si ajouté avec succès, false si doublon
+  /// Retourne true si ajoutÃ© avec succÃ¨s, false si doublon
   bool addAnimalToBatch(String animalId) {
     if (_activeBatch == null) {
       return false;
     }
 
-    // Vérifier doublon
+    // VÃ©rifier doublon
     if (_activeBatch!.animalIds.contains(animalId)) {
       return false;
     }
 
-    // Créer une copie modifiée du lot
+    // CrÃ©er une copie modifiÃ©e du lot
     final updatedBatch = Batch(
       id: _activeBatch!.id,
       name: _activeBatch!.name,
@@ -133,7 +133,7 @@ class BatchProvider with ChangeNotifier {
       createdAt: _activeBatch!.createdAt,
       usedAt: _activeBatch!.usedAt,
       completed: _activeBatch!.completed,
-      synced: false, // Marquer comme non synchronisé
+      synced: false, // Marquer comme non synchronisÃ©
     );
 
     // Remplacer dans la liste
@@ -150,9 +150,9 @@ class BatchProvider with ChangeNotifier {
 
   /// Retirer un animal du lot actif
   ///
-  /// [animalId] : ID de l'animal à retirer
+  /// [animalId] : ID de l'animal Ã  retirer
   ///
-  /// Retourne true si retiré avec succès
+  /// Retourne true si retirÃ© avec succÃ¨s
   bool removeAnimalFromBatch(String animalId) {
     if (_activeBatch == null) {
       return false;
@@ -162,7 +162,7 @@ class BatchProvider with ChangeNotifier {
       return false;
     }
 
-    // Créer une copie modifiée
+    // CrÃ©er une copie modifiÃ©e
     final updatedAnimalIds = List<String>.from(_activeBatch!.animalIds)
       ..remove(animalId);
 
@@ -188,19 +188,19 @@ class BatchProvider with ChangeNotifier {
     return true;
   }
 
-  /// Vérifier si un animal est déjà dans le lot actif
+  /// VÃ©rifier si un animal est dÃ©jÃ  dans le lot actif
   ///
-  /// Utilisé pour détecter les doublons lors du scan
+  /// UtilisÃ© pour dÃ©tecter les doublons lors du scan
   bool isAnimalInActiveBatch(String animalId) {
     if (_activeBatch == null) return false;
     return _activeBatch!.animalIds.contains(animalId);
   }
 
-  /// Marquer un lot comme complété (utilisé)
+  /// Marquer un lot comme complÃ©tÃ© (utilisÃ©)
   ///
-  /// [batchId] : ID du lot à compléter
+  /// [batchId] : ID du lot Ã  complÃ©ter
   ///
-  /// Appelé après une vente, un abattage, etc.
+  /// AppelÃ© aprÃ¨s une vente, un abattage, etc.
   void completeBatch(String batchId) {
     final index = _allBatches.indexWhere((b) => b.id == batchId);
 
@@ -223,7 +223,7 @@ class BatchProvider with ChangeNotifier {
 
     _allBatches[index] = updatedBatch;
 
-    // Si c'était le lot actif, le déréférencer
+    // Si c'Ã©tait le lot actif, le dÃ©rÃ©fÃ©rencer
     if (_activeBatch?.id == batchId) {
       _activeBatch = null;
     }
@@ -233,7 +233,7 @@ class BatchProvider with ChangeNotifier {
 
   /// Supprimer un lot
   ///
-  /// [batchId] : ID du lot à supprimer
+  /// [batchId] : ID du lot Ã  supprimer
   void deleteBatch(String batchId) {
     final index = _allBatches.indexWhere((b) => b.id == batchId);
 
@@ -245,7 +245,7 @@ class BatchProvider with ChangeNotifier {
 
     _allBatches.removeAt(index);
 
-    // Si c'était le lot actif, le déréférencer
+    // Si c'Ã©tait le lot actif, le dÃ©rÃ©fÃ©rencer
     if (_activeBatch?.id == batchId) {
       _activeBatch = null;
     }
@@ -253,7 +253,7 @@ class BatchProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Réinitialiser le lot actif (abandon de création)
+  /// RÃ©initialiser le lot actif (abandon de crÃ©ation)
   void clearActiveBatch() {
     if (_activeBatch != null) {
       _activeBatch = null;
@@ -261,9 +261,9 @@ class BatchProvider with ChangeNotifier {
     }
   }
 
-  /// Définir un lot existant comme actif (pour modification)
+  /// DÃ©finir un lot existant comme actif (pour modification)
   ///
-  /// [batchId] : ID du lot à réactiver
+  /// [batchId] : ID du lot Ã  rÃ©activer
   void setActiveBatch(String batchId) {
     final batch = _allBatches.firstWhere(
       (b) => b.id == batchId,
@@ -280,7 +280,7 @@ class BatchProvider with ChangeNotifier {
 
   /// Obtenir un lot par son ID
   ///
-  /// Retourne null si non trouvé
+  /// Retourne null si non trouvÃ©
   Batch? getBatchById(String batchId) {
     try {
       return _allBatches.firstWhere((b) => b.id == batchId);
@@ -289,9 +289,9 @@ class BatchProvider with ChangeNotifier {
     }
   }
 
-  /// Obtenir tous les lots contenant un animal spécifique
+  /// Obtenir tous les lots contenant un animal spÃ©cifique
   ///
-  /// Utile pour vérifier si un animal est déjà dans un lot
+  /// Utile pour vÃ©rifier si un animal est dÃ©jÃ  dans un lot
   List<Batch> getBatchesContainingAnimal(String animalId) {
     return _allBatches
         .where((batch) => batch.animalIds.contains(animalId))
@@ -303,34 +303,34 @@ class BatchProvider with ChangeNotifier {
     return _allBatches.where((b) => b.purpose == purpose).toList();
   }
 
-  // ==================== Méthodes de Chargement ====================
+  // ==================== MÃ©thodes de Chargement ====================
 
   /// Charger les lots depuis une source (base locale, API, etc.)
   ///
-  /// À implémenter avec la base de données SQLite
+  /// Ã€ implÃ©menter avec la base de donnÃ©es SQLite
   Future<void> loadBatches() async {
-    // TODO: Implémenter chargement depuis SQLite
+    // TODO: ImplÃ©menter chargement depuis SQLite
 
-    // Pour l'instant, on garde les données en mémoire
+    // Pour l'instant, on garde les donnÃ©es en mÃ©moire
     notifyListeners();
   }
 
   /// Sauvegarder les lots (vers base locale)
   ///
-  /// À implémenter avec la base de données SQLite
+  /// Ã€ implÃ©menter avec la base de donnÃ©es SQLite
   Future<void> saveBatches() async {
-    // TODO: Implémenter sauvegarde vers SQLite
+    // TODO: ImplÃ©menter sauvegarde vers SQLite
   }
 
-  /// Initialiser avec des données de test (mock)
+  /// Initialiser avec des donnÃ©es de test (mock)
   void initializeWithMockData(List<Batch> mockBatches) {
     _allBatches = mockBatches;
     notifyListeners();
   }
 
-  // ==================== Méthodes Privées ====================
+  // ==================== MÃ©thodes PrivÃ©es ====================
 
-  /// Générer un ID unique pour un lot
+  /// GÃ©nÃ©rer un ID unique pour un lot
   ///
   /// Format: batch_[timestamp]_[random]
   String _generateId() {
@@ -362,7 +362,7 @@ class BatchProvider with ChangeNotifier {
     return distribution;
   }
 
-  /// Réinitialiser toutes les données (pour tests)
+  /// RÃ©initialiser toutes les donnÃ©es (pour tests)
   @visibleForTesting
   void reset() {
     _allBatches.clear();

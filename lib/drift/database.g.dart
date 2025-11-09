@@ -1409,6 +1409,3443 @@ class AnimalsTableCompanion extends UpdateCompanion<AnimalsTableData> {
   }
 }
 
+class $TreatmentsTableTable extends TreatmentsTable
+    with TableInfo<$TreatmentsTableTable, TreatmentsTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TreatmentsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _farmIdMeta = const VerificationMeta('farmId');
+  @override
+  late final GeneratedColumn<String> farmId = GeneratedColumn<String>(
+      'farm_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _animalIdMeta =
+      const VerificationMeta('animalId');
+  @override
+  late final GeneratedColumn<String> animalId = GeneratedColumn<String>(
+      'animal_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _productIdMeta =
+      const VerificationMeta('productId');
+  @override
+  late final GeneratedColumn<String> productId = GeneratedColumn<String>(
+      'product_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _productNameMeta =
+      const VerificationMeta('productName');
+  @override
+  late final GeneratedColumn<String> productName = GeneratedColumn<String>(
+      'product_name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _doseMeta = const VerificationMeta('dose');
+  @override
+  late final GeneratedColumn<double> dose = GeneratedColumn<double>(
+      'dose', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _treatmentDateMeta =
+      const VerificationMeta('treatmentDate');
+  @override
+  late final GeneratedColumn<DateTime> treatmentDate =
+      GeneratedColumn<DateTime>('treatment_date', aliasedName, false,
+          type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _withdrawalEndDateMeta =
+      const VerificationMeta('withdrawalEndDate');
+  @override
+  late final GeneratedColumn<DateTime> withdrawalEndDate =
+      GeneratedColumn<DateTime>('withdrawal_end_date', aliasedName, false,
+          type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+      'notes', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _veterinarianIdMeta =
+      const VerificationMeta('veterinarianId');
+  @override
+  late final GeneratedColumn<String> veterinarianId = GeneratedColumn<String>(
+      'veterinarian_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _veterinarianNameMeta =
+      const VerificationMeta('veterinarianName');
+  @override
+  late final GeneratedColumn<String> veterinarianName = GeneratedColumn<String>(
+      'veterinarian_name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _campaignIdMeta =
+      const VerificationMeta('campaignId');
+  @override
+  late final GeneratedColumn<String> campaignId = GeneratedColumn<String>(
+      'campaign_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+      'synced', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("synced" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _lastSyncedAtMeta =
+      const VerificationMeta('lastSyncedAt');
+  @override
+  late final GeneratedColumn<DateTime> lastSyncedAt = GeneratedColumn<DateTime>(
+      'last_synced_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _serverVersionMeta =
+      const VerificationMeta('serverVersion');
+  @override
+  late final GeneratedColumn<int> serverVersion = GeneratedColumn<int>(
+      'server_version', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _deletedAtMeta =
+      const VerificationMeta('deletedAt');
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+      'deleted_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        farmId,
+        animalId,
+        productId,
+        productName,
+        dose,
+        treatmentDate,
+        withdrawalEndDate,
+        notes,
+        veterinarianId,
+        veterinarianName,
+        campaignId,
+        synced,
+        lastSyncedAt,
+        serverVersion,
+        deletedAt,
+        createdAt,
+        updatedAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'treatments';
+  @override
+  VerificationContext validateIntegrity(
+      Insertable<TreatmentsTableData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('farm_id')) {
+      context.handle(_farmIdMeta,
+          farmId.isAcceptableOrUnknown(data['farm_id']!, _farmIdMeta));
+    } else if (isInserting) {
+      context.missing(_farmIdMeta);
+    }
+    if (data.containsKey('animal_id')) {
+      context.handle(_animalIdMeta,
+          animalId.isAcceptableOrUnknown(data['animal_id']!, _animalIdMeta));
+    } else if (isInserting) {
+      context.missing(_animalIdMeta);
+    }
+    if (data.containsKey('product_id')) {
+      context.handle(_productIdMeta,
+          productId.isAcceptableOrUnknown(data['product_id']!, _productIdMeta));
+    } else if (isInserting) {
+      context.missing(_productIdMeta);
+    }
+    if (data.containsKey('product_name')) {
+      context.handle(
+          _productNameMeta,
+          productName.isAcceptableOrUnknown(
+              data['product_name']!, _productNameMeta));
+    } else if (isInserting) {
+      context.missing(_productNameMeta);
+    }
+    if (data.containsKey('dose')) {
+      context.handle(
+          _doseMeta, dose.isAcceptableOrUnknown(data['dose']!, _doseMeta));
+    } else if (isInserting) {
+      context.missing(_doseMeta);
+    }
+    if (data.containsKey('treatment_date')) {
+      context.handle(
+          _treatmentDateMeta,
+          treatmentDate.isAcceptableOrUnknown(
+              data['treatment_date']!, _treatmentDateMeta));
+    } else if (isInserting) {
+      context.missing(_treatmentDateMeta);
+    }
+    if (data.containsKey('withdrawal_end_date')) {
+      context.handle(
+          _withdrawalEndDateMeta,
+          withdrawalEndDate.isAcceptableOrUnknown(
+              data['withdrawal_end_date']!, _withdrawalEndDateMeta));
+    } else if (isInserting) {
+      context.missing(_withdrawalEndDateMeta);
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+          _notesMeta, notes.isAcceptableOrUnknown(data['notes']!, _notesMeta));
+    }
+    if (data.containsKey('veterinarian_id')) {
+      context.handle(
+          _veterinarianIdMeta,
+          veterinarianId.isAcceptableOrUnknown(
+              data['veterinarian_id']!, _veterinarianIdMeta));
+    }
+    if (data.containsKey('veterinarian_name')) {
+      context.handle(
+          _veterinarianNameMeta,
+          veterinarianName.isAcceptableOrUnknown(
+              data['veterinarian_name']!, _veterinarianNameMeta));
+    }
+    if (data.containsKey('campaign_id')) {
+      context.handle(
+          _campaignIdMeta,
+          campaignId.isAcceptableOrUnknown(
+              data['campaign_id']!, _campaignIdMeta));
+    }
+    if (data.containsKey('synced')) {
+      context.handle(_syncedMeta,
+          synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta));
+    }
+    if (data.containsKey('last_synced_at')) {
+      context.handle(
+          _lastSyncedAtMeta,
+          lastSyncedAt.isAcceptableOrUnknown(
+              data['last_synced_at']!, _lastSyncedAtMeta));
+    }
+    if (data.containsKey('server_version')) {
+      context.handle(
+          _serverVersionMeta,
+          serverVersion.isAcceptableOrUnknown(
+              data['server_version']!, _serverVersionMeta));
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(_deletedAtMeta,
+          deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  TreatmentsTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TreatmentsTableData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      farmId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}farm_id'])!,
+      animalId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}animal_id'])!,
+      productId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}product_id'])!,
+      productName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}product_name'])!,
+      dose: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}dose'])!,
+      treatmentDate: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}treatment_date'])!,
+      withdrawalEndDate: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime,
+          data['${effectivePrefix}withdrawal_end_date'])!,
+      notes: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}notes']),
+      veterinarianId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}veterinarian_id']),
+      veterinarianName: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}veterinarian_name']),
+      campaignId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}campaign_id']),
+      synced: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}synced'])!,
+      lastSyncedAt: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}last_synced_at']),
+      serverVersion: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}server_version']),
+      deletedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}deleted_at']),
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+    );
+  }
+
+  @override
+  $TreatmentsTableTable createAlias(String alias) {
+    return $TreatmentsTableTable(attachedDatabase, alias);
+  }
+}
+
+class TreatmentsTableData extends DataClass
+    implements Insertable<TreatmentsTableData> {
+  final String id;
+  final String farmId;
+  final String animalId;
+  final String productId;
+  final String productName;
+  final double dose;
+  final DateTime treatmentDate;
+  final DateTime withdrawalEndDate;
+  final String? notes;
+  final String? veterinarianId;
+  final String? veterinarianName;
+  final String? campaignId;
+  final bool synced;
+  final DateTime? lastSyncedAt;
+  final int? serverVersion;
+  final DateTime? deletedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const TreatmentsTableData(
+      {required this.id,
+      required this.farmId,
+      required this.animalId,
+      required this.productId,
+      required this.productName,
+      required this.dose,
+      required this.treatmentDate,
+      required this.withdrawalEndDate,
+      this.notes,
+      this.veterinarianId,
+      this.veterinarianName,
+      this.campaignId,
+      required this.synced,
+      this.lastSyncedAt,
+      this.serverVersion,
+      this.deletedAt,
+      required this.createdAt,
+      required this.updatedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['farm_id'] = Variable<String>(farmId);
+    map['animal_id'] = Variable<String>(animalId);
+    map['product_id'] = Variable<String>(productId);
+    map['product_name'] = Variable<String>(productName);
+    map['dose'] = Variable<double>(dose);
+    map['treatment_date'] = Variable<DateTime>(treatmentDate);
+    map['withdrawal_end_date'] = Variable<DateTime>(withdrawalEndDate);
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    if (!nullToAbsent || veterinarianId != null) {
+      map['veterinarian_id'] = Variable<String>(veterinarianId);
+    }
+    if (!nullToAbsent || veterinarianName != null) {
+      map['veterinarian_name'] = Variable<String>(veterinarianName);
+    }
+    if (!nullToAbsent || campaignId != null) {
+      map['campaign_id'] = Variable<String>(campaignId);
+    }
+    map['synced'] = Variable<bool>(synced);
+    if (!nullToAbsent || lastSyncedAt != null) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt);
+    }
+    if (!nullToAbsent || serverVersion != null) {
+      map['server_version'] = Variable<int>(serverVersion);
+    }
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  TreatmentsTableCompanion toCompanion(bool nullToAbsent) {
+    return TreatmentsTableCompanion(
+      id: Value(id),
+      farmId: Value(farmId),
+      animalId: Value(animalId),
+      productId: Value(productId),
+      productName: Value(productName),
+      dose: Value(dose),
+      treatmentDate: Value(treatmentDate),
+      withdrawalEndDate: Value(withdrawalEndDate),
+      notes:
+          notes == null && nullToAbsent ? const Value.absent() : Value(notes),
+      veterinarianId: veterinarianId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(veterinarianId),
+      veterinarianName: veterinarianName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(veterinarianName),
+      campaignId: campaignId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(campaignId),
+      synced: Value(synced),
+      lastSyncedAt: lastSyncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSyncedAt),
+      serverVersion: serverVersion == null && nullToAbsent
+          ? const Value.absent()
+          : Value(serverVersion),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory TreatmentsTableData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TreatmentsTableData(
+      id: serializer.fromJson<String>(json['id']),
+      farmId: serializer.fromJson<String>(json['farmId']),
+      animalId: serializer.fromJson<String>(json['animalId']),
+      productId: serializer.fromJson<String>(json['productId']),
+      productName: serializer.fromJson<String>(json['productName']),
+      dose: serializer.fromJson<double>(json['dose']),
+      treatmentDate: serializer.fromJson<DateTime>(json['treatmentDate']),
+      withdrawalEndDate:
+          serializer.fromJson<DateTime>(json['withdrawalEndDate']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      veterinarianId: serializer.fromJson<String?>(json['veterinarianId']),
+      veterinarianName: serializer.fromJson<String?>(json['veterinarianName']),
+      campaignId: serializer.fromJson<String?>(json['campaignId']),
+      synced: serializer.fromJson<bool>(json['synced']),
+      lastSyncedAt: serializer.fromJson<DateTime?>(json['lastSyncedAt']),
+      serverVersion: serializer.fromJson<int?>(json['serverVersion']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'farmId': serializer.toJson<String>(farmId),
+      'animalId': serializer.toJson<String>(animalId),
+      'productId': serializer.toJson<String>(productId),
+      'productName': serializer.toJson<String>(productName),
+      'dose': serializer.toJson<double>(dose),
+      'treatmentDate': serializer.toJson<DateTime>(treatmentDate),
+      'withdrawalEndDate': serializer.toJson<DateTime>(withdrawalEndDate),
+      'notes': serializer.toJson<String?>(notes),
+      'veterinarianId': serializer.toJson<String?>(veterinarianId),
+      'veterinarianName': serializer.toJson<String?>(veterinarianName),
+      'campaignId': serializer.toJson<String?>(campaignId),
+      'synced': serializer.toJson<bool>(synced),
+      'lastSyncedAt': serializer.toJson<DateTime?>(lastSyncedAt),
+      'serverVersion': serializer.toJson<int?>(serverVersion),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  TreatmentsTableData copyWith(
+          {String? id,
+          String? farmId,
+          String? animalId,
+          String? productId,
+          String? productName,
+          double? dose,
+          DateTime? treatmentDate,
+          DateTime? withdrawalEndDate,
+          Value<String?> notes = const Value.absent(),
+          Value<String?> veterinarianId = const Value.absent(),
+          Value<String?> veterinarianName = const Value.absent(),
+          Value<String?> campaignId = const Value.absent(),
+          bool? synced,
+          Value<DateTime?> lastSyncedAt = const Value.absent(),
+          Value<int?> serverVersion = const Value.absent(),
+          Value<DateTime?> deletedAt = const Value.absent(),
+          DateTime? createdAt,
+          DateTime? updatedAt}) =>
+      TreatmentsTableData(
+        id: id ?? this.id,
+        farmId: farmId ?? this.farmId,
+        animalId: animalId ?? this.animalId,
+        productId: productId ?? this.productId,
+        productName: productName ?? this.productName,
+        dose: dose ?? this.dose,
+        treatmentDate: treatmentDate ?? this.treatmentDate,
+        withdrawalEndDate: withdrawalEndDate ?? this.withdrawalEndDate,
+        notes: notes.present ? notes.value : this.notes,
+        veterinarianId:
+            veterinarianId.present ? veterinarianId.value : this.veterinarianId,
+        veterinarianName: veterinarianName.present
+            ? veterinarianName.value
+            : this.veterinarianName,
+        campaignId: campaignId.present ? campaignId.value : this.campaignId,
+        synced: synced ?? this.synced,
+        lastSyncedAt:
+            lastSyncedAt.present ? lastSyncedAt.value : this.lastSyncedAt,
+        serverVersion:
+            serverVersion.present ? serverVersion.value : this.serverVersion,
+        deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+  TreatmentsTableData copyWithCompanion(TreatmentsTableCompanion data) {
+    return TreatmentsTableData(
+      id: data.id.present ? data.id.value : this.id,
+      farmId: data.farmId.present ? data.farmId.value : this.farmId,
+      animalId: data.animalId.present ? data.animalId.value : this.animalId,
+      productId: data.productId.present ? data.productId.value : this.productId,
+      productName:
+          data.productName.present ? data.productName.value : this.productName,
+      dose: data.dose.present ? data.dose.value : this.dose,
+      treatmentDate: data.treatmentDate.present
+          ? data.treatmentDate.value
+          : this.treatmentDate,
+      withdrawalEndDate: data.withdrawalEndDate.present
+          ? data.withdrawalEndDate.value
+          : this.withdrawalEndDate,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      veterinarianId: data.veterinarianId.present
+          ? data.veterinarianId.value
+          : this.veterinarianId,
+      veterinarianName: data.veterinarianName.present
+          ? data.veterinarianName.value
+          : this.veterinarianName,
+      campaignId:
+          data.campaignId.present ? data.campaignId.value : this.campaignId,
+      synced: data.synced.present ? data.synced.value : this.synced,
+      lastSyncedAt: data.lastSyncedAt.present
+          ? data.lastSyncedAt.value
+          : this.lastSyncedAt,
+      serverVersion: data.serverVersion.present
+          ? data.serverVersion.value
+          : this.serverVersion,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TreatmentsTableData(')
+          ..write('id: $id, ')
+          ..write('farmId: $farmId, ')
+          ..write('animalId: $animalId, ')
+          ..write('productId: $productId, ')
+          ..write('productName: $productName, ')
+          ..write('dose: $dose, ')
+          ..write('treatmentDate: $treatmentDate, ')
+          ..write('withdrawalEndDate: $withdrawalEndDate, ')
+          ..write('notes: $notes, ')
+          ..write('veterinarianId: $veterinarianId, ')
+          ..write('veterinarianName: $veterinarianName, ')
+          ..write('campaignId: $campaignId, ')
+          ..write('synced: $synced, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('serverVersion: $serverVersion, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id,
+      farmId,
+      animalId,
+      productId,
+      productName,
+      dose,
+      treatmentDate,
+      withdrawalEndDate,
+      notes,
+      veterinarianId,
+      veterinarianName,
+      campaignId,
+      synced,
+      lastSyncedAt,
+      serverVersion,
+      deletedAt,
+      createdAt,
+      updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TreatmentsTableData &&
+          other.id == this.id &&
+          other.farmId == this.farmId &&
+          other.animalId == this.animalId &&
+          other.productId == this.productId &&
+          other.productName == this.productName &&
+          other.dose == this.dose &&
+          other.treatmentDate == this.treatmentDate &&
+          other.withdrawalEndDate == this.withdrawalEndDate &&
+          other.notes == this.notes &&
+          other.veterinarianId == this.veterinarianId &&
+          other.veterinarianName == this.veterinarianName &&
+          other.campaignId == this.campaignId &&
+          other.synced == this.synced &&
+          other.lastSyncedAt == this.lastSyncedAt &&
+          other.serverVersion == this.serverVersion &&
+          other.deletedAt == this.deletedAt &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class TreatmentsTableCompanion extends UpdateCompanion<TreatmentsTableData> {
+  final Value<String> id;
+  final Value<String> farmId;
+  final Value<String> animalId;
+  final Value<String> productId;
+  final Value<String> productName;
+  final Value<double> dose;
+  final Value<DateTime> treatmentDate;
+  final Value<DateTime> withdrawalEndDate;
+  final Value<String?> notes;
+  final Value<String?> veterinarianId;
+  final Value<String?> veterinarianName;
+  final Value<String?> campaignId;
+  final Value<bool> synced;
+  final Value<DateTime?> lastSyncedAt;
+  final Value<int?> serverVersion;
+  final Value<DateTime?> deletedAt;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const TreatmentsTableCompanion({
+    this.id = const Value.absent(),
+    this.farmId = const Value.absent(),
+    this.animalId = const Value.absent(),
+    this.productId = const Value.absent(),
+    this.productName = const Value.absent(),
+    this.dose = const Value.absent(),
+    this.treatmentDate = const Value.absent(),
+    this.withdrawalEndDate = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.veterinarianId = const Value.absent(),
+    this.veterinarianName = const Value.absent(),
+    this.campaignId = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.serverVersion = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TreatmentsTableCompanion.insert({
+    required String id,
+    required String farmId,
+    required String animalId,
+    required String productId,
+    required String productName,
+    required double dose,
+    required DateTime treatmentDate,
+    required DateTime withdrawalEndDate,
+    this.notes = const Value.absent(),
+    this.veterinarianId = const Value.absent(),
+    this.veterinarianName = const Value.absent(),
+    this.campaignId = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.serverVersion = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        farmId = Value(farmId),
+        animalId = Value(animalId),
+        productId = Value(productId),
+        productName = Value(productName),
+        dose = Value(dose),
+        treatmentDate = Value(treatmentDate),
+        withdrawalEndDate = Value(withdrawalEndDate),
+        createdAt = Value(createdAt),
+        updatedAt = Value(updatedAt);
+  static Insertable<TreatmentsTableData> custom({
+    Expression<String>? id,
+    Expression<String>? farmId,
+    Expression<String>? animalId,
+    Expression<String>? productId,
+    Expression<String>? productName,
+    Expression<double>? dose,
+    Expression<DateTime>? treatmentDate,
+    Expression<DateTime>? withdrawalEndDate,
+    Expression<String>? notes,
+    Expression<String>? veterinarianId,
+    Expression<String>? veterinarianName,
+    Expression<String>? campaignId,
+    Expression<bool>? synced,
+    Expression<DateTime>? lastSyncedAt,
+    Expression<int>? serverVersion,
+    Expression<DateTime>? deletedAt,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (farmId != null) 'farm_id': farmId,
+      if (animalId != null) 'animal_id': animalId,
+      if (productId != null) 'product_id': productId,
+      if (productName != null) 'product_name': productName,
+      if (dose != null) 'dose': dose,
+      if (treatmentDate != null) 'treatment_date': treatmentDate,
+      if (withdrawalEndDate != null) 'withdrawal_end_date': withdrawalEndDate,
+      if (notes != null) 'notes': notes,
+      if (veterinarianId != null) 'veterinarian_id': veterinarianId,
+      if (veterinarianName != null) 'veterinarian_name': veterinarianName,
+      if (campaignId != null) 'campaign_id': campaignId,
+      if (synced != null) 'synced': synced,
+      if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
+      if (serverVersion != null) 'server_version': serverVersion,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TreatmentsTableCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? farmId,
+      Value<String>? animalId,
+      Value<String>? productId,
+      Value<String>? productName,
+      Value<double>? dose,
+      Value<DateTime>? treatmentDate,
+      Value<DateTime>? withdrawalEndDate,
+      Value<String?>? notes,
+      Value<String?>? veterinarianId,
+      Value<String?>? veterinarianName,
+      Value<String?>? campaignId,
+      Value<bool>? synced,
+      Value<DateTime?>? lastSyncedAt,
+      Value<int?>? serverVersion,
+      Value<DateTime?>? deletedAt,
+      Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt,
+      Value<int>? rowid}) {
+    return TreatmentsTableCompanion(
+      id: id ?? this.id,
+      farmId: farmId ?? this.farmId,
+      animalId: animalId ?? this.animalId,
+      productId: productId ?? this.productId,
+      productName: productName ?? this.productName,
+      dose: dose ?? this.dose,
+      treatmentDate: treatmentDate ?? this.treatmentDate,
+      withdrawalEndDate: withdrawalEndDate ?? this.withdrawalEndDate,
+      notes: notes ?? this.notes,
+      veterinarianId: veterinarianId ?? this.veterinarianId,
+      veterinarianName: veterinarianName ?? this.veterinarianName,
+      campaignId: campaignId ?? this.campaignId,
+      synced: synced ?? this.synced,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      serverVersion: serverVersion ?? this.serverVersion,
+      deletedAt: deletedAt ?? this.deletedAt,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (farmId.present) {
+      map['farm_id'] = Variable<String>(farmId.value);
+    }
+    if (animalId.present) {
+      map['animal_id'] = Variable<String>(animalId.value);
+    }
+    if (productId.present) {
+      map['product_id'] = Variable<String>(productId.value);
+    }
+    if (productName.present) {
+      map['product_name'] = Variable<String>(productName.value);
+    }
+    if (dose.present) {
+      map['dose'] = Variable<double>(dose.value);
+    }
+    if (treatmentDate.present) {
+      map['treatment_date'] = Variable<DateTime>(treatmentDate.value);
+    }
+    if (withdrawalEndDate.present) {
+      map['withdrawal_end_date'] = Variable<DateTime>(withdrawalEndDate.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (veterinarianId.present) {
+      map['veterinarian_id'] = Variable<String>(veterinarianId.value);
+    }
+    if (veterinarianName.present) {
+      map['veterinarian_name'] = Variable<String>(veterinarianName.value);
+    }
+    if (campaignId.present) {
+      map['campaign_id'] = Variable<String>(campaignId.value);
+    }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
+    if (lastSyncedAt.present) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt.value);
+    }
+    if (serverVersion.present) {
+      map['server_version'] = Variable<int>(serverVersion.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TreatmentsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('farmId: $farmId, ')
+          ..write('animalId: $animalId, ')
+          ..write('productId: $productId, ')
+          ..write('productName: $productName, ')
+          ..write('dose: $dose, ')
+          ..write('treatmentDate: $treatmentDate, ')
+          ..write('withdrawalEndDate: $withdrawalEndDate, ')
+          ..write('notes: $notes, ')
+          ..write('veterinarianId: $veterinarianId, ')
+          ..write('veterinarianName: $veterinarianName, ')
+          ..write('campaignId: $campaignId, ')
+          ..write('synced: $synced, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('serverVersion: $serverVersion, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $VaccinationsTableTable extends VaccinationsTable
+    with TableInfo<$VaccinationsTableTable, VaccinationsTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $VaccinationsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _farmIdMeta = const VerificationMeta('farmId');
+  @override
+  late final GeneratedColumn<String> farmId = GeneratedColumn<String>(
+      'farm_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _animalIdMeta =
+      const VerificationMeta('animalId');
+  @override
+  late final GeneratedColumn<String> animalId = GeneratedColumn<String>(
+      'animal_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _animalIdsMeta =
+      const VerificationMeta('animalIds');
+  @override
+  late final GeneratedColumn<String> animalIds = GeneratedColumn<String>(
+      'animal_ids', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _protocolIdMeta =
+      const VerificationMeta('protocolId');
+  @override
+  late final GeneratedColumn<String> protocolId = GeneratedColumn<String>(
+      'protocol_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _vaccineNameMeta =
+      const VerificationMeta('vaccineName');
+  @override
+  late final GeneratedColumn<String> vaccineName = GeneratedColumn<String>(
+      'vaccine_name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _typeMeta = const VerificationMeta('type');
+  @override
+  late final GeneratedColumn<String> type = GeneratedColumn<String>(
+      'type', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _diseaseMeta =
+      const VerificationMeta('disease');
+  @override
+  late final GeneratedColumn<String> disease = GeneratedColumn<String>(
+      'disease', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _vaccinationDateMeta =
+      const VerificationMeta('vaccinationDate');
+  @override
+  late final GeneratedColumn<DateTime> vaccinationDate =
+      GeneratedColumn<DateTime>('vaccination_date', aliasedName, false,
+          type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _batchNumberMeta =
+      const VerificationMeta('batchNumber');
+  @override
+  late final GeneratedColumn<String> batchNumber = GeneratedColumn<String>(
+      'batch_number', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _expiryDateMeta =
+      const VerificationMeta('expiryDate');
+  @override
+  late final GeneratedColumn<DateTime> expiryDate = GeneratedColumn<DateTime>(
+      'expiry_date', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _doseMeta = const VerificationMeta('dose');
+  @override
+  late final GeneratedColumn<String> dose = GeneratedColumn<String>(
+      'dose', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _administrationRouteMeta =
+      const VerificationMeta('administrationRoute');
+  @override
+  late final GeneratedColumn<String> administrationRoute =
+      GeneratedColumn<String>('administration_route', aliasedName, false,
+          type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _veterinarianIdMeta =
+      const VerificationMeta('veterinarianId');
+  @override
+  late final GeneratedColumn<String> veterinarianId = GeneratedColumn<String>(
+      'veterinarian_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _veterinarianNameMeta =
+      const VerificationMeta('veterinarianName');
+  @override
+  late final GeneratedColumn<String> veterinarianName = GeneratedColumn<String>(
+      'veterinarian_name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _nextDueDateMeta =
+      const VerificationMeta('nextDueDate');
+  @override
+  late final GeneratedColumn<DateTime> nextDueDate = GeneratedColumn<DateTime>(
+      'next_due_date', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _withdrawalPeriodDaysMeta =
+      const VerificationMeta('withdrawalPeriodDays');
+  @override
+  late final GeneratedColumn<int> withdrawalPeriodDays = GeneratedColumn<int>(
+      'withdrawal_period_days', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+      'notes', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+      'synced', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("synced" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _lastSyncedAtMeta =
+      const VerificationMeta('lastSyncedAt');
+  @override
+  late final GeneratedColumn<DateTime> lastSyncedAt = GeneratedColumn<DateTime>(
+      'last_synced_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _serverVersionMeta =
+      const VerificationMeta('serverVersion');
+  @override
+  late final GeneratedColumn<int> serverVersion = GeneratedColumn<int>(
+      'server_version', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _deletedAtMeta =
+      const VerificationMeta('deletedAt');
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+      'deleted_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        farmId,
+        animalId,
+        animalIds,
+        protocolId,
+        vaccineName,
+        type,
+        disease,
+        vaccinationDate,
+        batchNumber,
+        expiryDate,
+        dose,
+        administrationRoute,
+        veterinarianId,
+        veterinarianName,
+        nextDueDate,
+        withdrawalPeriodDays,
+        notes,
+        synced,
+        lastSyncedAt,
+        serverVersion,
+        deletedAt,
+        createdAt,
+        updatedAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'vaccinations';
+  @override
+  VerificationContext validateIntegrity(
+      Insertable<VaccinationsTableData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('farm_id')) {
+      context.handle(_farmIdMeta,
+          farmId.isAcceptableOrUnknown(data['farm_id']!, _farmIdMeta));
+    } else if (isInserting) {
+      context.missing(_farmIdMeta);
+    }
+    if (data.containsKey('animal_id')) {
+      context.handle(_animalIdMeta,
+          animalId.isAcceptableOrUnknown(data['animal_id']!, _animalIdMeta));
+    }
+    if (data.containsKey('animal_ids')) {
+      context.handle(_animalIdsMeta,
+          animalIds.isAcceptableOrUnknown(data['animal_ids']!, _animalIdsMeta));
+    } else if (isInserting) {
+      context.missing(_animalIdsMeta);
+    }
+    if (data.containsKey('protocol_id')) {
+      context.handle(
+          _protocolIdMeta,
+          protocolId.isAcceptableOrUnknown(
+              data['protocol_id']!, _protocolIdMeta));
+    }
+    if (data.containsKey('vaccine_name')) {
+      context.handle(
+          _vaccineNameMeta,
+          vaccineName.isAcceptableOrUnknown(
+              data['vaccine_name']!, _vaccineNameMeta));
+    } else if (isInserting) {
+      context.missing(_vaccineNameMeta);
+    }
+    if (data.containsKey('type')) {
+      context.handle(
+          _typeMeta, type.isAcceptableOrUnknown(data['type']!, _typeMeta));
+    } else if (isInserting) {
+      context.missing(_typeMeta);
+    }
+    if (data.containsKey('disease')) {
+      context.handle(_diseaseMeta,
+          disease.isAcceptableOrUnknown(data['disease']!, _diseaseMeta));
+    } else if (isInserting) {
+      context.missing(_diseaseMeta);
+    }
+    if (data.containsKey('vaccination_date')) {
+      context.handle(
+          _vaccinationDateMeta,
+          vaccinationDate.isAcceptableOrUnknown(
+              data['vaccination_date']!, _vaccinationDateMeta));
+    } else if (isInserting) {
+      context.missing(_vaccinationDateMeta);
+    }
+    if (data.containsKey('batch_number')) {
+      context.handle(
+          _batchNumberMeta,
+          batchNumber.isAcceptableOrUnknown(
+              data['batch_number']!, _batchNumberMeta));
+    }
+    if (data.containsKey('expiry_date')) {
+      context.handle(
+          _expiryDateMeta,
+          expiryDate.isAcceptableOrUnknown(
+              data['expiry_date']!, _expiryDateMeta));
+    }
+    if (data.containsKey('dose')) {
+      context.handle(
+          _doseMeta, dose.isAcceptableOrUnknown(data['dose']!, _doseMeta));
+    } else if (isInserting) {
+      context.missing(_doseMeta);
+    }
+    if (data.containsKey('administration_route')) {
+      context.handle(
+          _administrationRouteMeta,
+          administrationRoute.isAcceptableOrUnknown(
+              data['administration_route']!, _administrationRouteMeta));
+    } else if (isInserting) {
+      context.missing(_administrationRouteMeta);
+    }
+    if (data.containsKey('veterinarian_id')) {
+      context.handle(
+          _veterinarianIdMeta,
+          veterinarianId.isAcceptableOrUnknown(
+              data['veterinarian_id']!, _veterinarianIdMeta));
+    }
+    if (data.containsKey('veterinarian_name')) {
+      context.handle(
+          _veterinarianNameMeta,
+          veterinarianName.isAcceptableOrUnknown(
+              data['veterinarian_name']!, _veterinarianNameMeta));
+    }
+    if (data.containsKey('next_due_date')) {
+      context.handle(
+          _nextDueDateMeta,
+          nextDueDate.isAcceptableOrUnknown(
+              data['next_due_date']!, _nextDueDateMeta));
+    }
+    if (data.containsKey('withdrawal_period_days')) {
+      context.handle(
+          _withdrawalPeriodDaysMeta,
+          withdrawalPeriodDays.isAcceptableOrUnknown(
+              data['withdrawal_period_days']!, _withdrawalPeriodDaysMeta));
+    } else if (isInserting) {
+      context.missing(_withdrawalPeriodDaysMeta);
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+          _notesMeta, notes.isAcceptableOrUnknown(data['notes']!, _notesMeta));
+    }
+    if (data.containsKey('synced')) {
+      context.handle(_syncedMeta,
+          synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta));
+    }
+    if (data.containsKey('last_synced_at')) {
+      context.handle(
+          _lastSyncedAtMeta,
+          lastSyncedAt.isAcceptableOrUnknown(
+              data['last_synced_at']!, _lastSyncedAtMeta));
+    }
+    if (data.containsKey('server_version')) {
+      context.handle(
+          _serverVersionMeta,
+          serverVersion.isAcceptableOrUnknown(
+              data['server_version']!, _serverVersionMeta));
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(_deletedAtMeta,
+          deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  VaccinationsTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return VaccinationsTableData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      farmId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}farm_id'])!,
+      animalId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}animal_id']),
+      animalIds: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}animal_ids'])!,
+      protocolId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}protocol_id']),
+      vaccineName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}vaccine_name'])!,
+      type: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}type'])!,
+      disease: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}disease'])!,
+      vaccinationDate: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}vaccination_date'])!,
+      batchNumber: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}batch_number']),
+      expiryDate: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}expiry_date']),
+      dose: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}dose'])!,
+      administrationRoute: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}administration_route'])!,
+      veterinarianId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}veterinarian_id']),
+      veterinarianName: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}veterinarian_name']),
+      nextDueDate: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}next_due_date']),
+      withdrawalPeriodDays: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}withdrawal_period_days'])!,
+      notes: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}notes']),
+      synced: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}synced'])!,
+      lastSyncedAt: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}last_synced_at']),
+      serverVersion: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}server_version']),
+      deletedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}deleted_at']),
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+    );
+  }
+
+  @override
+  $VaccinationsTableTable createAlias(String alias) {
+    return $VaccinationsTableTable(attachedDatabase, alias);
+  }
+}
+
+class VaccinationsTableData extends DataClass
+    implements Insertable<VaccinationsTableData> {
+  final String id;
+  final String farmId;
+
+  /// ID animal simple (vaccination individuelle) - nullable
+  final String? animalId;
+
+  /// Liste IDs animaux (JSON array) pour vaccination de groupe
+  /// Ex: ["animal-1", "animal-2", "animal-3"]
+  final String animalIds;
+  final String? protocolId;
+  final String vaccineName;
+
+  /// Type: "obligatoire", "recommandee", "optionnelle" (VaccinationType enum)
+  final String type;
+  final String disease;
+  final DateTime vaccinationDate;
+  final String? batchNumber;
+  final DateTime? expiryDate;
+  final String dose;
+  final String administrationRoute;
+  final String? veterinarianId;
+  final String? veterinarianName;
+  final DateTime? nextDueDate;
+  final int withdrawalPeriodDays;
+  final String? notes;
+  final bool synced;
+  final DateTime? lastSyncedAt;
+  final int? serverVersion;
+  final DateTime? deletedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const VaccinationsTableData(
+      {required this.id,
+      required this.farmId,
+      this.animalId,
+      required this.animalIds,
+      this.protocolId,
+      required this.vaccineName,
+      required this.type,
+      required this.disease,
+      required this.vaccinationDate,
+      this.batchNumber,
+      this.expiryDate,
+      required this.dose,
+      required this.administrationRoute,
+      this.veterinarianId,
+      this.veterinarianName,
+      this.nextDueDate,
+      required this.withdrawalPeriodDays,
+      this.notes,
+      required this.synced,
+      this.lastSyncedAt,
+      this.serverVersion,
+      this.deletedAt,
+      required this.createdAt,
+      required this.updatedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['farm_id'] = Variable<String>(farmId);
+    if (!nullToAbsent || animalId != null) {
+      map['animal_id'] = Variable<String>(animalId);
+    }
+    map['animal_ids'] = Variable<String>(animalIds);
+    if (!nullToAbsent || protocolId != null) {
+      map['protocol_id'] = Variable<String>(protocolId);
+    }
+    map['vaccine_name'] = Variable<String>(vaccineName);
+    map['type'] = Variable<String>(type);
+    map['disease'] = Variable<String>(disease);
+    map['vaccination_date'] = Variable<DateTime>(vaccinationDate);
+    if (!nullToAbsent || batchNumber != null) {
+      map['batch_number'] = Variable<String>(batchNumber);
+    }
+    if (!nullToAbsent || expiryDate != null) {
+      map['expiry_date'] = Variable<DateTime>(expiryDate);
+    }
+    map['dose'] = Variable<String>(dose);
+    map['administration_route'] = Variable<String>(administrationRoute);
+    if (!nullToAbsent || veterinarianId != null) {
+      map['veterinarian_id'] = Variable<String>(veterinarianId);
+    }
+    if (!nullToAbsent || veterinarianName != null) {
+      map['veterinarian_name'] = Variable<String>(veterinarianName);
+    }
+    if (!nullToAbsent || nextDueDate != null) {
+      map['next_due_date'] = Variable<DateTime>(nextDueDate);
+    }
+    map['withdrawal_period_days'] = Variable<int>(withdrawalPeriodDays);
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    map['synced'] = Variable<bool>(synced);
+    if (!nullToAbsent || lastSyncedAt != null) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt);
+    }
+    if (!nullToAbsent || serverVersion != null) {
+      map['server_version'] = Variable<int>(serverVersion);
+    }
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  VaccinationsTableCompanion toCompanion(bool nullToAbsent) {
+    return VaccinationsTableCompanion(
+      id: Value(id),
+      farmId: Value(farmId),
+      animalId: animalId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(animalId),
+      animalIds: Value(animalIds),
+      protocolId: protocolId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(protocolId),
+      vaccineName: Value(vaccineName),
+      type: Value(type),
+      disease: Value(disease),
+      vaccinationDate: Value(vaccinationDate),
+      batchNumber: batchNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(batchNumber),
+      expiryDate: expiryDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(expiryDate),
+      dose: Value(dose),
+      administrationRoute: Value(administrationRoute),
+      veterinarianId: veterinarianId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(veterinarianId),
+      veterinarianName: veterinarianName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(veterinarianName),
+      nextDueDate: nextDueDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nextDueDate),
+      withdrawalPeriodDays: Value(withdrawalPeriodDays),
+      notes:
+          notes == null && nullToAbsent ? const Value.absent() : Value(notes),
+      synced: Value(synced),
+      lastSyncedAt: lastSyncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSyncedAt),
+      serverVersion: serverVersion == null && nullToAbsent
+          ? const Value.absent()
+          : Value(serverVersion),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory VaccinationsTableData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return VaccinationsTableData(
+      id: serializer.fromJson<String>(json['id']),
+      farmId: serializer.fromJson<String>(json['farmId']),
+      animalId: serializer.fromJson<String?>(json['animalId']),
+      animalIds: serializer.fromJson<String>(json['animalIds']),
+      protocolId: serializer.fromJson<String?>(json['protocolId']),
+      vaccineName: serializer.fromJson<String>(json['vaccineName']),
+      type: serializer.fromJson<String>(json['type']),
+      disease: serializer.fromJson<String>(json['disease']),
+      vaccinationDate: serializer.fromJson<DateTime>(json['vaccinationDate']),
+      batchNumber: serializer.fromJson<String?>(json['batchNumber']),
+      expiryDate: serializer.fromJson<DateTime?>(json['expiryDate']),
+      dose: serializer.fromJson<String>(json['dose']),
+      administrationRoute:
+          serializer.fromJson<String>(json['administrationRoute']),
+      veterinarianId: serializer.fromJson<String?>(json['veterinarianId']),
+      veterinarianName: serializer.fromJson<String?>(json['veterinarianName']),
+      nextDueDate: serializer.fromJson<DateTime?>(json['nextDueDate']),
+      withdrawalPeriodDays:
+          serializer.fromJson<int>(json['withdrawalPeriodDays']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      synced: serializer.fromJson<bool>(json['synced']),
+      lastSyncedAt: serializer.fromJson<DateTime?>(json['lastSyncedAt']),
+      serverVersion: serializer.fromJson<int?>(json['serverVersion']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'farmId': serializer.toJson<String>(farmId),
+      'animalId': serializer.toJson<String?>(animalId),
+      'animalIds': serializer.toJson<String>(animalIds),
+      'protocolId': serializer.toJson<String?>(protocolId),
+      'vaccineName': serializer.toJson<String>(vaccineName),
+      'type': serializer.toJson<String>(type),
+      'disease': serializer.toJson<String>(disease),
+      'vaccinationDate': serializer.toJson<DateTime>(vaccinationDate),
+      'batchNumber': serializer.toJson<String?>(batchNumber),
+      'expiryDate': serializer.toJson<DateTime?>(expiryDate),
+      'dose': serializer.toJson<String>(dose),
+      'administrationRoute': serializer.toJson<String>(administrationRoute),
+      'veterinarianId': serializer.toJson<String?>(veterinarianId),
+      'veterinarianName': serializer.toJson<String?>(veterinarianName),
+      'nextDueDate': serializer.toJson<DateTime?>(nextDueDate),
+      'withdrawalPeriodDays': serializer.toJson<int>(withdrawalPeriodDays),
+      'notes': serializer.toJson<String?>(notes),
+      'synced': serializer.toJson<bool>(synced),
+      'lastSyncedAt': serializer.toJson<DateTime?>(lastSyncedAt),
+      'serverVersion': serializer.toJson<int?>(serverVersion),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  VaccinationsTableData copyWith(
+          {String? id,
+          String? farmId,
+          Value<String?> animalId = const Value.absent(),
+          String? animalIds,
+          Value<String?> protocolId = const Value.absent(),
+          String? vaccineName,
+          String? type,
+          String? disease,
+          DateTime? vaccinationDate,
+          Value<String?> batchNumber = const Value.absent(),
+          Value<DateTime?> expiryDate = const Value.absent(),
+          String? dose,
+          String? administrationRoute,
+          Value<String?> veterinarianId = const Value.absent(),
+          Value<String?> veterinarianName = const Value.absent(),
+          Value<DateTime?> nextDueDate = const Value.absent(),
+          int? withdrawalPeriodDays,
+          Value<String?> notes = const Value.absent(),
+          bool? synced,
+          Value<DateTime?> lastSyncedAt = const Value.absent(),
+          Value<int?> serverVersion = const Value.absent(),
+          Value<DateTime?> deletedAt = const Value.absent(),
+          DateTime? createdAt,
+          DateTime? updatedAt}) =>
+      VaccinationsTableData(
+        id: id ?? this.id,
+        farmId: farmId ?? this.farmId,
+        animalId: animalId.present ? animalId.value : this.animalId,
+        animalIds: animalIds ?? this.animalIds,
+        protocolId: protocolId.present ? protocolId.value : this.protocolId,
+        vaccineName: vaccineName ?? this.vaccineName,
+        type: type ?? this.type,
+        disease: disease ?? this.disease,
+        vaccinationDate: vaccinationDate ?? this.vaccinationDate,
+        batchNumber: batchNumber.present ? batchNumber.value : this.batchNumber,
+        expiryDate: expiryDate.present ? expiryDate.value : this.expiryDate,
+        dose: dose ?? this.dose,
+        administrationRoute: administrationRoute ?? this.administrationRoute,
+        veterinarianId:
+            veterinarianId.present ? veterinarianId.value : this.veterinarianId,
+        veterinarianName: veterinarianName.present
+            ? veterinarianName.value
+            : this.veterinarianName,
+        nextDueDate: nextDueDate.present ? nextDueDate.value : this.nextDueDate,
+        withdrawalPeriodDays: withdrawalPeriodDays ?? this.withdrawalPeriodDays,
+        notes: notes.present ? notes.value : this.notes,
+        synced: synced ?? this.synced,
+        lastSyncedAt:
+            lastSyncedAt.present ? lastSyncedAt.value : this.lastSyncedAt,
+        serverVersion:
+            serverVersion.present ? serverVersion.value : this.serverVersion,
+        deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+  VaccinationsTableData copyWithCompanion(VaccinationsTableCompanion data) {
+    return VaccinationsTableData(
+      id: data.id.present ? data.id.value : this.id,
+      farmId: data.farmId.present ? data.farmId.value : this.farmId,
+      animalId: data.animalId.present ? data.animalId.value : this.animalId,
+      animalIds: data.animalIds.present ? data.animalIds.value : this.animalIds,
+      protocolId:
+          data.protocolId.present ? data.protocolId.value : this.protocolId,
+      vaccineName:
+          data.vaccineName.present ? data.vaccineName.value : this.vaccineName,
+      type: data.type.present ? data.type.value : this.type,
+      disease: data.disease.present ? data.disease.value : this.disease,
+      vaccinationDate: data.vaccinationDate.present
+          ? data.vaccinationDate.value
+          : this.vaccinationDate,
+      batchNumber:
+          data.batchNumber.present ? data.batchNumber.value : this.batchNumber,
+      expiryDate:
+          data.expiryDate.present ? data.expiryDate.value : this.expiryDate,
+      dose: data.dose.present ? data.dose.value : this.dose,
+      administrationRoute: data.administrationRoute.present
+          ? data.administrationRoute.value
+          : this.administrationRoute,
+      veterinarianId: data.veterinarianId.present
+          ? data.veterinarianId.value
+          : this.veterinarianId,
+      veterinarianName: data.veterinarianName.present
+          ? data.veterinarianName.value
+          : this.veterinarianName,
+      nextDueDate:
+          data.nextDueDate.present ? data.nextDueDate.value : this.nextDueDate,
+      withdrawalPeriodDays: data.withdrawalPeriodDays.present
+          ? data.withdrawalPeriodDays.value
+          : this.withdrawalPeriodDays,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      synced: data.synced.present ? data.synced.value : this.synced,
+      lastSyncedAt: data.lastSyncedAt.present
+          ? data.lastSyncedAt.value
+          : this.lastSyncedAt,
+      serverVersion: data.serverVersion.present
+          ? data.serverVersion.value
+          : this.serverVersion,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('VaccinationsTableData(')
+          ..write('id: $id, ')
+          ..write('farmId: $farmId, ')
+          ..write('animalId: $animalId, ')
+          ..write('animalIds: $animalIds, ')
+          ..write('protocolId: $protocolId, ')
+          ..write('vaccineName: $vaccineName, ')
+          ..write('type: $type, ')
+          ..write('disease: $disease, ')
+          ..write('vaccinationDate: $vaccinationDate, ')
+          ..write('batchNumber: $batchNumber, ')
+          ..write('expiryDate: $expiryDate, ')
+          ..write('dose: $dose, ')
+          ..write('administrationRoute: $administrationRoute, ')
+          ..write('veterinarianId: $veterinarianId, ')
+          ..write('veterinarianName: $veterinarianName, ')
+          ..write('nextDueDate: $nextDueDate, ')
+          ..write('withdrawalPeriodDays: $withdrawalPeriodDays, ')
+          ..write('notes: $notes, ')
+          ..write('synced: $synced, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('serverVersion: $serverVersion, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+        id,
+        farmId,
+        animalId,
+        animalIds,
+        protocolId,
+        vaccineName,
+        type,
+        disease,
+        vaccinationDate,
+        batchNumber,
+        expiryDate,
+        dose,
+        administrationRoute,
+        veterinarianId,
+        veterinarianName,
+        nextDueDate,
+        withdrawalPeriodDays,
+        notes,
+        synced,
+        lastSyncedAt,
+        serverVersion,
+        deletedAt,
+        createdAt,
+        updatedAt
+      ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is VaccinationsTableData &&
+          other.id == this.id &&
+          other.farmId == this.farmId &&
+          other.animalId == this.animalId &&
+          other.animalIds == this.animalIds &&
+          other.protocolId == this.protocolId &&
+          other.vaccineName == this.vaccineName &&
+          other.type == this.type &&
+          other.disease == this.disease &&
+          other.vaccinationDate == this.vaccinationDate &&
+          other.batchNumber == this.batchNumber &&
+          other.expiryDate == this.expiryDate &&
+          other.dose == this.dose &&
+          other.administrationRoute == this.administrationRoute &&
+          other.veterinarianId == this.veterinarianId &&
+          other.veterinarianName == this.veterinarianName &&
+          other.nextDueDate == this.nextDueDate &&
+          other.withdrawalPeriodDays == this.withdrawalPeriodDays &&
+          other.notes == this.notes &&
+          other.synced == this.synced &&
+          other.lastSyncedAt == this.lastSyncedAt &&
+          other.serverVersion == this.serverVersion &&
+          other.deletedAt == this.deletedAt &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class VaccinationsTableCompanion
+    extends UpdateCompanion<VaccinationsTableData> {
+  final Value<String> id;
+  final Value<String> farmId;
+  final Value<String?> animalId;
+  final Value<String> animalIds;
+  final Value<String?> protocolId;
+  final Value<String> vaccineName;
+  final Value<String> type;
+  final Value<String> disease;
+  final Value<DateTime> vaccinationDate;
+  final Value<String?> batchNumber;
+  final Value<DateTime?> expiryDate;
+  final Value<String> dose;
+  final Value<String> administrationRoute;
+  final Value<String?> veterinarianId;
+  final Value<String?> veterinarianName;
+  final Value<DateTime?> nextDueDate;
+  final Value<int> withdrawalPeriodDays;
+  final Value<String?> notes;
+  final Value<bool> synced;
+  final Value<DateTime?> lastSyncedAt;
+  final Value<int?> serverVersion;
+  final Value<DateTime?> deletedAt;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const VaccinationsTableCompanion({
+    this.id = const Value.absent(),
+    this.farmId = const Value.absent(),
+    this.animalId = const Value.absent(),
+    this.animalIds = const Value.absent(),
+    this.protocolId = const Value.absent(),
+    this.vaccineName = const Value.absent(),
+    this.type = const Value.absent(),
+    this.disease = const Value.absent(),
+    this.vaccinationDate = const Value.absent(),
+    this.batchNumber = const Value.absent(),
+    this.expiryDate = const Value.absent(),
+    this.dose = const Value.absent(),
+    this.administrationRoute = const Value.absent(),
+    this.veterinarianId = const Value.absent(),
+    this.veterinarianName = const Value.absent(),
+    this.nextDueDate = const Value.absent(),
+    this.withdrawalPeriodDays = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.serverVersion = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  VaccinationsTableCompanion.insert({
+    required String id,
+    required String farmId,
+    this.animalId = const Value.absent(),
+    required String animalIds,
+    this.protocolId = const Value.absent(),
+    required String vaccineName,
+    required String type,
+    required String disease,
+    required DateTime vaccinationDate,
+    this.batchNumber = const Value.absent(),
+    this.expiryDate = const Value.absent(),
+    required String dose,
+    required String administrationRoute,
+    this.veterinarianId = const Value.absent(),
+    this.veterinarianName = const Value.absent(),
+    this.nextDueDate = const Value.absent(),
+    required int withdrawalPeriodDays,
+    this.notes = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.serverVersion = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        farmId = Value(farmId),
+        animalIds = Value(animalIds),
+        vaccineName = Value(vaccineName),
+        type = Value(type),
+        disease = Value(disease),
+        vaccinationDate = Value(vaccinationDate),
+        dose = Value(dose),
+        administrationRoute = Value(administrationRoute),
+        withdrawalPeriodDays = Value(withdrawalPeriodDays),
+        createdAt = Value(createdAt),
+        updatedAt = Value(updatedAt);
+  static Insertable<VaccinationsTableData> custom({
+    Expression<String>? id,
+    Expression<String>? farmId,
+    Expression<String>? animalId,
+    Expression<String>? animalIds,
+    Expression<String>? protocolId,
+    Expression<String>? vaccineName,
+    Expression<String>? type,
+    Expression<String>? disease,
+    Expression<DateTime>? vaccinationDate,
+    Expression<String>? batchNumber,
+    Expression<DateTime>? expiryDate,
+    Expression<String>? dose,
+    Expression<String>? administrationRoute,
+    Expression<String>? veterinarianId,
+    Expression<String>? veterinarianName,
+    Expression<DateTime>? nextDueDate,
+    Expression<int>? withdrawalPeriodDays,
+    Expression<String>? notes,
+    Expression<bool>? synced,
+    Expression<DateTime>? lastSyncedAt,
+    Expression<int>? serverVersion,
+    Expression<DateTime>? deletedAt,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (farmId != null) 'farm_id': farmId,
+      if (animalId != null) 'animal_id': animalId,
+      if (animalIds != null) 'animal_ids': animalIds,
+      if (protocolId != null) 'protocol_id': protocolId,
+      if (vaccineName != null) 'vaccine_name': vaccineName,
+      if (type != null) 'type': type,
+      if (disease != null) 'disease': disease,
+      if (vaccinationDate != null) 'vaccination_date': vaccinationDate,
+      if (batchNumber != null) 'batch_number': batchNumber,
+      if (expiryDate != null) 'expiry_date': expiryDate,
+      if (dose != null) 'dose': dose,
+      if (administrationRoute != null)
+        'administration_route': administrationRoute,
+      if (veterinarianId != null) 'veterinarian_id': veterinarianId,
+      if (veterinarianName != null) 'veterinarian_name': veterinarianName,
+      if (nextDueDate != null) 'next_due_date': nextDueDate,
+      if (withdrawalPeriodDays != null)
+        'withdrawal_period_days': withdrawalPeriodDays,
+      if (notes != null) 'notes': notes,
+      if (synced != null) 'synced': synced,
+      if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
+      if (serverVersion != null) 'server_version': serverVersion,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  VaccinationsTableCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? farmId,
+      Value<String?>? animalId,
+      Value<String>? animalIds,
+      Value<String?>? protocolId,
+      Value<String>? vaccineName,
+      Value<String>? type,
+      Value<String>? disease,
+      Value<DateTime>? vaccinationDate,
+      Value<String?>? batchNumber,
+      Value<DateTime?>? expiryDate,
+      Value<String>? dose,
+      Value<String>? administrationRoute,
+      Value<String?>? veterinarianId,
+      Value<String?>? veterinarianName,
+      Value<DateTime?>? nextDueDate,
+      Value<int>? withdrawalPeriodDays,
+      Value<String?>? notes,
+      Value<bool>? synced,
+      Value<DateTime?>? lastSyncedAt,
+      Value<int?>? serverVersion,
+      Value<DateTime?>? deletedAt,
+      Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt,
+      Value<int>? rowid}) {
+    return VaccinationsTableCompanion(
+      id: id ?? this.id,
+      farmId: farmId ?? this.farmId,
+      animalId: animalId ?? this.animalId,
+      animalIds: animalIds ?? this.animalIds,
+      protocolId: protocolId ?? this.protocolId,
+      vaccineName: vaccineName ?? this.vaccineName,
+      type: type ?? this.type,
+      disease: disease ?? this.disease,
+      vaccinationDate: vaccinationDate ?? this.vaccinationDate,
+      batchNumber: batchNumber ?? this.batchNumber,
+      expiryDate: expiryDate ?? this.expiryDate,
+      dose: dose ?? this.dose,
+      administrationRoute: administrationRoute ?? this.administrationRoute,
+      veterinarianId: veterinarianId ?? this.veterinarianId,
+      veterinarianName: veterinarianName ?? this.veterinarianName,
+      nextDueDate: nextDueDate ?? this.nextDueDate,
+      withdrawalPeriodDays: withdrawalPeriodDays ?? this.withdrawalPeriodDays,
+      notes: notes ?? this.notes,
+      synced: synced ?? this.synced,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      serverVersion: serverVersion ?? this.serverVersion,
+      deletedAt: deletedAt ?? this.deletedAt,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (farmId.present) {
+      map['farm_id'] = Variable<String>(farmId.value);
+    }
+    if (animalId.present) {
+      map['animal_id'] = Variable<String>(animalId.value);
+    }
+    if (animalIds.present) {
+      map['animal_ids'] = Variable<String>(animalIds.value);
+    }
+    if (protocolId.present) {
+      map['protocol_id'] = Variable<String>(protocolId.value);
+    }
+    if (vaccineName.present) {
+      map['vaccine_name'] = Variable<String>(vaccineName.value);
+    }
+    if (type.present) {
+      map['type'] = Variable<String>(type.value);
+    }
+    if (disease.present) {
+      map['disease'] = Variable<String>(disease.value);
+    }
+    if (vaccinationDate.present) {
+      map['vaccination_date'] = Variable<DateTime>(vaccinationDate.value);
+    }
+    if (batchNumber.present) {
+      map['batch_number'] = Variable<String>(batchNumber.value);
+    }
+    if (expiryDate.present) {
+      map['expiry_date'] = Variable<DateTime>(expiryDate.value);
+    }
+    if (dose.present) {
+      map['dose'] = Variable<String>(dose.value);
+    }
+    if (administrationRoute.present) {
+      map['administration_route'] = Variable<String>(administrationRoute.value);
+    }
+    if (veterinarianId.present) {
+      map['veterinarian_id'] = Variable<String>(veterinarianId.value);
+    }
+    if (veterinarianName.present) {
+      map['veterinarian_name'] = Variable<String>(veterinarianName.value);
+    }
+    if (nextDueDate.present) {
+      map['next_due_date'] = Variable<DateTime>(nextDueDate.value);
+    }
+    if (withdrawalPeriodDays.present) {
+      map['withdrawal_period_days'] = Variable<int>(withdrawalPeriodDays.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
+    if (lastSyncedAt.present) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt.value);
+    }
+    if (serverVersion.present) {
+      map['server_version'] = Variable<int>(serverVersion.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('VaccinationsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('farmId: $farmId, ')
+          ..write('animalId: $animalId, ')
+          ..write('animalIds: $animalIds, ')
+          ..write('protocolId: $protocolId, ')
+          ..write('vaccineName: $vaccineName, ')
+          ..write('type: $type, ')
+          ..write('disease: $disease, ')
+          ..write('vaccinationDate: $vaccinationDate, ')
+          ..write('batchNumber: $batchNumber, ')
+          ..write('expiryDate: $expiryDate, ')
+          ..write('dose: $dose, ')
+          ..write('administrationRoute: $administrationRoute, ')
+          ..write('veterinarianId: $veterinarianId, ')
+          ..write('veterinarianName: $veterinarianName, ')
+          ..write('nextDueDate: $nextDueDate, ')
+          ..write('withdrawalPeriodDays: $withdrawalPeriodDays, ')
+          ..write('notes: $notes, ')
+          ..write('synced: $synced, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('serverVersion: $serverVersion, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $WeightsTableTable extends WeightsTable
+    with TableInfo<$WeightsTableTable, WeightsTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WeightsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _farmIdMeta = const VerificationMeta('farmId');
+  @override
+  late final GeneratedColumn<String> farmId = GeneratedColumn<String>(
+      'farm_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _animalIdMeta =
+      const VerificationMeta('animalId');
+  @override
+  late final GeneratedColumn<String> animalId = GeneratedColumn<String>(
+      'animal_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _weightMeta = const VerificationMeta('weight');
+  @override
+  late final GeneratedColumn<double> weight = GeneratedColumn<double>(
+      'weight', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _recordedAtMeta =
+      const VerificationMeta('recordedAt');
+  @override
+  late final GeneratedColumn<DateTime> recordedAt = GeneratedColumn<DateTime>(
+      'recorded_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
+  @override
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
+      'source', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+      'notes', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+      'synced', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("synced" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _lastSyncedAtMeta =
+      const VerificationMeta('lastSyncedAt');
+  @override
+  late final GeneratedColumn<DateTime> lastSyncedAt = GeneratedColumn<DateTime>(
+      'last_synced_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _serverVersionMeta =
+      const VerificationMeta('serverVersion');
+  @override
+  late final GeneratedColumn<int> serverVersion = GeneratedColumn<int>(
+      'server_version', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _deletedAtMeta =
+      const VerificationMeta('deletedAt');
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+      'deleted_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        farmId,
+        animalId,
+        weight,
+        recordedAt,
+        source,
+        notes,
+        synced,
+        lastSyncedAt,
+        serverVersion,
+        deletedAt,
+        createdAt,
+        updatedAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'weights';
+  @override
+  VerificationContext validateIntegrity(Insertable<WeightsTableData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('farm_id')) {
+      context.handle(_farmIdMeta,
+          farmId.isAcceptableOrUnknown(data['farm_id']!, _farmIdMeta));
+    } else if (isInserting) {
+      context.missing(_farmIdMeta);
+    }
+    if (data.containsKey('animal_id')) {
+      context.handle(_animalIdMeta,
+          animalId.isAcceptableOrUnknown(data['animal_id']!, _animalIdMeta));
+    } else if (isInserting) {
+      context.missing(_animalIdMeta);
+    }
+    if (data.containsKey('weight')) {
+      context.handle(_weightMeta,
+          weight.isAcceptableOrUnknown(data['weight']!, _weightMeta));
+    } else if (isInserting) {
+      context.missing(_weightMeta);
+    }
+    if (data.containsKey('recorded_at')) {
+      context.handle(
+          _recordedAtMeta,
+          recordedAt.isAcceptableOrUnknown(
+              data['recorded_at']!, _recordedAtMeta));
+    } else if (isInserting) {
+      context.missing(_recordedAtMeta);
+    }
+    if (data.containsKey('source')) {
+      context.handle(_sourceMeta,
+          source.isAcceptableOrUnknown(data['source']!, _sourceMeta));
+    } else if (isInserting) {
+      context.missing(_sourceMeta);
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+          _notesMeta, notes.isAcceptableOrUnknown(data['notes']!, _notesMeta));
+    }
+    if (data.containsKey('synced')) {
+      context.handle(_syncedMeta,
+          synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta));
+    }
+    if (data.containsKey('last_synced_at')) {
+      context.handle(
+          _lastSyncedAtMeta,
+          lastSyncedAt.isAcceptableOrUnknown(
+              data['last_synced_at']!, _lastSyncedAtMeta));
+    }
+    if (data.containsKey('server_version')) {
+      context.handle(
+          _serverVersionMeta,
+          serverVersion.isAcceptableOrUnknown(
+              data['server_version']!, _serverVersionMeta));
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(_deletedAtMeta,
+          deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  WeightsTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return WeightsTableData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      farmId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}farm_id'])!,
+      animalId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}animal_id'])!,
+      weight: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}weight'])!,
+      recordedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}recorded_at'])!,
+      source: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}source'])!,
+      notes: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}notes']),
+      synced: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}synced'])!,
+      lastSyncedAt: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}last_synced_at']),
+      serverVersion: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}server_version']),
+      deletedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}deleted_at']),
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+    );
+  }
+
+  @override
+  $WeightsTableTable createAlias(String alias) {
+    return $WeightsTableTable(attachedDatabase, alias);
+  }
+}
+
+class WeightsTableData extends DataClass
+    implements Insertable<WeightsTableData> {
+  final String id;
+  final String farmId;
+  final String animalId;
+
+  /// Poids en kilogrammes
+  final double weight;
+
+  /// Date et heure de la pesée
+  final DateTime recordedAt;
+
+  /// Source: "scale", "manual", "estimated", "veterinary" (WeightSource enum)
+  final String source;
+
+  /// Notes optionnelles
+  final String? notes;
+  final bool synced;
+  final DateTime? lastSyncedAt;
+  final int? serverVersion;
+  final DateTime? deletedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const WeightsTableData(
+      {required this.id,
+      required this.farmId,
+      required this.animalId,
+      required this.weight,
+      required this.recordedAt,
+      required this.source,
+      this.notes,
+      required this.synced,
+      this.lastSyncedAt,
+      this.serverVersion,
+      this.deletedAt,
+      required this.createdAt,
+      required this.updatedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['farm_id'] = Variable<String>(farmId);
+    map['animal_id'] = Variable<String>(animalId);
+    map['weight'] = Variable<double>(weight);
+    map['recorded_at'] = Variable<DateTime>(recordedAt);
+    map['source'] = Variable<String>(source);
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    map['synced'] = Variable<bool>(synced);
+    if (!nullToAbsent || lastSyncedAt != null) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt);
+    }
+    if (!nullToAbsent || serverVersion != null) {
+      map['server_version'] = Variable<int>(serverVersion);
+    }
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  WeightsTableCompanion toCompanion(bool nullToAbsent) {
+    return WeightsTableCompanion(
+      id: Value(id),
+      farmId: Value(farmId),
+      animalId: Value(animalId),
+      weight: Value(weight),
+      recordedAt: Value(recordedAt),
+      source: Value(source),
+      notes:
+          notes == null && nullToAbsent ? const Value.absent() : Value(notes),
+      synced: Value(synced),
+      lastSyncedAt: lastSyncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSyncedAt),
+      serverVersion: serverVersion == null && nullToAbsent
+          ? const Value.absent()
+          : Value(serverVersion),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory WeightsTableData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return WeightsTableData(
+      id: serializer.fromJson<String>(json['id']),
+      farmId: serializer.fromJson<String>(json['farmId']),
+      animalId: serializer.fromJson<String>(json['animalId']),
+      weight: serializer.fromJson<double>(json['weight']),
+      recordedAt: serializer.fromJson<DateTime>(json['recordedAt']),
+      source: serializer.fromJson<String>(json['source']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      synced: serializer.fromJson<bool>(json['synced']),
+      lastSyncedAt: serializer.fromJson<DateTime?>(json['lastSyncedAt']),
+      serverVersion: serializer.fromJson<int?>(json['serverVersion']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'farmId': serializer.toJson<String>(farmId),
+      'animalId': serializer.toJson<String>(animalId),
+      'weight': serializer.toJson<double>(weight),
+      'recordedAt': serializer.toJson<DateTime>(recordedAt),
+      'source': serializer.toJson<String>(source),
+      'notes': serializer.toJson<String?>(notes),
+      'synced': serializer.toJson<bool>(synced),
+      'lastSyncedAt': serializer.toJson<DateTime?>(lastSyncedAt),
+      'serverVersion': serializer.toJson<int?>(serverVersion),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  WeightsTableData copyWith(
+          {String? id,
+          String? farmId,
+          String? animalId,
+          double? weight,
+          DateTime? recordedAt,
+          String? source,
+          Value<String?> notes = const Value.absent(),
+          bool? synced,
+          Value<DateTime?> lastSyncedAt = const Value.absent(),
+          Value<int?> serverVersion = const Value.absent(),
+          Value<DateTime?> deletedAt = const Value.absent(),
+          DateTime? createdAt,
+          DateTime? updatedAt}) =>
+      WeightsTableData(
+        id: id ?? this.id,
+        farmId: farmId ?? this.farmId,
+        animalId: animalId ?? this.animalId,
+        weight: weight ?? this.weight,
+        recordedAt: recordedAt ?? this.recordedAt,
+        source: source ?? this.source,
+        notes: notes.present ? notes.value : this.notes,
+        synced: synced ?? this.synced,
+        lastSyncedAt:
+            lastSyncedAt.present ? lastSyncedAt.value : this.lastSyncedAt,
+        serverVersion:
+            serverVersion.present ? serverVersion.value : this.serverVersion,
+        deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+  WeightsTableData copyWithCompanion(WeightsTableCompanion data) {
+    return WeightsTableData(
+      id: data.id.present ? data.id.value : this.id,
+      farmId: data.farmId.present ? data.farmId.value : this.farmId,
+      animalId: data.animalId.present ? data.animalId.value : this.animalId,
+      weight: data.weight.present ? data.weight.value : this.weight,
+      recordedAt:
+          data.recordedAt.present ? data.recordedAt.value : this.recordedAt,
+      source: data.source.present ? data.source.value : this.source,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      synced: data.synced.present ? data.synced.value : this.synced,
+      lastSyncedAt: data.lastSyncedAt.present
+          ? data.lastSyncedAt.value
+          : this.lastSyncedAt,
+      serverVersion: data.serverVersion.present
+          ? data.serverVersion.value
+          : this.serverVersion,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WeightsTableData(')
+          ..write('id: $id, ')
+          ..write('farmId: $farmId, ')
+          ..write('animalId: $animalId, ')
+          ..write('weight: $weight, ')
+          ..write('recordedAt: $recordedAt, ')
+          ..write('source: $source, ')
+          ..write('notes: $notes, ')
+          ..write('synced: $synced, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('serverVersion: $serverVersion, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id,
+      farmId,
+      animalId,
+      weight,
+      recordedAt,
+      source,
+      notes,
+      synced,
+      lastSyncedAt,
+      serverVersion,
+      deletedAt,
+      createdAt,
+      updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is WeightsTableData &&
+          other.id == this.id &&
+          other.farmId == this.farmId &&
+          other.animalId == this.animalId &&
+          other.weight == this.weight &&
+          other.recordedAt == this.recordedAt &&
+          other.source == this.source &&
+          other.notes == this.notes &&
+          other.synced == this.synced &&
+          other.lastSyncedAt == this.lastSyncedAt &&
+          other.serverVersion == this.serverVersion &&
+          other.deletedAt == this.deletedAt &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class WeightsTableCompanion extends UpdateCompanion<WeightsTableData> {
+  final Value<String> id;
+  final Value<String> farmId;
+  final Value<String> animalId;
+  final Value<double> weight;
+  final Value<DateTime> recordedAt;
+  final Value<String> source;
+  final Value<String?> notes;
+  final Value<bool> synced;
+  final Value<DateTime?> lastSyncedAt;
+  final Value<int?> serverVersion;
+  final Value<DateTime?> deletedAt;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const WeightsTableCompanion({
+    this.id = const Value.absent(),
+    this.farmId = const Value.absent(),
+    this.animalId = const Value.absent(),
+    this.weight = const Value.absent(),
+    this.recordedAt = const Value.absent(),
+    this.source = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.serverVersion = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  WeightsTableCompanion.insert({
+    required String id,
+    required String farmId,
+    required String animalId,
+    required double weight,
+    required DateTime recordedAt,
+    required String source,
+    this.notes = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.serverVersion = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        farmId = Value(farmId),
+        animalId = Value(animalId),
+        weight = Value(weight),
+        recordedAt = Value(recordedAt),
+        source = Value(source),
+        createdAt = Value(createdAt),
+        updatedAt = Value(updatedAt);
+  static Insertable<WeightsTableData> custom({
+    Expression<String>? id,
+    Expression<String>? farmId,
+    Expression<String>? animalId,
+    Expression<double>? weight,
+    Expression<DateTime>? recordedAt,
+    Expression<String>? source,
+    Expression<String>? notes,
+    Expression<bool>? synced,
+    Expression<DateTime>? lastSyncedAt,
+    Expression<int>? serverVersion,
+    Expression<DateTime>? deletedAt,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (farmId != null) 'farm_id': farmId,
+      if (animalId != null) 'animal_id': animalId,
+      if (weight != null) 'weight': weight,
+      if (recordedAt != null) 'recorded_at': recordedAt,
+      if (source != null) 'source': source,
+      if (notes != null) 'notes': notes,
+      if (synced != null) 'synced': synced,
+      if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
+      if (serverVersion != null) 'server_version': serverVersion,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  WeightsTableCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? farmId,
+      Value<String>? animalId,
+      Value<double>? weight,
+      Value<DateTime>? recordedAt,
+      Value<String>? source,
+      Value<String?>? notes,
+      Value<bool>? synced,
+      Value<DateTime?>? lastSyncedAt,
+      Value<int?>? serverVersion,
+      Value<DateTime?>? deletedAt,
+      Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt,
+      Value<int>? rowid}) {
+    return WeightsTableCompanion(
+      id: id ?? this.id,
+      farmId: farmId ?? this.farmId,
+      animalId: animalId ?? this.animalId,
+      weight: weight ?? this.weight,
+      recordedAt: recordedAt ?? this.recordedAt,
+      source: source ?? this.source,
+      notes: notes ?? this.notes,
+      synced: synced ?? this.synced,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      serverVersion: serverVersion ?? this.serverVersion,
+      deletedAt: deletedAt ?? this.deletedAt,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (farmId.present) {
+      map['farm_id'] = Variable<String>(farmId.value);
+    }
+    if (animalId.present) {
+      map['animal_id'] = Variable<String>(animalId.value);
+    }
+    if (weight.present) {
+      map['weight'] = Variable<double>(weight.value);
+    }
+    if (recordedAt.present) {
+      map['recorded_at'] = Variable<DateTime>(recordedAt.value);
+    }
+    if (source.present) {
+      map['source'] = Variable<String>(source.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
+    if (lastSyncedAt.present) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt.value);
+    }
+    if (serverVersion.present) {
+      map['server_version'] = Variable<int>(serverVersion.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WeightsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('farmId: $farmId, ')
+          ..write('animalId: $animalId, ')
+          ..write('weight: $weight, ')
+          ..write('recordedAt: $recordedAt, ')
+          ..write('source: $source, ')
+          ..write('notes: $notes, ')
+          ..write('synced: $synced, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('serverVersion: $serverVersion, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $MovementsTableTable extends MovementsTable
+    with TableInfo<$MovementsTableTable, MovementsTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MovementsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _farmIdMeta = const VerificationMeta('farmId');
+  @override
+  late final GeneratedColumn<String> farmId = GeneratedColumn<String>(
+      'farm_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _animalIdMeta =
+      const VerificationMeta('animalId');
+  @override
+  late final GeneratedColumn<String> animalId = GeneratedColumn<String>(
+      'animal_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _typeMeta = const VerificationMeta('type');
+  @override
+  late final GeneratedColumn<String> type = GeneratedColumn<String>(
+      'type', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _movementDateMeta =
+      const VerificationMeta('movementDate');
+  @override
+  late final GeneratedColumn<DateTime> movementDate = GeneratedColumn<DateTime>(
+      'movement_date', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _fromFarmIdMeta =
+      const VerificationMeta('fromFarmId');
+  @override
+  late final GeneratedColumn<String> fromFarmId = GeneratedColumn<String>(
+      'from_farm_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _toFarmIdMeta =
+      const VerificationMeta('toFarmId');
+  @override
+  late final GeneratedColumn<String> toFarmId = GeneratedColumn<String>(
+      'to_farm_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _priceMeta = const VerificationMeta('price');
+  @override
+  late final GeneratedColumn<double> price = GeneratedColumn<double>(
+      'price', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+      'notes', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _buyerQrSignatureMeta =
+      const VerificationMeta('buyerQrSignature');
+  @override
+  late final GeneratedColumn<String> buyerQrSignature = GeneratedColumn<String>(
+      'buyer_qr_signature', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+      'synced', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("synced" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _lastSyncedAtMeta =
+      const VerificationMeta('lastSyncedAt');
+  @override
+  late final GeneratedColumn<DateTime> lastSyncedAt = GeneratedColumn<DateTime>(
+      'last_synced_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _serverVersionMeta =
+      const VerificationMeta('serverVersion');
+  @override
+  late final GeneratedColumn<int> serverVersion = GeneratedColumn<int>(
+      'server_version', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _deletedAtMeta =
+      const VerificationMeta('deletedAt');
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+      'deleted_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        farmId,
+        animalId,
+        type,
+        movementDate,
+        fromFarmId,
+        toFarmId,
+        price,
+        notes,
+        buyerQrSignature,
+        synced,
+        lastSyncedAt,
+        serverVersion,
+        deletedAt,
+        createdAt,
+        updatedAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'movements';
+  @override
+  VerificationContext validateIntegrity(Insertable<MovementsTableData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('farm_id')) {
+      context.handle(_farmIdMeta,
+          farmId.isAcceptableOrUnknown(data['farm_id']!, _farmIdMeta));
+    } else if (isInserting) {
+      context.missing(_farmIdMeta);
+    }
+    if (data.containsKey('animal_id')) {
+      context.handle(_animalIdMeta,
+          animalId.isAcceptableOrUnknown(data['animal_id']!, _animalIdMeta));
+    } else if (isInserting) {
+      context.missing(_animalIdMeta);
+    }
+    if (data.containsKey('type')) {
+      context.handle(
+          _typeMeta, type.isAcceptableOrUnknown(data['type']!, _typeMeta));
+    } else if (isInserting) {
+      context.missing(_typeMeta);
+    }
+    if (data.containsKey('movement_date')) {
+      context.handle(
+          _movementDateMeta,
+          movementDate.isAcceptableOrUnknown(
+              data['movement_date']!, _movementDateMeta));
+    } else if (isInserting) {
+      context.missing(_movementDateMeta);
+    }
+    if (data.containsKey('from_farm_id')) {
+      context.handle(
+          _fromFarmIdMeta,
+          fromFarmId.isAcceptableOrUnknown(
+              data['from_farm_id']!, _fromFarmIdMeta));
+    }
+    if (data.containsKey('to_farm_id')) {
+      context.handle(_toFarmIdMeta,
+          toFarmId.isAcceptableOrUnknown(data['to_farm_id']!, _toFarmIdMeta));
+    }
+    if (data.containsKey('price')) {
+      context.handle(
+          _priceMeta, price.isAcceptableOrUnknown(data['price']!, _priceMeta));
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+          _notesMeta, notes.isAcceptableOrUnknown(data['notes']!, _notesMeta));
+    }
+    if (data.containsKey('buyer_qr_signature')) {
+      context.handle(
+          _buyerQrSignatureMeta,
+          buyerQrSignature.isAcceptableOrUnknown(
+              data['buyer_qr_signature']!, _buyerQrSignatureMeta));
+    }
+    if (data.containsKey('synced')) {
+      context.handle(_syncedMeta,
+          synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta));
+    }
+    if (data.containsKey('last_synced_at')) {
+      context.handle(
+          _lastSyncedAtMeta,
+          lastSyncedAt.isAcceptableOrUnknown(
+              data['last_synced_at']!, _lastSyncedAtMeta));
+    }
+    if (data.containsKey('server_version')) {
+      context.handle(
+          _serverVersionMeta,
+          serverVersion.isAcceptableOrUnknown(
+              data['server_version']!, _serverVersionMeta));
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(_deletedAtMeta,
+          deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MovementsTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MovementsTableData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      farmId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}farm_id'])!,
+      animalId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}animal_id'])!,
+      type: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}type'])!,
+      movementDate: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}movement_date'])!,
+      fromFarmId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}from_farm_id']),
+      toFarmId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}to_farm_id']),
+      price: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}price']),
+      notes: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}notes']),
+      buyerQrSignature: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}buyer_qr_signature']),
+      synced: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}synced'])!,
+      lastSyncedAt: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}last_synced_at']),
+      serverVersion: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}server_version']),
+      deletedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}deleted_at']),
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+    );
+  }
+
+  @override
+  $MovementsTableTable createAlias(String alias) {
+    return $MovementsTableTable(attachedDatabase, alias);
+  }
+}
+
+class MovementsTableData extends DataClass
+    implements Insertable<MovementsTableData> {
+  final String id;
+  final String farmId;
+  final String animalId;
+
+  /// Type: "birth", "purchase", "sale", "death", "slaughter" (MovementType enum)
+  final String type;
+
+  /// Date du mouvement
+  final DateTime movementDate;
+
+  /// ID de la ferme d'origine (pour purchase)
+  final String? fromFarmId;
+
+  /// ID de la ferme de destination (pour sale)
+  final String? toFarmId;
+
+  /// Prix (pour purchase/sale)
+  final double? price;
+
+  /// Notes optionnelles
+  final String? notes;
+
+  /// Signature QR de l'acheteur (pour sale)
+  final String? buyerQrSignature;
+  final bool synced;
+  final DateTime? lastSyncedAt;
+  final int? serverVersion;
+  final DateTime? deletedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const MovementsTableData(
+      {required this.id,
+      required this.farmId,
+      required this.animalId,
+      required this.type,
+      required this.movementDate,
+      this.fromFarmId,
+      this.toFarmId,
+      this.price,
+      this.notes,
+      this.buyerQrSignature,
+      required this.synced,
+      this.lastSyncedAt,
+      this.serverVersion,
+      this.deletedAt,
+      required this.createdAt,
+      required this.updatedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['farm_id'] = Variable<String>(farmId);
+    map['animal_id'] = Variable<String>(animalId);
+    map['type'] = Variable<String>(type);
+    map['movement_date'] = Variable<DateTime>(movementDate);
+    if (!nullToAbsent || fromFarmId != null) {
+      map['from_farm_id'] = Variable<String>(fromFarmId);
+    }
+    if (!nullToAbsent || toFarmId != null) {
+      map['to_farm_id'] = Variable<String>(toFarmId);
+    }
+    if (!nullToAbsent || price != null) {
+      map['price'] = Variable<double>(price);
+    }
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    if (!nullToAbsent || buyerQrSignature != null) {
+      map['buyer_qr_signature'] = Variable<String>(buyerQrSignature);
+    }
+    map['synced'] = Variable<bool>(synced);
+    if (!nullToAbsent || lastSyncedAt != null) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt);
+    }
+    if (!nullToAbsent || serverVersion != null) {
+      map['server_version'] = Variable<int>(serverVersion);
+    }
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  MovementsTableCompanion toCompanion(bool nullToAbsent) {
+    return MovementsTableCompanion(
+      id: Value(id),
+      farmId: Value(farmId),
+      animalId: Value(animalId),
+      type: Value(type),
+      movementDate: Value(movementDate),
+      fromFarmId: fromFarmId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fromFarmId),
+      toFarmId: toFarmId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(toFarmId),
+      price:
+          price == null && nullToAbsent ? const Value.absent() : Value(price),
+      notes:
+          notes == null && nullToAbsent ? const Value.absent() : Value(notes),
+      buyerQrSignature: buyerQrSignature == null && nullToAbsent
+          ? const Value.absent()
+          : Value(buyerQrSignature),
+      synced: Value(synced),
+      lastSyncedAt: lastSyncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSyncedAt),
+      serverVersion: serverVersion == null && nullToAbsent
+          ? const Value.absent()
+          : Value(serverVersion),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory MovementsTableData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MovementsTableData(
+      id: serializer.fromJson<String>(json['id']),
+      farmId: serializer.fromJson<String>(json['farmId']),
+      animalId: serializer.fromJson<String>(json['animalId']),
+      type: serializer.fromJson<String>(json['type']),
+      movementDate: serializer.fromJson<DateTime>(json['movementDate']),
+      fromFarmId: serializer.fromJson<String?>(json['fromFarmId']),
+      toFarmId: serializer.fromJson<String?>(json['toFarmId']),
+      price: serializer.fromJson<double?>(json['price']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      buyerQrSignature: serializer.fromJson<String?>(json['buyerQrSignature']),
+      synced: serializer.fromJson<bool>(json['synced']),
+      lastSyncedAt: serializer.fromJson<DateTime?>(json['lastSyncedAt']),
+      serverVersion: serializer.fromJson<int?>(json['serverVersion']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'farmId': serializer.toJson<String>(farmId),
+      'animalId': serializer.toJson<String>(animalId),
+      'type': serializer.toJson<String>(type),
+      'movementDate': serializer.toJson<DateTime>(movementDate),
+      'fromFarmId': serializer.toJson<String?>(fromFarmId),
+      'toFarmId': serializer.toJson<String?>(toFarmId),
+      'price': serializer.toJson<double?>(price),
+      'notes': serializer.toJson<String?>(notes),
+      'buyerQrSignature': serializer.toJson<String?>(buyerQrSignature),
+      'synced': serializer.toJson<bool>(synced),
+      'lastSyncedAt': serializer.toJson<DateTime?>(lastSyncedAt),
+      'serverVersion': serializer.toJson<int?>(serverVersion),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  MovementsTableData copyWith(
+          {String? id,
+          String? farmId,
+          String? animalId,
+          String? type,
+          DateTime? movementDate,
+          Value<String?> fromFarmId = const Value.absent(),
+          Value<String?> toFarmId = const Value.absent(),
+          Value<double?> price = const Value.absent(),
+          Value<String?> notes = const Value.absent(),
+          Value<String?> buyerQrSignature = const Value.absent(),
+          bool? synced,
+          Value<DateTime?> lastSyncedAt = const Value.absent(),
+          Value<int?> serverVersion = const Value.absent(),
+          Value<DateTime?> deletedAt = const Value.absent(),
+          DateTime? createdAt,
+          DateTime? updatedAt}) =>
+      MovementsTableData(
+        id: id ?? this.id,
+        farmId: farmId ?? this.farmId,
+        animalId: animalId ?? this.animalId,
+        type: type ?? this.type,
+        movementDate: movementDate ?? this.movementDate,
+        fromFarmId: fromFarmId.present ? fromFarmId.value : this.fromFarmId,
+        toFarmId: toFarmId.present ? toFarmId.value : this.toFarmId,
+        price: price.present ? price.value : this.price,
+        notes: notes.present ? notes.value : this.notes,
+        buyerQrSignature: buyerQrSignature.present
+            ? buyerQrSignature.value
+            : this.buyerQrSignature,
+        synced: synced ?? this.synced,
+        lastSyncedAt:
+            lastSyncedAt.present ? lastSyncedAt.value : this.lastSyncedAt,
+        serverVersion:
+            serverVersion.present ? serverVersion.value : this.serverVersion,
+        deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+  MovementsTableData copyWithCompanion(MovementsTableCompanion data) {
+    return MovementsTableData(
+      id: data.id.present ? data.id.value : this.id,
+      farmId: data.farmId.present ? data.farmId.value : this.farmId,
+      animalId: data.animalId.present ? data.animalId.value : this.animalId,
+      type: data.type.present ? data.type.value : this.type,
+      movementDate: data.movementDate.present
+          ? data.movementDate.value
+          : this.movementDate,
+      fromFarmId:
+          data.fromFarmId.present ? data.fromFarmId.value : this.fromFarmId,
+      toFarmId: data.toFarmId.present ? data.toFarmId.value : this.toFarmId,
+      price: data.price.present ? data.price.value : this.price,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      buyerQrSignature: data.buyerQrSignature.present
+          ? data.buyerQrSignature.value
+          : this.buyerQrSignature,
+      synced: data.synced.present ? data.synced.value : this.synced,
+      lastSyncedAt: data.lastSyncedAt.present
+          ? data.lastSyncedAt.value
+          : this.lastSyncedAt,
+      serverVersion: data.serverVersion.present
+          ? data.serverVersion.value
+          : this.serverVersion,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MovementsTableData(')
+          ..write('id: $id, ')
+          ..write('farmId: $farmId, ')
+          ..write('animalId: $animalId, ')
+          ..write('type: $type, ')
+          ..write('movementDate: $movementDate, ')
+          ..write('fromFarmId: $fromFarmId, ')
+          ..write('toFarmId: $toFarmId, ')
+          ..write('price: $price, ')
+          ..write('notes: $notes, ')
+          ..write('buyerQrSignature: $buyerQrSignature, ')
+          ..write('synced: $synced, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('serverVersion: $serverVersion, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id,
+      farmId,
+      animalId,
+      type,
+      movementDate,
+      fromFarmId,
+      toFarmId,
+      price,
+      notes,
+      buyerQrSignature,
+      synced,
+      lastSyncedAt,
+      serverVersion,
+      deletedAt,
+      createdAt,
+      updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MovementsTableData &&
+          other.id == this.id &&
+          other.farmId == this.farmId &&
+          other.animalId == this.animalId &&
+          other.type == this.type &&
+          other.movementDate == this.movementDate &&
+          other.fromFarmId == this.fromFarmId &&
+          other.toFarmId == this.toFarmId &&
+          other.price == this.price &&
+          other.notes == this.notes &&
+          other.buyerQrSignature == this.buyerQrSignature &&
+          other.synced == this.synced &&
+          other.lastSyncedAt == this.lastSyncedAt &&
+          other.serverVersion == this.serverVersion &&
+          other.deletedAt == this.deletedAt &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class MovementsTableCompanion extends UpdateCompanion<MovementsTableData> {
+  final Value<String> id;
+  final Value<String> farmId;
+  final Value<String> animalId;
+  final Value<String> type;
+  final Value<DateTime> movementDate;
+  final Value<String?> fromFarmId;
+  final Value<String?> toFarmId;
+  final Value<double?> price;
+  final Value<String?> notes;
+  final Value<String?> buyerQrSignature;
+  final Value<bool> synced;
+  final Value<DateTime?> lastSyncedAt;
+  final Value<int?> serverVersion;
+  final Value<DateTime?> deletedAt;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const MovementsTableCompanion({
+    this.id = const Value.absent(),
+    this.farmId = const Value.absent(),
+    this.animalId = const Value.absent(),
+    this.type = const Value.absent(),
+    this.movementDate = const Value.absent(),
+    this.fromFarmId = const Value.absent(),
+    this.toFarmId = const Value.absent(),
+    this.price = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.buyerQrSignature = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.serverVersion = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  MovementsTableCompanion.insert({
+    required String id,
+    required String farmId,
+    required String animalId,
+    required String type,
+    required DateTime movementDate,
+    this.fromFarmId = const Value.absent(),
+    this.toFarmId = const Value.absent(),
+    this.price = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.buyerQrSignature = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.serverVersion = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        farmId = Value(farmId),
+        animalId = Value(animalId),
+        type = Value(type),
+        movementDate = Value(movementDate),
+        createdAt = Value(createdAt),
+        updatedAt = Value(updatedAt);
+  static Insertable<MovementsTableData> custom({
+    Expression<String>? id,
+    Expression<String>? farmId,
+    Expression<String>? animalId,
+    Expression<String>? type,
+    Expression<DateTime>? movementDate,
+    Expression<String>? fromFarmId,
+    Expression<String>? toFarmId,
+    Expression<double>? price,
+    Expression<String>? notes,
+    Expression<String>? buyerQrSignature,
+    Expression<bool>? synced,
+    Expression<DateTime>? lastSyncedAt,
+    Expression<int>? serverVersion,
+    Expression<DateTime>? deletedAt,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (farmId != null) 'farm_id': farmId,
+      if (animalId != null) 'animal_id': animalId,
+      if (type != null) 'type': type,
+      if (movementDate != null) 'movement_date': movementDate,
+      if (fromFarmId != null) 'from_farm_id': fromFarmId,
+      if (toFarmId != null) 'to_farm_id': toFarmId,
+      if (price != null) 'price': price,
+      if (notes != null) 'notes': notes,
+      if (buyerQrSignature != null) 'buyer_qr_signature': buyerQrSignature,
+      if (synced != null) 'synced': synced,
+      if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
+      if (serverVersion != null) 'server_version': serverVersion,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  MovementsTableCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? farmId,
+      Value<String>? animalId,
+      Value<String>? type,
+      Value<DateTime>? movementDate,
+      Value<String?>? fromFarmId,
+      Value<String?>? toFarmId,
+      Value<double?>? price,
+      Value<String?>? notes,
+      Value<String?>? buyerQrSignature,
+      Value<bool>? synced,
+      Value<DateTime?>? lastSyncedAt,
+      Value<int?>? serverVersion,
+      Value<DateTime?>? deletedAt,
+      Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt,
+      Value<int>? rowid}) {
+    return MovementsTableCompanion(
+      id: id ?? this.id,
+      farmId: farmId ?? this.farmId,
+      animalId: animalId ?? this.animalId,
+      type: type ?? this.type,
+      movementDate: movementDate ?? this.movementDate,
+      fromFarmId: fromFarmId ?? this.fromFarmId,
+      toFarmId: toFarmId ?? this.toFarmId,
+      price: price ?? this.price,
+      notes: notes ?? this.notes,
+      buyerQrSignature: buyerQrSignature ?? this.buyerQrSignature,
+      synced: synced ?? this.synced,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      serverVersion: serverVersion ?? this.serverVersion,
+      deletedAt: deletedAt ?? this.deletedAt,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (farmId.present) {
+      map['farm_id'] = Variable<String>(farmId.value);
+    }
+    if (animalId.present) {
+      map['animal_id'] = Variable<String>(animalId.value);
+    }
+    if (type.present) {
+      map['type'] = Variable<String>(type.value);
+    }
+    if (movementDate.present) {
+      map['movement_date'] = Variable<DateTime>(movementDate.value);
+    }
+    if (fromFarmId.present) {
+      map['from_farm_id'] = Variable<String>(fromFarmId.value);
+    }
+    if (toFarmId.present) {
+      map['to_farm_id'] = Variable<String>(toFarmId.value);
+    }
+    if (price.present) {
+      map['price'] = Variable<double>(price.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (buyerQrSignature.present) {
+      map['buyer_qr_signature'] = Variable<String>(buyerQrSignature.value);
+    }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
+    if (lastSyncedAt.present) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt.value);
+    }
+    if (serverVersion.present) {
+      map['server_version'] = Variable<int>(serverVersion.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MovementsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('farmId: $farmId, ')
+          ..write('animalId: $animalId, ')
+          ..write('type: $type, ')
+          ..write('movementDate: $movementDate, ')
+          ..write('fromFarmId: $fromFarmId, ')
+          ..write('toFarmId: $toFarmId, ')
+          ..write('price: $price, ')
+          ..write('notes: $notes, ')
+          ..write('buyerQrSignature: $buyerQrSignature, ')
+          ..write('synced: $synced, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('serverVersion: $serverVersion, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $SpeciesTableTable extends SpeciesTable
     with TableInfo<$SpeciesTableTable, SpeciesTableData> {
   @override
@@ -6485,11 +9922,2715 @@ class VeterinariansTableCompanion
   }
 }
 
+class $BatchesTableTable extends BatchesTable
+    with TableInfo<$BatchesTableTable, BatchesTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BatchesTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _farmIdMeta = const VerificationMeta('farmId');
+  @override
+  late final GeneratedColumn<String> farmId = GeneratedColumn<String>(
+      'farm_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _purposeMeta =
+      const VerificationMeta('purpose');
+  @override
+  late final GeneratedColumn<String> purpose = GeneratedColumn<String>(
+      'purpose', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _animalIdsJsonMeta =
+      const VerificationMeta('animalIdsJson');
+  @override
+  late final GeneratedColumn<String> animalIdsJson = GeneratedColumn<String>(
+      'animal_ids_json', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _usedAtMeta = const VerificationMeta('usedAt');
+  @override
+  late final GeneratedColumn<DateTime> usedAt = GeneratedColumn<DateTime>(
+      'used_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _completedMeta =
+      const VerificationMeta('completed');
+  @override
+  late final GeneratedColumn<bool> completed = GeneratedColumn<bool>(
+      'completed', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("completed" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+      'notes', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+      'synced', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("synced" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _lastSyncedAtMeta =
+      const VerificationMeta('lastSyncedAt');
+  @override
+  late final GeneratedColumn<DateTime> lastSyncedAt = GeneratedColumn<DateTime>(
+      'last_synced_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _serverVersionMeta =
+      const VerificationMeta('serverVersion');
+  @override
+  late final GeneratedColumn<String> serverVersion = GeneratedColumn<String>(
+      'server_version', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        farmId,
+        name,
+        purpose,
+        animalIdsJson,
+        usedAt,
+        completed,
+        notes,
+        synced,
+        createdAt,
+        updatedAt,
+        lastSyncedAt,
+        serverVersion
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'batches';
+  @override
+  VerificationContext validateIntegrity(Insertable<BatchesTableData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('farm_id')) {
+      context.handle(_farmIdMeta,
+          farmId.isAcceptableOrUnknown(data['farm_id']!, _farmIdMeta));
+    } else if (isInserting) {
+      context.missing(_farmIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('purpose')) {
+      context.handle(_purposeMeta,
+          purpose.isAcceptableOrUnknown(data['purpose']!, _purposeMeta));
+    } else if (isInserting) {
+      context.missing(_purposeMeta);
+    }
+    if (data.containsKey('animal_ids_json')) {
+      context.handle(
+          _animalIdsJsonMeta,
+          animalIdsJson.isAcceptableOrUnknown(
+              data['animal_ids_json']!, _animalIdsJsonMeta));
+    } else if (isInserting) {
+      context.missing(_animalIdsJsonMeta);
+    }
+    if (data.containsKey('used_at')) {
+      context.handle(_usedAtMeta,
+          usedAt.isAcceptableOrUnknown(data['used_at']!, _usedAtMeta));
+    }
+    if (data.containsKey('completed')) {
+      context.handle(_completedMeta,
+          completed.isAcceptableOrUnknown(data['completed']!, _completedMeta));
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+          _notesMeta, notes.isAcceptableOrUnknown(data['notes']!, _notesMeta));
+    }
+    if (data.containsKey('synced')) {
+      context.handle(_syncedMeta,
+          synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('last_synced_at')) {
+      context.handle(
+          _lastSyncedAtMeta,
+          lastSyncedAt.isAcceptableOrUnknown(
+              data['last_synced_at']!, _lastSyncedAtMeta));
+    }
+    if (data.containsKey('server_version')) {
+      context.handle(
+          _serverVersionMeta,
+          serverVersion.isAcceptableOrUnknown(
+              data['server_version']!, _serverVersionMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  BatchesTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BatchesTableData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      farmId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}farm_id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      purpose: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}purpose'])!,
+      animalIdsJson: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}animal_ids_json'])!,
+      usedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}used_at']),
+      completed: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}completed'])!,
+      notes: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}notes']),
+      synced: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}synced'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+      lastSyncedAt: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}last_synced_at']),
+      serverVersion: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}server_version']),
+    );
+  }
+
+  @override
+  $BatchesTableTable createAlias(String alias) {
+    return $BatchesTableTable(attachedDatabase, alias);
+  }
+}
+
+class BatchesTableData extends DataClass
+    implements Insertable<BatchesTableData> {
+  final String id;
+  final String farmId;
+  final String name;
+  final String purpose;
+  final String animalIdsJson;
+  final DateTime? usedAt;
+  final bool completed;
+  final String? notes;
+  final bool synced;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? lastSyncedAt;
+  final String? serverVersion;
+  const BatchesTableData(
+      {required this.id,
+      required this.farmId,
+      required this.name,
+      required this.purpose,
+      required this.animalIdsJson,
+      this.usedAt,
+      required this.completed,
+      this.notes,
+      required this.synced,
+      required this.createdAt,
+      required this.updatedAt,
+      this.lastSyncedAt,
+      this.serverVersion});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['farm_id'] = Variable<String>(farmId);
+    map['name'] = Variable<String>(name);
+    map['purpose'] = Variable<String>(purpose);
+    map['animal_ids_json'] = Variable<String>(animalIdsJson);
+    if (!nullToAbsent || usedAt != null) {
+      map['used_at'] = Variable<DateTime>(usedAt);
+    }
+    map['completed'] = Variable<bool>(completed);
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    map['synced'] = Variable<bool>(synced);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || lastSyncedAt != null) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt);
+    }
+    if (!nullToAbsent || serverVersion != null) {
+      map['server_version'] = Variable<String>(serverVersion);
+    }
+    return map;
+  }
+
+  BatchesTableCompanion toCompanion(bool nullToAbsent) {
+    return BatchesTableCompanion(
+      id: Value(id),
+      farmId: Value(farmId),
+      name: Value(name),
+      purpose: Value(purpose),
+      animalIdsJson: Value(animalIdsJson),
+      usedAt:
+          usedAt == null && nullToAbsent ? const Value.absent() : Value(usedAt),
+      completed: Value(completed),
+      notes:
+          notes == null && nullToAbsent ? const Value.absent() : Value(notes),
+      synced: Value(synced),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      lastSyncedAt: lastSyncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSyncedAt),
+      serverVersion: serverVersion == null && nullToAbsent
+          ? const Value.absent()
+          : Value(serverVersion),
+    );
+  }
+
+  factory BatchesTableData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BatchesTableData(
+      id: serializer.fromJson<String>(json['id']),
+      farmId: serializer.fromJson<String>(json['farmId']),
+      name: serializer.fromJson<String>(json['name']),
+      purpose: serializer.fromJson<String>(json['purpose']),
+      animalIdsJson: serializer.fromJson<String>(json['animalIdsJson']),
+      usedAt: serializer.fromJson<DateTime?>(json['usedAt']),
+      completed: serializer.fromJson<bool>(json['completed']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      synced: serializer.fromJson<bool>(json['synced']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      lastSyncedAt: serializer.fromJson<DateTime?>(json['lastSyncedAt']),
+      serverVersion: serializer.fromJson<String?>(json['serverVersion']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'farmId': serializer.toJson<String>(farmId),
+      'name': serializer.toJson<String>(name),
+      'purpose': serializer.toJson<String>(purpose),
+      'animalIdsJson': serializer.toJson<String>(animalIdsJson),
+      'usedAt': serializer.toJson<DateTime?>(usedAt),
+      'completed': serializer.toJson<bool>(completed),
+      'notes': serializer.toJson<String?>(notes),
+      'synced': serializer.toJson<bool>(synced),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'lastSyncedAt': serializer.toJson<DateTime?>(lastSyncedAt),
+      'serverVersion': serializer.toJson<String?>(serverVersion),
+    };
+  }
+
+  BatchesTableData copyWith(
+          {String? id,
+          String? farmId,
+          String? name,
+          String? purpose,
+          String? animalIdsJson,
+          Value<DateTime?> usedAt = const Value.absent(),
+          bool? completed,
+          Value<String?> notes = const Value.absent(),
+          bool? synced,
+          DateTime? createdAt,
+          DateTime? updatedAt,
+          Value<DateTime?> lastSyncedAt = const Value.absent(),
+          Value<String?> serverVersion = const Value.absent()}) =>
+      BatchesTableData(
+        id: id ?? this.id,
+        farmId: farmId ?? this.farmId,
+        name: name ?? this.name,
+        purpose: purpose ?? this.purpose,
+        animalIdsJson: animalIdsJson ?? this.animalIdsJson,
+        usedAt: usedAt.present ? usedAt.value : this.usedAt,
+        completed: completed ?? this.completed,
+        notes: notes.present ? notes.value : this.notes,
+        synced: synced ?? this.synced,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+        lastSyncedAt:
+            lastSyncedAt.present ? lastSyncedAt.value : this.lastSyncedAt,
+        serverVersion:
+            serverVersion.present ? serverVersion.value : this.serverVersion,
+      );
+  BatchesTableData copyWithCompanion(BatchesTableCompanion data) {
+    return BatchesTableData(
+      id: data.id.present ? data.id.value : this.id,
+      farmId: data.farmId.present ? data.farmId.value : this.farmId,
+      name: data.name.present ? data.name.value : this.name,
+      purpose: data.purpose.present ? data.purpose.value : this.purpose,
+      animalIdsJson: data.animalIdsJson.present
+          ? data.animalIdsJson.value
+          : this.animalIdsJson,
+      usedAt: data.usedAt.present ? data.usedAt.value : this.usedAt,
+      completed: data.completed.present ? data.completed.value : this.completed,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      synced: data.synced.present ? data.synced.value : this.synced,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      lastSyncedAt: data.lastSyncedAt.present
+          ? data.lastSyncedAt.value
+          : this.lastSyncedAt,
+      serverVersion: data.serverVersion.present
+          ? data.serverVersion.value
+          : this.serverVersion,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BatchesTableData(')
+          ..write('id: $id, ')
+          ..write('farmId: $farmId, ')
+          ..write('name: $name, ')
+          ..write('purpose: $purpose, ')
+          ..write('animalIdsJson: $animalIdsJson, ')
+          ..write('usedAt: $usedAt, ')
+          ..write('completed: $completed, ')
+          ..write('notes: $notes, ')
+          ..write('synced: $synced, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('serverVersion: $serverVersion')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id,
+      farmId,
+      name,
+      purpose,
+      animalIdsJson,
+      usedAt,
+      completed,
+      notes,
+      synced,
+      createdAt,
+      updatedAt,
+      lastSyncedAt,
+      serverVersion);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BatchesTableData &&
+          other.id == this.id &&
+          other.farmId == this.farmId &&
+          other.name == this.name &&
+          other.purpose == this.purpose &&
+          other.animalIdsJson == this.animalIdsJson &&
+          other.usedAt == this.usedAt &&
+          other.completed == this.completed &&
+          other.notes == this.notes &&
+          other.synced == this.synced &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.lastSyncedAt == this.lastSyncedAt &&
+          other.serverVersion == this.serverVersion);
+}
+
+class BatchesTableCompanion extends UpdateCompanion<BatchesTableData> {
+  final Value<String> id;
+  final Value<String> farmId;
+  final Value<String> name;
+  final Value<String> purpose;
+  final Value<String> animalIdsJson;
+  final Value<DateTime?> usedAt;
+  final Value<bool> completed;
+  final Value<String?> notes;
+  final Value<bool> synced;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> lastSyncedAt;
+  final Value<String?> serverVersion;
+  final Value<int> rowid;
+  const BatchesTableCompanion({
+    this.id = const Value.absent(),
+    this.farmId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.purpose = const Value.absent(),
+    this.animalIdsJson = const Value.absent(),
+    this.usedAt = const Value.absent(),
+    this.completed = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.serverVersion = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  BatchesTableCompanion.insert({
+    required String id,
+    required String farmId,
+    required String name,
+    required String purpose,
+    required String animalIdsJson,
+    this.usedAt = const Value.absent(),
+    this.completed = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.synced = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.lastSyncedAt = const Value.absent(),
+    this.serverVersion = const Value.absent(),
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        farmId = Value(farmId),
+        name = Value(name),
+        purpose = Value(purpose),
+        animalIdsJson = Value(animalIdsJson),
+        createdAt = Value(createdAt),
+        updatedAt = Value(updatedAt);
+  static Insertable<BatchesTableData> custom({
+    Expression<String>? id,
+    Expression<String>? farmId,
+    Expression<String>? name,
+    Expression<String>? purpose,
+    Expression<String>? animalIdsJson,
+    Expression<DateTime>? usedAt,
+    Expression<bool>? completed,
+    Expression<String>? notes,
+    Expression<bool>? synced,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? lastSyncedAt,
+    Expression<String>? serverVersion,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (farmId != null) 'farm_id': farmId,
+      if (name != null) 'name': name,
+      if (purpose != null) 'purpose': purpose,
+      if (animalIdsJson != null) 'animal_ids_json': animalIdsJson,
+      if (usedAt != null) 'used_at': usedAt,
+      if (completed != null) 'completed': completed,
+      if (notes != null) 'notes': notes,
+      if (synced != null) 'synced': synced,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
+      if (serverVersion != null) 'server_version': serverVersion,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  BatchesTableCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? farmId,
+      Value<String>? name,
+      Value<String>? purpose,
+      Value<String>? animalIdsJson,
+      Value<DateTime?>? usedAt,
+      Value<bool>? completed,
+      Value<String?>? notes,
+      Value<bool>? synced,
+      Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt,
+      Value<DateTime?>? lastSyncedAt,
+      Value<String?>? serverVersion,
+      Value<int>? rowid}) {
+    return BatchesTableCompanion(
+      id: id ?? this.id,
+      farmId: farmId ?? this.farmId,
+      name: name ?? this.name,
+      purpose: purpose ?? this.purpose,
+      animalIdsJson: animalIdsJson ?? this.animalIdsJson,
+      usedAt: usedAt ?? this.usedAt,
+      completed: completed ?? this.completed,
+      notes: notes ?? this.notes,
+      synced: synced ?? this.synced,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      serverVersion: serverVersion ?? this.serverVersion,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (farmId.present) {
+      map['farm_id'] = Variable<String>(farmId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (purpose.present) {
+      map['purpose'] = Variable<String>(purpose.value);
+    }
+    if (animalIdsJson.present) {
+      map['animal_ids_json'] = Variable<String>(animalIdsJson.value);
+    }
+    if (usedAt.present) {
+      map['used_at'] = Variable<DateTime>(usedAt.value);
+    }
+    if (completed.present) {
+      map['completed'] = Variable<bool>(completed.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (lastSyncedAt.present) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt.value);
+    }
+    if (serverVersion.present) {
+      map['server_version'] = Variable<String>(serverVersion.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BatchesTableCompanion(')
+          ..write('id: $id, ')
+          ..write('farmId: $farmId, ')
+          ..write('name: $name, ')
+          ..write('purpose: $purpose, ')
+          ..write('animalIdsJson: $animalIdsJson, ')
+          ..write('usedAt: $usedAt, ')
+          ..write('completed: $completed, ')
+          ..write('notes: $notes, ')
+          ..write('synced: $synced, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('serverVersion: $serverVersion, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $LotsTableTable extends LotsTable
+    with TableInfo<$LotsTableTable, LotsTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LotsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _farmIdMeta = const VerificationMeta('farmId');
+  @override
+  late final GeneratedColumn<String> farmId = GeneratedColumn<String>(
+      'farm_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _typeMeta = const VerificationMeta('type');
+  @override
+  late final GeneratedColumn<String> type = GeneratedColumn<String>(
+      'type', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _animalIdsJsonMeta =
+      const VerificationMeta('animalIdsJson');
+  @override
+  late final GeneratedColumn<String> animalIdsJson = GeneratedColumn<String>(
+      'animal_ids_json', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _completedMeta =
+      const VerificationMeta('completed');
+  @override
+  late final GeneratedColumn<bool> completed = GeneratedColumn<bool>(
+      'completed', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("completed" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _completedAtMeta =
+      const VerificationMeta('completedAt');
+  @override
+  late final GeneratedColumn<DateTime> completedAt = GeneratedColumn<DateTime>(
+      'completed_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _productIdMeta =
+      const VerificationMeta('productId');
+  @override
+  late final GeneratedColumn<String> productId = GeneratedColumn<String>(
+      'product_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _productNameMeta =
+      const VerificationMeta('productName');
+  @override
+  late final GeneratedColumn<String> productName = GeneratedColumn<String>(
+      'product_name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _treatmentDateMeta =
+      const VerificationMeta('treatmentDate');
+  @override
+  late final GeneratedColumn<DateTime> treatmentDate =
+      GeneratedColumn<DateTime>('treatment_date', aliasedName, true,
+          type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _withdrawalEndDateMeta =
+      const VerificationMeta('withdrawalEndDate');
+  @override
+  late final GeneratedColumn<DateTime> withdrawalEndDate =
+      GeneratedColumn<DateTime>('withdrawal_end_date', aliasedName, true,
+          type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _veterinarianIdMeta =
+      const VerificationMeta('veterinarianId');
+  @override
+  late final GeneratedColumn<String> veterinarianId = GeneratedColumn<String>(
+      'veterinarian_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _veterinarianNameMeta =
+      const VerificationMeta('veterinarianName');
+  @override
+  late final GeneratedColumn<String> veterinarianName = GeneratedColumn<String>(
+      'veterinarian_name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _buyerNameMeta =
+      const VerificationMeta('buyerName');
+  @override
+  late final GeneratedColumn<String> buyerName = GeneratedColumn<String>(
+      'buyer_name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _buyerFarmIdMeta =
+      const VerificationMeta('buyerFarmId');
+  @override
+  late final GeneratedColumn<String> buyerFarmId = GeneratedColumn<String>(
+      'buyer_farm_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _totalPriceMeta =
+      const VerificationMeta('totalPrice');
+  @override
+  late final GeneratedColumn<double> totalPrice = GeneratedColumn<double>(
+      'total_price', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _pricePerAnimalMeta =
+      const VerificationMeta('pricePerAnimal');
+  @override
+  late final GeneratedColumn<double> pricePerAnimal = GeneratedColumn<double>(
+      'price_per_animal', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _saleDateMeta =
+      const VerificationMeta('saleDate');
+  @override
+  late final GeneratedColumn<DateTime> saleDate = GeneratedColumn<DateTime>(
+      'sale_date', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _slaughterhouseNameMeta =
+      const VerificationMeta('slaughterhouseName');
+  @override
+  late final GeneratedColumn<String> slaughterhouseName =
+      GeneratedColumn<String>('slaughterhouse_name', aliasedName, true,
+          type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _slaughterhouseIdMeta =
+      const VerificationMeta('slaughterhouseId');
+  @override
+  late final GeneratedColumn<String> slaughterhouseId = GeneratedColumn<String>(
+      'slaughterhouse_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _slaughterDateMeta =
+      const VerificationMeta('slaughterDate');
+  @override
+  late final GeneratedColumn<DateTime> slaughterDate =
+      GeneratedColumn<DateTime>('slaughter_date', aliasedName, true,
+          type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+      'notes', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+      'synced', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("synced" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _lastSyncedAtMeta =
+      const VerificationMeta('lastSyncedAt');
+  @override
+  late final GeneratedColumn<DateTime> lastSyncedAt = GeneratedColumn<DateTime>(
+      'last_synced_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _serverVersionMeta =
+      const VerificationMeta('serverVersion');
+  @override
+  late final GeneratedColumn<String> serverVersion = GeneratedColumn<String>(
+      'server_version', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        farmId,
+        name,
+        type,
+        animalIdsJson,
+        completed,
+        completedAt,
+        productId,
+        productName,
+        treatmentDate,
+        withdrawalEndDate,
+        veterinarianId,
+        veterinarianName,
+        buyerName,
+        buyerFarmId,
+        totalPrice,
+        pricePerAnimal,
+        saleDate,
+        slaughterhouseName,
+        slaughterhouseId,
+        slaughterDate,
+        notes,
+        synced,
+        createdAt,
+        updatedAt,
+        lastSyncedAt,
+        serverVersion
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'lots';
+  @override
+  VerificationContext validateIntegrity(Insertable<LotsTableData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('farm_id')) {
+      context.handle(_farmIdMeta,
+          farmId.isAcceptableOrUnknown(data['farm_id']!, _farmIdMeta));
+    } else if (isInserting) {
+      context.missing(_farmIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('type')) {
+      context.handle(
+          _typeMeta, type.isAcceptableOrUnknown(data['type']!, _typeMeta));
+    }
+    if (data.containsKey('animal_ids_json')) {
+      context.handle(
+          _animalIdsJsonMeta,
+          animalIdsJson.isAcceptableOrUnknown(
+              data['animal_ids_json']!, _animalIdsJsonMeta));
+    } else if (isInserting) {
+      context.missing(_animalIdsJsonMeta);
+    }
+    if (data.containsKey('completed')) {
+      context.handle(_completedMeta,
+          completed.isAcceptableOrUnknown(data['completed']!, _completedMeta));
+    }
+    if (data.containsKey('completed_at')) {
+      context.handle(
+          _completedAtMeta,
+          completedAt.isAcceptableOrUnknown(
+              data['completed_at']!, _completedAtMeta));
+    }
+    if (data.containsKey('product_id')) {
+      context.handle(_productIdMeta,
+          productId.isAcceptableOrUnknown(data['product_id']!, _productIdMeta));
+    }
+    if (data.containsKey('product_name')) {
+      context.handle(
+          _productNameMeta,
+          productName.isAcceptableOrUnknown(
+              data['product_name']!, _productNameMeta));
+    }
+    if (data.containsKey('treatment_date')) {
+      context.handle(
+          _treatmentDateMeta,
+          treatmentDate.isAcceptableOrUnknown(
+              data['treatment_date']!, _treatmentDateMeta));
+    }
+    if (data.containsKey('withdrawal_end_date')) {
+      context.handle(
+          _withdrawalEndDateMeta,
+          withdrawalEndDate.isAcceptableOrUnknown(
+              data['withdrawal_end_date']!, _withdrawalEndDateMeta));
+    }
+    if (data.containsKey('veterinarian_id')) {
+      context.handle(
+          _veterinarianIdMeta,
+          veterinarianId.isAcceptableOrUnknown(
+              data['veterinarian_id']!, _veterinarianIdMeta));
+    }
+    if (data.containsKey('veterinarian_name')) {
+      context.handle(
+          _veterinarianNameMeta,
+          veterinarianName.isAcceptableOrUnknown(
+              data['veterinarian_name']!, _veterinarianNameMeta));
+    }
+    if (data.containsKey('buyer_name')) {
+      context.handle(_buyerNameMeta,
+          buyerName.isAcceptableOrUnknown(data['buyer_name']!, _buyerNameMeta));
+    }
+    if (data.containsKey('buyer_farm_id')) {
+      context.handle(
+          _buyerFarmIdMeta,
+          buyerFarmId.isAcceptableOrUnknown(
+              data['buyer_farm_id']!, _buyerFarmIdMeta));
+    }
+    if (data.containsKey('total_price')) {
+      context.handle(
+          _totalPriceMeta,
+          totalPrice.isAcceptableOrUnknown(
+              data['total_price']!, _totalPriceMeta));
+    }
+    if (data.containsKey('price_per_animal')) {
+      context.handle(
+          _pricePerAnimalMeta,
+          pricePerAnimal.isAcceptableOrUnknown(
+              data['price_per_animal']!, _pricePerAnimalMeta));
+    }
+    if (data.containsKey('sale_date')) {
+      context.handle(_saleDateMeta,
+          saleDate.isAcceptableOrUnknown(data['sale_date']!, _saleDateMeta));
+    }
+    if (data.containsKey('slaughterhouse_name')) {
+      context.handle(
+          _slaughterhouseNameMeta,
+          slaughterhouseName.isAcceptableOrUnknown(
+              data['slaughterhouse_name']!, _slaughterhouseNameMeta));
+    }
+    if (data.containsKey('slaughterhouse_id')) {
+      context.handle(
+          _slaughterhouseIdMeta,
+          slaughterhouseId.isAcceptableOrUnknown(
+              data['slaughterhouse_id']!, _slaughterhouseIdMeta));
+    }
+    if (data.containsKey('slaughter_date')) {
+      context.handle(
+          _slaughterDateMeta,
+          slaughterDate.isAcceptableOrUnknown(
+              data['slaughter_date']!, _slaughterDateMeta));
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+          _notesMeta, notes.isAcceptableOrUnknown(data['notes']!, _notesMeta));
+    }
+    if (data.containsKey('synced')) {
+      context.handle(_syncedMeta,
+          synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('last_synced_at')) {
+      context.handle(
+          _lastSyncedAtMeta,
+          lastSyncedAt.isAcceptableOrUnknown(
+              data['last_synced_at']!, _lastSyncedAtMeta));
+    }
+    if (data.containsKey('server_version')) {
+      context.handle(
+          _serverVersionMeta,
+          serverVersion.isAcceptableOrUnknown(
+              data['server_version']!, _serverVersionMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LotsTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LotsTableData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      farmId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}farm_id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      type: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}type']),
+      animalIdsJson: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}animal_ids_json'])!,
+      completed: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}completed'])!,
+      completedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}completed_at']),
+      productId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}product_id']),
+      productName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}product_name']),
+      treatmentDate: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}treatment_date']),
+      withdrawalEndDate: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}withdrawal_end_date']),
+      veterinarianId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}veterinarian_id']),
+      veterinarianName: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}veterinarian_name']),
+      buyerName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}buyer_name']),
+      buyerFarmId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}buyer_farm_id']),
+      totalPrice: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}total_price']),
+      pricePerAnimal: attachedDatabase.typeMapping.read(
+          DriftSqlType.double, data['${effectivePrefix}price_per_animal']),
+      saleDate: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}sale_date']),
+      slaughterhouseName: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}slaughterhouse_name']),
+      slaughterhouseId: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}slaughterhouse_id']),
+      slaughterDate: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}slaughter_date']),
+      notes: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}notes']),
+      synced: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}synced'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+      lastSyncedAt: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}last_synced_at']),
+      serverVersion: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}server_version']),
+    );
+  }
+
+  @override
+  $LotsTableTable createAlias(String alias) {
+    return $LotsTableTable(attachedDatabase, alias);
+  }
+}
+
+class LotsTableData extends DataClass implements Insertable<LotsTableData> {
+  final String id;
+  final String farmId;
+  final String name;
+  final String? type;
+  final String animalIdsJson;
+  final bool completed;
+  final DateTime? completedAt;
+  final String? productId;
+  final String? productName;
+  final DateTime? treatmentDate;
+  final DateTime? withdrawalEndDate;
+  final String? veterinarianId;
+  final String? veterinarianName;
+  final String? buyerName;
+  final String? buyerFarmId;
+  final double? totalPrice;
+  final double? pricePerAnimal;
+  final DateTime? saleDate;
+  final String? slaughterhouseName;
+  final String? slaughterhouseId;
+  final DateTime? slaughterDate;
+  final String? notes;
+  final bool synced;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? lastSyncedAt;
+  final String? serverVersion;
+  const LotsTableData(
+      {required this.id,
+      required this.farmId,
+      required this.name,
+      this.type,
+      required this.animalIdsJson,
+      required this.completed,
+      this.completedAt,
+      this.productId,
+      this.productName,
+      this.treatmentDate,
+      this.withdrawalEndDate,
+      this.veterinarianId,
+      this.veterinarianName,
+      this.buyerName,
+      this.buyerFarmId,
+      this.totalPrice,
+      this.pricePerAnimal,
+      this.saleDate,
+      this.slaughterhouseName,
+      this.slaughterhouseId,
+      this.slaughterDate,
+      this.notes,
+      required this.synced,
+      required this.createdAt,
+      required this.updatedAt,
+      this.lastSyncedAt,
+      this.serverVersion});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['farm_id'] = Variable<String>(farmId);
+    map['name'] = Variable<String>(name);
+    if (!nullToAbsent || type != null) {
+      map['type'] = Variable<String>(type);
+    }
+    map['animal_ids_json'] = Variable<String>(animalIdsJson);
+    map['completed'] = Variable<bool>(completed);
+    if (!nullToAbsent || completedAt != null) {
+      map['completed_at'] = Variable<DateTime>(completedAt);
+    }
+    if (!nullToAbsent || productId != null) {
+      map['product_id'] = Variable<String>(productId);
+    }
+    if (!nullToAbsent || productName != null) {
+      map['product_name'] = Variable<String>(productName);
+    }
+    if (!nullToAbsent || treatmentDate != null) {
+      map['treatment_date'] = Variable<DateTime>(treatmentDate);
+    }
+    if (!nullToAbsent || withdrawalEndDate != null) {
+      map['withdrawal_end_date'] = Variable<DateTime>(withdrawalEndDate);
+    }
+    if (!nullToAbsent || veterinarianId != null) {
+      map['veterinarian_id'] = Variable<String>(veterinarianId);
+    }
+    if (!nullToAbsent || veterinarianName != null) {
+      map['veterinarian_name'] = Variable<String>(veterinarianName);
+    }
+    if (!nullToAbsent || buyerName != null) {
+      map['buyer_name'] = Variable<String>(buyerName);
+    }
+    if (!nullToAbsent || buyerFarmId != null) {
+      map['buyer_farm_id'] = Variable<String>(buyerFarmId);
+    }
+    if (!nullToAbsent || totalPrice != null) {
+      map['total_price'] = Variable<double>(totalPrice);
+    }
+    if (!nullToAbsent || pricePerAnimal != null) {
+      map['price_per_animal'] = Variable<double>(pricePerAnimal);
+    }
+    if (!nullToAbsent || saleDate != null) {
+      map['sale_date'] = Variable<DateTime>(saleDate);
+    }
+    if (!nullToAbsent || slaughterhouseName != null) {
+      map['slaughterhouse_name'] = Variable<String>(slaughterhouseName);
+    }
+    if (!nullToAbsent || slaughterhouseId != null) {
+      map['slaughterhouse_id'] = Variable<String>(slaughterhouseId);
+    }
+    if (!nullToAbsent || slaughterDate != null) {
+      map['slaughter_date'] = Variable<DateTime>(slaughterDate);
+    }
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    map['synced'] = Variable<bool>(synced);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || lastSyncedAt != null) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt);
+    }
+    if (!nullToAbsent || serverVersion != null) {
+      map['server_version'] = Variable<String>(serverVersion);
+    }
+    return map;
+  }
+
+  LotsTableCompanion toCompanion(bool nullToAbsent) {
+    return LotsTableCompanion(
+      id: Value(id),
+      farmId: Value(farmId),
+      name: Value(name),
+      type: type == null && nullToAbsent ? const Value.absent() : Value(type),
+      animalIdsJson: Value(animalIdsJson),
+      completed: Value(completed),
+      completedAt: completedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(completedAt),
+      productId: productId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(productId),
+      productName: productName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(productName),
+      treatmentDate: treatmentDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(treatmentDate),
+      withdrawalEndDate: withdrawalEndDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(withdrawalEndDate),
+      veterinarianId: veterinarianId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(veterinarianId),
+      veterinarianName: veterinarianName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(veterinarianName),
+      buyerName: buyerName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(buyerName),
+      buyerFarmId: buyerFarmId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(buyerFarmId),
+      totalPrice: totalPrice == null && nullToAbsent
+          ? const Value.absent()
+          : Value(totalPrice),
+      pricePerAnimal: pricePerAnimal == null && nullToAbsent
+          ? const Value.absent()
+          : Value(pricePerAnimal),
+      saleDate: saleDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(saleDate),
+      slaughterhouseName: slaughterhouseName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(slaughterhouseName),
+      slaughterhouseId: slaughterhouseId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(slaughterhouseId),
+      slaughterDate: slaughterDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(slaughterDate),
+      notes:
+          notes == null && nullToAbsent ? const Value.absent() : Value(notes),
+      synced: Value(synced),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      lastSyncedAt: lastSyncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSyncedAt),
+      serverVersion: serverVersion == null && nullToAbsent
+          ? const Value.absent()
+          : Value(serverVersion),
+    );
+  }
+
+  factory LotsTableData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LotsTableData(
+      id: serializer.fromJson<String>(json['id']),
+      farmId: serializer.fromJson<String>(json['farmId']),
+      name: serializer.fromJson<String>(json['name']),
+      type: serializer.fromJson<String?>(json['type']),
+      animalIdsJson: serializer.fromJson<String>(json['animalIdsJson']),
+      completed: serializer.fromJson<bool>(json['completed']),
+      completedAt: serializer.fromJson<DateTime?>(json['completedAt']),
+      productId: serializer.fromJson<String?>(json['productId']),
+      productName: serializer.fromJson<String?>(json['productName']),
+      treatmentDate: serializer.fromJson<DateTime?>(json['treatmentDate']),
+      withdrawalEndDate:
+          serializer.fromJson<DateTime?>(json['withdrawalEndDate']),
+      veterinarianId: serializer.fromJson<String?>(json['veterinarianId']),
+      veterinarianName: serializer.fromJson<String?>(json['veterinarianName']),
+      buyerName: serializer.fromJson<String?>(json['buyerName']),
+      buyerFarmId: serializer.fromJson<String?>(json['buyerFarmId']),
+      totalPrice: serializer.fromJson<double?>(json['totalPrice']),
+      pricePerAnimal: serializer.fromJson<double?>(json['pricePerAnimal']),
+      saleDate: serializer.fromJson<DateTime?>(json['saleDate']),
+      slaughterhouseName:
+          serializer.fromJson<String?>(json['slaughterhouseName']),
+      slaughterhouseId: serializer.fromJson<String?>(json['slaughterhouseId']),
+      slaughterDate: serializer.fromJson<DateTime?>(json['slaughterDate']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      synced: serializer.fromJson<bool>(json['synced']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      lastSyncedAt: serializer.fromJson<DateTime?>(json['lastSyncedAt']),
+      serverVersion: serializer.fromJson<String?>(json['serverVersion']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'farmId': serializer.toJson<String>(farmId),
+      'name': serializer.toJson<String>(name),
+      'type': serializer.toJson<String?>(type),
+      'animalIdsJson': serializer.toJson<String>(animalIdsJson),
+      'completed': serializer.toJson<bool>(completed),
+      'completedAt': serializer.toJson<DateTime?>(completedAt),
+      'productId': serializer.toJson<String?>(productId),
+      'productName': serializer.toJson<String?>(productName),
+      'treatmentDate': serializer.toJson<DateTime?>(treatmentDate),
+      'withdrawalEndDate': serializer.toJson<DateTime?>(withdrawalEndDate),
+      'veterinarianId': serializer.toJson<String?>(veterinarianId),
+      'veterinarianName': serializer.toJson<String?>(veterinarianName),
+      'buyerName': serializer.toJson<String?>(buyerName),
+      'buyerFarmId': serializer.toJson<String?>(buyerFarmId),
+      'totalPrice': serializer.toJson<double?>(totalPrice),
+      'pricePerAnimal': serializer.toJson<double?>(pricePerAnimal),
+      'saleDate': serializer.toJson<DateTime?>(saleDate),
+      'slaughterhouseName': serializer.toJson<String?>(slaughterhouseName),
+      'slaughterhouseId': serializer.toJson<String?>(slaughterhouseId),
+      'slaughterDate': serializer.toJson<DateTime?>(slaughterDate),
+      'notes': serializer.toJson<String?>(notes),
+      'synced': serializer.toJson<bool>(synced),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'lastSyncedAt': serializer.toJson<DateTime?>(lastSyncedAt),
+      'serverVersion': serializer.toJson<String?>(serverVersion),
+    };
+  }
+
+  LotsTableData copyWith(
+          {String? id,
+          String? farmId,
+          String? name,
+          Value<String?> type = const Value.absent(),
+          String? animalIdsJson,
+          bool? completed,
+          Value<DateTime?> completedAt = const Value.absent(),
+          Value<String?> productId = const Value.absent(),
+          Value<String?> productName = const Value.absent(),
+          Value<DateTime?> treatmentDate = const Value.absent(),
+          Value<DateTime?> withdrawalEndDate = const Value.absent(),
+          Value<String?> veterinarianId = const Value.absent(),
+          Value<String?> veterinarianName = const Value.absent(),
+          Value<String?> buyerName = const Value.absent(),
+          Value<String?> buyerFarmId = const Value.absent(),
+          Value<double?> totalPrice = const Value.absent(),
+          Value<double?> pricePerAnimal = const Value.absent(),
+          Value<DateTime?> saleDate = const Value.absent(),
+          Value<String?> slaughterhouseName = const Value.absent(),
+          Value<String?> slaughterhouseId = const Value.absent(),
+          Value<DateTime?> slaughterDate = const Value.absent(),
+          Value<String?> notes = const Value.absent(),
+          bool? synced,
+          DateTime? createdAt,
+          DateTime? updatedAt,
+          Value<DateTime?> lastSyncedAt = const Value.absent(),
+          Value<String?> serverVersion = const Value.absent()}) =>
+      LotsTableData(
+        id: id ?? this.id,
+        farmId: farmId ?? this.farmId,
+        name: name ?? this.name,
+        type: type.present ? type.value : this.type,
+        animalIdsJson: animalIdsJson ?? this.animalIdsJson,
+        completed: completed ?? this.completed,
+        completedAt: completedAt.present ? completedAt.value : this.completedAt,
+        productId: productId.present ? productId.value : this.productId,
+        productName: productName.present ? productName.value : this.productName,
+        treatmentDate:
+            treatmentDate.present ? treatmentDate.value : this.treatmentDate,
+        withdrawalEndDate: withdrawalEndDate.present
+            ? withdrawalEndDate.value
+            : this.withdrawalEndDate,
+        veterinarianId:
+            veterinarianId.present ? veterinarianId.value : this.veterinarianId,
+        veterinarianName: veterinarianName.present
+            ? veterinarianName.value
+            : this.veterinarianName,
+        buyerName: buyerName.present ? buyerName.value : this.buyerName,
+        buyerFarmId: buyerFarmId.present ? buyerFarmId.value : this.buyerFarmId,
+        totalPrice: totalPrice.present ? totalPrice.value : this.totalPrice,
+        pricePerAnimal:
+            pricePerAnimal.present ? pricePerAnimal.value : this.pricePerAnimal,
+        saleDate: saleDate.present ? saleDate.value : this.saleDate,
+        slaughterhouseName: slaughterhouseName.present
+            ? slaughterhouseName.value
+            : this.slaughterhouseName,
+        slaughterhouseId: slaughterhouseId.present
+            ? slaughterhouseId.value
+            : this.slaughterhouseId,
+        slaughterDate:
+            slaughterDate.present ? slaughterDate.value : this.slaughterDate,
+        notes: notes.present ? notes.value : this.notes,
+        synced: synced ?? this.synced,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+        lastSyncedAt:
+            lastSyncedAt.present ? lastSyncedAt.value : this.lastSyncedAt,
+        serverVersion:
+            serverVersion.present ? serverVersion.value : this.serverVersion,
+      );
+  LotsTableData copyWithCompanion(LotsTableCompanion data) {
+    return LotsTableData(
+      id: data.id.present ? data.id.value : this.id,
+      farmId: data.farmId.present ? data.farmId.value : this.farmId,
+      name: data.name.present ? data.name.value : this.name,
+      type: data.type.present ? data.type.value : this.type,
+      animalIdsJson: data.animalIdsJson.present
+          ? data.animalIdsJson.value
+          : this.animalIdsJson,
+      completed: data.completed.present ? data.completed.value : this.completed,
+      completedAt:
+          data.completedAt.present ? data.completedAt.value : this.completedAt,
+      productId: data.productId.present ? data.productId.value : this.productId,
+      productName:
+          data.productName.present ? data.productName.value : this.productName,
+      treatmentDate: data.treatmentDate.present
+          ? data.treatmentDate.value
+          : this.treatmentDate,
+      withdrawalEndDate: data.withdrawalEndDate.present
+          ? data.withdrawalEndDate.value
+          : this.withdrawalEndDate,
+      veterinarianId: data.veterinarianId.present
+          ? data.veterinarianId.value
+          : this.veterinarianId,
+      veterinarianName: data.veterinarianName.present
+          ? data.veterinarianName.value
+          : this.veterinarianName,
+      buyerName: data.buyerName.present ? data.buyerName.value : this.buyerName,
+      buyerFarmId:
+          data.buyerFarmId.present ? data.buyerFarmId.value : this.buyerFarmId,
+      totalPrice:
+          data.totalPrice.present ? data.totalPrice.value : this.totalPrice,
+      pricePerAnimal: data.pricePerAnimal.present
+          ? data.pricePerAnimal.value
+          : this.pricePerAnimal,
+      saleDate: data.saleDate.present ? data.saleDate.value : this.saleDate,
+      slaughterhouseName: data.slaughterhouseName.present
+          ? data.slaughterhouseName.value
+          : this.slaughterhouseName,
+      slaughterhouseId: data.slaughterhouseId.present
+          ? data.slaughterhouseId.value
+          : this.slaughterhouseId,
+      slaughterDate: data.slaughterDate.present
+          ? data.slaughterDate.value
+          : this.slaughterDate,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      synced: data.synced.present ? data.synced.value : this.synced,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      lastSyncedAt: data.lastSyncedAt.present
+          ? data.lastSyncedAt.value
+          : this.lastSyncedAt,
+      serverVersion: data.serverVersion.present
+          ? data.serverVersion.value
+          : this.serverVersion,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LotsTableData(')
+          ..write('id: $id, ')
+          ..write('farmId: $farmId, ')
+          ..write('name: $name, ')
+          ..write('type: $type, ')
+          ..write('animalIdsJson: $animalIdsJson, ')
+          ..write('completed: $completed, ')
+          ..write('completedAt: $completedAt, ')
+          ..write('productId: $productId, ')
+          ..write('productName: $productName, ')
+          ..write('treatmentDate: $treatmentDate, ')
+          ..write('withdrawalEndDate: $withdrawalEndDate, ')
+          ..write('veterinarianId: $veterinarianId, ')
+          ..write('veterinarianName: $veterinarianName, ')
+          ..write('buyerName: $buyerName, ')
+          ..write('buyerFarmId: $buyerFarmId, ')
+          ..write('totalPrice: $totalPrice, ')
+          ..write('pricePerAnimal: $pricePerAnimal, ')
+          ..write('saleDate: $saleDate, ')
+          ..write('slaughterhouseName: $slaughterhouseName, ')
+          ..write('slaughterhouseId: $slaughterhouseId, ')
+          ..write('slaughterDate: $slaughterDate, ')
+          ..write('notes: $notes, ')
+          ..write('synced: $synced, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('serverVersion: $serverVersion')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+        id,
+        farmId,
+        name,
+        type,
+        animalIdsJson,
+        completed,
+        completedAt,
+        productId,
+        productName,
+        treatmentDate,
+        withdrawalEndDate,
+        veterinarianId,
+        veterinarianName,
+        buyerName,
+        buyerFarmId,
+        totalPrice,
+        pricePerAnimal,
+        saleDate,
+        slaughterhouseName,
+        slaughterhouseId,
+        slaughterDate,
+        notes,
+        synced,
+        createdAt,
+        updatedAt,
+        lastSyncedAt,
+        serverVersion
+      ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LotsTableData &&
+          other.id == this.id &&
+          other.farmId == this.farmId &&
+          other.name == this.name &&
+          other.type == this.type &&
+          other.animalIdsJson == this.animalIdsJson &&
+          other.completed == this.completed &&
+          other.completedAt == this.completedAt &&
+          other.productId == this.productId &&
+          other.productName == this.productName &&
+          other.treatmentDate == this.treatmentDate &&
+          other.withdrawalEndDate == this.withdrawalEndDate &&
+          other.veterinarianId == this.veterinarianId &&
+          other.veterinarianName == this.veterinarianName &&
+          other.buyerName == this.buyerName &&
+          other.buyerFarmId == this.buyerFarmId &&
+          other.totalPrice == this.totalPrice &&
+          other.pricePerAnimal == this.pricePerAnimal &&
+          other.saleDate == this.saleDate &&
+          other.slaughterhouseName == this.slaughterhouseName &&
+          other.slaughterhouseId == this.slaughterhouseId &&
+          other.slaughterDate == this.slaughterDate &&
+          other.notes == this.notes &&
+          other.synced == this.synced &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.lastSyncedAt == this.lastSyncedAt &&
+          other.serverVersion == this.serverVersion);
+}
+
+class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
+  final Value<String> id;
+  final Value<String> farmId;
+  final Value<String> name;
+  final Value<String?> type;
+  final Value<String> animalIdsJson;
+  final Value<bool> completed;
+  final Value<DateTime?> completedAt;
+  final Value<String?> productId;
+  final Value<String?> productName;
+  final Value<DateTime?> treatmentDate;
+  final Value<DateTime?> withdrawalEndDate;
+  final Value<String?> veterinarianId;
+  final Value<String?> veterinarianName;
+  final Value<String?> buyerName;
+  final Value<String?> buyerFarmId;
+  final Value<double?> totalPrice;
+  final Value<double?> pricePerAnimal;
+  final Value<DateTime?> saleDate;
+  final Value<String?> slaughterhouseName;
+  final Value<String?> slaughterhouseId;
+  final Value<DateTime?> slaughterDate;
+  final Value<String?> notes;
+  final Value<bool> synced;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> lastSyncedAt;
+  final Value<String?> serverVersion;
+  final Value<int> rowid;
+  const LotsTableCompanion({
+    this.id = const Value.absent(),
+    this.farmId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.type = const Value.absent(),
+    this.animalIdsJson = const Value.absent(),
+    this.completed = const Value.absent(),
+    this.completedAt = const Value.absent(),
+    this.productId = const Value.absent(),
+    this.productName = const Value.absent(),
+    this.treatmentDate = const Value.absent(),
+    this.withdrawalEndDate = const Value.absent(),
+    this.veterinarianId = const Value.absent(),
+    this.veterinarianName = const Value.absent(),
+    this.buyerName = const Value.absent(),
+    this.buyerFarmId = const Value.absent(),
+    this.totalPrice = const Value.absent(),
+    this.pricePerAnimal = const Value.absent(),
+    this.saleDate = const Value.absent(),
+    this.slaughterhouseName = const Value.absent(),
+    this.slaughterhouseId = const Value.absent(),
+    this.slaughterDate = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.serverVersion = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  LotsTableCompanion.insert({
+    required String id,
+    required String farmId,
+    required String name,
+    this.type = const Value.absent(),
+    required String animalIdsJson,
+    this.completed = const Value.absent(),
+    this.completedAt = const Value.absent(),
+    this.productId = const Value.absent(),
+    this.productName = const Value.absent(),
+    this.treatmentDate = const Value.absent(),
+    this.withdrawalEndDate = const Value.absent(),
+    this.veterinarianId = const Value.absent(),
+    this.veterinarianName = const Value.absent(),
+    this.buyerName = const Value.absent(),
+    this.buyerFarmId = const Value.absent(),
+    this.totalPrice = const Value.absent(),
+    this.pricePerAnimal = const Value.absent(),
+    this.saleDate = const Value.absent(),
+    this.slaughterhouseName = const Value.absent(),
+    this.slaughterhouseId = const Value.absent(),
+    this.slaughterDate = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.synced = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.lastSyncedAt = const Value.absent(),
+    this.serverVersion = const Value.absent(),
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        farmId = Value(farmId),
+        name = Value(name),
+        animalIdsJson = Value(animalIdsJson),
+        createdAt = Value(createdAt),
+        updatedAt = Value(updatedAt);
+  static Insertable<LotsTableData> custom({
+    Expression<String>? id,
+    Expression<String>? farmId,
+    Expression<String>? name,
+    Expression<String>? type,
+    Expression<String>? animalIdsJson,
+    Expression<bool>? completed,
+    Expression<DateTime>? completedAt,
+    Expression<String>? productId,
+    Expression<String>? productName,
+    Expression<DateTime>? treatmentDate,
+    Expression<DateTime>? withdrawalEndDate,
+    Expression<String>? veterinarianId,
+    Expression<String>? veterinarianName,
+    Expression<String>? buyerName,
+    Expression<String>? buyerFarmId,
+    Expression<double>? totalPrice,
+    Expression<double>? pricePerAnimal,
+    Expression<DateTime>? saleDate,
+    Expression<String>? slaughterhouseName,
+    Expression<String>? slaughterhouseId,
+    Expression<DateTime>? slaughterDate,
+    Expression<String>? notes,
+    Expression<bool>? synced,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? lastSyncedAt,
+    Expression<String>? serverVersion,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (farmId != null) 'farm_id': farmId,
+      if (name != null) 'name': name,
+      if (type != null) 'type': type,
+      if (animalIdsJson != null) 'animal_ids_json': animalIdsJson,
+      if (completed != null) 'completed': completed,
+      if (completedAt != null) 'completed_at': completedAt,
+      if (productId != null) 'product_id': productId,
+      if (productName != null) 'product_name': productName,
+      if (treatmentDate != null) 'treatment_date': treatmentDate,
+      if (withdrawalEndDate != null) 'withdrawal_end_date': withdrawalEndDate,
+      if (veterinarianId != null) 'veterinarian_id': veterinarianId,
+      if (veterinarianName != null) 'veterinarian_name': veterinarianName,
+      if (buyerName != null) 'buyer_name': buyerName,
+      if (buyerFarmId != null) 'buyer_farm_id': buyerFarmId,
+      if (totalPrice != null) 'total_price': totalPrice,
+      if (pricePerAnimal != null) 'price_per_animal': pricePerAnimal,
+      if (saleDate != null) 'sale_date': saleDate,
+      if (slaughterhouseName != null) 'slaughterhouse_name': slaughterhouseName,
+      if (slaughterhouseId != null) 'slaughterhouse_id': slaughterhouseId,
+      if (slaughterDate != null) 'slaughter_date': slaughterDate,
+      if (notes != null) 'notes': notes,
+      if (synced != null) 'synced': synced,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
+      if (serverVersion != null) 'server_version': serverVersion,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  LotsTableCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? farmId,
+      Value<String>? name,
+      Value<String?>? type,
+      Value<String>? animalIdsJson,
+      Value<bool>? completed,
+      Value<DateTime?>? completedAt,
+      Value<String?>? productId,
+      Value<String?>? productName,
+      Value<DateTime?>? treatmentDate,
+      Value<DateTime?>? withdrawalEndDate,
+      Value<String?>? veterinarianId,
+      Value<String?>? veterinarianName,
+      Value<String?>? buyerName,
+      Value<String?>? buyerFarmId,
+      Value<double?>? totalPrice,
+      Value<double?>? pricePerAnimal,
+      Value<DateTime?>? saleDate,
+      Value<String?>? slaughterhouseName,
+      Value<String?>? slaughterhouseId,
+      Value<DateTime?>? slaughterDate,
+      Value<String?>? notes,
+      Value<bool>? synced,
+      Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt,
+      Value<DateTime?>? lastSyncedAt,
+      Value<String?>? serverVersion,
+      Value<int>? rowid}) {
+    return LotsTableCompanion(
+      id: id ?? this.id,
+      farmId: farmId ?? this.farmId,
+      name: name ?? this.name,
+      type: type ?? this.type,
+      animalIdsJson: animalIdsJson ?? this.animalIdsJson,
+      completed: completed ?? this.completed,
+      completedAt: completedAt ?? this.completedAt,
+      productId: productId ?? this.productId,
+      productName: productName ?? this.productName,
+      treatmentDate: treatmentDate ?? this.treatmentDate,
+      withdrawalEndDate: withdrawalEndDate ?? this.withdrawalEndDate,
+      veterinarianId: veterinarianId ?? this.veterinarianId,
+      veterinarianName: veterinarianName ?? this.veterinarianName,
+      buyerName: buyerName ?? this.buyerName,
+      buyerFarmId: buyerFarmId ?? this.buyerFarmId,
+      totalPrice: totalPrice ?? this.totalPrice,
+      pricePerAnimal: pricePerAnimal ?? this.pricePerAnimal,
+      saleDate: saleDate ?? this.saleDate,
+      slaughterhouseName: slaughterhouseName ?? this.slaughterhouseName,
+      slaughterhouseId: slaughterhouseId ?? this.slaughterhouseId,
+      slaughterDate: slaughterDate ?? this.slaughterDate,
+      notes: notes ?? this.notes,
+      synced: synced ?? this.synced,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      serverVersion: serverVersion ?? this.serverVersion,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (farmId.present) {
+      map['farm_id'] = Variable<String>(farmId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (type.present) {
+      map['type'] = Variable<String>(type.value);
+    }
+    if (animalIdsJson.present) {
+      map['animal_ids_json'] = Variable<String>(animalIdsJson.value);
+    }
+    if (completed.present) {
+      map['completed'] = Variable<bool>(completed.value);
+    }
+    if (completedAt.present) {
+      map['completed_at'] = Variable<DateTime>(completedAt.value);
+    }
+    if (productId.present) {
+      map['product_id'] = Variable<String>(productId.value);
+    }
+    if (productName.present) {
+      map['product_name'] = Variable<String>(productName.value);
+    }
+    if (treatmentDate.present) {
+      map['treatment_date'] = Variable<DateTime>(treatmentDate.value);
+    }
+    if (withdrawalEndDate.present) {
+      map['withdrawal_end_date'] = Variable<DateTime>(withdrawalEndDate.value);
+    }
+    if (veterinarianId.present) {
+      map['veterinarian_id'] = Variable<String>(veterinarianId.value);
+    }
+    if (veterinarianName.present) {
+      map['veterinarian_name'] = Variable<String>(veterinarianName.value);
+    }
+    if (buyerName.present) {
+      map['buyer_name'] = Variable<String>(buyerName.value);
+    }
+    if (buyerFarmId.present) {
+      map['buyer_farm_id'] = Variable<String>(buyerFarmId.value);
+    }
+    if (totalPrice.present) {
+      map['total_price'] = Variable<double>(totalPrice.value);
+    }
+    if (pricePerAnimal.present) {
+      map['price_per_animal'] = Variable<double>(pricePerAnimal.value);
+    }
+    if (saleDate.present) {
+      map['sale_date'] = Variable<DateTime>(saleDate.value);
+    }
+    if (slaughterhouseName.present) {
+      map['slaughterhouse_name'] = Variable<String>(slaughterhouseName.value);
+    }
+    if (slaughterhouseId.present) {
+      map['slaughterhouse_id'] = Variable<String>(slaughterhouseId.value);
+    }
+    if (slaughterDate.present) {
+      map['slaughter_date'] = Variable<DateTime>(slaughterDate.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (lastSyncedAt.present) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt.value);
+    }
+    if (serverVersion.present) {
+      map['server_version'] = Variable<String>(serverVersion.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LotsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('farmId: $farmId, ')
+          ..write('name: $name, ')
+          ..write('type: $type, ')
+          ..write('animalIdsJson: $animalIdsJson, ')
+          ..write('completed: $completed, ')
+          ..write('completedAt: $completedAt, ')
+          ..write('productId: $productId, ')
+          ..write('productName: $productName, ')
+          ..write('treatmentDate: $treatmentDate, ')
+          ..write('withdrawalEndDate: $withdrawalEndDate, ')
+          ..write('veterinarianId: $veterinarianId, ')
+          ..write('veterinarianName: $veterinarianName, ')
+          ..write('buyerName: $buyerName, ')
+          ..write('buyerFarmId: $buyerFarmId, ')
+          ..write('totalPrice: $totalPrice, ')
+          ..write('pricePerAnimal: $pricePerAnimal, ')
+          ..write('saleDate: $saleDate, ')
+          ..write('slaughterhouseName: $slaughterhouseName, ')
+          ..write('slaughterhouseId: $slaughterhouseId, ')
+          ..write('slaughterDate: $slaughterDate, ')
+          ..write('notes: $notes, ')
+          ..write('synced: $synced, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('serverVersion: $serverVersion, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CampaignsTableTable extends CampaignsTable
+    with TableInfo<$CampaignsTableTable, CampaignsTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CampaignsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _farmIdMeta = const VerificationMeta('farmId');
+  @override
+  late final GeneratedColumn<String> farmId = GeneratedColumn<String>(
+      'farm_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _productIdMeta =
+      const VerificationMeta('productId');
+  @override
+  late final GeneratedColumn<String> productId = GeneratedColumn<String>(
+      'product_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _productNameMeta =
+      const VerificationMeta('productName');
+  @override
+  late final GeneratedColumn<String> productName = GeneratedColumn<String>(
+      'product_name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _campaignDateMeta =
+      const VerificationMeta('campaignDate');
+  @override
+  late final GeneratedColumn<DateTime> campaignDate = GeneratedColumn<DateTime>(
+      'campaign_date', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _withdrawalEndDateMeta =
+      const VerificationMeta('withdrawalEndDate');
+  @override
+  late final GeneratedColumn<DateTime> withdrawalEndDate =
+      GeneratedColumn<DateTime>('withdrawal_end_date', aliasedName, false,
+          type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _veterinarianIdMeta =
+      const VerificationMeta('veterinarianId');
+  @override
+  late final GeneratedColumn<String> veterinarianId = GeneratedColumn<String>(
+      'veterinarian_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _veterinarianNameMeta =
+      const VerificationMeta('veterinarianName');
+  @override
+  late final GeneratedColumn<String> veterinarianName = GeneratedColumn<String>(
+      'veterinarian_name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _animalIdsJsonMeta =
+      const VerificationMeta('animalIdsJson');
+  @override
+  late final GeneratedColumn<String> animalIdsJson = GeneratedColumn<String>(
+      'animal_ids_json', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _completedMeta =
+      const VerificationMeta('completed');
+  @override
+  late final GeneratedColumn<bool> completed = GeneratedColumn<bool>(
+      'completed', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("completed" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+      'synced', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("synced" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _lastSyncedAtMeta =
+      const VerificationMeta('lastSyncedAt');
+  @override
+  late final GeneratedColumn<DateTime> lastSyncedAt = GeneratedColumn<DateTime>(
+      'last_synced_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _serverVersionMeta =
+      const VerificationMeta('serverVersion');
+  @override
+  late final GeneratedColumn<String> serverVersion = GeneratedColumn<String>(
+      'server_version', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        farmId,
+        name,
+        productId,
+        productName,
+        campaignDate,
+        withdrawalEndDate,
+        veterinarianId,
+        veterinarianName,
+        animalIdsJson,
+        completed,
+        synced,
+        createdAt,
+        updatedAt,
+        lastSyncedAt,
+        serverVersion
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'campaigns';
+  @override
+  VerificationContext validateIntegrity(Insertable<CampaignsTableData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('farm_id')) {
+      context.handle(_farmIdMeta,
+          farmId.isAcceptableOrUnknown(data['farm_id']!, _farmIdMeta));
+    } else if (isInserting) {
+      context.missing(_farmIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('product_id')) {
+      context.handle(_productIdMeta,
+          productId.isAcceptableOrUnknown(data['product_id']!, _productIdMeta));
+    } else if (isInserting) {
+      context.missing(_productIdMeta);
+    }
+    if (data.containsKey('product_name')) {
+      context.handle(
+          _productNameMeta,
+          productName.isAcceptableOrUnknown(
+              data['product_name']!, _productNameMeta));
+    } else if (isInserting) {
+      context.missing(_productNameMeta);
+    }
+    if (data.containsKey('campaign_date')) {
+      context.handle(
+          _campaignDateMeta,
+          campaignDate.isAcceptableOrUnknown(
+              data['campaign_date']!, _campaignDateMeta));
+    } else if (isInserting) {
+      context.missing(_campaignDateMeta);
+    }
+    if (data.containsKey('withdrawal_end_date')) {
+      context.handle(
+          _withdrawalEndDateMeta,
+          withdrawalEndDate.isAcceptableOrUnknown(
+              data['withdrawal_end_date']!, _withdrawalEndDateMeta));
+    } else if (isInserting) {
+      context.missing(_withdrawalEndDateMeta);
+    }
+    if (data.containsKey('veterinarian_id')) {
+      context.handle(
+          _veterinarianIdMeta,
+          veterinarianId.isAcceptableOrUnknown(
+              data['veterinarian_id']!, _veterinarianIdMeta));
+    }
+    if (data.containsKey('veterinarian_name')) {
+      context.handle(
+          _veterinarianNameMeta,
+          veterinarianName.isAcceptableOrUnknown(
+              data['veterinarian_name']!, _veterinarianNameMeta));
+    }
+    if (data.containsKey('animal_ids_json')) {
+      context.handle(
+          _animalIdsJsonMeta,
+          animalIdsJson.isAcceptableOrUnknown(
+              data['animal_ids_json']!, _animalIdsJsonMeta));
+    } else if (isInserting) {
+      context.missing(_animalIdsJsonMeta);
+    }
+    if (data.containsKey('completed')) {
+      context.handle(_completedMeta,
+          completed.isAcceptableOrUnknown(data['completed']!, _completedMeta));
+    }
+    if (data.containsKey('synced')) {
+      context.handle(_syncedMeta,
+          synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('last_synced_at')) {
+      context.handle(
+          _lastSyncedAtMeta,
+          lastSyncedAt.isAcceptableOrUnknown(
+              data['last_synced_at']!, _lastSyncedAtMeta));
+    }
+    if (data.containsKey('server_version')) {
+      context.handle(
+          _serverVersionMeta,
+          serverVersion.isAcceptableOrUnknown(
+              data['server_version']!, _serverVersionMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CampaignsTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CampaignsTableData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      farmId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}farm_id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      productId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}product_id'])!,
+      productName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}product_name'])!,
+      campaignDate: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}campaign_date'])!,
+      withdrawalEndDate: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime,
+          data['${effectivePrefix}withdrawal_end_date'])!,
+      veterinarianId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}veterinarian_id']),
+      veterinarianName: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}veterinarian_name']),
+      animalIdsJson: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}animal_ids_json'])!,
+      completed: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}completed'])!,
+      synced: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}synced'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+      lastSyncedAt: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}last_synced_at']),
+      serverVersion: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}server_version']),
+    );
+  }
+
+  @override
+  $CampaignsTableTable createAlias(String alias) {
+    return $CampaignsTableTable(attachedDatabase, alias);
+  }
+}
+
+class CampaignsTableData extends DataClass
+    implements Insertable<CampaignsTableData> {
+  final String id;
+  final String farmId;
+  final String name;
+  final String productId;
+  final String productName;
+  final DateTime campaignDate;
+  final DateTime withdrawalEndDate;
+  final String? veterinarianId;
+  final String? veterinarianName;
+  final String animalIdsJson;
+  final bool completed;
+  final bool synced;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? lastSyncedAt;
+  final String? serverVersion;
+  const CampaignsTableData(
+      {required this.id,
+      required this.farmId,
+      required this.name,
+      required this.productId,
+      required this.productName,
+      required this.campaignDate,
+      required this.withdrawalEndDate,
+      this.veterinarianId,
+      this.veterinarianName,
+      required this.animalIdsJson,
+      required this.completed,
+      required this.synced,
+      required this.createdAt,
+      required this.updatedAt,
+      this.lastSyncedAt,
+      this.serverVersion});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['farm_id'] = Variable<String>(farmId);
+    map['name'] = Variable<String>(name);
+    map['product_id'] = Variable<String>(productId);
+    map['product_name'] = Variable<String>(productName);
+    map['campaign_date'] = Variable<DateTime>(campaignDate);
+    map['withdrawal_end_date'] = Variable<DateTime>(withdrawalEndDate);
+    if (!nullToAbsent || veterinarianId != null) {
+      map['veterinarian_id'] = Variable<String>(veterinarianId);
+    }
+    if (!nullToAbsent || veterinarianName != null) {
+      map['veterinarian_name'] = Variable<String>(veterinarianName);
+    }
+    map['animal_ids_json'] = Variable<String>(animalIdsJson);
+    map['completed'] = Variable<bool>(completed);
+    map['synced'] = Variable<bool>(synced);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || lastSyncedAt != null) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt);
+    }
+    if (!nullToAbsent || serverVersion != null) {
+      map['server_version'] = Variable<String>(serverVersion);
+    }
+    return map;
+  }
+
+  CampaignsTableCompanion toCompanion(bool nullToAbsent) {
+    return CampaignsTableCompanion(
+      id: Value(id),
+      farmId: Value(farmId),
+      name: Value(name),
+      productId: Value(productId),
+      productName: Value(productName),
+      campaignDate: Value(campaignDate),
+      withdrawalEndDate: Value(withdrawalEndDate),
+      veterinarianId: veterinarianId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(veterinarianId),
+      veterinarianName: veterinarianName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(veterinarianName),
+      animalIdsJson: Value(animalIdsJson),
+      completed: Value(completed),
+      synced: Value(synced),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      lastSyncedAt: lastSyncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSyncedAt),
+      serverVersion: serverVersion == null && nullToAbsent
+          ? const Value.absent()
+          : Value(serverVersion),
+    );
+  }
+
+  factory CampaignsTableData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CampaignsTableData(
+      id: serializer.fromJson<String>(json['id']),
+      farmId: serializer.fromJson<String>(json['farmId']),
+      name: serializer.fromJson<String>(json['name']),
+      productId: serializer.fromJson<String>(json['productId']),
+      productName: serializer.fromJson<String>(json['productName']),
+      campaignDate: serializer.fromJson<DateTime>(json['campaignDate']),
+      withdrawalEndDate:
+          serializer.fromJson<DateTime>(json['withdrawalEndDate']),
+      veterinarianId: serializer.fromJson<String?>(json['veterinarianId']),
+      veterinarianName: serializer.fromJson<String?>(json['veterinarianName']),
+      animalIdsJson: serializer.fromJson<String>(json['animalIdsJson']),
+      completed: serializer.fromJson<bool>(json['completed']),
+      synced: serializer.fromJson<bool>(json['synced']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      lastSyncedAt: serializer.fromJson<DateTime?>(json['lastSyncedAt']),
+      serverVersion: serializer.fromJson<String?>(json['serverVersion']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'farmId': serializer.toJson<String>(farmId),
+      'name': serializer.toJson<String>(name),
+      'productId': serializer.toJson<String>(productId),
+      'productName': serializer.toJson<String>(productName),
+      'campaignDate': serializer.toJson<DateTime>(campaignDate),
+      'withdrawalEndDate': serializer.toJson<DateTime>(withdrawalEndDate),
+      'veterinarianId': serializer.toJson<String?>(veterinarianId),
+      'veterinarianName': serializer.toJson<String?>(veterinarianName),
+      'animalIdsJson': serializer.toJson<String>(animalIdsJson),
+      'completed': serializer.toJson<bool>(completed),
+      'synced': serializer.toJson<bool>(synced),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'lastSyncedAt': serializer.toJson<DateTime?>(lastSyncedAt),
+      'serverVersion': serializer.toJson<String?>(serverVersion),
+    };
+  }
+
+  CampaignsTableData copyWith(
+          {String? id,
+          String? farmId,
+          String? name,
+          String? productId,
+          String? productName,
+          DateTime? campaignDate,
+          DateTime? withdrawalEndDate,
+          Value<String?> veterinarianId = const Value.absent(),
+          Value<String?> veterinarianName = const Value.absent(),
+          String? animalIdsJson,
+          bool? completed,
+          bool? synced,
+          DateTime? createdAt,
+          DateTime? updatedAt,
+          Value<DateTime?> lastSyncedAt = const Value.absent(),
+          Value<String?> serverVersion = const Value.absent()}) =>
+      CampaignsTableData(
+        id: id ?? this.id,
+        farmId: farmId ?? this.farmId,
+        name: name ?? this.name,
+        productId: productId ?? this.productId,
+        productName: productName ?? this.productName,
+        campaignDate: campaignDate ?? this.campaignDate,
+        withdrawalEndDate: withdrawalEndDate ?? this.withdrawalEndDate,
+        veterinarianId:
+            veterinarianId.present ? veterinarianId.value : this.veterinarianId,
+        veterinarianName: veterinarianName.present
+            ? veterinarianName.value
+            : this.veterinarianName,
+        animalIdsJson: animalIdsJson ?? this.animalIdsJson,
+        completed: completed ?? this.completed,
+        synced: synced ?? this.synced,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+        lastSyncedAt:
+            lastSyncedAt.present ? lastSyncedAt.value : this.lastSyncedAt,
+        serverVersion:
+            serverVersion.present ? serverVersion.value : this.serverVersion,
+      );
+  CampaignsTableData copyWithCompanion(CampaignsTableCompanion data) {
+    return CampaignsTableData(
+      id: data.id.present ? data.id.value : this.id,
+      farmId: data.farmId.present ? data.farmId.value : this.farmId,
+      name: data.name.present ? data.name.value : this.name,
+      productId: data.productId.present ? data.productId.value : this.productId,
+      productName:
+          data.productName.present ? data.productName.value : this.productName,
+      campaignDate: data.campaignDate.present
+          ? data.campaignDate.value
+          : this.campaignDate,
+      withdrawalEndDate: data.withdrawalEndDate.present
+          ? data.withdrawalEndDate.value
+          : this.withdrawalEndDate,
+      veterinarianId: data.veterinarianId.present
+          ? data.veterinarianId.value
+          : this.veterinarianId,
+      veterinarianName: data.veterinarianName.present
+          ? data.veterinarianName.value
+          : this.veterinarianName,
+      animalIdsJson: data.animalIdsJson.present
+          ? data.animalIdsJson.value
+          : this.animalIdsJson,
+      completed: data.completed.present ? data.completed.value : this.completed,
+      synced: data.synced.present ? data.synced.value : this.synced,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      lastSyncedAt: data.lastSyncedAt.present
+          ? data.lastSyncedAt.value
+          : this.lastSyncedAt,
+      serverVersion: data.serverVersion.present
+          ? data.serverVersion.value
+          : this.serverVersion,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CampaignsTableData(')
+          ..write('id: $id, ')
+          ..write('farmId: $farmId, ')
+          ..write('name: $name, ')
+          ..write('productId: $productId, ')
+          ..write('productName: $productName, ')
+          ..write('campaignDate: $campaignDate, ')
+          ..write('withdrawalEndDate: $withdrawalEndDate, ')
+          ..write('veterinarianId: $veterinarianId, ')
+          ..write('veterinarianName: $veterinarianName, ')
+          ..write('animalIdsJson: $animalIdsJson, ')
+          ..write('completed: $completed, ')
+          ..write('synced: $synced, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('serverVersion: $serverVersion')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id,
+      farmId,
+      name,
+      productId,
+      productName,
+      campaignDate,
+      withdrawalEndDate,
+      veterinarianId,
+      veterinarianName,
+      animalIdsJson,
+      completed,
+      synced,
+      createdAt,
+      updatedAt,
+      lastSyncedAt,
+      serverVersion);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CampaignsTableData &&
+          other.id == this.id &&
+          other.farmId == this.farmId &&
+          other.name == this.name &&
+          other.productId == this.productId &&
+          other.productName == this.productName &&
+          other.campaignDate == this.campaignDate &&
+          other.withdrawalEndDate == this.withdrawalEndDate &&
+          other.veterinarianId == this.veterinarianId &&
+          other.veterinarianName == this.veterinarianName &&
+          other.animalIdsJson == this.animalIdsJson &&
+          other.completed == this.completed &&
+          other.synced == this.synced &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.lastSyncedAt == this.lastSyncedAt &&
+          other.serverVersion == this.serverVersion);
+}
+
+class CampaignsTableCompanion extends UpdateCompanion<CampaignsTableData> {
+  final Value<String> id;
+  final Value<String> farmId;
+  final Value<String> name;
+  final Value<String> productId;
+  final Value<String> productName;
+  final Value<DateTime> campaignDate;
+  final Value<DateTime> withdrawalEndDate;
+  final Value<String?> veterinarianId;
+  final Value<String?> veterinarianName;
+  final Value<String> animalIdsJson;
+  final Value<bool> completed;
+  final Value<bool> synced;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> lastSyncedAt;
+  final Value<String?> serverVersion;
+  final Value<int> rowid;
+  const CampaignsTableCompanion({
+    this.id = const Value.absent(),
+    this.farmId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.productId = const Value.absent(),
+    this.productName = const Value.absent(),
+    this.campaignDate = const Value.absent(),
+    this.withdrawalEndDate = const Value.absent(),
+    this.veterinarianId = const Value.absent(),
+    this.veterinarianName = const Value.absent(),
+    this.animalIdsJson = const Value.absent(),
+    this.completed = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.serverVersion = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CampaignsTableCompanion.insert({
+    required String id,
+    required String farmId,
+    required String name,
+    required String productId,
+    required String productName,
+    required DateTime campaignDate,
+    required DateTime withdrawalEndDate,
+    this.veterinarianId = const Value.absent(),
+    this.veterinarianName = const Value.absent(),
+    required String animalIdsJson,
+    this.completed = const Value.absent(),
+    this.synced = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.lastSyncedAt = const Value.absent(),
+    this.serverVersion = const Value.absent(),
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        farmId = Value(farmId),
+        name = Value(name),
+        productId = Value(productId),
+        productName = Value(productName),
+        campaignDate = Value(campaignDate),
+        withdrawalEndDate = Value(withdrawalEndDate),
+        animalIdsJson = Value(animalIdsJson),
+        createdAt = Value(createdAt),
+        updatedAt = Value(updatedAt);
+  static Insertable<CampaignsTableData> custom({
+    Expression<String>? id,
+    Expression<String>? farmId,
+    Expression<String>? name,
+    Expression<String>? productId,
+    Expression<String>? productName,
+    Expression<DateTime>? campaignDate,
+    Expression<DateTime>? withdrawalEndDate,
+    Expression<String>? veterinarianId,
+    Expression<String>? veterinarianName,
+    Expression<String>? animalIdsJson,
+    Expression<bool>? completed,
+    Expression<bool>? synced,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? lastSyncedAt,
+    Expression<String>? serverVersion,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (farmId != null) 'farm_id': farmId,
+      if (name != null) 'name': name,
+      if (productId != null) 'product_id': productId,
+      if (productName != null) 'product_name': productName,
+      if (campaignDate != null) 'campaign_date': campaignDate,
+      if (withdrawalEndDate != null) 'withdrawal_end_date': withdrawalEndDate,
+      if (veterinarianId != null) 'veterinarian_id': veterinarianId,
+      if (veterinarianName != null) 'veterinarian_name': veterinarianName,
+      if (animalIdsJson != null) 'animal_ids_json': animalIdsJson,
+      if (completed != null) 'completed': completed,
+      if (synced != null) 'synced': synced,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
+      if (serverVersion != null) 'server_version': serverVersion,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CampaignsTableCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? farmId,
+      Value<String>? name,
+      Value<String>? productId,
+      Value<String>? productName,
+      Value<DateTime>? campaignDate,
+      Value<DateTime>? withdrawalEndDate,
+      Value<String?>? veterinarianId,
+      Value<String?>? veterinarianName,
+      Value<String>? animalIdsJson,
+      Value<bool>? completed,
+      Value<bool>? synced,
+      Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt,
+      Value<DateTime?>? lastSyncedAt,
+      Value<String?>? serverVersion,
+      Value<int>? rowid}) {
+    return CampaignsTableCompanion(
+      id: id ?? this.id,
+      farmId: farmId ?? this.farmId,
+      name: name ?? this.name,
+      productId: productId ?? this.productId,
+      productName: productName ?? this.productName,
+      campaignDate: campaignDate ?? this.campaignDate,
+      withdrawalEndDate: withdrawalEndDate ?? this.withdrawalEndDate,
+      veterinarianId: veterinarianId ?? this.veterinarianId,
+      veterinarianName: veterinarianName ?? this.veterinarianName,
+      animalIdsJson: animalIdsJson ?? this.animalIdsJson,
+      completed: completed ?? this.completed,
+      synced: synced ?? this.synced,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      serverVersion: serverVersion ?? this.serverVersion,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (farmId.present) {
+      map['farm_id'] = Variable<String>(farmId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (productId.present) {
+      map['product_id'] = Variable<String>(productId.value);
+    }
+    if (productName.present) {
+      map['product_name'] = Variable<String>(productName.value);
+    }
+    if (campaignDate.present) {
+      map['campaign_date'] = Variable<DateTime>(campaignDate.value);
+    }
+    if (withdrawalEndDate.present) {
+      map['withdrawal_end_date'] = Variable<DateTime>(withdrawalEndDate.value);
+    }
+    if (veterinarianId.present) {
+      map['veterinarian_id'] = Variable<String>(veterinarianId.value);
+    }
+    if (veterinarianName.present) {
+      map['veterinarian_name'] = Variable<String>(veterinarianName.value);
+    }
+    if (animalIdsJson.present) {
+      map['animal_ids_json'] = Variable<String>(animalIdsJson.value);
+    }
+    if (completed.present) {
+      map['completed'] = Variable<bool>(completed.value);
+    }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (lastSyncedAt.present) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt.value);
+    }
+    if (serverVersion.present) {
+      map['server_version'] = Variable<String>(serverVersion.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CampaignsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('farmId: $farmId, ')
+          ..write('name: $name, ')
+          ..write('productId: $productId, ')
+          ..write('productName: $productName, ')
+          ..write('campaignDate: $campaignDate, ')
+          ..write('withdrawalEndDate: $withdrawalEndDate, ')
+          ..write('veterinarianId: $veterinarianId, ')
+          ..write('veterinarianName: $veterinarianName, ')
+          ..write('animalIdsJson: $animalIdsJson, ')
+          ..write('completed: $completed, ')
+          ..write('synced: $synced, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('serverVersion: $serverVersion, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $FarmsTableTable farmsTable = $FarmsTableTable(this);
   late final $AnimalsTableTable animalsTable = $AnimalsTableTable(this);
+  late final $TreatmentsTableTable treatmentsTable =
+      $TreatmentsTableTable(this);
+  late final $VaccinationsTableTable vaccinationsTable =
+      $VaccinationsTableTable(this);
+  late final $WeightsTableTable weightsTable = $WeightsTableTable(this);
+  late final $MovementsTableTable movementsTable = $MovementsTableTable(this);
   late final $SpeciesTableTable speciesTable = $SpeciesTableTable(this);
   late final $BreedsTableTable breedsTable = $BreedsTableTable(this);
   late final $MedicalProductsTableTable medicalProductsTable =
@@ -6497,8 +12638,16 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $VaccinesTableTable vaccinesTable = $VaccinesTableTable(this);
   late final $VeterinariansTableTable veterinariansTable =
       $VeterinariansTableTable(this);
+  late final $BatchesTableTable batchesTable = $BatchesTableTable(this);
+  late final $LotsTableTable lotsTable = $LotsTableTable(this);
+  late final $CampaignsTableTable campaignsTable = $CampaignsTableTable(this);
   late final FarmDao farmDao = FarmDao(this as AppDatabase);
   late final AnimalDao animalDao = AnimalDao(this as AppDatabase);
+  late final TreatmentDao treatmentDao = TreatmentDao(this as AppDatabase);
+  late final VaccinationDao vaccinationDao =
+      VaccinationDao(this as AppDatabase);
+  late final WeightDao weightDao = WeightDao(this as AppDatabase);
+  late final MovementDao movementDao = MovementDao(this as AppDatabase);
   late final SpeciesDao speciesDao = SpeciesDao(this as AppDatabase);
   late final BreedDao breedDao = BreedDao(this as AppDatabase);
   late final MedicalProductDao medicalProductDao =
@@ -6506,6 +12655,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final VaccineDao vaccineDao = VaccineDao(this as AppDatabase);
   late final VeterinarianDao veterinarianDao =
       VeterinarianDao(this as AppDatabase);
+  late final BatchDao batchDao = BatchDao(this as AppDatabase);
+  late final LotDao lotDao = LotDao(this as AppDatabase);
+  late final CampaignDao campaignDao = CampaignDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -6513,11 +12665,18 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [
         farmsTable,
         animalsTable,
+        treatmentsTable,
+        vaccinationsTable,
+        weightsTable,
+        movementsTable,
         speciesTable,
         breedsTable,
         medicalProductsTable,
         vaccinesTable,
-        veterinariansTable
+        veterinariansTable,
+        batchesTable,
+        lotsTable,
+        campaignsTable
       ];
 }
 
@@ -7154,6 +13313,1497 @@ typedef $$AnimalsTableTableProcessedTableManager = ProcessedTableManager<
       BaseReferences<_$AppDatabase, $AnimalsTableTable, AnimalsTableData>
     ),
     AnimalsTableData,
+    PrefetchHooks Function()>;
+typedef $$TreatmentsTableTableCreateCompanionBuilder = TreatmentsTableCompanion
+    Function({
+  required String id,
+  required String farmId,
+  required String animalId,
+  required String productId,
+  required String productName,
+  required double dose,
+  required DateTime treatmentDate,
+  required DateTime withdrawalEndDate,
+  Value<String?> notes,
+  Value<String?> veterinarianId,
+  Value<String?> veterinarianName,
+  Value<String?> campaignId,
+  Value<bool> synced,
+  Value<DateTime?> lastSyncedAt,
+  Value<int?> serverVersion,
+  Value<DateTime?> deletedAt,
+  required DateTime createdAt,
+  required DateTime updatedAt,
+  Value<int> rowid,
+});
+typedef $$TreatmentsTableTableUpdateCompanionBuilder = TreatmentsTableCompanion
+    Function({
+  Value<String> id,
+  Value<String> farmId,
+  Value<String> animalId,
+  Value<String> productId,
+  Value<String> productName,
+  Value<double> dose,
+  Value<DateTime> treatmentDate,
+  Value<DateTime> withdrawalEndDate,
+  Value<String?> notes,
+  Value<String?> veterinarianId,
+  Value<String?> veterinarianName,
+  Value<String?> campaignId,
+  Value<bool> synced,
+  Value<DateTime?> lastSyncedAt,
+  Value<int?> serverVersion,
+  Value<DateTime?> deletedAt,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<int> rowid,
+});
+
+class $$TreatmentsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $TreatmentsTableTable> {
+  $$TreatmentsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get farmId => $composableBuilder(
+      column: $table.farmId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get animalId => $composableBuilder(
+      column: $table.animalId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get productId => $composableBuilder(
+      column: $table.productId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get productName => $composableBuilder(
+      column: $table.productName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get dose => $composableBuilder(
+      column: $table.dose, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get treatmentDate => $composableBuilder(
+      column: $table.treatmentDate, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get withdrawalEndDate => $composableBuilder(
+      column: $table.withdrawalEndDate,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get veterinarianId => $composableBuilder(
+      column: $table.veterinarianId,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get veterinarianName => $composableBuilder(
+      column: $table.veterinarianName,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get campaignId => $composableBuilder(
+      column: $table.campaignId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+      column: $table.synced, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get serverVersion => $composableBuilder(
+      column: $table.serverVersion, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+      column: $table.deletedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$TreatmentsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $TreatmentsTableTable> {
+  $$TreatmentsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get farmId => $composableBuilder(
+      column: $table.farmId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get animalId => $composableBuilder(
+      column: $table.animalId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get productId => $composableBuilder(
+      column: $table.productId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get productName => $composableBuilder(
+      column: $table.productName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get dose => $composableBuilder(
+      column: $table.dose, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get treatmentDate => $composableBuilder(
+      column: $table.treatmentDate,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get withdrawalEndDate => $composableBuilder(
+      column: $table.withdrawalEndDate,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get veterinarianId => $composableBuilder(
+      column: $table.veterinarianId,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get veterinarianName => $composableBuilder(
+      column: $table.veterinarianName,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get campaignId => $composableBuilder(
+      column: $table.campaignId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+      column: $table.synced, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get serverVersion => $composableBuilder(
+      column: $table.serverVersion,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+      column: $table.deletedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$TreatmentsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TreatmentsTableTable> {
+  $$TreatmentsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get farmId =>
+      $composableBuilder(column: $table.farmId, builder: (column) => column);
+
+  GeneratedColumn<String> get animalId =>
+      $composableBuilder(column: $table.animalId, builder: (column) => column);
+
+  GeneratedColumn<String> get productId =>
+      $composableBuilder(column: $table.productId, builder: (column) => column);
+
+  GeneratedColumn<String> get productName => $composableBuilder(
+      column: $table.productName, builder: (column) => column);
+
+  GeneratedColumn<double> get dose =>
+      $composableBuilder(column: $table.dose, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get treatmentDate => $composableBuilder(
+      column: $table.treatmentDate, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get withdrawalEndDate => $composableBuilder(
+      column: $table.withdrawalEndDate, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<String> get veterinarianId => $composableBuilder(
+      column: $table.veterinarianId, builder: (column) => column);
+
+  GeneratedColumn<String> get veterinarianName => $composableBuilder(
+      column: $table.veterinarianName, builder: (column) => column);
+
+  GeneratedColumn<String> get campaignId => $composableBuilder(
+      column: $table.campaignId, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get serverVersion => $composableBuilder(
+      column: $table.serverVersion, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$TreatmentsTableTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $TreatmentsTableTable,
+    TreatmentsTableData,
+    $$TreatmentsTableTableFilterComposer,
+    $$TreatmentsTableTableOrderingComposer,
+    $$TreatmentsTableTableAnnotationComposer,
+    $$TreatmentsTableTableCreateCompanionBuilder,
+    $$TreatmentsTableTableUpdateCompanionBuilder,
+    (
+      TreatmentsTableData,
+      BaseReferences<_$AppDatabase, $TreatmentsTableTable, TreatmentsTableData>
+    ),
+    TreatmentsTableData,
+    PrefetchHooks Function()> {
+  $$TreatmentsTableTableTableManager(
+      _$AppDatabase db, $TreatmentsTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TreatmentsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TreatmentsTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TreatmentsTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> farmId = const Value.absent(),
+            Value<String> animalId = const Value.absent(),
+            Value<String> productId = const Value.absent(),
+            Value<String> productName = const Value.absent(),
+            Value<double> dose = const Value.absent(),
+            Value<DateTime> treatmentDate = const Value.absent(),
+            Value<DateTime> withdrawalEndDate = const Value.absent(),
+            Value<String?> notes = const Value.absent(),
+            Value<String?> veterinarianId = const Value.absent(),
+            Value<String?> veterinarianName = const Value.absent(),
+            Value<String?> campaignId = const Value.absent(),
+            Value<bool> synced = const Value.absent(),
+            Value<DateTime?> lastSyncedAt = const Value.absent(),
+            Value<int?> serverVersion = const Value.absent(),
+            Value<DateTime?> deletedAt = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              TreatmentsTableCompanion(
+            id: id,
+            farmId: farmId,
+            animalId: animalId,
+            productId: productId,
+            productName: productName,
+            dose: dose,
+            treatmentDate: treatmentDate,
+            withdrawalEndDate: withdrawalEndDate,
+            notes: notes,
+            veterinarianId: veterinarianId,
+            veterinarianName: veterinarianName,
+            campaignId: campaignId,
+            synced: synced,
+            lastSyncedAt: lastSyncedAt,
+            serverVersion: serverVersion,
+            deletedAt: deletedAt,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String farmId,
+            required String animalId,
+            required String productId,
+            required String productName,
+            required double dose,
+            required DateTime treatmentDate,
+            required DateTime withdrawalEndDate,
+            Value<String?> notes = const Value.absent(),
+            Value<String?> veterinarianId = const Value.absent(),
+            Value<String?> veterinarianName = const Value.absent(),
+            Value<String?> campaignId = const Value.absent(),
+            Value<bool> synced = const Value.absent(),
+            Value<DateTime?> lastSyncedAt = const Value.absent(),
+            Value<int?> serverVersion = const Value.absent(),
+            Value<DateTime?> deletedAt = const Value.absent(),
+            required DateTime createdAt,
+            required DateTime updatedAt,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              TreatmentsTableCompanion.insert(
+            id: id,
+            farmId: farmId,
+            animalId: animalId,
+            productId: productId,
+            productName: productName,
+            dose: dose,
+            treatmentDate: treatmentDate,
+            withdrawalEndDate: withdrawalEndDate,
+            notes: notes,
+            veterinarianId: veterinarianId,
+            veterinarianName: veterinarianName,
+            campaignId: campaignId,
+            synced: synced,
+            lastSyncedAt: lastSyncedAt,
+            serverVersion: serverVersion,
+            deletedAt: deletedAt,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$TreatmentsTableTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $TreatmentsTableTable,
+    TreatmentsTableData,
+    $$TreatmentsTableTableFilterComposer,
+    $$TreatmentsTableTableOrderingComposer,
+    $$TreatmentsTableTableAnnotationComposer,
+    $$TreatmentsTableTableCreateCompanionBuilder,
+    $$TreatmentsTableTableUpdateCompanionBuilder,
+    (
+      TreatmentsTableData,
+      BaseReferences<_$AppDatabase, $TreatmentsTableTable, TreatmentsTableData>
+    ),
+    TreatmentsTableData,
+    PrefetchHooks Function()>;
+typedef $$VaccinationsTableTableCreateCompanionBuilder
+    = VaccinationsTableCompanion Function({
+  required String id,
+  required String farmId,
+  Value<String?> animalId,
+  required String animalIds,
+  Value<String?> protocolId,
+  required String vaccineName,
+  required String type,
+  required String disease,
+  required DateTime vaccinationDate,
+  Value<String?> batchNumber,
+  Value<DateTime?> expiryDate,
+  required String dose,
+  required String administrationRoute,
+  Value<String?> veterinarianId,
+  Value<String?> veterinarianName,
+  Value<DateTime?> nextDueDate,
+  required int withdrawalPeriodDays,
+  Value<String?> notes,
+  Value<bool> synced,
+  Value<DateTime?> lastSyncedAt,
+  Value<int?> serverVersion,
+  Value<DateTime?> deletedAt,
+  required DateTime createdAt,
+  required DateTime updatedAt,
+  Value<int> rowid,
+});
+typedef $$VaccinationsTableTableUpdateCompanionBuilder
+    = VaccinationsTableCompanion Function({
+  Value<String> id,
+  Value<String> farmId,
+  Value<String?> animalId,
+  Value<String> animalIds,
+  Value<String?> protocolId,
+  Value<String> vaccineName,
+  Value<String> type,
+  Value<String> disease,
+  Value<DateTime> vaccinationDate,
+  Value<String?> batchNumber,
+  Value<DateTime?> expiryDate,
+  Value<String> dose,
+  Value<String> administrationRoute,
+  Value<String?> veterinarianId,
+  Value<String?> veterinarianName,
+  Value<DateTime?> nextDueDate,
+  Value<int> withdrawalPeriodDays,
+  Value<String?> notes,
+  Value<bool> synced,
+  Value<DateTime?> lastSyncedAt,
+  Value<int?> serverVersion,
+  Value<DateTime?> deletedAt,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<int> rowid,
+});
+
+class $$VaccinationsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $VaccinationsTableTable> {
+  $$VaccinationsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get farmId => $composableBuilder(
+      column: $table.farmId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get animalId => $composableBuilder(
+      column: $table.animalId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get animalIds => $composableBuilder(
+      column: $table.animalIds, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get protocolId => $composableBuilder(
+      column: $table.protocolId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get vaccineName => $composableBuilder(
+      column: $table.vaccineName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get type => $composableBuilder(
+      column: $table.type, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get disease => $composableBuilder(
+      column: $table.disease, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get vaccinationDate => $composableBuilder(
+      column: $table.vaccinationDate,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get batchNumber => $composableBuilder(
+      column: $table.batchNumber, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get expiryDate => $composableBuilder(
+      column: $table.expiryDate, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get dose => $composableBuilder(
+      column: $table.dose, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get administrationRoute => $composableBuilder(
+      column: $table.administrationRoute,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get veterinarianId => $composableBuilder(
+      column: $table.veterinarianId,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get veterinarianName => $composableBuilder(
+      column: $table.veterinarianName,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get nextDueDate => $composableBuilder(
+      column: $table.nextDueDate, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get withdrawalPeriodDays => $composableBuilder(
+      column: $table.withdrawalPeriodDays,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+      column: $table.synced, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get serverVersion => $composableBuilder(
+      column: $table.serverVersion, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+      column: $table.deletedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$VaccinationsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $VaccinationsTableTable> {
+  $$VaccinationsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get farmId => $composableBuilder(
+      column: $table.farmId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get animalId => $composableBuilder(
+      column: $table.animalId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get animalIds => $composableBuilder(
+      column: $table.animalIds, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get protocolId => $composableBuilder(
+      column: $table.protocolId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get vaccineName => $composableBuilder(
+      column: $table.vaccineName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get type => $composableBuilder(
+      column: $table.type, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get disease => $composableBuilder(
+      column: $table.disease, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get vaccinationDate => $composableBuilder(
+      column: $table.vaccinationDate,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get batchNumber => $composableBuilder(
+      column: $table.batchNumber, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get expiryDate => $composableBuilder(
+      column: $table.expiryDate, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get dose => $composableBuilder(
+      column: $table.dose, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get administrationRoute => $composableBuilder(
+      column: $table.administrationRoute,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get veterinarianId => $composableBuilder(
+      column: $table.veterinarianId,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get veterinarianName => $composableBuilder(
+      column: $table.veterinarianName,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get nextDueDate => $composableBuilder(
+      column: $table.nextDueDate, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get withdrawalPeriodDays => $composableBuilder(
+      column: $table.withdrawalPeriodDays,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+      column: $table.synced, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get serverVersion => $composableBuilder(
+      column: $table.serverVersion,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+      column: $table.deletedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$VaccinationsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $VaccinationsTableTable> {
+  $$VaccinationsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get farmId =>
+      $composableBuilder(column: $table.farmId, builder: (column) => column);
+
+  GeneratedColumn<String> get animalId =>
+      $composableBuilder(column: $table.animalId, builder: (column) => column);
+
+  GeneratedColumn<String> get animalIds =>
+      $composableBuilder(column: $table.animalIds, builder: (column) => column);
+
+  GeneratedColumn<String> get protocolId => $composableBuilder(
+      column: $table.protocolId, builder: (column) => column);
+
+  GeneratedColumn<String> get vaccineName => $composableBuilder(
+      column: $table.vaccineName, builder: (column) => column);
+
+  GeneratedColumn<String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+
+  GeneratedColumn<String> get disease =>
+      $composableBuilder(column: $table.disease, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get vaccinationDate => $composableBuilder(
+      column: $table.vaccinationDate, builder: (column) => column);
+
+  GeneratedColumn<String> get batchNumber => $composableBuilder(
+      column: $table.batchNumber, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get expiryDate => $composableBuilder(
+      column: $table.expiryDate, builder: (column) => column);
+
+  GeneratedColumn<String> get dose =>
+      $composableBuilder(column: $table.dose, builder: (column) => column);
+
+  GeneratedColumn<String> get administrationRoute => $composableBuilder(
+      column: $table.administrationRoute, builder: (column) => column);
+
+  GeneratedColumn<String> get veterinarianId => $composableBuilder(
+      column: $table.veterinarianId, builder: (column) => column);
+
+  GeneratedColumn<String> get veterinarianName => $composableBuilder(
+      column: $table.veterinarianName, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get nextDueDate => $composableBuilder(
+      column: $table.nextDueDate, builder: (column) => column);
+
+  GeneratedColumn<int> get withdrawalPeriodDays => $composableBuilder(
+      column: $table.withdrawalPeriodDays, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get serverVersion => $composableBuilder(
+      column: $table.serverVersion, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$VaccinationsTableTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $VaccinationsTableTable,
+    VaccinationsTableData,
+    $$VaccinationsTableTableFilterComposer,
+    $$VaccinationsTableTableOrderingComposer,
+    $$VaccinationsTableTableAnnotationComposer,
+    $$VaccinationsTableTableCreateCompanionBuilder,
+    $$VaccinationsTableTableUpdateCompanionBuilder,
+    (
+      VaccinationsTableData,
+      BaseReferences<_$AppDatabase, $VaccinationsTableTable,
+          VaccinationsTableData>
+    ),
+    VaccinationsTableData,
+    PrefetchHooks Function()> {
+  $$VaccinationsTableTableTableManager(
+      _$AppDatabase db, $VaccinationsTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$VaccinationsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$VaccinationsTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$VaccinationsTableTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> farmId = const Value.absent(),
+            Value<String?> animalId = const Value.absent(),
+            Value<String> animalIds = const Value.absent(),
+            Value<String?> protocolId = const Value.absent(),
+            Value<String> vaccineName = const Value.absent(),
+            Value<String> type = const Value.absent(),
+            Value<String> disease = const Value.absent(),
+            Value<DateTime> vaccinationDate = const Value.absent(),
+            Value<String?> batchNumber = const Value.absent(),
+            Value<DateTime?> expiryDate = const Value.absent(),
+            Value<String> dose = const Value.absent(),
+            Value<String> administrationRoute = const Value.absent(),
+            Value<String?> veterinarianId = const Value.absent(),
+            Value<String?> veterinarianName = const Value.absent(),
+            Value<DateTime?> nextDueDate = const Value.absent(),
+            Value<int> withdrawalPeriodDays = const Value.absent(),
+            Value<String?> notes = const Value.absent(),
+            Value<bool> synced = const Value.absent(),
+            Value<DateTime?> lastSyncedAt = const Value.absent(),
+            Value<int?> serverVersion = const Value.absent(),
+            Value<DateTime?> deletedAt = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              VaccinationsTableCompanion(
+            id: id,
+            farmId: farmId,
+            animalId: animalId,
+            animalIds: animalIds,
+            protocolId: protocolId,
+            vaccineName: vaccineName,
+            type: type,
+            disease: disease,
+            vaccinationDate: vaccinationDate,
+            batchNumber: batchNumber,
+            expiryDate: expiryDate,
+            dose: dose,
+            administrationRoute: administrationRoute,
+            veterinarianId: veterinarianId,
+            veterinarianName: veterinarianName,
+            nextDueDate: nextDueDate,
+            withdrawalPeriodDays: withdrawalPeriodDays,
+            notes: notes,
+            synced: synced,
+            lastSyncedAt: lastSyncedAt,
+            serverVersion: serverVersion,
+            deletedAt: deletedAt,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String farmId,
+            Value<String?> animalId = const Value.absent(),
+            required String animalIds,
+            Value<String?> protocolId = const Value.absent(),
+            required String vaccineName,
+            required String type,
+            required String disease,
+            required DateTime vaccinationDate,
+            Value<String?> batchNumber = const Value.absent(),
+            Value<DateTime?> expiryDate = const Value.absent(),
+            required String dose,
+            required String administrationRoute,
+            Value<String?> veterinarianId = const Value.absent(),
+            Value<String?> veterinarianName = const Value.absent(),
+            Value<DateTime?> nextDueDate = const Value.absent(),
+            required int withdrawalPeriodDays,
+            Value<String?> notes = const Value.absent(),
+            Value<bool> synced = const Value.absent(),
+            Value<DateTime?> lastSyncedAt = const Value.absent(),
+            Value<int?> serverVersion = const Value.absent(),
+            Value<DateTime?> deletedAt = const Value.absent(),
+            required DateTime createdAt,
+            required DateTime updatedAt,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              VaccinationsTableCompanion.insert(
+            id: id,
+            farmId: farmId,
+            animalId: animalId,
+            animalIds: animalIds,
+            protocolId: protocolId,
+            vaccineName: vaccineName,
+            type: type,
+            disease: disease,
+            vaccinationDate: vaccinationDate,
+            batchNumber: batchNumber,
+            expiryDate: expiryDate,
+            dose: dose,
+            administrationRoute: administrationRoute,
+            veterinarianId: veterinarianId,
+            veterinarianName: veterinarianName,
+            nextDueDate: nextDueDate,
+            withdrawalPeriodDays: withdrawalPeriodDays,
+            notes: notes,
+            synced: synced,
+            lastSyncedAt: lastSyncedAt,
+            serverVersion: serverVersion,
+            deletedAt: deletedAt,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$VaccinationsTableTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $VaccinationsTableTable,
+    VaccinationsTableData,
+    $$VaccinationsTableTableFilterComposer,
+    $$VaccinationsTableTableOrderingComposer,
+    $$VaccinationsTableTableAnnotationComposer,
+    $$VaccinationsTableTableCreateCompanionBuilder,
+    $$VaccinationsTableTableUpdateCompanionBuilder,
+    (
+      VaccinationsTableData,
+      BaseReferences<_$AppDatabase, $VaccinationsTableTable,
+          VaccinationsTableData>
+    ),
+    VaccinationsTableData,
+    PrefetchHooks Function()>;
+typedef $$WeightsTableTableCreateCompanionBuilder = WeightsTableCompanion
+    Function({
+  required String id,
+  required String farmId,
+  required String animalId,
+  required double weight,
+  required DateTime recordedAt,
+  required String source,
+  Value<String?> notes,
+  Value<bool> synced,
+  Value<DateTime?> lastSyncedAt,
+  Value<int?> serverVersion,
+  Value<DateTime?> deletedAt,
+  required DateTime createdAt,
+  required DateTime updatedAt,
+  Value<int> rowid,
+});
+typedef $$WeightsTableTableUpdateCompanionBuilder = WeightsTableCompanion
+    Function({
+  Value<String> id,
+  Value<String> farmId,
+  Value<String> animalId,
+  Value<double> weight,
+  Value<DateTime> recordedAt,
+  Value<String> source,
+  Value<String?> notes,
+  Value<bool> synced,
+  Value<DateTime?> lastSyncedAt,
+  Value<int?> serverVersion,
+  Value<DateTime?> deletedAt,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<int> rowid,
+});
+
+class $$WeightsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $WeightsTableTable> {
+  $$WeightsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get farmId => $composableBuilder(
+      column: $table.farmId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get animalId => $composableBuilder(
+      column: $table.animalId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get weight => $composableBuilder(
+      column: $table.weight, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get recordedAt => $composableBuilder(
+      column: $table.recordedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get source => $composableBuilder(
+      column: $table.source, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+      column: $table.synced, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get serverVersion => $composableBuilder(
+      column: $table.serverVersion, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+      column: $table.deletedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$WeightsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $WeightsTableTable> {
+  $$WeightsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get farmId => $composableBuilder(
+      column: $table.farmId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get animalId => $composableBuilder(
+      column: $table.animalId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get weight => $composableBuilder(
+      column: $table.weight, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get recordedAt => $composableBuilder(
+      column: $table.recordedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get source => $composableBuilder(
+      column: $table.source, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+      column: $table.synced, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get serverVersion => $composableBuilder(
+      column: $table.serverVersion,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+      column: $table.deletedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$WeightsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $WeightsTableTable> {
+  $$WeightsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get farmId =>
+      $composableBuilder(column: $table.farmId, builder: (column) => column);
+
+  GeneratedColumn<String> get animalId =>
+      $composableBuilder(column: $table.animalId, builder: (column) => column);
+
+  GeneratedColumn<double> get weight =>
+      $composableBuilder(column: $table.weight, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get recordedAt => $composableBuilder(
+      column: $table.recordedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get serverVersion => $composableBuilder(
+      column: $table.serverVersion, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$WeightsTableTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $WeightsTableTable,
+    WeightsTableData,
+    $$WeightsTableTableFilterComposer,
+    $$WeightsTableTableOrderingComposer,
+    $$WeightsTableTableAnnotationComposer,
+    $$WeightsTableTableCreateCompanionBuilder,
+    $$WeightsTableTableUpdateCompanionBuilder,
+    (
+      WeightsTableData,
+      BaseReferences<_$AppDatabase, $WeightsTableTable, WeightsTableData>
+    ),
+    WeightsTableData,
+    PrefetchHooks Function()> {
+  $$WeightsTableTableTableManager(_$AppDatabase db, $WeightsTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$WeightsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$WeightsTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$WeightsTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> farmId = const Value.absent(),
+            Value<String> animalId = const Value.absent(),
+            Value<double> weight = const Value.absent(),
+            Value<DateTime> recordedAt = const Value.absent(),
+            Value<String> source = const Value.absent(),
+            Value<String?> notes = const Value.absent(),
+            Value<bool> synced = const Value.absent(),
+            Value<DateTime?> lastSyncedAt = const Value.absent(),
+            Value<int?> serverVersion = const Value.absent(),
+            Value<DateTime?> deletedAt = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              WeightsTableCompanion(
+            id: id,
+            farmId: farmId,
+            animalId: animalId,
+            weight: weight,
+            recordedAt: recordedAt,
+            source: source,
+            notes: notes,
+            synced: synced,
+            lastSyncedAt: lastSyncedAt,
+            serverVersion: serverVersion,
+            deletedAt: deletedAt,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String farmId,
+            required String animalId,
+            required double weight,
+            required DateTime recordedAt,
+            required String source,
+            Value<String?> notes = const Value.absent(),
+            Value<bool> synced = const Value.absent(),
+            Value<DateTime?> lastSyncedAt = const Value.absent(),
+            Value<int?> serverVersion = const Value.absent(),
+            Value<DateTime?> deletedAt = const Value.absent(),
+            required DateTime createdAt,
+            required DateTime updatedAt,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              WeightsTableCompanion.insert(
+            id: id,
+            farmId: farmId,
+            animalId: animalId,
+            weight: weight,
+            recordedAt: recordedAt,
+            source: source,
+            notes: notes,
+            synced: synced,
+            lastSyncedAt: lastSyncedAt,
+            serverVersion: serverVersion,
+            deletedAt: deletedAt,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$WeightsTableTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $WeightsTableTable,
+    WeightsTableData,
+    $$WeightsTableTableFilterComposer,
+    $$WeightsTableTableOrderingComposer,
+    $$WeightsTableTableAnnotationComposer,
+    $$WeightsTableTableCreateCompanionBuilder,
+    $$WeightsTableTableUpdateCompanionBuilder,
+    (
+      WeightsTableData,
+      BaseReferences<_$AppDatabase, $WeightsTableTable, WeightsTableData>
+    ),
+    WeightsTableData,
+    PrefetchHooks Function()>;
+typedef $$MovementsTableTableCreateCompanionBuilder = MovementsTableCompanion
+    Function({
+  required String id,
+  required String farmId,
+  required String animalId,
+  required String type,
+  required DateTime movementDate,
+  Value<String?> fromFarmId,
+  Value<String?> toFarmId,
+  Value<double?> price,
+  Value<String?> notes,
+  Value<String?> buyerQrSignature,
+  Value<bool> synced,
+  Value<DateTime?> lastSyncedAt,
+  Value<int?> serverVersion,
+  Value<DateTime?> deletedAt,
+  required DateTime createdAt,
+  required DateTime updatedAt,
+  Value<int> rowid,
+});
+typedef $$MovementsTableTableUpdateCompanionBuilder = MovementsTableCompanion
+    Function({
+  Value<String> id,
+  Value<String> farmId,
+  Value<String> animalId,
+  Value<String> type,
+  Value<DateTime> movementDate,
+  Value<String?> fromFarmId,
+  Value<String?> toFarmId,
+  Value<double?> price,
+  Value<String?> notes,
+  Value<String?> buyerQrSignature,
+  Value<bool> synced,
+  Value<DateTime?> lastSyncedAt,
+  Value<int?> serverVersion,
+  Value<DateTime?> deletedAt,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<int> rowid,
+});
+
+class $$MovementsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $MovementsTableTable> {
+  $$MovementsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get farmId => $composableBuilder(
+      column: $table.farmId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get animalId => $composableBuilder(
+      column: $table.animalId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get type => $composableBuilder(
+      column: $table.type, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get movementDate => $composableBuilder(
+      column: $table.movementDate, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get fromFarmId => $composableBuilder(
+      column: $table.fromFarmId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get toFarmId => $composableBuilder(
+      column: $table.toFarmId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get price => $composableBuilder(
+      column: $table.price, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get buyerQrSignature => $composableBuilder(
+      column: $table.buyerQrSignature,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+      column: $table.synced, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get serverVersion => $composableBuilder(
+      column: $table.serverVersion, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+      column: $table.deletedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$MovementsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $MovementsTableTable> {
+  $$MovementsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get farmId => $composableBuilder(
+      column: $table.farmId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get animalId => $composableBuilder(
+      column: $table.animalId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get type => $composableBuilder(
+      column: $table.type, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get movementDate => $composableBuilder(
+      column: $table.movementDate,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get fromFarmId => $composableBuilder(
+      column: $table.fromFarmId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get toFarmId => $composableBuilder(
+      column: $table.toFarmId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get price => $composableBuilder(
+      column: $table.price, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get buyerQrSignature => $composableBuilder(
+      column: $table.buyerQrSignature,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+      column: $table.synced, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get serverVersion => $composableBuilder(
+      column: $table.serverVersion,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+      column: $table.deletedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$MovementsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MovementsTableTable> {
+  $$MovementsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get farmId =>
+      $composableBuilder(column: $table.farmId, builder: (column) => column);
+
+  GeneratedColumn<String> get animalId =>
+      $composableBuilder(column: $table.animalId, builder: (column) => column);
+
+  GeneratedColumn<String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get movementDate => $composableBuilder(
+      column: $table.movementDate, builder: (column) => column);
+
+  GeneratedColumn<String> get fromFarmId => $composableBuilder(
+      column: $table.fromFarmId, builder: (column) => column);
+
+  GeneratedColumn<String> get toFarmId =>
+      $composableBuilder(column: $table.toFarmId, builder: (column) => column);
+
+  GeneratedColumn<double> get price =>
+      $composableBuilder(column: $table.price, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<String> get buyerQrSignature => $composableBuilder(
+      column: $table.buyerQrSignature, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get serverVersion => $composableBuilder(
+      column: $table.serverVersion, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$MovementsTableTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $MovementsTableTable,
+    MovementsTableData,
+    $$MovementsTableTableFilterComposer,
+    $$MovementsTableTableOrderingComposer,
+    $$MovementsTableTableAnnotationComposer,
+    $$MovementsTableTableCreateCompanionBuilder,
+    $$MovementsTableTableUpdateCompanionBuilder,
+    (
+      MovementsTableData,
+      BaseReferences<_$AppDatabase, $MovementsTableTable, MovementsTableData>
+    ),
+    MovementsTableData,
+    PrefetchHooks Function()> {
+  $$MovementsTableTableTableManager(
+      _$AppDatabase db, $MovementsTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MovementsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MovementsTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MovementsTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> farmId = const Value.absent(),
+            Value<String> animalId = const Value.absent(),
+            Value<String> type = const Value.absent(),
+            Value<DateTime> movementDate = const Value.absent(),
+            Value<String?> fromFarmId = const Value.absent(),
+            Value<String?> toFarmId = const Value.absent(),
+            Value<double?> price = const Value.absent(),
+            Value<String?> notes = const Value.absent(),
+            Value<String?> buyerQrSignature = const Value.absent(),
+            Value<bool> synced = const Value.absent(),
+            Value<DateTime?> lastSyncedAt = const Value.absent(),
+            Value<int?> serverVersion = const Value.absent(),
+            Value<DateTime?> deletedAt = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              MovementsTableCompanion(
+            id: id,
+            farmId: farmId,
+            animalId: animalId,
+            type: type,
+            movementDate: movementDate,
+            fromFarmId: fromFarmId,
+            toFarmId: toFarmId,
+            price: price,
+            notes: notes,
+            buyerQrSignature: buyerQrSignature,
+            synced: synced,
+            lastSyncedAt: lastSyncedAt,
+            serverVersion: serverVersion,
+            deletedAt: deletedAt,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String farmId,
+            required String animalId,
+            required String type,
+            required DateTime movementDate,
+            Value<String?> fromFarmId = const Value.absent(),
+            Value<String?> toFarmId = const Value.absent(),
+            Value<double?> price = const Value.absent(),
+            Value<String?> notes = const Value.absent(),
+            Value<String?> buyerQrSignature = const Value.absent(),
+            Value<bool> synced = const Value.absent(),
+            Value<DateTime?> lastSyncedAt = const Value.absent(),
+            Value<int?> serverVersion = const Value.absent(),
+            Value<DateTime?> deletedAt = const Value.absent(),
+            required DateTime createdAt,
+            required DateTime updatedAt,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              MovementsTableCompanion.insert(
+            id: id,
+            farmId: farmId,
+            animalId: animalId,
+            type: type,
+            movementDate: movementDate,
+            fromFarmId: fromFarmId,
+            toFarmId: toFarmId,
+            price: price,
+            notes: notes,
+            buyerQrSignature: buyerQrSignature,
+            synced: synced,
+            lastSyncedAt: lastSyncedAt,
+            serverVersion: serverVersion,
+            deletedAt: deletedAt,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$MovementsTableTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $MovementsTableTable,
+    MovementsTableData,
+    $$MovementsTableTableFilterComposer,
+    $$MovementsTableTableOrderingComposer,
+    $$MovementsTableTableAnnotationComposer,
+    $$MovementsTableTableCreateCompanionBuilder,
+    $$MovementsTableTableUpdateCompanionBuilder,
+    (
+      MovementsTableData,
+      BaseReferences<_$AppDatabase, $MovementsTableTable, MovementsTableData>
+    ),
+    MovementsTableData,
     PrefetchHooks Function()>;
 typedef $$SpeciesTableTableCreateCompanionBuilder = SpeciesTableCompanion
     Function({
@@ -9320,6 +16970,1169 @@ typedef $$VeterinariansTableTableProcessedTableManager = ProcessedTableManager<
     ),
     VeterinariansTableData,
     PrefetchHooks Function()>;
+typedef $$BatchesTableTableCreateCompanionBuilder = BatchesTableCompanion
+    Function({
+  required String id,
+  required String farmId,
+  required String name,
+  required String purpose,
+  required String animalIdsJson,
+  Value<DateTime?> usedAt,
+  Value<bool> completed,
+  Value<String?> notes,
+  Value<bool> synced,
+  required DateTime createdAt,
+  required DateTime updatedAt,
+  Value<DateTime?> lastSyncedAt,
+  Value<String?> serverVersion,
+  Value<int> rowid,
+});
+typedef $$BatchesTableTableUpdateCompanionBuilder = BatchesTableCompanion
+    Function({
+  Value<String> id,
+  Value<String> farmId,
+  Value<String> name,
+  Value<String> purpose,
+  Value<String> animalIdsJson,
+  Value<DateTime?> usedAt,
+  Value<bool> completed,
+  Value<String?> notes,
+  Value<bool> synced,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<DateTime?> lastSyncedAt,
+  Value<String?> serverVersion,
+  Value<int> rowid,
+});
+
+class $$BatchesTableTableFilterComposer
+    extends Composer<_$AppDatabase, $BatchesTableTable> {
+  $$BatchesTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get farmId => $composableBuilder(
+      column: $table.farmId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get purpose => $composableBuilder(
+      column: $table.purpose, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get animalIdsJson => $composableBuilder(
+      column: $table.animalIdsJson, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get usedAt => $composableBuilder(
+      column: $table.usedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get completed => $composableBuilder(
+      column: $table.completed, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+      column: $table.synced, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get serverVersion => $composableBuilder(
+      column: $table.serverVersion, builder: (column) => ColumnFilters(column));
+}
+
+class $$BatchesTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $BatchesTableTable> {
+  $$BatchesTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get farmId => $composableBuilder(
+      column: $table.farmId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get purpose => $composableBuilder(
+      column: $table.purpose, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get animalIdsJson => $composableBuilder(
+      column: $table.animalIdsJson,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get usedAt => $composableBuilder(
+      column: $table.usedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get completed => $composableBuilder(
+      column: $table.completed, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+      column: $table.synced, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get serverVersion => $composableBuilder(
+      column: $table.serverVersion,
+      builder: (column) => ColumnOrderings(column));
+}
+
+class $$BatchesTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BatchesTableTable> {
+  $$BatchesTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get farmId =>
+      $composableBuilder(column: $table.farmId, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get purpose =>
+      $composableBuilder(column: $table.purpose, builder: (column) => column);
+
+  GeneratedColumn<String> get animalIdsJson => $composableBuilder(
+      column: $table.animalIdsJson, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get usedAt =>
+      $composableBuilder(column: $table.usedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get completed =>
+      $composableBuilder(column: $table.completed, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get serverVersion => $composableBuilder(
+      column: $table.serverVersion, builder: (column) => column);
+}
+
+class $$BatchesTableTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $BatchesTableTable,
+    BatchesTableData,
+    $$BatchesTableTableFilterComposer,
+    $$BatchesTableTableOrderingComposer,
+    $$BatchesTableTableAnnotationComposer,
+    $$BatchesTableTableCreateCompanionBuilder,
+    $$BatchesTableTableUpdateCompanionBuilder,
+    (
+      BatchesTableData,
+      BaseReferences<_$AppDatabase, $BatchesTableTable, BatchesTableData>
+    ),
+    BatchesTableData,
+    PrefetchHooks Function()> {
+  $$BatchesTableTableTableManager(_$AppDatabase db, $BatchesTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BatchesTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BatchesTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BatchesTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> farmId = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<String> purpose = const Value.absent(),
+            Value<String> animalIdsJson = const Value.absent(),
+            Value<DateTime?> usedAt = const Value.absent(),
+            Value<bool> completed = const Value.absent(),
+            Value<String?> notes = const Value.absent(),
+            Value<bool> synced = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<DateTime?> lastSyncedAt = const Value.absent(),
+            Value<String?> serverVersion = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              BatchesTableCompanion(
+            id: id,
+            farmId: farmId,
+            name: name,
+            purpose: purpose,
+            animalIdsJson: animalIdsJson,
+            usedAt: usedAt,
+            completed: completed,
+            notes: notes,
+            synced: synced,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            lastSyncedAt: lastSyncedAt,
+            serverVersion: serverVersion,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String farmId,
+            required String name,
+            required String purpose,
+            required String animalIdsJson,
+            Value<DateTime?> usedAt = const Value.absent(),
+            Value<bool> completed = const Value.absent(),
+            Value<String?> notes = const Value.absent(),
+            Value<bool> synced = const Value.absent(),
+            required DateTime createdAt,
+            required DateTime updatedAt,
+            Value<DateTime?> lastSyncedAt = const Value.absent(),
+            Value<String?> serverVersion = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              BatchesTableCompanion.insert(
+            id: id,
+            farmId: farmId,
+            name: name,
+            purpose: purpose,
+            animalIdsJson: animalIdsJson,
+            usedAt: usedAt,
+            completed: completed,
+            notes: notes,
+            synced: synced,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            lastSyncedAt: lastSyncedAt,
+            serverVersion: serverVersion,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$BatchesTableTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $BatchesTableTable,
+    BatchesTableData,
+    $$BatchesTableTableFilterComposer,
+    $$BatchesTableTableOrderingComposer,
+    $$BatchesTableTableAnnotationComposer,
+    $$BatchesTableTableCreateCompanionBuilder,
+    $$BatchesTableTableUpdateCompanionBuilder,
+    (
+      BatchesTableData,
+      BaseReferences<_$AppDatabase, $BatchesTableTable, BatchesTableData>
+    ),
+    BatchesTableData,
+    PrefetchHooks Function()>;
+typedef $$LotsTableTableCreateCompanionBuilder = LotsTableCompanion Function({
+  required String id,
+  required String farmId,
+  required String name,
+  Value<String?> type,
+  required String animalIdsJson,
+  Value<bool> completed,
+  Value<DateTime?> completedAt,
+  Value<String?> productId,
+  Value<String?> productName,
+  Value<DateTime?> treatmentDate,
+  Value<DateTime?> withdrawalEndDate,
+  Value<String?> veterinarianId,
+  Value<String?> veterinarianName,
+  Value<String?> buyerName,
+  Value<String?> buyerFarmId,
+  Value<double?> totalPrice,
+  Value<double?> pricePerAnimal,
+  Value<DateTime?> saleDate,
+  Value<String?> slaughterhouseName,
+  Value<String?> slaughterhouseId,
+  Value<DateTime?> slaughterDate,
+  Value<String?> notes,
+  Value<bool> synced,
+  required DateTime createdAt,
+  required DateTime updatedAt,
+  Value<DateTime?> lastSyncedAt,
+  Value<String?> serverVersion,
+  Value<int> rowid,
+});
+typedef $$LotsTableTableUpdateCompanionBuilder = LotsTableCompanion Function({
+  Value<String> id,
+  Value<String> farmId,
+  Value<String> name,
+  Value<String?> type,
+  Value<String> animalIdsJson,
+  Value<bool> completed,
+  Value<DateTime?> completedAt,
+  Value<String?> productId,
+  Value<String?> productName,
+  Value<DateTime?> treatmentDate,
+  Value<DateTime?> withdrawalEndDate,
+  Value<String?> veterinarianId,
+  Value<String?> veterinarianName,
+  Value<String?> buyerName,
+  Value<String?> buyerFarmId,
+  Value<double?> totalPrice,
+  Value<double?> pricePerAnimal,
+  Value<DateTime?> saleDate,
+  Value<String?> slaughterhouseName,
+  Value<String?> slaughterhouseId,
+  Value<DateTime?> slaughterDate,
+  Value<String?> notes,
+  Value<bool> synced,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<DateTime?> lastSyncedAt,
+  Value<String?> serverVersion,
+  Value<int> rowid,
+});
+
+class $$LotsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $LotsTableTable> {
+  $$LotsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get farmId => $composableBuilder(
+      column: $table.farmId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get type => $composableBuilder(
+      column: $table.type, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get animalIdsJson => $composableBuilder(
+      column: $table.animalIdsJson, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get completed => $composableBuilder(
+      column: $table.completed, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get completedAt => $composableBuilder(
+      column: $table.completedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get productId => $composableBuilder(
+      column: $table.productId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get productName => $composableBuilder(
+      column: $table.productName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get treatmentDate => $composableBuilder(
+      column: $table.treatmentDate, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get withdrawalEndDate => $composableBuilder(
+      column: $table.withdrawalEndDate,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get veterinarianId => $composableBuilder(
+      column: $table.veterinarianId,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get veterinarianName => $composableBuilder(
+      column: $table.veterinarianName,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get buyerName => $composableBuilder(
+      column: $table.buyerName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get buyerFarmId => $composableBuilder(
+      column: $table.buyerFarmId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get totalPrice => $composableBuilder(
+      column: $table.totalPrice, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get pricePerAnimal => $composableBuilder(
+      column: $table.pricePerAnimal,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get saleDate => $composableBuilder(
+      column: $table.saleDate, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get slaughterhouseName => $composableBuilder(
+      column: $table.slaughterhouseName,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get slaughterhouseId => $composableBuilder(
+      column: $table.slaughterhouseId,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get slaughterDate => $composableBuilder(
+      column: $table.slaughterDate, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+      column: $table.synced, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get serverVersion => $composableBuilder(
+      column: $table.serverVersion, builder: (column) => ColumnFilters(column));
+}
+
+class $$LotsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $LotsTableTable> {
+  $$LotsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get farmId => $composableBuilder(
+      column: $table.farmId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get type => $composableBuilder(
+      column: $table.type, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get animalIdsJson => $composableBuilder(
+      column: $table.animalIdsJson,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get completed => $composableBuilder(
+      column: $table.completed, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get completedAt => $composableBuilder(
+      column: $table.completedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get productId => $composableBuilder(
+      column: $table.productId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get productName => $composableBuilder(
+      column: $table.productName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get treatmentDate => $composableBuilder(
+      column: $table.treatmentDate,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get withdrawalEndDate => $composableBuilder(
+      column: $table.withdrawalEndDate,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get veterinarianId => $composableBuilder(
+      column: $table.veterinarianId,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get veterinarianName => $composableBuilder(
+      column: $table.veterinarianName,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get buyerName => $composableBuilder(
+      column: $table.buyerName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get buyerFarmId => $composableBuilder(
+      column: $table.buyerFarmId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get totalPrice => $composableBuilder(
+      column: $table.totalPrice, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get pricePerAnimal => $composableBuilder(
+      column: $table.pricePerAnimal,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get saleDate => $composableBuilder(
+      column: $table.saleDate, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get slaughterhouseName => $composableBuilder(
+      column: $table.slaughterhouseName,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get slaughterhouseId => $composableBuilder(
+      column: $table.slaughterhouseId,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get slaughterDate => $composableBuilder(
+      column: $table.slaughterDate,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+      column: $table.synced, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get serverVersion => $composableBuilder(
+      column: $table.serverVersion,
+      builder: (column) => ColumnOrderings(column));
+}
+
+class $$LotsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LotsTableTable> {
+  $$LotsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get farmId =>
+      $composableBuilder(column: $table.farmId, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+
+  GeneratedColumn<String> get animalIdsJson => $composableBuilder(
+      column: $table.animalIdsJson, builder: (column) => column);
+
+  GeneratedColumn<bool> get completed =>
+      $composableBuilder(column: $table.completed, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get completedAt => $composableBuilder(
+      column: $table.completedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get productId =>
+      $composableBuilder(column: $table.productId, builder: (column) => column);
+
+  GeneratedColumn<String> get productName => $composableBuilder(
+      column: $table.productName, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get treatmentDate => $composableBuilder(
+      column: $table.treatmentDate, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get withdrawalEndDate => $composableBuilder(
+      column: $table.withdrawalEndDate, builder: (column) => column);
+
+  GeneratedColumn<String> get veterinarianId => $composableBuilder(
+      column: $table.veterinarianId, builder: (column) => column);
+
+  GeneratedColumn<String> get veterinarianName => $composableBuilder(
+      column: $table.veterinarianName, builder: (column) => column);
+
+  GeneratedColumn<String> get buyerName =>
+      $composableBuilder(column: $table.buyerName, builder: (column) => column);
+
+  GeneratedColumn<String> get buyerFarmId => $composableBuilder(
+      column: $table.buyerFarmId, builder: (column) => column);
+
+  GeneratedColumn<double> get totalPrice => $composableBuilder(
+      column: $table.totalPrice, builder: (column) => column);
+
+  GeneratedColumn<double> get pricePerAnimal => $composableBuilder(
+      column: $table.pricePerAnimal, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get saleDate =>
+      $composableBuilder(column: $table.saleDate, builder: (column) => column);
+
+  GeneratedColumn<String> get slaughterhouseName => $composableBuilder(
+      column: $table.slaughterhouseName, builder: (column) => column);
+
+  GeneratedColumn<String> get slaughterhouseId => $composableBuilder(
+      column: $table.slaughterhouseId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get slaughterDate => $composableBuilder(
+      column: $table.slaughterDate, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get serverVersion => $composableBuilder(
+      column: $table.serverVersion, builder: (column) => column);
+}
+
+class $$LotsTableTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $LotsTableTable,
+    LotsTableData,
+    $$LotsTableTableFilterComposer,
+    $$LotsTableTableOrderingComposer,
+    $$LotsTableTableAnnotationComposer,
+    $$LotsTableTableCreateCompanionBuilder,
+    $$LotsTableTableUpdateCompanionBuilder,
+    (
+      LotsTableData,
+      BaseReferences<_$AppDatabase, $LotsTableTable, LotsTableData>
+    ),
+    LotsTableData,
+    PrefetchHooks Function()> {
+  $$LotsTableTableTableManager(_$AppDatabase db, $LotsTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LotsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LotsTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LotsTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> farmId = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<String?> type = const Value.absent(),
+            Value<String> animalIdsJson = const Value.absent(),
+            Value<bool> completed = const Value.absent(),
+            Value<DateTime?> completedAt = const Value.absent(),
+            Value<String?> productId = const Value.absent(),
+            Value<String?> productName = const Value.absent(),
+            Value<DateTime?> treatmentDate = const Value.absent(),
+            Value<DateTime?> withdrawalEndDate = const Value.absent(),
+            Value<String?> veterinarianId = const Value.absent(),
+            Value<String?> veterinarianName = const Value.absent(),
+            Value<String?> buyerName = const Value.absent(),
+            Value<String?> buyerFarmId = const Value.absent(),
+            Value<double?> totalPrice = const Value.absent(),
+            Value<double?> pricePerAnimal = const Value.absent(),
+            Value<DateTime?> saleDate = const Value.absent(),
+            Value<String?> slaughterhouseName = const Value.absent(),
+            Value<String?> slaughterhouseId = const Value.absent(),
+            Value<DateTime?> slaughterDate = const Value.absent(),
+            Value<String?> notes = const Value.absent(),
+            Value<bool> synced = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<DateTime?> lastSyncedAt = const Value.absent(),
+            Value<String?> serverVersion = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              LotsTableCompanion(
+            id: id,
+            farmId: farmId,
+            name: name,
+            type: type,
+            animalIdsJson: animalIdsJson,
+            completed: completed,
+            completedAt: completedAt,
+            productId: productId,
+            productName: productName,
+            treatmentDate: treatmentDate,
+            withdrawalEndDate: withdrawalEndDate,
+            veterinarianId: veterinarianId,
+            veterinarianName: veterinarianName,
+            buyerName: buyerName,
+            buyerFarmId: buyerFarmId,
+            totalPrice: totalPrice,
+            pricePerAnimal: pricePerAnimal,
+            saleDate: saleDate,
+            slaughterhouseName: slaughterhouseName,
+            slaughterhouseId: slaughterhouseId,
+            slaughterDate: slaughterDate,
+            notes: notes,
+            synced: synced,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            lastSyncedAt: lastSyncedAt,
+            serverVersion: serverVersion,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String farmId,
+            required String name,
+            Value<String?> type = const Value.absent(),
+            required String animalIdsJson,
+            Value<bool> completed = const Value.absent(),
+            Value<DateTime?> completedAt = const Value.absent(),
+            Value<String?> productId = const Value.absent(),
+            Value<String?> productName = const Value.absent(),
+            Value<DateTime?> treatmentDate = const Value.absent(),
+            Value<DateTime?> withdrawalEndDate = const Value.absent(),
+            Value<String?> veterinarianId = const Value.absent(),
+            Value<String?> veterinarianName = const Value.absent(),
+            Value<String?> buyerName = const Value.absent(),
+            Value<String?> buyerFarmId = const Value.absent(),
+            Value<double?> totalPrice = const Value.absent(),
+            Value<double?> pricePerAnimal = const Value.absent(),
+            Value<DateTime?> saleDate = const Value.absent(),
+            Value<String?> slaughterhouseName = const Value.absent(),
+            Value<String?> slaughterhouseId = const Value.absent(),
+            Value<DateTime?> slaughterDate = const Value.absent(),
+            Value<String?> notes = const Value.absent(),
+            Value<bool> synced = const Value.absent(),
+            required DateTime createdAt,
+            required DateTime updatedAt,
+            Value<DateTime?> lastSyncedAt = const Value.absent(),
+            Value<String?> serverVersion = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              LotsTableCompanion.insert(
+            id: id,
+            farmId: farmId,
+            name: name,
+            type: type,
+            animalIdsJson: animalIdsJson,
+            completed: completed,
+            completedAt: completedAt,
+            productId: productId,
+            productName: productName,
+            treatmentDate: treatmentDate,
+            withdrawalEndDate: withdrawalEndDate,
+            veterinarianId: veterinarianId,
+            veterinarianName: veterinarianName,
+            buyerName: buyerName,
+            buyerFarmId: buyerFarmId,
+            totalPrice: totalPrice,
+            pricePerAnimal: pricePerAnimal,
+            saleDate: saleDate,
+            slaughterhouseName: slaughterhouseName,
+            slaughterhouseId: slaughterhouseId,
+            slaughterDate: slaughterDate,
+            notes: notes,
+            synced: synced,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            lastSyncedAt: lastSyncedAt,
+            serverVersion: serverVersion,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$LotsTableTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $LotsTableTable,
+    LotsTableData,
+    $$LotsTableTableFilterComposer,
+    $$LotsTableTableOrderingComposer,
+    $$LotsTableTableAnnotationComposer,
+    $$LotsTableTableCreateCompanionBuilder,
+    $$LotsTableTableUpdateCompanionBuilder,
+    (
+      LotsTableData,
+      BaseReferences<_$AppDatabase, $LotsTableTable, LotsTableData>
+    ),
+    LotsTableData,
+    PrefetchHooks Function()>;
+typedef $$CampaignsTableTableCreateCompanionBuilder = CampaignsTableCompanion
+    Function({
+  required String id,
+  required String farmId,
+  required String name,
+  required String productId,
+  required String productName,
+  required DateTime campaignDate,
+  required DateTime withdrawalEndDate,
+  Value<String?> veterinarianId,
+  Value<String?> veterinarianName,
+  required String animalIdsJson,
+  Value<bool> completed,
+  Value<bool> synced,
+  required DateTime createdAt,
+  required DateTime updatedAt,
+  Value<DateTime?> lastSyncedAt,
+  Value<String?> serverVersion,
+  Value<int> rowid,
+});
+typedef $$CampaignsTableTableUpdateCompanionBuilder = CampaignsTableCompanion
+    Function({
+  Value<String> id,
+  Value<String> farmId,
+  Value<String> name,
+  Value<String> productId,
+  Value<String> productName,
+  Value<DateTime> campaignDate,
+  Value<DateTime> withdrawalEndDate,
+  Value<String?> veterinarianId,
+  Value<String?> veterinarianName,
+  Value<String> animalIdsJson,
+  Value<bool> completed,
+  Value<bool> synced,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<DateTime?> lastSyncedAt,
+  Value<String?> serverVersion,
+  Value<int> rowid,
+});
+
+class $$CampaignsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $CampaignsTableTable> {
+  $$CampaignsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get farmId => $composableBuilder(
+      column: $table.farmId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get productId => $composableBuilder(
+      column: $table.productId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get productName => $composableBuilder(
+      column: $table.productName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get campaignDate => $composableBuilder(
+      column: $table.campaignDate, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get withdrawalEndDate => $composableBuilder(
+      column: $table.withdrawalEndDate,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get veterinarianId => $composableBuilder(
+      column: $table.veterinarianId,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get veterinarianName => $composableBuilder(
+      column: $table.veterinarianName,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get animalIdsJson => $composableBuilder(
+      column: $table.animalIdsJson, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get completed => $composableBuilder(
+      column: $table.completed, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+      column: $table.synced, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get serverVersion => $composableBuilder(
+      column: $table.serverVersion, builder: (column) => ColumnFilters(column));
+}
+
+class $$CampaignsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $CampaignsTableTable> {
+  $$CampaignsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get farmId => $composableBuilder(
+      column: $table.farmId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get productId => $composableBuilder(
+      column: $table.productId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get productName => $composableBuilder(
+      column: $table.productName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get campaignDate => $composableBuilder(
+      column: $table.campaignDate,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get withdrawalEndDate => $composableBuilder(
+      column: $table.withdrawalEndDate,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get veterinarianId => $composableBuilder(
+      column: $table.veterinarianId,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get veterinarianName => $composableBuilder(
+      column: $table.veterinarianName,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get animalIdsJson => $composableBuilder(
+      column: $table.animalIdsJson,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get completed => $composableBuilder(
+      column: $table.completed, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+      column: $table.synced, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get serverVersion => $composableBuilder(
+      column: $table.serverVersion,
+      builder: (column) => ColumnOrderings(column));
+}
+
+class $$CampaignsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CampaignsTableTable> {
+  $$CampaignsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get farmId =>
+      $composableBuilder(column: $table.farmId, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get productId =>
+      $composableBuilder(column: $table.productId, builder: (column) => column);
+
+  GeneratedColumn<String> get productName => $composableBuilder(
+      column: $table.productName, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get campaignDate => $composableBuilder(
+      column: $table.campaignDate, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get withdrawalEndDate => $composableBuilder(
+      column: $table.withdrawalEndDate, builder: (column) => column);
+
+  GeneratedColumn<String> get veterinarianId => $composableBuilder(
+      column: $table.veterinarianId, builder: (column) => column);
+
+  GeneratedColumn<String> get veterinarianName => $composableBuilder(
+      column: $table.veterinarianName, builder: (column) => column);
+
+  GeneratedColumn<String> get animalIdsJson => $composableBuilder(
+      column: $table.animalIdsJson, builder: (column) => column);
+
+  GeneratedColumn<bool> get completed =>
+      $composableBuilder(column: $table.completed, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get serverVersion => $composableBuilder(
+      column: $table.serverVersion, builder: (column) => column);
+}
+
+class $$CampaignsTableTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $CampaignsTableTable,
+    CampaignsTableData,
+    $$CampaignsTableTableFilterComposer,
+    $$CampaignsTableTableOrderingComposer,
+    $$CampaignsTableTableAnnotationComposer,
+    $$CampaignsTableTableCreateCompanionBuilder,
+    $$CampaignsTableTableUpdateCompanionBuilder,
+    (
+      CampaignsTableData,
+      BaseReferences<_$AppDatabase, $CampaignsTableTable, CampaignsTableData>
+    ),
+    CampaignsTableData,
+    PrefetchHooks Function()> {
+  $$CampaignsTableTableTableManager(
+      _$AppDatabase db, $CampaignsTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CampaignsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CampaignsTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CampaignsTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> farmId = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<String> productId = const Value.absent(),
+            Value<String> productName = const Value.absent(),
+            Value<DateTime> campaignDate = const Value.absent(),
+            Value<DateTime> withdrawalEndDate = const Value.absent(),
+            Value<String?> veterinarianId = const Value.absent(),
+            Value<String?> veterinarianName = const Value.absent(),
+            Value<String> animalIdsJson = const Value.absent(),
+            Value<bool> completed = const Value.absent(),
+            Value<bool> synced = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<DateTime?> lastSyncedAt = const Value.absent(),
+            Value<String?> serverVersion = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              CampaignsTableCompanion(
+            id: id,
+            farmId: farmId,
+            name: name,
+            productId: productId,
+            productName: productName,
+            campaignDate: campaignDate,
+            withdrawalEndDate: withdrawalEndDate,
+            veterinarianId: veterinarianId,
+            veterinarianName: veterinarianName,
+            animalIdsJson: animalIdsJson,
+            completed: completed,
+            synced: synced,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            lastSyncedAt: lastSyncedAt,
+            serverVersion: serverVersion,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String farmId,
+            required String name,
+            required String productId,
+            required String productName,
+            required DateTime campaignDate,
+            required DateTime withdrawalEndDate,
+            Value<String?> veterinarianId = const Value.absent(),
+            Value<String?> veterinarianName = const Value.absent(),
+            required String animalIdsJson,
+            Value<bool> completed = const Value.absent(),
+            Value<bool> synced = const Value.absent(),
+            required DateTime createdAt,
+            required DateTime updatedAt,
+            Value<DateTime?> lastSyncedAt = const Value.absent(),
+            Value<String?> serverVersion = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              CampaignsTableCompanion.insert(
+            id: id,
+            farmId: farmId,
+            name: name,
+            productId: productId,
+            productName: productName,
+            campaignDate: campaignDate,
+            withdrawalEndDate: withdrawalEndDate,
+            veterinarianId: veterinarianId,
+            veterinarianName: veterinarianName,
+            animalIdsJson: animalIdsJson,
+            completed: completed,
+            synced: synced,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            lastSyncedAt: lastSyncedAt,
+            serverVersion: serverVersion,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$CampaignsTableTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $CampaignsTableTable,
+    CampaignsTableData,
+    $$CampaignsTableTableFilterComposer,
+    $$CampaignsTableTableOrderingComposer,
+    $$CampaignsTableTableAnnotationComposer,
+    $$CampaignsTableTableCreateCompanionBuilder,
+    $$CampaignsTableTableUpdateCompanionBuilder,
+    (
+      CampaignsTableData,
+      BaseReferences<_$AppDatabase, $CampaignsTableTable, CampaignsTableData>
+    ),
+    CampaignsTableData,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -9328,6 +18141,14 @@ class $AppDatabaseManager {
       $$FarmsTableTableTableManager(_db, _db.farmsTable);
   $$AnimalsTableTableTableManager get animalsTable =>
       $$AnimalsTableTableTableManager(_db, _db.animalsTable);
+  $$TreatmentsTableTableTableManager get treatmentsTable =>
+      $$TreatmentsTableTableTableManager(_db, _db.treatmentsTable);
+  $$VaccinationsTableTableTableManager get vaccinationsTable =>
+      $$VaccinationsTableTableTableManager(_db, _db.vaccinationsTable);
+  $$WeightsTableTableTableManager get weightsTable =>
+      $$WeightsTableTableTableManager(_db, _db.weightsTable);
+  $$MovementsTableTableTableManager get movementsTable =>
+      $$MovementsTableTableTableManager(_db, _db.movementsTable);
   $$SpeciesTableTableTableManager get speciesTable =>
       $$SpeciesTableTableTableManager(_db, _db.speciesTable);
   $$BreedsTableTableTableManager get breedsTable =>
@@ -9338,4 +18159,10 @@ class $AppDatabaseManager {
       $$VaccinesTableTableTableManager(_db, _db.vaccinesTable);
   $$VeterinariansTableTableTableManager get veterinariansTable =>
       $$VeterinariansTableTableTableManager(_db, _db.veterinariansTable);
+  $$BatchesTableTableTableManager get batchesTable =>
+      $$BatchesTableTableTableManager(_db, _db.batchesTable);
+  $$LotsTableTableTableManager get lotsTable =>
+      $$LotsTableTableTableManager(_db, _db.lotsTable);
+  $$CampaignsTableTableTableManager get campaignsTable =>
+      $$CampaignsTableTableTableManager(_db, _db.campaignsTable);
 }
