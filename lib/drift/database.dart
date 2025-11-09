@@ -14,6 +14,8 @@ import 'tables/farms_table.dart';
 
 // Main Entity Tables
 import 'tables/animals_table.dart';
+import 'tables/breedings_table.dart';
+import 'tables/documents_table.dart';
 
 // Transaction Tables (depend on main entities)
 import 'tables/treatments_table.dart';
@@ -44,6 +46,8 @@ import 'daos/farm_dao.dart';
 
 // Main Entity DAOs
 import 'daos/animal_dao.dart';
+import 'daos/breeding_dao.dart';
+import 'daos/document_dao.dart';
 
 // Transaction DAOs
 import 'daos/treatment_dao.dart';
@@ -85,6 +89,8 @@ part 'database.g.dart';
     // MAIN ENTITY TABLES
     // ────────────────────────────────────────────────────────
     AnimalsTable,
+    BreedingsTable,
+    DocumentsTable,
 
     // ────────────────────────────────────────────────────────
     // TRANSACTION TABLES (depend on main entities)
@@ -125,6 +131,8 @@ part 'database.g.dart';
     // MAIN ENTITY DAOs
     // ────────────────────────────────────────────────────────
     AnimalDao,
+    BreedingDao,
+    DocumentDao,
 
     // ────────────────────────────────────────────────────────
     // TRANSACTION DAOs
@@ -183,6 +191,8 @@ class AppDatabase extends _$AppDatabase {
           // INDEXES - MAIN ENTITY TABLES
           // ───────────────────────────────────────────────────
           await _createAnimalsIndexes();
+          await _createBreedingsIndexes();
+          await _createDocumentsIndexes();
 
           // ───────────────────────────────────────────────────
           // INDEXES - TRANSACTION TABLES
@@ -221,9 +231,6 @@ class AppDatabase extends _$AppDatabase {
           // }
         },
       );
-
-  // ═══════════════════════════════════════════════════════════
-  // INDEX CREATION METHODS
   // ═══════════════════════════════════════════════════════════
 
   // ───────────────────────────────────────────────────────────
@@ -760,6 +767,176 @@ class AppDatabase extends _$AppDatabase {
         'CREATE INDEX idx_campaigns_withdrawal_end_date ON campaigns(withdrawal_end_date);');
   }
 
+  /// Créer les indexes pour la table breedings
+  ///
+  /// Indexes optimisés pour:
+  /// - Filtrage par farmId (multi-tenancy)
+  /// - Recherche par mère (motherId)
+  /// - Recherche par père (fatherId)
+  /// - Filtrage par statut (pending, completed, failed, aborted)
+  /// - Filtrage par méthode (natural, artificialInsemination)
+  /// - Recherche par date de saillie (breedingDate)
+  /// - Recherche par date de mise-bas prévue (expectedBirthDate)
+  /// - Recherche par date de mise-bas réelle (actualBirthDate)
+  /// - Recherche par vétérinaire (pour IA)
+  Future<void> _createBreedingsIndexes() async {
+    // Index principal: farmId (queries fréquentes par ferme)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_breedings_farm_id '
+      'ON breedings(farm_id);',
+    );
+
+    // Index: motherId (historique reproductions par mère)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_breedings_mother_id '
+      'ON breedings(mother_id);',
+    );
+
+    // Index: fatherId (historique reproductions par père)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_breedings_father_id '
+      'ON breedings(father_id);',
+    );
+
+    // Index: status (filtrage par statut)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_breedings_status '
+      'ON breedings(status);',
+    );
+
+    // Index: method (filtrage par méthode)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_breedings_method '
+      'ON breedings(method);',
+    );
+
+    // Index: breedingDate (recherche par date de saillie)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_breedings_breeding_date '
+      'ON breedings(breeding_date);',
+    );
+
+    // Index: expectedBirthDate (reproductions à surveiller)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_breedings_expected_birth_date '
+      'ON breedings(expected_birth_date);',
+    );
+
+    // Index: actualBirthDate (historique mises-bas)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_breedings_actual_birth_date '
+      'ON breedings(actual_birth_date);',
+    );
+
+    // Index: veterinarianId (IA par vétérinaire)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_breedings_veterinarian_id '
+      'ON breedings(veterinarian_id);',
+    );
+
+    // Index composite: farmId + motherId (query très fréquente)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_breedings_farm_mother '
+      'ON breedings(farm_id, mother_id);',
+    );
+
+    // Index composite: farmId + status (filtrage statut par ferme)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_breedings_farm_status '
+      'ON breedings(farm_id, status);',
+    );
+
+    // Index composite: farmId + expectedBirthDate (surveillance mises-bas)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_breedings_farm_expected_date '
+      'ON breedings(farm_id, expected_birth_date);',
+    );
+
+    // Index composite: farmId + status + expectedBirthDate (pending births)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_breedings_farm_status_date '
+      'ON breedings(farm_id, status, expected_birth_date);',
+    );
+  }
+
+  /// Créer les indexes pour la table documents
+  ///
+  /// Indexes optimisés pour:
+  /// - Filtrage par farmId (multi-tenancy)
+  /// - Filtrage par animal (animalId nullable)
+  /// - Filtrage par type de document
+  /// - Recherche par nom de fichier
+  /// - Filtrage par date d'upload
+  /// - Filtrage par date d'expiration
+  /// - Recherche par uploadedBy
+  Future<void> _createDocumentsIndexes() async {
+    // Index principal: farmId (queries fréquentes par ferme)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_documents_farm_id '
+      'ON documents(farm_id);',
+    );
+
+    // Index: animalId (documents par animal)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_documents_animal_id '
+      'ON documents(animal_id);',
+    );
+
+    // Index: type (filtrage par type)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_documents_type '
+      'ON documents(type);',
+    );
+
+    // Index: fileName (recherche par nom)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_documents_file_name '
+      'ON documents(file_name);',
+    );
+
+    // Index: uploadDate (tri chronologique uploads)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_documents_upload_date '
+      'ON documents(upload_date);',
+    );
+
+    // Index: expiryDate (documents expirant bientôt)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_documents_expiry_date '
+      'ON documents(expiry_date);',
+    );
+
+    // Index: uploadedBy (documents par utilisateur)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_documents_uploaded_by '
+      'ON documents(uploaded_by);',
+    );
+
+    // Index composite: farmId + animalId (query très fréquente)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_documents_farm_animal '
+      'ON documents(farm_id, animal_id);',
+    );
+
+    // Index composite: farmId + type (filtrage type par ferme)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_documents_farm_type '
+      'ON documents(farm_id, type);',
+    );
+
+    // Index composite: farmId + expiryDate (alertes expirations)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_documents_farm_expiry '
+      'ON documents(farm_id, expiry_date);',
+    );
+
+    // Index composite: farmId + uploadDate (listing chronologique)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_documents_farm_upload '
+      'ON documents(farm_id, upload_date);',
+    );
+  }
+
   // ═══════════════════════════════════════════════════════════
   // DAO GETTERS
   // ═══════════════════════════════════════════════════════════
@@ -775,6 +952,10 @@ class AppDatabase extends _$AppDatabase {
   // ───────────────────────────────────────────────────────────
   @override
   AnimalDao get animalDao => AnimalDao(this);
+  @override
+  BreedingDao get breedingDao => BreedingDao(this);
+  @override
+  DocumentDao get documentDao => DocumentDao(this);
 
   // ───────────────────────────────────────────────────────────
   // TRANSACTION DAOs

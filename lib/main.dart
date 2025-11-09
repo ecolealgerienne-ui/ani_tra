@@ -39,6 +39,15 @@ import 'data/mocks/mock_vaccination_references.dart';
 import 'data/mocks/mock_veterinarians.dart';
 import 'drift/database.dart';
 import 'repositories/animal_repository.dart';
+import 'repositories/weight_repository.dart';
+import 'repositories/vaccination_repository.dart';
+import 'repositories/veterinarian_repository.dart';
+import 'repositories/breed_repository.dart';
+import 'repositories/batch_repository.dart';
+import 'repositories/lot_repository.dart';
+import 'repositories/campaign_repository.dart';
+import 'repositories/breeding_repository.dart';
+import 'repositories/document_repository.dart';
 
 // Instance globale du plugin de notifications
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -73,37 +82,86 @@ void main() async {
       debugPrint('Notification cliquée: ${response.payload}');
     },
   );
-  // Initialize Database & Repository
+
+  // Initialize Database
   final database = AppDatabase();
+
+  // Initialize ALL Repositories
   final animalRepository = AnimalRepository(database);
+  final weightRepository = WeightRepository(database);
+  final vaccinationRepository = VaccinationRepository(database);
+  final veterinarianRepository = VeterinarianRepository(database);
+  final breedRepository = BreedRepository(database);
+  final batchRepository = BatchRepository(database);
+  final lotRepository = LotRepository(database);
+  final campaignRepository = CampaignRepository(database);
+  final breedingRepository = BreedingRepository(database);
+  final documentRepository = DocumentRepository(database);
 
   runApp(MyApp(
     database: database,
     animalRepository: animalRepository,
+    weightRepository: weightRepository,
+    vaccinationRepository: vaccinationRepository,
+    veterinarianRepository: veterinarianRepository,
+    breedRepository: breedRepository,
+    batchRepository: batchRepository,
+    lotRepository: lotRepository,
+    campaignRepository: campaignRepository,
+    breedingRepository: breedingRepository,
+    documentRepository: documentRepository,
   ));
 }
 
 class MyApp extends StatelessWidget {
   final AppDatabase database;
   final AnimalRepository animalRepository;
+  final WeightRepository weightRepository;
+  final VaccinationRepository vaccinationRepository;
+  final VeterinarianRepository veterinarianRepository;
+  final BreedRepository breedRepository;
+  final BatchRepository batchRepository;
+  final LotRepository lotRepository;
+  final CampaignRepository campaignRepository;
+  final BreedingRepository breedingRepository;
+  final DocumentRepository documentRepository;
 
   const MyApp({
     super.key,
     required this.database,
     required this.animalRepository,
+    required this.weightRepository,
+    required this.vaccinationRepository,
+    required this.veterinarianRepository,
+    required this.breedRepository,
+    required this.batchRepository,
+    required this.lotRepository,
+    required this.campaignRepository,
+    required this.breedingRepository,
+    required this.documentRepository,
   });
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // AJOUTER ces 2 providers AVANT les autres
+        // === Database & Repositories ===
         Provider<AppDatabase>.value(value: database),
         Provider<AnimalRepository>.value(value: animalRepository),
-        // 1. AuthProvider EN PREMIER
+        Provider<WeightRepository>.value(value: weightRepository),
+        Provider<VaccinationRepository>.value(value: vaccinationRepository),
+        Provider<VeterinarianRepository>.value(value: veterinarianRepository),
+        Provider<BreedRepository>.value(value: breedRepository),
+        Provider<BatchRepository>.value(value: batchRepository),
+        Provider<LotRepository>.value(value: lotRepository),
+        Provider<CampaignRepository>.value(value: campaignRepository),
+        Provider<BreedingRepository>.value(value: breedingRepository),
+        Provider<DocumentRepository>.value(value: documentRepository),
+
+        // === AuthProvider EN PREMIER ===
         ChangeNotifierProvider(create: (_) => AuthProvider()),
 
-        // 2. Providers sans dépendance
+        // === Providers sans dépendance ===
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => QRProvider()),
         ChangeNotifierProvider(create: (_) => SyncProvider()),
@@ -119,7 +177,7 @@ class MyApp extends StatelessWidget {
           create: (_) => ReminderProvider(flutterLocalNotificationsPlugin),
         ),
 
-        // AnimalProvider
+        // === AnimalProvider (avec Repository) ===
         ChangeNotifierProxyProvider<AuthProvider, AnimalProvider>(
           create: (context) {
             final auth = context.read<AuthProvider>();
@@ -138,38 +196,51 @@ class MyApp extends StatelessWidget {
               AnimalProvider(auth, context.read<AnimalRepository>()),
         ),
 
-        // BatchProvider
+        // === BatchProvider (avec Repository) ===
         ChangeNotifierProxyProvider<AuthProvider, BatchProvider>(
           create: (context) {
             final auth = context.read<AuthProvider>();
-            final provider = BatchProvider(auth);
+            final provider =
+                BatchProvider(auth, context.read<BatchRepository>());
             provider.initializeWithMockData(MockData.generateBatches());
             return provider;
           },
-          update: (context, auth, previous) => previous ?? BatchProvider(auth),
-        ),
-
-        ChangeNotifierProxyProvider<AuthProvider, LotProvider>(
-          create: (context) => LotProvider(context.read<AuthProvider>()),
-          update: (context, auth, previous) => previous ?? LotProvider(auth),
-        ),
-
-        ChangeNotifierProxyProvider<AuthProvider, CampaignProvider>(
-          create: (context) => CampaignProvider(context.read<AuthProvider>()),
           update: (context, auth, previous) =>
-              previous ?? CampaignProvider(auth),
+              previous ?? BatchProvider(auth, context.read<BatchRepository>()),
         ),
 
+        // === LotProvider (avec Repository) ===
+        ChangeNotifierProxyProvider<AuthProvider, LotProvider>(
+          create: (context) => LotProvider(
+              context.read<AuthProvider>(), context.read<LotRepository>()),
+          update: (context, auth, previous) =>
+              previous ?? LotProvider(auth, context.read<LotRepository>()),
+        ),
+
+        // === CampaignProvider (avec Repository) ===
+        ChangeNotifierProxyProvider<AuthProvider, CampaignProvider>(
+          create: (context) => CampaignProvider(
+              context.read<AuthProvider>(), context.read<CampaignRepository>()),
+          update: (context, auth, previous) =>
+              previous ??
+              CampaignProvider(auth, context.read<CampaignRepository>()),
+        ),
+
+        // === WeightProvider (avec Repository) ===
         ChangeNotifierProxyProvider<AuthProvider, WeightProvider>(
           create: (context) {
             final auth = context.read<AuthProvider>();
-            final provider = WeightProvider(auth);
+            final provider =
+                WeightProvider(auth, context.read<WeightRepository>());
             provider.setWeights(MockData.generateWeights());
             return provider;
           },
-          update: (context, auth, previous) => previous ?? WeightProvider(auth),
+          update: (context, auth, previous) =>
+              previous ??
+              WeightProvider(auth, context.read<WeightRepository>()),
         ),
 
+        // === VaccinationReferenceProvider ===
         ChangeNotifierProxyProvider<AuthProvider, VaccinationReferenceProvider>(
           create: (context) {
             final auth = context.read<AuthProvider>();
@@ -185,41 +256,54 @@ class MyApp extends StatelessWidget {
               previous ?? VaccinationReferenceProvider(auth),
         ),
 
+        // === VaccinationProvider (avec Repository) ===
         ChangeNotifierProxyProvider<AuthProvider, VaccinationProvider>(
           create: (context) {
             final auth = context.read<AuthProvider>();
-            final provider = VaccinationProvider(auth);
+            final provider = VaccinationProvider(
+                auth, context.read<VaccinationRepository>());
             provider.setVaccinations(MockData.generateVaccinations());
             return provider;
           },
           update: (context, auth, previous) =>
-              previous ?? VaccinationProvider(auth),
+              previous ??
+              VaccinationProvider(auth, context.read<VaccinationRepository>()),
         ),
 
+        // === DocumentProvider (avec Repository) ===
         ChangeNotifierProxyProvider<AuthProvider, DocumentProvider>(
-          create: (context) => DocumentProvider(context.read<AuthProvider>()),
+          create: (context) => DocumentProvider(
+              context.read<AuthProvider>(), context.read<DocumentRepository>()),
           update: (context, auth, previous) =>
-              previous ?? DocumentProvider(auth),
+              previous ??
+              DocumentProvider(auth, context.read<DocumentRepository>()),
         ),
 
+        // === BreedingProvider (avec Repository) ===
         ChangeNotifierProxyProvider<AuthProvider, BreedingProvider>(
-          create: (context) => BreedingProvider(context.read<AuthProvider>()),
+          create: (context) => BreedingProvider(
+              context.read<AuthProvider>(), context.read<BreedingRepository>()),
           update: (context, auth, previous) =>
-              previous ?? BreedingProvider(auth),
+              previous ??
+              BreedingProvider(auth, context.read<BreedingRepository>()),
         ),
 
+        // === VeterinarianProvider (avec Repository) ===
         ChangeNotifierProxyProvider<AuthProvider, VeterinarianProvider>(
           create: (context) {
             final auth = context.read<AuthProvider>();
-            final provider = VeterinarianProvider(auth);
+            final provider = VeterinarianProvider(
+                auth, context.read<VeterinarianRepository>());
             provider.loadMockVets(MockVeterinarians.generateVeterinarians());
             return provider;
           },
           update: (context, auth, previous) =>
-              previous ?? VeterinarianProvider(auth),
+              previous ??
+              VeterinarianProvider(
+                  auth, context.read<VeterinarianRepository>()),
         ),
 
-        // 4. AlertProvider (dépend de plusieurs providers)
+        // === AlertProvider (dépend de plusieurs providers) ===
         ChangeNotifierProxyProvider4<AnimalProvider, WeightProvider,
             SyncProvider, VaccinationProvider, AlertProvider>(
           create: (context) => AlertProvider(

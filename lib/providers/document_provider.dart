@@ -2,66 +2,71 @@
 
 import 'package:flutter/foundation.dart';
 import '../models/document.dart';
+import '../repositories/document_repository.dart';
 import 'auth_provider.dart';
 
-/// Provider pour la gestion des documents
-/// Mode MOCK : Données en mémoire uniquement
+/// DocumentProvider - Phase 1C
+/// CHANGEMENT: Utilise Repository pour Documents (SQLite)
 class DocumentProvider extends ChangeNotifier {
   final AuthProvider _authProvider;
+  final DocumentRepository _repository;
   String _currentFarmId;
 
-  DocumentProvider(this._authProvider)
+  // Données principales (cache local)
+  final List<Document> _allDocuments = [];
+
+  // Loading state
+  bool _isLoading = false;
+
+  DocumentProvider(this._authProvider, this._repository)
       : _currentFarmId = _authProvider.currentFarmId {
     _authProvider.addListener(_onFarmChanged);
+    _loadDocumentsFromRepository();
   }
 
   void _onFarmChanged() {
     if (_currentFarmId != _authProvider.currentFarmId) {
       _currentFarmId = _authProvider.currentFarmId;
-      notifyListeners();
+      _loadDocumentsFromRepository();
     }
   }
 
-  // === Données en mémoire (MOCK) ===
-  List<Document> _allDocuments = [];
-
   // === Getters ===
 
-  /// Tous les documents
   List<Document> get documents => List.unmodifiable(
-    _allDocuments.where((item) => item.farmId == _authProvider.currentFarmId)
-  );
+      _allDocuments.where((d) => d.farmId == _authProvider.currentFarmId));
 
-  /// Nombre total de documents
-  int get count => _allDocuments.length;
+  bool get isLoading => _isLoading;
+
+  int get count => documents.length;
 
   /// Documents par animal
   List<Document> getByAnimal(String animalId) {
-    return _allDocuments.where((d) => d.animalId == animalId).toList()
+    return documents.where((d) => d.animalId == animalId).toList()
       ..sort((a, b) => b.uploadDate.compareTo(a.uploadDate));
   }
 
   /// Documents de la ferme (non liés à un animal)
   List<Document> get farmDocuments {
-    return _allDocuments.where((d) => d.animalId == null).toList()
+    return documents.where((d) => d.animalId == null).toList()
       ..sort((a, b) => b.uploadDate.compareTo(a.uploadDate));
   }
 
   /// Documents par type
   List<Document> getByType(DocumentType type) {
-    return _allDocuments.where((d) => d.type == type).toList()
+    return documents.where((d) => d.type == type).toList()
       ..sort((a, b) => b.uploadDate.compareTo(a.uploadDate));
   }
 
   /// Documents expirés
   List<Document> get expired {
-    return _allDocuments.where((d) => d.isExpired).toList()
+    return documents.where((d) => d.isExpired).toList()
       ..sort((a, b) => a.expiryDate!.compareTo(b.expiryDate!));
   }
 
   /// Documents qui expirent bientôt (dans les 30 jours)
   List<Document> get expiringSoon {
-    return _allDocuments.where((d) {
+    return documents.where((d) {
       if (d.expiryDate == null) return false;
       final days = d.daysUntilExpiry;
       return days != null && days <= 30 && days > 0;
@@ -72,7 +77,7 @@ class DocumentProvider extends ChangeNotifier {
   /// Documents uploadés ce mois
   List<Document> get thisMonth {
     final now = DateTime.now();
-    return _allDocuments.where((d) {
+    return documents.where((d) {
       return d.uploadDate.year == now.year && d.uploadDate.month == now.month;
     }).toList()
       ..sort((a, b) => b.uploadDate.compareTo(a.uploadDate));
@@ -81,41 +86,95 @@ class DocumentProvider extends ChangeNotifier {
   /// Trouver par ID
   Document? getById(String id) {
     try {
-      return _allDocuments.firstWhere((d) => d.id == id);
+      return documents.firstWhere((d) => d.id == id);
     } catch (e) {
       return null;
     }
   }
 
-  // === Méthodes CRUD (MOCK) ===
+  // === Repository Loading ===
+
+  Future<void> _loadDocumentsFromRepository() async {
+    if (_currentFarmId.isEmpty) return;
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final farmDocuments = await _repository.getAll(_currentFarmId);
+      _allDocuments.removeWhere((d) => d.farmId == _currentFarmId);
+      _allDocuments.addAll(farmDocuments);
+    } catch (e) {
+      debugPrint('❌ Error loading documents from repository: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> loadMockData(List<Document> mockDocuments) async {
+    await _migrateDocumentsToRepository(mockDocuments);
+  }
+
+  Future<void> _migrateDocumentsToRepository(List<Document> documents) async {
+    for (final document in documents) {
+      try {
+        await _repository.create(document, document.farmId);
+      } catch (e) {
+        debugPrint('⚠️ Document ${document.id} already exists or error: $e');
+      }
+    }
+    await _loadDocumentsFromRepository();
+  }
+
+  // === CRUD ===
 
   /// Ajouter un document
   Future<void> add(Document document) async {
-    await Future.delayed(const Duration(milliseconds: 100)); // Simulate async
-    _allDocuments.add(document);
-    notifyListeners();
+    final documentWithFarm = document;
+
+    try {
+      await _repository.create(documentWithFarm, _authProvider.currentFarmId);
+      _allDocuments.add(documentWithFarm);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('❌ Error adding document: $e');
+      rethrow;
+    }
   }
 
   /// Mettre à jour un document
   Future<void> update(Document document) async {
-    await Future.delayed(const Duration(milliseconds: 100));
-    final index = _allDocuments.indexWhere((d) => d.id == document.id);
-    if (index != -1) {
-      _allDocuments[index] = document.markAsModified();
-      notifyListeners();
+    try {
+      final updated = document.markAsModified();
+      await _repository.update(updated, _authProvider.currentFarmId);
+
+      final index = _allDocuments.indexWhere((d) => d.id == document.id);
+      if (index != -1) {
+        _allDocuments[index] = updated;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('❌ Error updating document: $e');
+      rethrow;
     }
   }
 
   /// Supprimer un document
   Future<void> delete(String id) async {
-    await Future.delayed(const Duration(milliseconds: 100));
-    _allDocuments.removeWhere((d) => d.id == id);
-    notifyListeners();
+    try {
+      await _repository.delete(id, _authProvider.currentFarmId);
+
+      _allDocuments.removeWhere((d) => d.id == id);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('❌ Error deleting document: $e');
+      rethrow;
+    }
   }
 
   /// Upload un nouveau document
   Future<Document> uploadDocument({
-    required String farmId,
     String? animalId,
     required DocumentType type,
     required String fileName,
@@ -126,10 +185,8 @@ class DocumentProvider extends ChangeNotifier {
     String? notes,
     String? uploadedBy,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 500)); // Simulate upload
-
     final document = Document(
-      farmId: farmId,
+      farmId: _authProvider.currentFarmId,
       animalId: animalId,
       type: type,
       fileName: fileName,
@@ -148,9 +205,15 @@ class DocumentProvider extends ChangeNotifier {
 
   /// Supprimer tous les documents d'un animal
   Future<void> deleteAllForAnimal(String animalId) async {
-    await Future.delayed(const Duration(milliseconds: 100));
-    _allDocuments.removeWhere((d) => d.animalId == animalId);
-    notifyListeners();
+    try {
+      await _repository.deleteAllForAnimal(
+          _authProvider.currentFarmId, animalId);
+      _allDocuments.removeWhere((d) => d.animalId == animalId);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('❌ Error deleting documents for animal: $e');
+      rethrow;
+    }
   }
 
   // === Statistiques ===
@@ -158,7 +221,7 @@ class DocumentProvider extends ChangeNotifier {
   /// Nombre de documents par type
   Map<DocumentType, int> getCountsByType() {
     final counts = <DocumentType, int>{};
-    for (final doc in _allDocuments) {
+    for (final doc in documents) {
       counts[doc.type] = (counts[doc.type] ?? 0) + 1;
     }
     return counts;
@@ -166,7 +229,7 @@ class DocumentProvider extends ChangeNotifier {
 
   /// Taille totale des documents (en bytes)
   int get totalStorageUsed {
-    return _allDocuments.fold<int>(
+    return documents.fold<int>(
       0,
       (sum, doc) => sum + (doc.fileSizeBytes ?? 0),
     );
@@ -199,38 +262,25 @@ class DocumentProvider extends ChangeNotifier {
   /// Rechercher par nom de fichier
   List<Document> searchByFileName(String query) {
     final lowerQuery = query.toLowerCase();
-    return _allDocuments
+    return documents
         .where((d) => d.fileName.toLowerCase().contains(lowerQuery))
         .toList()
       ..sort((a, b) => b.uploadDate.compareTo(a.uploadDate));
   }
 
-  // === Chargement initial (MOCK) ===
+  // === Utilities ===
 
-  /// Charger les données de mock
-  Future<void> loadMockData(List<Document> mockDocuments) async {
-    await Future.delayed(const Duration(milliseconds: 200));
-    _allDocuments = mockDocuments;
-    notifyListeners();
-  }
-
-  /// Réinitialiser les données
   void clear() {
     _allDocuments.clear();
     notifyListeners();
   }
 
-  // === Synchronisation (MOCK - ne fait rien) ===
-
-  /// Synchroniser avec le serveur (placeholder)
   Future<void> syncToServer() async {
-    // TODO: Implémenter quand serveur prêt
     await Future.delayed(const Duration(milliseconds: 100));
   }
 
-  /// Marquer comme synchronisé (placeholder)
-  void _markAsSynced(String id, String serverVersion) {
-    // TODO: Implémenter quand serveur prêt
+  Future<void> refresh() async {
+    await _loadDocumentsFromRepository();
   }
 
   @override

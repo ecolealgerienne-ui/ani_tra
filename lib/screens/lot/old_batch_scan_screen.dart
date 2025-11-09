@@ -100,7 +100,7 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
       // Nouvel animal
       final success = batchProvider.addAnimalToBatch(animal.id);
 
-      if (success) {
+      if (await success) {
         _showSuccessFeedback(animal);
         _loadScannedAnimals();
       }
@@ -162,9 +162,11 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
   }
 
   /// Retirer un animal du lot
-  void _removeAnimal(String animalId) {
+  Future<void> _removeAnimal(String animalId) async {
     final batchProvider = context.read<BatchProvider>();
-    final success = batchProvider.removeAnimalFromBatch(animalId);
+    final success = await batchProvider.removeAnimalFromBatch(animalId);
+
+    if (!mounted) return;
 
     if (success) {
       _loadScannedAnimals();

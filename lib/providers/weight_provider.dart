@@ -1,92 +1,153 @@
 // lib/providers/weight_provider.dart
 import 'package:flutter/foundation.dart';
 import '../models/weight_record.dart';
+import '../repositories/weight_repository.dart';
 import 'auth_provider.dart';
 
-/// Provider de gestion des pesées.
-/// Aucune chaîne affichée à l'utilisateur n'est émise ici.
-/// Toute validation/erreur côté UI doit passer par vos clés de traduction.
+/// WeightProvider - Phase 1C
+/// CHANGEMENT: Utilise Repository pour WeightRecords (SQLite)
 class WeightProvider extends ChangeNotifier {
   final AuthProvider _authProvider;
+  final WeightRepository _repository;
   String _currentFarmId;
 
-  WeightProvider(this._authProvider)
-      : _currentFarmId = _authProvider.currentFarmId {
-    _authProvider.addListener(_onFarmChanged);
-  }
+  // Données principales (cache local)
+  final List<WeightRecord> _allWeightRecords = [];
 
-  void _onFarmChanged() {
-    if (_currentFarmId != _authProvider.currentFarmId) {
-      _currentFarmId = _authProvider.currentFarmId;
-      notifyListeners();
-    }
-  }
+  // Loading state
+  bool _isLoading = false;
 
-  // (Optionnel) Clés techniques si besoin de logs externes
+  // Constantes
   static const String kLogWeightsSet = 'log.weight.set_list';
   static const String kLogWeightAdded = 'log.weight.added';
   static const String kLogWeightUpdated = 'log.weight.updated';
   static const String kLogWeightRemoved = 'log.weight.removed';
 
-  final List<WeightRecord> _allWeightRecords = [];
+  WeightProvider(this._authProvider, this._repository)
+      : _currentFarmId = _authProvider.currentFarmId {
+    _authProvider.addListener(_onFarmChanged);
+    _loadWeightsFromRepository();
+  }
 
-  /// Accès en lecture seule
-  List<WeightRecord> get weights => List.unmodifiable(_allWeightRecords);
+  void _onFarmChanged() {
+    if (_currentFarmId != _authProvider.currentFarmId) {
+      _currentFarmId = _authProvider.currentFarmId;
+      _loadWeightsFromRepository();
+    }
+  }
 
-  /// Remplace la liste complète (utile pour init/mocks/sync)
+  // ==================== Getters ====================
+
+  List<WeightRecord> get weights => List.unmodifiable(
+      _allWeightRecords.where((w) => w.farmId == _authProvider.currentFarmId));
+
+  bool get isLoading => _isLoading;
+
+  List<WeightRecord> get timelineSorted {
+    final copy = [...weights];
+    copy.sort((a, b) => a.recordedAt.compareTo(b.recordedAt));
+    return copy;
+  }
+
+  // ==================== Repository Loading ====================
+
+  Future<void> _loadWeightsFromRepository() async {
+    if (_currentFarmId.isEmpty) return;
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final farmWeights = await _repository.getAll(_currentFarmId);
+      _allWeightRecords.removeWhere((w) => w.farmId == _currentFarmId);
+      _allWeightRecords.addAll(farmWeights);
+    } catch (e) {
+      debugPrint('❌ Error loading weights from repository: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   void setWeights(List<WeightRecord> items) {
-    _allWeightRecords
-      ..clear()
-      ..addAll(items);
-    notifyListeners();
+    _migrateWeightsToRepository(items);
   }
 
-  /// Ajoute un enregistrement de poids
-  void addWeight(WeightRecord record) {
+  Future<void> _migrateWeightsToRepository(List<WeightRecord> weights) async {
+    for (final weight in weights) {
+      try {
+        await _repository.create(weight, weight.farmId);
+      } catch (e) {
+        debugPrint('⚠️ Weight ${weight.id} already exists or error: $e');
+      }
+    }
+    await _loadWeightsFromRepository();
+  }
+
+  // ==================== CRUD ====================
+
+  Future<void> addWeight(WeightRecord record) async {
     final recordWithFarm = record.copyWith(farmId: _authProvider.currentFarmId);
-    _allWeightRecords.add(recordWithFarm);
-    notifyListeners();
-  }
 
-  /// Met à jour un enregistrement existant (par id)
-  void updateWeight(WeightRecord updated) {
-    final idx = _allWeightRecords.indexWhere((w) => w.id == updated.id);
-    if (idx != -1) {
-      _allWeightRecords[idx] = updated;
+    try {
+      await _repository.create(recordWithFarm, _authProvider.currentFarmId);
+      _allWeightRecords.add(recordWithFarm);
       notifyListeners();
+    } catch (e) {
+      debugPrint('❌ Error adding weight: $e');
+      rethrow;
     }
   }
 
-  /// Supprime un enregistrement par id
-  void removeWeight(String id) {
-    final before = _allWeightRecords.length;
-    _allWeightRecords.removeWhere((w) => w.id == id); // removeWhere retourne void
-    if (_allWeightRecords.length < before) {
-      notifyListeners();
+  Future<void> updateWeight(WeightRecord updated) async {
+    try {
+      await _repository.update(updated, _authProvider.currentFarmId);
+
+      final idx = _allWeightRecords.indexWhere((w) => w.id == updated.id);
+      if (idx != -1) {
+        _allWeightRecords[idx] = updated;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('❌ Error updating weight: $e');
+      rethrow;
     }
   }
 
-  /// Retourne les poids enregistrés sur les `days` derniers jours (par défaut 30)
+  Future<void> removeWeight(String id) async {
+    try {
+      await _repository.delete(id, _authProvider.currentFarmId);
+
+      final before = _allWeightRecords.length;
+      _allWeightRecords.removeWhere((w) => w.id == id);
+      if (_allWeightRecords.length < before) {
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('❌ Error removing weight: $e');
+      rethrow;
+    }
+  }
+
+  // ==================== Query Methods ====================
+
   List<WeightRecord> getRecentWeights({int days = 30}) {
     final cutoffDate = DateTime.now().subtract(Duration(days: days));
-    return _allWeightRecords.where((w) => w.recordedAt.isAfter(cutoffDate)).toList();
+    return weights.where((w) => w.recordedAt.isAfter(cutoffDate)).toList();
   }
 
-  /// Poids moyen sur les `days` derniers jours (null si aucun)
   double? averageRecentWeight({int days = 30}) {
     final recent = getRecentWeights(days: days);
     if (recent.isEmpty) return null;
 
-    // Utilise le champ réel du modèle: `weight`
     final sum = recent.fold<double>(0.0, (acc, w) => acc + w.weight);
     return sum / recent.length;
   }
 
-  /// Retourne l’historique trié par date croissante (utile aux graphes)
-  List<WeightRecord> get timelineSorted {
-    final copy = [..._allWeightRecords];
-    copy.sort((a, b) => a.recordedAt.compareTo(b.recordedAt));
-    return copy;
+  // ==================== Refresh ====================
+
+  Future<void> refresh() async {
+    await _loadWeightsFromRepository();
   }
 
   @override

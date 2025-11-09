@@ -150,7 +150,7 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
 
         // Après retour de medical_act_screen, finaliser le lot
         if (!mounted) return;
-        success = lotProvider.finalizeLot(
+        success = await lotProvider.finalizeLot(
           widget.lotId,
           type: LotType.treatment,
           notes: _notesController.text.isEmpty ? null : _notesController.text,
@@ -176,7 +176,7 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
 
         final totalPrice = pricePerAnimal * lot.animalCount;
 
-        success = lotProvider.finalizeLot(
+        success = await lotProvider.finalizeLot(
           widget.lotId,
           type: LotType.sale,
           buyerName: _buyerNameController.text,
@@ -205,7 +205,7 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
         break;
 
       case LotType.slaughter:
-        success = lotProvider.finalizeLot(
+        success = await lotProvider.finalizeLot(
           widget.lotId,
           type: LotType.slaughter,
           slaughterhouseName: _slaughterhouseNameController.text,
@@ -330,7 +330,7 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
                   _notesController.text.isEmpty ? null : _notesController.text,
             );
 
-            if (success) {
+            if (await success) {
               syncProvider.incrementPendingData();
               if (mounted) {
                 Navigator.pop(context);

@@ -1409,6 +1409,1868 @@ class AnimalsTableCompanion extends UpdateCompanion<AnimalsTableData> {
   }
 }
 
+class $BreedingsTableTable extends BreedingsTable
+    with TableInfo<$BreedingsTableTable, BreedingsTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BreedingsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _farmIdMeta = const VerificationMeta('farmId');
+  @override
+  late final GeneratedColumn<String> farmId = GeneratedColumn<String>(
+      'farm_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _motherIdMeta =
+      const VerificationMeta('motherId');
+  @override
+  late final GeneratedColumn<String> motherId = GeneratedColumn<String>(
+      'mother_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _fatherIdMeta =
+      const VerificationMeta('fatherId');
+  @override
+  late final GeneratedColumn<String> fatherId = GeneratedColumn<String>(
+      'father_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _fatherNameMeta =
+      const VerificationMeta('fatherName');
+  @override
+  late final GeneratedColumn<String> fatherName = GeneratedColumn<String>(
+      'father_name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _methodMeta = const VerificationMeta('method');
+  @override
+  late final GeneratedColumn<String> method = GeneratedColumn<String>(
+      'method', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _breedingDateMeta =
+      const VerificationMeta('breedingDate');
+  @override
+  late final GeneratedColumn<DateTime> breedingDate = GeneratedColumn<DateTime>(
+      'breeding_date', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _expectedBirthDateMeta =
+      const VerificationMeta('expectedBirthDate');
+  @override
+  late final GeneratedColumn<DateTime> expectedBirthDate =
+      GeneratedColumn<DateTime>('expected_birth_date', aliasedName, false,
+          type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _actualBirthDateMeta =
+      const VerificationMeta('actualBirthDate');
+  @override
+  late final GeneratedColumn<DateTime> actualBirthDate =
+      GeneratedColumn<DateTime>('actual_birth_date', aliasedName, true,
+          type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _expectedOffspringCountMeta =
+      const VerificationMeta('expectedOffspringCount');
+  @override
+  late final GeneratedColumn<int> expectedOffspringCount = GeneratedColumn<int>(
+      'expected_offspring_count', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _offspringIdsMeta =
+      const VerificationMeta('offspringIds');
+  @override
+  late final GeneratedColumn<String> offspringIds = GeneratedColumn<String>(
+      'offspring_ids', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _veterinarianIdMeta =
+      const VerificationMeta('veterinarianId');
+  @override
+  late final GeneratedColumn<String> veterinarianId = GeneratedColumn<String>(
+      'veterinarian_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _veterinarianNameMeta =
+      const VerificationMeta('veterinarianName');
+  @override
+  late final GeneratedColumn<String> veterinarianName = GeneratedColumn<String>(
+      'veterinarian_name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+      'notes', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+      'status', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+      'synced', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("synced" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _lastSyncedAtMeta =
+      const VerificationMeta('lastSyncedAt');
+  @override
+  late final GeneratedColumn<DateTime> lastSyncedAt = GeneratedColumn<DateTime>(
+      'last_synced_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _serverVersionMeta =
+      const VerificationMeta('serverVersion');
+  @override
+  late final GeneratedColumn<String> serverVersion = GeneratedColumn<String>(
+      'server_version', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _deletedAtMeta =
+      const VerificationMeta('deletedAt');
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+      'deleted_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        farmId,
+        motherId,
+        fatherId,
+        fatherName,
+        method,
+        breedingDate,
+        expectedBirthDate,
+        actualBirthDate,
+        expectedOffspringCount,
+        offspringIds,
+        veterinarianId,
+        veterinarianName,
+        notes,
+        status,
+        synced,
+        lastSyncedAt,
+        serverVersion,
+        deletedAt,
+        createdAt,
+        updatedAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'breedings';
+  @override
+  VerificationContext validateIntegrity(Insertable<BreedingsTableData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('farm_id')) {
+      context.handle(_farmIdMeta,
+          farmId.isAcceptableOrUnknown(data['farm_id']!, _farmIdMeta));
+    } else if (isInserting) {
+      context.missing(_farmIdMeta);
+    }
+    if (data.containsKey('mother_id')) {
+      context.handle(_motherIdMeta,
+          motherId.isAcceptableOrUnknown(data['mother_id']!, _motherIdMeta));
+    } else if (isInserting) {
+      context.missing(_motherIdMeta);
+    }
+    if (data.containsKey('father_id')) {
+      context.handle(_fatherIdMeta,
+          fatherId.isAcceptableOrUnknown(data['father_id']!, _fatherIdMeta));
+    }
+    if (data.containsKey('father_name')) {
+      context.handle(
+          _fatherNameMeta,
+          fatherName.isAcceptableOrUnknown(
+              data['father_name']!, _fatherNameMeta));
+    }
+    if (data.containsKey('method')) {
+      context.handle(_methodMeta,
+          method.isAcceptableOrUnknown(data['method']!, _methodMeta));
+    } else if (isInserting) {
+      context.missing(_methodMeta);
+    }
+    if (data.containsKey('breeding_date')) {
+      context.handle(
+          _breedingDateMeta,
+          breedingDate.isAcceptableOrUnknown(
+              data['breeding_date']!, _breedingDateMeta));
+    } else if (isInserting) {
+      context.missing(_breedingDateMeta);
+    }
+    if (data.containsKey('expected_birth_date')) {
+      context.handle(
+          _expectedBirthDateMeta,
+          expectedBirthDate.isAcceptableOrUnknown(
+              data['expected_birth_date']!, _expectedBirthDateMeta));
+    } else if (isInserting) {
+      context.missing(_expectedBirthDateMeta);
+    }
+    if (data.containsKey('actual_birth_date')) {
+      context.handle(
+          _actualBirthDateMeta,
+          actualBirthDate.isAcceptableOrUnknown(
+              data['actual_birth_date']!, _actualBirthDateMeta));
+    }
+    if (data.containsKey('expected_offspring_count')) {
+      context.handle(
+          _expectedOffspringCountMeta,
+          expectedOffspringCount.isAcceptableOrUnknown(
+              data['expected_offspring_count']!, _expectedOffspringCountMeta));
+    }
+    if (data.containsKey('offspring_ids')) {
+      context.handle(
+          _offspringIdsMeta,
+          offspringIds.isAcceptableOrUnknown(
+              data['offspring_ids']!, _offspringIdsMeta));
+    }
+    if (data.containsKey('veterinarian_id')) {
+      context.handle(
+          _veterinarianIdMeta,
+          veterinarianId.isAcceptableOrUnknown(
+              data['veterinarian_id']!, _veterinarianIdMeta));
+    }
+    if (data.containsKey('veterinarian_name')) {
+      context.handle(
+          _veterinarianNameMeta,
+          veterinarianName.isAcceptableOrUnknown(
+              data['veterinarian_name']!, _veterinarianNameMeta));
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+          _notesMeta, notes.isAcceptableOrUnknown(data['notes']!, _notesMeta));
+    }
+    if (data.containsKey('status')) {
+      context.handle(_statusMeta,
+          status.isAcceptableOrUnknown(data['status']!, _statusMeta));
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('synced')) {
+      context.handle(_syncedMeta,
+          synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta));
+    }
+    if (data.containsKey('last_synced_at')) {
+      context.handle(
+          _lastSyncedAtMeta,
+          lastSyncedAt.isAcceptableOrUnknown(
+              data['last_synced_at']!, _lastSyncedAtMeta));
+    }
+    if (data.containsKey('server_version')) {
+      context.handle(
+          _serverVersionMeta,
+          serverVersion.isAcceptableOrUnknown(
+              data['server_version']!, _serverVersionMeta));
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(_deletedAtMeta,
+          deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  BreedingsTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BreedingsTableData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      farmId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}farm_id'])!,
+      motherId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}mother_id'])!,
+      fatherId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}father_id']),
+      fatherName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}father_name']),
+      method: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}method'])!,
+      breedingDate: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}breeding_date'])!,
+      expectedBirthDate: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime,
+          data['${effectivePrefix}expected_birth_date'])!,
+      actualBirthDate: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}actual_birth_date']),
+      expectedOffspringCount: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}expected_offspring_count']),
+      offspringIds: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}offspring_ids']),
+      veterinarianId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}veterinarian_id']),
+      veterinarianName: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}veterinarian_name']),
+      notes: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}notes']),
+      status: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}status'])!,
+      synced: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}synced'])!,
+      lastSyncedAt: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}last_synced_at']),
+      serverVersion: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}server_version']),
+      deletedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}deleted_at']),
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+    );
+  }
+
+  @override
+  $BreedingsTableTable createAlias(String alias) {
+    return $BreedingsTableTable(attachedDatabase, alias);
+  }
+}
+
+class BreedingsTableData extends DataClass
+    implements Insertable<BreedingsTableData> {
+  final String id;
+  final String farmId;
+  final String motherId;
+  final String? fatherId;
+  final String? fatherName;
+  final String method;
+  final DateTime breedingDate;
+  final DateTime expectedBirthDate;
+  final DateTime? actualBirthDate;
+  final int? expectedOffspringCount;
+  final String? offspringIds;
+  final String? veterinarianId;
+  final String? veterinarianName;
+  final String? notes;
+  final String status;
+  final bool synced;
+  final DateTime? lastSyncedAt;
+  final String? serverVersion;
+  final DateTime? deletedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const BreedingsTableData(
+      {required this.id,
+      required this.farmId,
+      required this.motherId,
+      this.fatherId,
+      this.fatherName,
+      required this.method,
+      required this.breedingDate,
+      required this.expectedBirthDate,
+      this.actualBirthDate,
+      this.expectedOffspringCount,
+      this.offspringIds,
+      this.veterinarianId,
+      this.veterinarianName,
+      this.notes,
+      required this.status,
+      required this.synced,
+      this.lastSyncedAt,
+      this.serverVersion,
+      this.deletedAt,
+      required this.createdAt,
+      required this.updatedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['farm_id'] = Variable<String>(farmId);
+    map['mother_id'] = Variable<String>(motherId);
+    if (!nullToAbsent || fatherId != null) {
+      map['father_id'] = Variable<String>(fatherId);
+    }
+    if (!nullToAbsent || fatherName != null) {
+      map['father_name'] = Variable<String>(fatherName);
+    }
+    map['method'] = Variable<String>(method);
+    map['breeding_date'] = Variable<DateTime>(breedingDate);
+    map['expected_birth_date'] = Variable<DateTime>(expectedBirthDate);
+    if (!nullToAbsent || actualBirthDate != null) {
+      map['actual_birth_date'] = Variable<DateTime>(actualBirthDate);
+    }
+    if (!nullToAbsent || expectedOffspringCount != null) {
+      map['expected_offspring_count'] = Variable<int>(expectedOffspringCount);
+    }
+    if (!nullToAbsent || offspringIds != null) {
+      map['offspring_ids'] = Variable<String>(offspringIds);
+    }
+    if (!nullToAbsent || veterinarianId != null) {
+      map['veterinarian_id'] = Variable<String>(veterinarianId);
+    }
+    if (!nullToAbsent || veterinarianName != null) {
+      map['veterinarian_name'] = Variable<String>(veterinarianName);
+    }
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    map['status'] = Variable<String>(status);
+    map['synced'] = Variable<bool>(synced);
+    if (!nullToAbsent || lastSyncedAt != null) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt);
+    }
+    if (!nullToAbsent || serverVersion != null) {
+      map['server_version'] = Variable<String>(serverVersion);
+    }
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  BreedingsTableCompanion toCompanion(bool nullToAbsent) {
+    return BreedingsTableCompanion(
+      id: Value(id),
+      farmId: Value(farmId),
+      motherId: Value(motherId),
+      fatherId: fatherId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fatherId),
+      fatherName: fatherName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fatherName),
+      method: Value(method),
+      breedingDate: Value(breedingDate),
+      expectedBirthDate: Value(expectedBirthDate),
+      actualBirthDate: actualBirthDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(actualBirthDate),
+      expectedOffspringCount: expectedOffspringCount == null && nullToAbsent
+          ? const Value.absent()
+          : Value(expectedOffspringCount),
+      offspringIds: offspringIds == null && nullToAbsent
+          ? const Value.absent()
+          : Value(offspringIds),
+      veterinarianId: veterinarianId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(veterinarianId),
+      veterinarianName: veterinarianName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(veterinarianName),
+      notes:
+          notes == null && nullToAbsent ? const Value.absent() : Value(notes),
+      status: Value(status),
+      synced: Value(synced),
+      lastSyncedAt: lastSyncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSyncedAt),
+      serverVersion: serverVersion == null && nullToAbsent
+          ? const Value.absent()
+          : Value(serverVersion),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory BreedingsTableData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BreedingsTableData(
+      id: serializer.fromJson<String>(json['id']),
+      farmId: serializer.fromJson<String>(json['farmId']),
+      motherId: serializer.fromJson<String>(json['motherId']),
+      fatherId: serializer.fromJson<String?>(json['fatherId']),
+      fatherName: serializer.fromJson<String?>(json['fatherName']),
+      method: serializer.fromJson<String>(json['method']),
+      breedingDate: serializer.fromJson<DateTime>(json['breedingDate']),
+      expectedBirthDate:
+          serializer.fromJson<DateTime>(json['expectedBirthDate']),
+      actualBirthDate: serializer.fromJson<DateTime?>(json['actualBirthDate']),
+      expectedOffspringCount:
+          serializer.fromJson<int?>(json['expectedOffspringCount']),
+      offspringIds: serializer.fromJson<String?>(json['offspringIds']),
+      veterinarianId: serializer.fromJson<String?>(json['veterinarianId']),
+      veterinarianName: serializer.fromJson<String?>(json['veterinarianName']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      status: serializer.fromJson<String>(json['status']),
+      synced: serializer.fromJson<bool>(json['synced']),
+      lastSyncedAt: serializer.fromJson<DateTime?>(json['lastSyncedAt']),
+      serverVersion: serializer.fromJson<String?>(json['serverVersion']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'farmId': serializer.toJson<String>(farmId),
+      'motherId': serializer.toJson<String>(motherId),
+      'fatherId': serializer.toJson<String?>(fatherId),
+      'fatherName': serializer.toJson<String?>(fatherName),
+      'method': serializer.toJson<String>(method),
+      'breedingDate': serializer.toJson<DateTime>(breedingDate),
+      'expectedBirthDate': serializer.toJson<DateTime>(expectedBirthDate),
+      'actualBirthDate': serializer.toJson<DateTime?>(actualBirthDate),
+      'expectedOffspringCount': serializer.toJson<int?>(expectedOffspringCount),
+      'offspringIds': serializer.toJson<String?>(offspringIds),
+      'veterinarianId': serializer.toJson<String?>(veterinarianId),
+      'veterinarianName': serializer.toJson<String?>(veterinarianName),
+      'notes': serializer.toJson<String?>(notes),
+      'status': serializer.toJson<String>(status),
+      'synced': serializer.toJson<bool>(synced),
+      'lastSyncedAt': serializer.toJson<DateTime?>(lastSyncedAt),
+      'serverVersion': serializer.toJson<String?>(serverVersion),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  BreedingsTableData copyWith(
+          {String? id,
+          String? farmId,
+          String? motherId,
+          Value<String?> fatherId = const Value.absent(),
+          Value<String?> fatherName = const Value.absent(),
+          String? method,
+          DateTime? breedingDate,
+          DateTime? expectedBirthDate,
+          Value<DateTime?> actualBirthDate = const Value.absent(),
+          Value<int?> expectedOffspringCount = const Value.absent(),
+          Value<String?> offspringIds = const Value.absent(),
+          Value<String?> veterinarianId = const Value.absent(),
+          Value<String?> veterinarianName = const Value.absent(),
+          Value<String?> notes = const Value.absent(),
+          String? status,
+          bool? synced,
+          Value<DateTime?> lastSyncedAt = const Value.absent(),
+          Value<String?> serverVersion = const Value.absent(),
+          Value<DateTime?> deletedAt = const Value.absent(),
+          DateTime? createdAt,
+          DateTime? updatedAt}) =>
+      BreedingsTableData(
+        id: id ?? this.id,
+        farmId: farmId ?? this.farmId,
+        motherId: motherId ?? this.motherId,
+        fatherId: fatherId.present ? fatherId.value : this.fatherId,
+        fatherName: fatherName.present ? fatherName.value : this.fatherName,
+        method: method ?? this.method,
+        breedingDate: breedingDate ?? this.breedingDate,
+        expectedBirthDate: expectedBirthDate ?? this.expectedBirthDate,
+        actualBirthDate: actualBirthDate.present
+            ? actualBirthDate.value
+            : this.actualBirthDate,
+        expectedOffspringCount: expectedOffspringCount.present
+            ? expectedOffspringCount.value
+            : this.expectedOffspringCount,
+        offspringIds:
+            offspringIds.present ? offspringIds.value : this.offspringIds,
+        veterinarianId:
+            veterinarianId.present ? veterinarianId.value : this.veterinarianId,
+        veterinarianName: veterinarianName.present
+            ? veterinarianName.value
+            : this.veterinarianName,
+        notes: notes.present ? notes.value : this.notes,
+        status: status ?? this.status,
+        synced: synced ?? this.synced,
+        lastSyncedAt:
+            lastSyncedAt.present ? lastSyncedAt.value : this.lastSyncedAt,
+        serverVersion:
+            serverVersion.present ? serverVersion.value : this.serverVersion,
+        deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+  BreedingsTableData copyWithCompanion(BreedingsTableCompanion data) {
+    return BreedingsTableData(
+      id: data.id.present ? data.id.value : this.id,
+      farmId: data.farmId.present ? data.farmId.value : this.farmId,
+      motherId: data.motherId.present ? data.motherId.value : this.motherId,
+      fatherId: data.fatherId.present ? data.fatherId.value : this.fatherId,
+      fatherName:
+          data.fatherName.present ? data.fatherName.value : this.fatherName,
+      method: data.method.present ? data.method.value : this.method,
+      breedingDate: data.breedingDate.present
+          ? data.breedingDate.value
+          : this.breedingDate,
+      expectedBirthDate: data.expectedBirthDate.present
+          ? data.expectedBirthDate.value
+          : this.expectedBirthDate,
+      actualBirthDate: data.actualBirthDate.present
+          ? data.actualBirthDate.value
+          : this.actualBirthDate,
+      expectedOffspringCount: data.expectedOffspringCount.present
+          ? data.expectedOffspringCount.value
+          : this.expectedOffspringCount,
+      offspringIds: data.offspringIds.present
+          ? data.offspringIds.value
+          : this.offspringIds,
+      veterinarianId: data.veterinarianId.present
+          ? data.veterinarianId.value
+          : this.veterinarianId,
+      veterinarianName: data.veterinarianName.present
+          ? data.veterinarianName.value
+          : this.veterinarianName,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      status: data.status.present ? data.status.value : this.status,
+      synced: data.synced.present ? data.synced.value : this.synced,
+      lastSyncedAt: data.lastSyncedAt.present
+          ? data.lastSyncedAt.value
+          : this.lastSyncedAt,
+      serverVersion: data.serverVersion.present
+          ? data.serverVersion.value
+          : this.serverVersion,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BreedingsTableData(')
+          ..write('id: $id, ')
+          ..write('farmId: $farmId, ')
+          ..write('motherId: $motherId, ')
+          ..write('fatherId: $fatherId, ')
+          ..write('fatherName: $fatherName, ')
+          ..write('method: $method, ')
+          ..write('breedingDate: $breedingDate, ')
+          ..write('expectedBirthDate: $expectedBirthDate, ')
+          ..write('actualBirthDate: $actualBirthDate, ')
+          ..write('expectedOffspringCount: $expectedOffspringCount, ')
+          ..write('offspringIds: $offspringIds, ')
+          ..write('veterinarianId: $veterinarianId, ')
+          ..write('veterinarianName: $veterinarianName, ')
+          ..write('notes: $notes, ')
+          ..write('status: $status, ')
+          ..write('synced: $synced, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('serverVersion: $serverVersion, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+        id,
+        farmId,
+        motherId,
+        fatherId,
+        fatherName,
+        method,
+        breedingDate,
+        expectedBirthDate,
+        actualBirthDate,
+        expectedOffspringCount,
+        offspringIds,
+        veterinarianId,
+        veterinarianName,
+        notes,
+        status,
+        synced,
+        lastSyncedAt,
+        serverVersion,
+        deletedAt,
+        createdAt,
+        updatedAt
+      ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BreedingsTableData &&
+          other.id == this.id &&
+          other.farmId == this.farmId &&
+          other.motherId == this.motherId &&
+          other.fatherId == this.fatherId &&
+          other.fatherName == this.fatherName &&
+          other.method == this.method &&
+          other.breedingDate == this.breedingDate &&
+          other.expectedBirthDate == this.expectedBirthDate &&
+          other.actualBirthDate == this.actualBirthDate &&
+          other.expectedOffspringCount == this.expectedOffspringCount &&
+          other.offspringIds == this.offspringIds &&
+          other.veterinarianId == this.veterinarianId &&
+          other.veterinarianName == this.veterinarianName &&
+          other.notes == this.notes &&
+          other.status == this.status &&
+          other.synced == this.synced &&
+          other.lastSyncedAt == this.lastSyncedAt &&
+          other.serverVersion == this.serverVersion &&
+          other.deletedAt == this.deletedAt &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class BreedingsTableCompanion extends UpdateCompanion<BreedingsTableData> {
+  final Value<String> id;
+  final Value<String> farmId;
+  final Value<String> motherId;
+  final Value<String?> fatherId;
+  final Value<String?> fatherName;
+  final Value<String> method;
+  final Value<DateTime> breedingDate;
+  final Value<DateTime> expectedBirthDate;
+  final Value<DateTime?> actualBirthDate;
+  final Value<int?> expectedOffspringCount;
+  final Value<String?> offspringIds;
+  final Value<String?> veterinarianId;
+  final Value<String?> veterinarianName;
+  final Value<String?> notes;
+  final Value<String> status;
+  final Value<bool> synced;
+  final Value<DateTime?> lastSyncedAt;
+  final Value<String?> serverVersion;
+  final Value<DateTime?> deletedAt;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const BreedingsTableCompanion({
+    this.id = const Value.absent(),
+    this.farmId = const Value.absent(),
+    this.motherId = const Value.absent(),
+    this.fatherId = const Value.absent(),
+    this.fatherName = const Value.absent(),
+    this.method = const Value.absent(),
+    this.breedingDate = const Value.absent(),
+    this.expectedBirthDate = const Value.absent(),
+    this.actualBirthDate = const Value.absent(),
+    this.expectedOffspringCount = const Value.absent(),
+    this.offspringIds = const Value.absent(),
+    this.veterinarianId = const Value.absent(),
+    this.veterinarianName = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.status = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.serverVersion = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  BreedingsTableCompanion.insert({
+    required String id,
+    required String farmId,
+    required String motherId,
+    this.fatherId = const Value.absent(),
+    this.fatherName = const Value.absent(),
+    required String method,
+    required DateTime breedingDate,
+    required DateTime expectedBirthDate,
+    this.actualBirthDate = const Value.absent(),
+    this.expectedOffspringCount = const Value.absent(),
+    this.offspringIds = const Value.absent(),
+    this.veterinarianId = const Value.absent(),
+    this.veterinarianName = const Value.absent(),
+    this.notes = const Value.absent(),
+    required String status,
+    this.synced = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.serverVersion = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        farmId = Value(farmId),
+        motherId = Value(motherId),
+        method = Value(method),
+        breedingDate = Value(breedingDate),
+        expectedBirthDate = Value(expectedBirthDate),
+        status = Value(status),
+        createdAt = Value(createdAt),
+        updatedAt = Value(updatedAt);
+  static Insertable<BreedingsTableData> custom({
+    Expression<String>? id,
+    Expression<String>? farmId,
+    Expression<String>? motherId,
+    Expression<String>? fatherId,
+    Expression<String>? fatherName,
+    Expression<String>? method,
+    Expression<DateTime>? breedingDate,
+    Expression<DateTime>? expectedBirthDate,
+    Expression<DateTime>? actualBirthDate,
+    Expression<int>? expectedOffspringCount,
+    Expression<String>? offspringIds,
+    Expression<String>? veterinarianId,
+    Expression<String>? veterinarianName,
+    Expression<String>? notes,
+    Expression<String>? status,
+    Expression<bool>? synced,
+    Expression<DateTime>? lastSyncedAt,
+    Expression<String>? serverVersion,
+    Expression<DateTime>? deletedAt,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (farmId != null) 'farm_id': farmId,
+      if (motherId != null) 'mother_id': motherId,
+      if (fatherId != null) 'father_id': fatherId,
+      if (fatherName != null) 'father_name': fatherName,
+      if (method != null) 'method': method,
+      if (breedingDate != null) 'breeding_date': breedingDate,
+      if (expectedBirthDate != null) 'expected_birth_date': expectedBirthDate,
+      if (actualBirthDate != null) 'actual_birth_date': actualBirthDate,
+      if (expectedOffspringCount != null)
+        'expected_offspring_count': expectedOffspringCount,
+      if (offspringIds != null) 'offspring_ids': offspringIds,
+      if (veterinarianId != null) 'veterinarian_id': veterinarianId,
+      if (veterinarianName != null) 'veterinarian_name': veterinarianName,
+      if (notes != null) 'notes': notes,
+      if (status != null) 'status': status,
+      if (synced != null) 'synced': synced,
+      if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
+      if (serverVersion != null) 'server_version': serverVersion,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  BreedingsTableCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? farmId,
+      Value<String>? motherId,
+      Value<String?>? fatherId,
+      Value<String?>? fatherName,
+      Value<String>? method,
+      Value<DateTime>? breedingDate,
+      Value<DateTime>? expectedBirthDate,
+      Value<DateTime?>? actualBirthDate,
+      Value<int?>? expectedOffspringCount,
+      Value<String?>? offspringIds,
+      Value<String?>? veterinarianId,
+      Value<String?>? veterinarianName,
+      Value<String?>? notes,
+      Value<String>? status,
+      Value<bool>? synced,
+      Value<DateTime?>? lastSyncedAt,
+      Value<String?>? serverVersion,
+      Value<DateTime?>? deletedAt,
+      Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt,
+      Value<int>? rowid}) {
+    return BreedingsTableCompanion(
+      id: id ?? this.id,
+      farmId: farmId ?? this.farmId,
+      motherId: motherId ?? this.motherId,
+      fatherId: fatherId ?? this.fatherId,
+      fatherName: fatherName ?? this.fatherName,
+      method: method ?? this.method,
+      breedingDate: breedingDate ?? this.breedingDate,
+      expectedBirthDate: expectedBirthDate ?? this.expectedBirthDate,
+      actualBirthDate: actualBirthDate ?? this.actualBirthDate,
+      expectedOffspringCount:
+          expectedOffspringCount ?? this.expectedOffspringCount,
+      offspringIds: offspringIds ?? this.offspringIds,
+      veterinarianId: veterinarianId ?? this.veterinarianId,
+      veterinarianName: veterinarianName ?? this.veterinarianName,
+      notes: notes ?? this.notes,
+      status: status ?? this.status,
+      synced: synced ?? this.synced,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      serverVersion: serverVersion ?? this.serverVersion,
+      deletedAt: deletedAt ?? this.deletedAt,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (farmId.present) {
+      map['farm_id'] = Variable<String>(farmId.value);
+    }
+    if (motherId.present) {
+      map['mother_id'] = Variable<String>(motherId.value);
+    }
+    if (fatherId.present) {
+      map['father_id'] = Variable<String>(fatherId.value);
+    }
+    if (fatherName.present) {
+      map['father_name'] = Variable<String>(fatherName.value);
+    }
+    if (method.present) {
+      map['method'] = Variable<String>(method.value);
+    }
+    if (breedingDate.present) {
+      map['breeding_date'] = Variable<DateTime>(breedingDate.value);
+    }
+    if (expectedBirthDate.present) {
+      map['expected_birth_date'] = Variable<DateTime>(expectedBirthDate.value);
+    }
+    if (actualBirthDate.present) {
+      map['actual_birth_date'] = Variable<DateTime>(actualBirthDate.value);
+    }
+    if (expectedOffspringCount.present) {
+      map['expected_offspring_count'] =
+          Variable<int>(expectedOffspringCount.value);
+    }
+    if (offspringIds.present) {
+      map['offspring_ids'] = Variable<String>(offspringIds.value);
+    }
+    if (veterinarianId.present) {
+      map['veterinarian_id'] = Variable<String>(veterinarianId.value);
+    }
+    if (veterinarianName.present) {
+      map['veterinarian_name'] = Variable<String>(veterinarianName.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
+    if (lastSyncedAt.present) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt.value);
+    }
+    if (serverVersion.present) {
+      map['server_version'] = Variable<String>(serverVersion.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BreedingsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('farmId: $farmId, ')
+          ..write('motherId: $motherId, ')
+          ..write('fatherId: $fatherId, ')
+          ..write('fatherName: $fatherName, ')
+          ..write('method: $method, ')
+          ..write('breedingDate: $breedingDate, ')
+          ..write('expectedBirthDate: $expectedBirthDate, ')
+          ..write('actualBirthDate: $actualBirthDate, ')
+          ..write('expectedOffspringCount: $expectedOffspringCount, ')
+          ..write('offspringIds: $offspringIds, ')
+          ..write('veterinarianId: $veterinarianId, ')
+          ..write('veterinarianName: $veterinarianName, ')
+          ..write('notes: $notes, ')
+          ..write('status: $status, ')
+          ..write('synced: $synced, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('serverVersion: $serverVersion, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $DocumentsTableTable extends DocumentsTable
+    with TableInfo<$DocumentsTableTable, DocumentsTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DocumentsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _farmIdMeta = const VerificationMeta('farmId');
+  @override
+  late final GeneratedColumn<String> farmId = GeneratedColumn<String>(
+      'farm_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _animalIdMeta =
+      const VerificationMeta('animalId');
+  @override
+  late final GeneratedColumn<String> animalId = GeneratedColumn<String>(
+      'animal_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _typeMeta = const VerificationMeta('type');
+  @override
+  late final GeneratedColumn<String> type = GeneratedColumn<String>(
+      'type', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _fileNameMeta =
+      const VerificationMeta('fileName');
+  @override
+  late final GeneratedColumn<String> fileName = GeneratedColumn<String>(
+      'file_name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _fileUrlMeta =
+      const VerificationMeta('fileUrl');
+  @override
+  late final GeneratedColumn<String> fileUrl = GeneratedColumn<String>(
+      'file_url', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _fileSizeBytesMeta =
+      const VerificationMeta('fileSizeBytes');
+  @override
+  late final GeneratedColumn<int> fileSizeBytes = GeneratedColumn<int>(
+      'file_size_bytes', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _mimeTypeMeta =
+      const VerificationMeta('mimeType');
+  @override
+  late final GeneratedColumn<String> mimeType = GeneratedColumn<String>(
+      'mime_type', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _uploadDateMeta =
+      const VerificationMeta('uploadDate');
+  @override
+  late final GeneratedColumn<DateTime> uploadDate = GeneratedColumn<DateTime>(
+      'upload_date', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _expiryDateMeta =
+      const VerificationMeta('expiryDate');
+  @override
+  late final GeneratedColumn<DateTime> expiryDate = GeneratedColumn<DateTime>(
+      'expiry_date', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+      'notes', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _uploadedByMeta =
+      const VerificationMeta('uploadedBy');
+  @override
+  late final GeneratedColumn<String> uploadedBy = GeneratedColumn<String>(
+      'uploaded_by', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+      'synced', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("synced" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _lastSyncedAtMeta =
+      const VerificationMeta('lastSyncedAt');
+  @override
+  late final GeneratedColumn<DateTime> lastSyncedAt = GeneratedColumn<DateTime>(
+      'last_synced_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _serverVersionMeta =
+      const VerificationMeta('serverVersion');
+  @override
+  late final GeneratedColumn<String> serverVersion = GeneratedColumn<String>(
+      'server_version', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _deletedAtMeta =
+      const VerificationMeta('deletedAt');
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+      'deleted_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        farmId,
+        animalId,
+        type,
+        fileName,
+        fileUrl,
+        fileSizeBytes,
+        mimeType,
+        uploadDate,
+        expiryDate,
+        notes,
+        uploadedBy,
+        synced,
+        lastSyncedAt,
+        serverVersion,
+        deletedAt,
+        createdAt,
+        updatedAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'documents';
+  @override
+  VerificationContext validateIntegrity(Insertable<DocumentsTableData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('farm_id')) {
+      context.handle(_farmIdMeta,
+          farmId.isAcceptableOrUnknown(data['farm_id']!, _farmIdMeta));
+    } else if (isInserting) {
+      context.missing(_farmIdMeta);
+    }
+    if (data.containsKey('animal_id')) {
+      context.handle(_animalIdMeta,
+          animalId.isAcceptableOrUnknown(data['animal_id']!, _animalIdMeta));
+    }
+    if (data.containsKey('type')) {
+      context.handle(
+          _typeMeta, type.isAcceptableOrUnknown(data['type']!, _typeMeta));
+    } else if (isInserting) {
+      context.missing(_typeMeta);
+    }
+    if (data.containsKey('file_name')) {
+      context.handle(_fileNameMeta,
+          fileName.isAcceptableOrUnknown(data['file_name']!, _fileNameMeta));
+    } else if (isInserting) {
+      context.missing(_fileNameMeta);
+    }
+    if (data.containsKey('file_url')) {
+      context.handle(_fileUrlMeta,
+          fileUrl.isAcceptableOrUnknown(data['file_url']!, _fileUrlMeta));
+    } else if (isInserting) {
+      context.missing(_fileUrlMeta);
+    }
+    if (data.containsKey('file_size_bytes')) {
+      context.handle(
+          _fileSizeBytesMeta,
+          fileSizeBytes.isAcceptableOrUnknown(
+              data['file_size_bytes']!, _fileSizeBytesMeta));
+    }
+    if (data.containsKey('mime_type')) {
+      context.handle(_mimeTypeMeta,
+          mimeType.isAcceptableOrUnknown(data['mime_type']!, _mimeTypeMeta));
+    }
+    if (data.containsKey('upload_date')) {
+      context.handle(
+          _uploadDateMeta,
+          uploadDate.isAcceptableOrUnknown(
+              data['upload_date']!, _uploadDateMeta));
+    } else if (isInserting) {
+      context.missing(_uploadDateMeta);
+    }
+    if (data.containsKey('expiry_date')) {
+      context.handle(
+          _expiryDateMeta,
+          expiryDate.isAcceptableOrUnknown(
+              data['expiry_date']!, _expiryDateMeta));
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+          _notesMeta, notes.isAcceptableOrUnknown(data['notes']!, _notesMeta));
+    }
+    if (data.containsKey('uploaded_by')) {
+      context.handle(
+          _uploadedByMeta,
+          uploadedBy.isAcceptableOrUnknown(
+              data['uploaded_by']!, _uploadedByMeta));
+    }
+    if (data.containsKey('synced')) {
+      context.handle(_syncedMeta,
+          synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta));
+    }
+    if (data.containsKey('last_synced_at')) {
+      context.handle(
+          _lastSyncedAtMeta,
+          lastSyncedAt.isAcceptableOrUnknown(
+              data['last_synced_at']!, _lastSyncedAtMeta));
+    }
+    if (data.containsKey('server_version')) {
+      context.handle(
+          _serverVersionMeta,
+          serverVersion.isAcceptableOrUnknown(
+              data['server_version']!, _serverVersionMeta));
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(_deletedAtMeta,
+          deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DocumentsTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DocumentsTableData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      farmId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}farm_id'])!,
+      animalId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}animal_id']),
+      type: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}type'])!,
+      fileName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}file_name'])!,
+      fileUrl: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}file_url'])!,
+      fileSizeBytes: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}file_size_bytes']),
+      mimeType: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}mime_type']),
+      uploadDate: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}upload_date'])!,
+      expiryDate: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}expiry_date']),
+      notes: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}notes']),
+      uploadedBy: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}uploaded_by']),
+      synced: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}synced'])!,
+      lastSyncedAt: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}last_synced_at']),
+      serverVersion: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}server_version']),
+      deletedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}deleted_at']),
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+    );
+  }
+
+  @override
+  $DocumentsTableTable createAlias(String alias) {
+    return $DocumentsTableTable(attachedDatabase, alias);
+  }
+}
+
+class DocumentsTableData extends DataClass
+    implements Insertable<DocumentsTableData> {
+  final String id;
+  final String farmId;
+  final String? animalId;
+  final String type;
+  final String fileName;
+  final String fileUrl;
+  final int? fileSizeBytes;
+  final String? mimeType;
+  final DateTime uploadDate;
+  final DateTime? expiryDate;
+  final String? notes;
+  final String? uploadedBy;
+  final bool synced;
+  final DateTime? lastSyncedAt;
+  final String? serverVersion;
+  final DateTime? deletedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const DocumentsTableData(
+      {required this.id,
+      required this.farmId,
+      this.animalId,
+      required this.type,
+      required this.fileName,
+      required this.fileUrl,
+      this.fileSizeBytes,
+      this.mimeType,
+      required this.uploadDate,
+      this.expiryDate,
+      this.notes,
+      this.uploadedBy,
+      required this.synced,
+      this.lastSyncedAt,
+      this.serverVersion,
+      this.deletedAt,
+      required this.createdAt,
+      required this.updatedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['farm_id'] = Variable<String>(farmId);
+    if (!nullToAbsent || animalId != null) {
+      map['animal_id'] = Variable<String>(animalId);
+    }
+    map['type'] = Variable<String>(type);
+    map['file_name'] = Variable<String>(fileName);
+    map['file_url'] = Variable<String>(fileUrl);
+    if (!nullToAbsent || fileSizeBytes != null) {
+      map['file_size_bytes'] = Variable<int>(fileSizeBytes);
+    }
+    if (!nullToAbsent || mimeType != null) {
+      map['mime_type'] = Variable<String>(mimeType);
+    }
+    map['upload_date'] = Variable<DateTime>(uploadDate);
+    if (!nullToAbsent || expiryDate != null) {
+      map['expiry_date'] = Variable<DateTime>(expiryDate);
+    }
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    if (!nullToAbsent || uploadedBy != null) {
+      map['uploaded_by'] = Variable<String>(uploadedBy);
+    }
+    map['synced'] = Variable<bool>(synced);
+    if (!nullToAbsent || lastSyncedAt != null) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt);
+    }
+    if (!nullToAbsent || serverVersion != null) {
+      map['server_version'] = Variable<String>(serverVersion);
+    }
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  DocumentsTableCompanion toCompanion(bool nullToAbsent) {
+    return DocumentsTableCompanion(
+      id: Value(id),
+      farmId: Value(farmId),
+      animalId: animalId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(animalId),
+      type: Value(type),
+      fileName: Value(fileName),
+      fileUrl: Value(fileUrl),
+      fileSizeBytes: fileSizeBytes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fileSizeBytes),
+      mimeType: mimeType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(mimeType),
+      uploadDate: Value(uploadDate),
+      expiryDate: expiryDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(expiryDate),
+      notes:
+          notes == null && nullToAbsent ? const Value.absent() : Value(notes),
+      uploadedBy: uploadedBy == null && nullToAbsent
+          ? const Value.absent()
+          : Value(uploadedBy),
+      synced: Value(synced),
+      lastSyncedAt: lastSyncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSyncedAt),
+      serverVersion: serverVersion == null && nullToAbsent
+          ? const Value.absent()
+          : Value(serverVersion),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory DocumentsTableData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DocumentsTableData(
+      id: serializer.fromJson<String>(json['id']),
+      farmId: serializer.fromJson<String>(json['farmId']),
+      animalId: serializer.fromJson<String?>(json['animalId']),
+      type: serializer.fromJson<String>(json['type']),
+      fileName: serializer.fromJson<String>(json['fileName']),
+      fileUrl: serializer.fromJson<String>(json['fileUrl']),
+      fileSizeBytes: serializer.fromJson<int?>(json['fileSizeBytes']),
+      mimeType: serializer.fromJson<String?>(json['mimeType']),
+      uploadDate: serializer.fromJson<DateTime>(json['uploadDate']),
+      expiryDate: serializer.fromJson<DateTime?>(json['expiryDate']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      uploadedBy: serializer.fromJson<String?>(json['uploadedBy']),
+      synced: serializer.fromJson<bool>(json['synced']),
+      lastSyncedAt: serializer.fromJson<DateTime?>(json['lastSyncedAt']),
+      serverVersion: serializer.fromJson<String?>(json['serverVersion']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'farmId': serializer.toJson<String>(farmId),
+      'animalId': serializer.toJson<String?>(animalId),
+      'type': serializer.toJson<String>(type),
+      'fileName': serializer.toJson<String>(fileName),
+      'fileUrl': serializer.toJson<String>(fileUrl),
+      'fileSizeBytes': serializer.toJson<int?>(fileSizeBytes),
+      'mimeType': serializer.toJson<String?>(mimeType),
+      'uploadDate': serializer.toJson<DateTime>(uploadDate),
+      'expiryDate': serializer.toJson<DateTime?>(expiryDate),
+      'notes': serializer.toJson<String?>(notes),
+      'uploadedBy': serializer.toJson<String?>(uploadedBy),
+      'synced': serializer.toJson<bool>(synced),
+      'lastSyncedAt': serializer.toJson<DateTime?>(lastSyncedAt),
+      'serverVersion': serializer.toJson<String?>(serverVersion),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  DocumentsTableData copyWith(
+          {String? id,
+          String? farmId,
+          Value<String?> animalId = const Value.absent(),
+          String? type,
+          String? fileName,
+          String? fileUrl,
+          Value<int?> fileSizeBytes = const Value.absent(),
+          Value<String?> mimeType = const Value.absent(),
+          DateTime? uploadDate,
+          Value<DateTime?> expiryDate = const Value.absent(),
+          Value<String?> notes = const Value.absent(),
+          Value<String?> uploadedBy = const Value.absent(),
+          bool? synced,
+          Value<DateTime?> lastSyncedAt = const Value.absent(),
+          Value<String?> serverVersion = const Value.absent(),
+          Value<DateTime?> deletedAt = const Value.absent(),
+          DateTime? createdAt,
+          DateTime? updatedAt}) =>
+      DocumentsTableData(
+        id: id ?? this.id,
+        farmId: farmId ?? this.farmId,
+        animalId: animalId.present ? animalId.value : this.animalId,
+        type: type ?? this.type,
+        fileName: fileName ?? this.fileName,
+        fileUrl: fileUrl ?? this.fileUrl,
+        fileSizeBytes:
+            fileSizeBytes.present ? fileSizeBytes.value : this.fileSizeBytes,
+        mimeType: mimeType.present ? mimeType.value : this.mimeType,
+        uploadDate: uploadDate ?? this.uploadDate,
+        expiryDate: expiryDate.present ? expiryDate.value : this.expiryDate,
+        notes: notes.present ? notes.value : this.notes,
+        uploadedBy: uploadedBy.present ? uploadedBy.value : this.uploadedBy,
+        synced: synced ?? this.synced,
+        lastSyncedAt:
+            lastSyncedAt.present ? lastSyncedAt.value : this.lastSyncedAt,
+        serverVersion:
+            serverVersion.present ? serverVersion.value : this.serverVersion,
+        deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+  DocumentsTableData copyWithCompanion(DocumentsTableCompanion data) {
+    return DocumentsTableData(
+      id: data.id.present ? data.id.value : this.id,
+      farmId: data.farmId.present ? data.farmId.value : this.farmId,
+      animalId: data.animalId.present ? data.animalId.value : this.animalId,
+      type: data.type.present ? data.type.value : this.type,
+      fileName: data.fileName.present ? data.fileName.value : this.fileName,
+      fileUrl: data.fileUrl.present ? data.fileUrl.value : this.fileUrl,
+      fileSizeBytes: data.fileSizeBytes.present
+          ? data.fileSizeBytes.value
+          : this.fileSizeBytes,
+      mimeType: data.mimeType.present ? data.mimeType.value : this.mimeType,
+      uploadDate:
+          data.uploadDate.present ? data.uploadDate.value : this.uploadDate,
+      expiryDate:
+          data.expiryDate.present ? data.expiryDate.value : this.expiryDate,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      uploadedBy:
+          data.uploadedBy.present ? data.uploadedBy.value : this.uploadedBy,
+      synced: data.synced.present ? data.synced.value : this.synced,
+      lastSyncedAt: data.lastSyncedAt.present
+          ? data.lastSyncedAt.value
+          : this.lastSyncedAt,
+      serverVersion: data.serverVersion.present
+          ? data.serverVersion.value
+          : this.serverVersion,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DocumentsTableData(')
+          ..write('id: $id, ')
+          ..write('farmId: $farmId, ')
+          ..write('animalId: $animalId, ')
+          ..write('type: $type, ')
+          ..write('fileName: $fileName, ')
+          ..write('fileUrl: $fileUrl, ')
+          ..write('fileSizeBytes: $fileSizeBytes, ')
+          ..write('mimeType: $mimeType, ')
+          ..write('uploadDate: $uploadDate, ')
+          ..write('expiryDate: $expiryDate, ')
+          ..write('notes: $notes, ')
+          ..write('uploadedBy: $uploadedBy, ')
+          ..write('synced: $synced, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('serverVersion: $serverVersion, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id,
+      farmId,
+      animalId,
+      type,
+      fileName,
+      fileUrl,
+      fileSizeBytes,
+      mimeType,
+      uploadDate,
+      expiryDate,
+      notes,
+      uploadedBy,
+      synced,
+      lastSyncedAt,
+      serverVersion,
+      deletedAt,
+      createdAt,
+      updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DocumentsTableData &&
+          other.id == this.id &&
+          other.farmId == this.farmId &&
+          other.animalId == this.animalId &&
+          other.type == this.type &&
+          other.fileName == this.fileName &&
+          other.fileUrl == this.fileUrl &&
+          other.fileSizeBytes == this.fileSizeBytes &&
+          other.mimeType == this.mimeType &&
+          other.uploadDate == this.uploadDate &&
+          other.expiryDate == this.expiryDate &&
+          other.notes == this.notes &&
+          other.uploadedBy == this.uploadedBy &&
+          other.synced == this.synced &&
+          other.lastSyncedAt == this.lastSyncedAt &&
+          other.serverVersion == this.serverVersion &&
+          other.deletedAt == this.deletedAt &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class DocumentsTableCompanion extends UpdateCompanion<DocumentsTableData> {
+  final Value<String> id;
+  final Value<String> farmId;
+  final Value<String?> animalId;
+  final Value<String> type;
+  final Value<String> fileName;
+  final Value<String> fileUrl;
+  final Value<int?> fileSizeBytes;
+  final Value<String?> mimeType;
+  final Value<DateTime> uploadDate;
+  final Value<DateTime?> expiryDate;
+  final Value<String?> notes;
+  final Value<String?> uploadedBy;
+  final Value<bool> synced;
+  final Value<DateTime?> lastSyncedAt;
+  final Value<String?> serverVersion;
+  final Value<DateTime?> deletedAt;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const DocumentsTableCompanion({
+    this.id = const Value.absent(),
+    this.farmId = const Value.absent(),
+    this.animalId = const Value.absent(),
+    this.type = const Value.absent(),
+    this.fileName = const Value.absent(),
+    this.fileUrl = const Value.absent(),
+    this.fileSizeBytes = const Value.absent(),
+    this.mimeType = const Value.absent(),
+    this.uploadDate = const Value.absent(),
+    this.expiryDate = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.uploadedBy = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.serverVersion = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DocumentsTableCompanion.insert({
+    required String id,
+    required String farmId,
+    this.animalId = const Value.absent(),
+    required String type,
+    required String fileName,
+    required String fileUrl,
+    this.fileSizeBytes = const Value.absent(),
+    this.mimeType = const Value.absent(),
+    required DateTime uploadDate,
+    this.expiryDate = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.uploadedBy = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.serverVersion = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        farmId = Value(farmId),
+        type = Value(type),
+        fileName = Value(fileName),
+        fileUrl = Value(fileUrl),
+        uploadDate = Value(uploadDate),
+        createdAt = Value(createdAt),
+        updatedAt = Value(updatedAt);
+  static Insertable<DocumentsTableData> custom({
+    Expression<String>? id,
+    Expression<String>? farmId,
+    Expression<String>? animalId,
+    Expression<String>? type,
+    Expression<String>? fileName,
+    Expression<String>? fileUrl,
+    Expression<int>? fileSizeBytes,
+    Expression<String>? mimeType,
+    Expression<DateTime>? uploadDate,
+    Expression<DateTime>? expiryDate,
+    Expression<String>? notes,
+    Expression<String>? uploadedBy,
+    Expression<bool>? synced,
+    Expression<DateTime>? lastSyncedAt,
+    Expression<String>? serverVersion,
+    Expression<DateTime>? deletedAt,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (farmId != null) 'farm_id': farmId,
+      if (animalId != null) 'animal_id': animalId,
+      if (type != null) 'type': type,
+      if (fileName != null) 'file_name': fileName,
+      if (fileUrl != null) 'file_url': fileUrl,
+      if (fileSizeBytes != null) 'file_size_bytes': fileSizeBytes,
+      if (mimeType != null) 'mime_type': mimeType,
+      if (uploadDate != null) 'upload_date': uploadDate,
+      if (expiryDate != null) 'expiry_date': expiryDate,
+      if (notes != null) 'notes': notes,
+      if (uploadedBy != null) 'uploaded_by': uploadedBy,
+      if (synced != null) 'synced': synced,
+      if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
+      if (serverVersion != null) 'server_version': serverVersion,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DocumentsTableCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? farmId,
+      Value<String?>? animalId,
+      Value<String>? type,
+      Value<String>? fileName,
+      Value<String>? fileUrl,
+      Value<int?>? fileSizeBytes,
+      Value<String?>? mimeType,
+      Value<DateTime>? uploadDate,
+      Value<DateTime?>? expiryDate,
+      Value<String?>? notes,
+      Value<String?>? uploadedBy,
+      Value<bool>? synced,
+      Value<DateTime?>? lastSyncedAt,
+      Value<String?>? serverVersion,
+      Value<DateTime?>? deletedAt,
+      Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt,
+      Value<int>? rowid}) {
+    return DocumentsTableCompanion(
+      id: id ?? this.id,
+      farmId: farmId ?? this.farmId,
+      animalId: animalId ?? this.animalId,
+      type: type ?? this.type,
+      fileName: fileName ?? this.fileName,
+      fileUrl: fileUrl ?? this.fileUrl,
+      fileSizeBytes: fileSizeBytes ?? this.fileSizeBytes,
+      mimeType: mimeType ?? this.mimeType,
+      uploadDate: uploadDate ?? this.uploadDate,
+      expiryDate: expiryDate ?? this.expiryDate,
+      notes: notes ?? this.notes,
+      uploadedBy: uploadedBy ?? this.uploadedBy,
+      synced: synced ?? this.synced,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      serverVersion: serverVersion ?? this.serverVersion,
+      deletedAt: deletedAt ?? this.deletedAt,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (farmId.present) {
+      map['farm_id'] = Variable<String>(farmId.value);
+    }
+    if (animalId.present) {
+      map['animal_id'] = Variable<String>(animalId.value);
+    }
+    if (type.present) {
+      map['type'] = Variable<String>(type.value);
+    }
+    if (fileName.present) {
+      map['file_name'] = Variable<String>(fileName.value);
+    }
+    if (fileUrl.present) {
+      map['file_url'] = Variable<String>(fileUrl.value);
+    }
+    if (fileSizeBytes.present) {
+      map['file_size_bytes'] = Variable<int>(fileSizeBytes.value);
+    }
+    if (mimeType.present) {
+      map['mime_type'] = Variable<String>(mimeType.value);
+    }
+    if (uploadDate.present) {
+      map['upload_date'] = Variable<DateTime>(uploadDate.value);
+    }
+    if (expiryDate.present) {
+      map['expiry_date'] = Variable<DateTime>(expiryDate.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (uploadedBy.present) {
+      map['uploaded_by'] = Variable<String>(uploadedBy.value);
+    }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
+    if (lastSyncedAt.present) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt.value);
+    }
+    if (serverVersion.present) {
+      map['server_version'] = Variable<String>(serverVersion.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DocumentsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('farmId: $farmId, ')
+          ..write('animalId: $animalId, ')
+          ..write('type: $type, ')
+          ..write('fileName: $fileName, ')
+          ..write('fileUrl: $fileUrl, ')
+          ..write('fileSizeBytes: $fileSizeBytes, ')
+          ..write('mimeType: $mimeType, ')
+          ..write('uploadDate: $uploadDate, ')
+          ..write('expiryDate: $expiryDate, ')
+          ..write('notes: $notes, ')
+          ..write('uploadedBy: $uploadedBy, ')
+          ..write('synced: $synced, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('serverVersion: $serverVersion, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $TreatmentsTableTable extends TreatmentsTable
     with TableInfo<$TreatmentsTableTable, TreatmentsTableData> {
   @override
@@ -12625,6 +14487,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $FarmsTableTable farmsTable = $FarmsTableTable(this);
   late final $AnimalsTableTable animalsTable = $AnimalsTableTable(this);
+  late final $BreedingsTableTable breedingsTable = $BreedingsTableTable(this);
+  late final $DocumentsTableTable documentsTable = $DocumentsTableTable(this);
   late final $TreatmentsTableTable treatmentsTable =
       $TreatmentsTableTable(this);
   late final $VaccinationsTableTable vaccinationsTable =
@@ -12643,6 +14507,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $CampaignsTableTable campaignsTable = $CampaignsTableTable(this);
   late final FarmDao farmDao = FarmDao(this as AppDatabase);
   late final AnimalDao animalDao = AnimalDao(this as AppDatabase);
+  late final BreedingDao breedingDao = BreedingDao(this as AppDatabase);
+  late final DocumentDao documentDao = DocumentDao(this as AppDatabase);
   late final TreatmentDao treatmentDao = TreatmentDao(this as AppDatabase);
   late final VaccinationDao vaccinationDao =
       VaccinationDao(this as AppDatabase);
@@ -12665,6 +14531,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [
         farmsTable,
         animalsTable,
+        breedingsTable,
+        documentsTable,
         treatmentsTable,
         vaccinationsTable,
         weightsTable,
@@ -13313,6 +15181,806 @@ typedef $$AnimalsTableTableProcessedTableManager = ProcessedTableManager<
       BaseReferences<_$AppDatabase, $AnimalsTableTable, AnimalsTableData>
     ),
     AnimalsTableData,
+    PrefetchHooks Function()>;
+typedef $$BreedingsTableTableCreateCompanionBuilder = BreedingsTableCompanion
+    Function({
+  required String id,
+  required String farmId,
+  required String motherId,
+  Value<String?> fatherId,
+  Value<String?> fatherName,
+  required String method,
+  required DateTime breedingDate,
+  required DateTime expectedBirthDate,
+  Value<DateTime?> actualBirthDate,
+  Value<int?> expectedOffspringCount,
+  Value<String?> offspringIds,
+  Value<String?> veterinarianId,
+  Value<String?> veterinarianName,
+  Value<String?> notes,
+  required String status,
+  Value<bool> synced,
+  Value<DateTime?> lastSyncedAt,
+  Value<String?> serverVersion,
+  Value<DateTime?> deletedAt,
+  required DateTime createdAt,
+  required DateTime updatedAt,
+  Value<int> rowid,
+});
+typedef $$BreedingsTableTableUpdateCompanionBuilder = BreedingsTableCompanion
+    Function({
+  Value<String> id,
+  Value<String> farmId,
+  Value<String> motherId,
+  Value<String?> fatherId,
+  Value<String?> fatherName,
+  Value<String> method,
+  Value<DateTime> breedingDate,
+  Value<DateTime> expectedBirthDate,
+  Value<DateTime?> actualBirthDate,
+  Value<int?> expectedOffspringCount,
+  Value<String?> offspringIds,
+  Value<String?> veterinarianId,
+  Value<String?> veterinarianName,
+  Value<String?> notes,
+  Value<String> status,
+  Value<bool> synced,
+  Value<DateTime?> lastSyncedAt,
+  Value<String?> serverVersion,
+  Value<DateTime?> deletedAt,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<int> rowid,
+});
+
+class $$BreedingsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $BreedingsTableTable> {
+  $$BreedingsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get farmId => $composableBuilder(
+      column: $table.farmId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get motherId => $composableBuilder(
+      column: $table.motherId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get fatherId => $composableBuilder(
+      column: $table.fatherId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get fatherName => $composableBuilder(
+      column: $table.fatherName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get method => $composableBuilder(
+      column: $table.method, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get breedingDate => $composableBuilder(
+      column: $table.breedingDate, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get expectedBirthDate => $composableBuilder(
+      column: $table.expectedBirthDate,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get actualBirthDate => $composableBuilder(
+      column: $table.actualBirthDate,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get expectedOffspringCount => $composableBuilder(
+      column: $table.expectedOffspringCount,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get offspringIds => $composableBuilder(
+      column: $table.offspringIds, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get veterinarianId => $composableBuilder(
+      column: $table.veterinarianId,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get veterinarianName => $composableBuilder(
+      column: $table.veterinarianName,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get status => $composableBuilder(
+      column: $table.status, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+      column: $table.synced, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get serverVersion => $composableBuilder(
+      column: $table.serverVersion, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+      column: $table.deletedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$BreedingsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $BreedingsTableTable> {
+  $$BreedingsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get farmId => $composableBuilder(
+      column: $table.farmId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get motherId => $composableBuilder(
+      column: $table.motherId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get fatherId => $composableBuilder(
+      column: $table.fatherId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get fatherName => $composableBuilder(
+      column: $table.fatherName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get method => $composableBuilder(
+      column: $table.method, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get breedingDate => $composableBuilder(
+      column: $table.breedingDate,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get expectedBirthDate => $composableBuilder(
+      column: $table.expectedBirthDate,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get actualBirthDate => $composableBuilder(
+      column: $table.actualBirthDate,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get expectedOffspringCount => $composableBuilder(
+      column: $table.expectedOffspringCount,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get offspringIds => $composableBuilder(
+      column: $table.offspringIds,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get veterinarianId => $composableBuilder(
+      column: $table.veterinarianId,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get veterinarianName => $composableBuilder(
+      column: $table.veterinarianName,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get status => $composableBuilder(
+      column: $table.status, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+      column: $table.synced, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get serverVersion => $composableBuilder(
+      column: $table.serverVersion,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+      column: $table.deletedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$BreedingsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BreedingsTableTable> {
+  $$BreedingsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get farmId =>
+      $composableBuilder(column: $table.farmId, builder: (column) => column);
+
+  GeneratedColumn<String> get motherId =>
+      $composableBuilder(column: $table.motherId, builder: (column) => column);
+
+  GeneratedColumn<String> get fatherId =>
+      $composableBuilder(column: $table.fatherId, builder: (column) => column);
+
+  GeneratedColumn<String> get fatherName => $composableBuilder(
+      column: $table.fatherName, builder: (column) => column);
+
+  GeneratedColumn<String> get method =>
+      $composableBuilder(column: $table.method, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get breedingDate => $composableBuilder(
+      column: $table.breedingDate, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get expectedBirthDate => $composableBuilder(
+      column: $table.expectedBirthDate, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get actualBirthDate => $composableBuilder(
+      column: $table.actualBirthDate, builder: (column) => column);
+
+  GeneratedColumn<int> get expectedOffspringCount => $composableBuilder(
+      column: $table.expectedOffspringCount, builder: (column) => column);
+
+  GeneratedColumn<String> get offspringIds => $composableBuilder(
+      column: $table.offspringIds, builder: (column) => column);
+
+  GeneratedColumn<String> get veterinarianId => $composableBuilder(
+      column: $table.veterinarianId, builder: (column) => column);
+
+  GeneratedColumn<String> get veterinarianName => $composableBuilder(
+      column: $table.veterinarianName, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get serverVersion => $composableBuilder(
+      column: $table.serverVersion, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$BreedingsTableTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $BreedingsTableTable,
+    BreedingsTableData,
+    $$BreedingsTableTableFilterComposer,
+    $$BreedingsTableTableOrderingComposer,
+    $$BreedingsTableTableAnnotationComposer,
+    $$BreedingsTableTableCreateCompanionBuilder,
+    $$BreedingsTableTableUpdateCompanionBuilder,
+    (
+      BreedingsTableData,
+      BaseReferences<_$AppDatabase, $BreedingsTableTable, BreedingsTableData>
+    ),
+    BreedingsTableData,
+    PrefetchHooks Function()> {
+  $$BreedingsTableTableTableManager(
+      _$AppDatabase db, $BreedingsTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BreedingsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BreedingsTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BreedingsTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> farmId = const Value.absent(),
+            Value<String> motherId = const Value.absent(),
+            Value<String?> fatherId = const Value.absent(),
+            Value<String?> fatherName = const Value.absent(),
+            Value<String> method = const Value.absent(),
+            Value<DateTime> breedingDate = const Value.absent(),
+            Value<DateTime> expectedBirthDate = const Value.absent(),
+            Value<DateTime?> actualBirthDate = const Value.absent(),
+            Value<int?> expectedOffspringCount = const Value.absent(),
+            Value<String?> offspringIds = const Value.absent(),
+            Value<String?> veterinarianId = const Value.absent(),
+            Value<String?> veterinarianName = const Value.absent(),
+            Value<String?> notes = const Value.absent(),
+            Value<String> status = const Value.absent(),
+            Value<bool> synced = const Value.absent(),
+            Value<DateTime?> lastSyncedAt = const Value.absent(),
+            Value<String?> serverVersion = const Value.absent(),
+            Value<DateTime?> deletedAt = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              BreedingsTableCompanion(
+            id: id,
+            farmId: farmId,
+            motherId: motherId,
+            fatherId: fatherId,
+            fatherName: fatherName,
+            method: method,
+            breedingDate: breedingDate,
+            expectedBirthDate: expectedBirthDate,
+            actualBirthDate: actualBirthDate,
+            expectedOffspringCount: expectedOffspringCount,
+            offspringIds: offspringIds,
+            veterinarianId: veterinarianId,
+            veterinarianName: veterinarianName,
+            notes: notes,
+            status: status,
+            synced: synced,
+            lastSyncedAt: lastSyncedAt,
+            serverVersion: serverVersion,
+            deletedAt: deletedAt,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String farmId,
+            required String motherId,
+            Value<String?> fatherId = const Value.absent(),
+            Value<String?> fatherName = const Value.absent(),
+            required String method,
+            required DateTime breedingDate,
+            required DateTime expectedBirthDate,
+            Value<DateTime?> actualBirthDate = const Value.absent(),
+            Value<int?> expectedOffspringCount = const Value.absent(),
+            Value<String?> offspringIds = const Value.absent(),
+            Value<String?> veterinarianId = const Value.absent(),
+            Value<String?> veterinarianName = const Value.absent(),
+            Value<String?> notes = const Value.absent(),
+            required String status,
+            Value<bool> synced = const Value.absent(),
+            Value<DateTime?> lastSyncedAt = const Value.absent(),
+            Value<String?> serverVersion = const Value.absent(),
+            Value<DateTime?> deletedAt = const Value.absent(),
+            required DateTime createdAt,
+            required DateTime updatedAt,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              BreedingsTableCompanion.insert(
+            id: id,
+            farmId: farmId,
+            motherId: motherId,
+            fatherId: fatherId,
+            fatherName: fatherName,
+            method: method,
+            breedingDate: breedingDate,
+            expectedBirthDate: expectedBirthDate,
+            actualBirthDate: actualBirthDate,
+            expectedOffspringCount: expectedOffspringCount,
+            offspringIds: offspringIds,
+            veterinarianId: veterinarianId,
+            veterinarianName: veterinarianName,
+            notes: notes,
+            status: status,
+            synced: synced,
+            lastSyncedAt: lastSyncedAt,
+            serverVersion: serverVersion,
+            deletedAt: deletedAt,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$BreedingsTableTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $BreedingsTableTable,
+    BreedingsTableData,
+    $$BreedingsTableTableFilterComposer,
+    $$BreedingsTableTableOrderingComposer,
+    $$BreedingsTableTableAnnotationComposer,
+    $$BreedingsTableTableCreateCompanionBuilder,
+    $$BreedingsTableTableUpdateCompanionBuilder,
+    (
+      BreedingsTableData,
+      BaseReferences<_$AppDatabase, $BreedingsTableTable, BreedingsTableData>
+    ),
+    BreedingsTableData,
+    PrefetchHooks Function()>;
+typedef $$DocumentsTableTableCreateCompanionBuilder = DocumentsTableCompanion
+    Function({
+  required String id,
+  required String farmId,
+  Value<String?> animalId,
+  required String type,
+  required String fileName,
+  required String fileUrl,
+  Value<int?> fileSizeBytes,
+  Value<String?> mimeType,
+  required DateTime uploadDate,
+  Value<DateTime?> expiryDate,
+  Value<String?> notes,
+  Value<String?> uploadedBy,
+  Value<bool> synced,
+  Value<DateTime?> lastSyncedAt,
+  Value<String?> serverVersion,
+  Value<DateTime?> deletedAt,
+  required DateTime createdAt,
+  required DateTime updatedAt,
+  Value<int> rowid,
+});
+typedef $$DocumentsTableTableUpdateCompanionBuilder = DocumentsTableCompanion
+    Function({
+  Value<String> id,
+  Value<String> farmId,
+  Value<String?> animalId,
+  Value<String> type,
+  Value<String> fileName,
+  Value<String> fileUrl,
+  Value<int?> fileSizeBytes,
+  Value<String?> mimeType,
+  Value<DateTime> uploadDate,
+  Value<DateTime?> expiryDate,
+  Value<String?> notes,
+  Value<String?> uploadedBy,
+  Value<bool> synced,
+  Value<DateTime?> lastSyncedAt,
+  Value<String?> serverVersion,
+  Value<DateTime?> deletedAt,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<int> rowid,
+});
+
+class $$DocumentsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $DocumentsTableTable> {
+  $$DocumentsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get farmId => $composableBuilder(
+      column: $table.farmId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get animalId => $composableBuilder(
+      column: $table.animalId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get type => $composableBuilder(
+      column: $table.type, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get fileName => $composableBuilder(
+      column: $table.fileName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get fileUrl => $composableBuilder(
+      column: $table.fileUrl, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get fileSizeBytes => $composableBuilder(
+      column: $table.fileSizeBytes, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get mimeType => $composableBuilder(
+      column: $table.mimeType, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get uploadDate => $composableBuilder(
+      column: $table.uploadDate, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get expiryDate => $composableBuilder(
+      column: $table.expiryDate, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get uploadedBy => $composableBuilder(
+      column: $table.uploadedBy, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+      column: $table.synced, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get serverVersion => $composableBuilder(
+      column: $table.serverVersion, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+      column: $table.deletedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$DocumentsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $DocumentsTableTable> {
+  $$DocumentsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get farmId => $composableBuilder(
+      column: $table.farmId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get animalId => $composableBuilder(
+      column: $table.animalId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get type => $composableBuilder(
+      column: $table.type, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get fileName => $composableBuilder(
+      column: $table.fileName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get fileUrl => $composableBuilder(
+      column: $table.fileUrl, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get fileSizeBytes => $composableBuilder(
+      column: $table.fileSizeBytes,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get mimeType => $composableBuilder(
+      column: $table.mimeType, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get uploadDate => $composableBuilder(
+      column: $table.uploadDate, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get expiryDate => $composableBuilder(
+      column: $table.expiryDate, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get uploadedBy => $composableBuilder(
+      column: $table.uploadedBy, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+      column: $table.synced, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get serverVersion => $composableBuilder(
+      column: $table.serverVersion,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+      column: $table.deletedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$DocumentsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DocumentsTableTable> {
+  $$DocumentsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get farmId =>
+      $composableBuilder(column: $table.farmId, builder: (column) => column);
+
+  GeneratedColumn<String> get animalId =>
+      $composableBuilder(column: $table.animalId, builder: (column) => column);
+
+  GeneratedColumn<String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+
+  GeneratedColumn<String> get fileName =>
+      $composableBuilder(column: $table.fileName, builder: (column) => column);
+
+  GeneratedColumn<String> get fileUrl =>
+      $composableBuilder(column: $table.fileUrl, builder: (column) => column);
+
+  GeneratedColumn<int> get fileSizeBytes => $composableBuilder(
+      column: $table.fileSizeBytes, builder: (column) => column);
+
+  GeneratedColumn<String> get mimeType =>
+      $composableBuilder(column: $table.mimeType, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get uploadDate => $composableBuilder(
+      column: $table.uploadDate, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get expiryDate => $composableBuilder(
+      column: $table.expiryDate, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<String> get uploadedBy => $composableBuilder(
+      column: $table.uploadedBy, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get serverVersion => $composableBuilder(
+      column: $table.serverVersion, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$DocumentsTableTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $DocumentsTableTable,
+    DocumentsTableData,
+    $$DocumentsTableTableFilterComposer,
+    $$DocumentsTableTableOrderingComposer,
+    $$DocumentsTableTableAnnotationComposer,
+    $$DocumentsTableTableCreateCompanionBuilder,
+    $$DocumentsTableTableUpdateCompanionBuilder,
+    (
+      DocumentsTableData,
+      BaseReferences<_$AppDatabase, $DocumentsTableTable, DocumentsTableData>
+    ),
+    DocumentsTableData,
+    PrefetchHooks Function()> {
+  $$DocumentsTableTableTableManager(
+      _$AppDatabase db, $DocumentsTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DocumentsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DocumentsTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DocumentsTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> farmId = const Value.absent(),
+            Value<String?> animalId = const Value.absent(),
+            Value<String> type = const Value.absent(),
+            Value<String> fileName = const Value.absent(),
+            Value<String> fileUrl = const Value.absent(),
+            Value<int?> fileSizeBytes = const Value.absent(),
+            Value<String?> mimeType = const Value.absent(),
+            Value<DateTime> uploadDate = const Value.absent(),
+            Value<DateTime?> expiryDate = const Value.absent(),
+            Value<String?> notes = const Value.absent(),
+            Value<String?> uploadedBy = const Value.absent(),
+            Value<bool> synced = const Value.absent(),
+            Value<DateTime?> lastSyncedAt = const Value.absent(),
+            Value<String?> serverVersion = const Value.absent(),
+            Value<DateTime?> deletedAt = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              DocumentsTableCompanion(
+            id: id,
+            farmId: farmId,
+            animalId: animalId,
+            type: type,
+            fileName: fileName,
+            fileUrl: fileUrl,
+            fileSizeBytes: fileSizeBytes,
+            mimeType: mimeType,
+            uploadDate: uploadDate,
+            expiryDate: expiryDate,
+            notes: notes,
+            uploadedBy: uploadedBy,
+            synced: synced,
+            lastSyncedAt: lastSyncedAt,
+            serverVersion: serverVersion,
+            deletedAt: deletedAt,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String farmId,
+            Value<String?> animalId = const Value.absent(),
+            required String type,
+            required String fileName,
+            required String fileUrl,
+            Value<int?> fileSizeBytes = const Value.absent(),
+            Value<String?> mimeType = const Value.absent(),
+            required DateTime uploadDate,
+            Value<DateTime?> expiryDate = const Value.absent(),
+            Value<String?> notes = const Value.absent(),
+            Value<String?> uploadedBy = const Value.absent(),
+            Value<bool> synced = const Value.absent(),
+            Value<DateTime?> lastSyncedAt = const Value.absent(),
+            Value<String?> serverVersion = const Value.absent(),
+            Value<DateTime?> deletedAt = const Value.absent(),
+            required DateTime createdAt,
+            required DateTime updatedAt,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              DocumentsTableCompanion.insert(
+            id: id,
+            farmId: farmId,
+            animalId: animalId,
+            type: type,
+            fileName: fileName,
+            fileUrl: fileUrl,
+            fileSizeBytes: fileSizeBytes,
+            mimeType: mimeType,
+            uploadDate: uploadDate,
+            expiryDate: expiryDate,
+            notes: notes,
+            uploadedBy: uploadedBy,
+            synced: synced,
+            lastSyncedAt: lastSyncedAt,
+            serverVersion: serverVersion,
+            deletedAt: deletedAt,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$DocumentsTableTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $DocumentsTableTable,
+    DocumentsTableData,
+    $$DocumentsTableTableFilterComposer,
+    $$DocumentsTableTableOrderingComposer,
+    $$DocumentsTableTableAnnotationComposer,
+    $$DocumentsTableTableCreateCompanionBuilder,
+    $$DocumentsTableTableUpdateCompanionBuilder,
+    (
+      DocumentsTableData,
+      BaseReferences<_$AppDatabase, $DocumentsTableTable, DocumentsTableData>
+    ),
+    DocumentsTableData,
     PrefetchHooks Function()>;
 typedef $$TreatmentsTableTableCreateCompanionBuilder = TreatmentsTableCompanion
     Function({
@@ -18141,6 +20809,10 @@ class $AppDatabaseManager {
       $$FarmsTableTableTableManager(_db, _db.farmsTable);
   $$AnimalsTableTableTableManager get animalsTable =>
       $$AnimalsTableTableTableManager(_db, _db.animalsTable);
+  $$BreedingsTableTableTableManager get breedingsTable =>
+      $$BreedingsTableTableTableManager(_db, _db.breedingsTable);
+  $$DocumentsTableTableTableManager get documentsTable =>
+      $$DocumentsTableTableTableManager(_db, _db.documentsTable);
   $$TreatmentsTableTableTableManager get treatmentsTable =>
       $$TreatmentsTableTableTableManager(_db, _db.treatmentsTable);
   $$VaccinationsTableTableTableManager get vaccinationsTable =>

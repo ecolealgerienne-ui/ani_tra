@@ -3,12 +3,10 @@ import 'dart:convert';
 import '../models/campaign.dart';
 import '../drift/database.dart';
 import '../drift/daos/campaign_dao.dart';
-//import '../drift/tables/campaigns_table.dart';
 import 'package:drift/drift.dart' as drift;
 
 /// Repository pour gérer la persistance des campagnes
-///
-/// Fait le pont entre les models Dart et la base de données Drift
+/// Phase 1C: Avec security checks farmId
 class CampaignRepository {
   final CampaignDao _dao;
 
@@ -22,10 +20,17 @@ class CampaignRepository {
     return data.map(_toCampaign).toList();
   }
 
-  /// Récupérer une campagne par son ID
-  Future<Campaign?> findById(String id) async {
+  /// Récupérer une campagne par son ID (avec vérification farmId)
+  Future<Campaign?> findById(String id, String farmId) async {
     final data = await _dao.findById(id);
-    return data != null ? _toCampaign(data) : null;
+    if (data == null) return null;
+
+    // Security check
+    if (data.farmId != farmId) {
+      throw Exception('Farm ID mismatch - Security violation');
+    }
+
+    return _toCampaign(data);
   }
 
   /// Récupérer les campagnes actives (non complétées) d'une ferme
@@ -74,40 +79,86 @@ class CampaignRepository {
     return data.map(_toCampaign).toList();
   }
 
-  /// Créer une nouvelle campagne
-  Future<Campaign> create(Campaign campaign) async {
+  /// Créer une nouvelle campagne avec validation farmId
+  Future<Campaign> create(Campaign campaign, String farmId) async {
+    // Security check: vérifier que la campagne appartient à cette ferme
+    if (campaign.farmId != farmId) {
+      throw Exception('Farm ID mismatch - Security violation');
+    }
+
     final companion = _toCompanion(campaign, isUpdate: false);
     await _dao.insertCampaign(companion);
     return campaign;
   }
 
-  /// Mettre à jour une campagne
-  Future<Campaign> update(Campaign campaign) async {
+  /// Mettre à jour une campagne avec security check
+  Future<Campaign> update(Campaign campaign, String farmId) async {
+    // Security check: vérifier l'ownership
+    final existing = await _dao.findById(campaign.id);
+    if (existing == null || existing.farmId != farmId) {
+      throw Exception(
+          'Campaign not found or farm mismatch - Security violation');
+    }
+
+    // Double-check: la campagne à updater doit aussi matcher
+    if (campaign.farmId != farmId) {
+      throw Exception('Farm ID mismatch - Security violation');
+    }
+
     final companion = _toCompanion(campaign, isUpdate: true);
     await _dao.updateCampaign(companion);
     return campaign;
   }
 
-  /// Supprimer une campagne
-  Future<void> delete(String id) async {
+  /// Supprimer une campagne avec security check
+  Future<void> delete(String id, String farmId) async {
+    // Security check: vérifier l'ownership
+    final existing = await _dao.findById(id);
+    if (existing == null || existing.farmId != farmId) {
+      throw Exception(
+          'Campaign not found or farm mismatch - Security violation');
+    }
+
     await _dao.deleteCampaign(id);
   }
 
   // ==================== Business Logic ====================
 
-  /// Marquer une campagne comme complétée
-  Future<void> markAsCompleted(String id) async {
+  /// Marquer une campagne comme complétée avec security check
+  Future<void> markAsCompleted(String id, String farmId) async {
+    // Security check
+    final existing = await _dao.findById(id);
+    if (existing == null || existing.farmId != farmId) {
+      throw Exception(
+          'Campaign not found or farm mismatch - Security violation');
+    }
+
     await _dao.markAsCompleted(id);
   }
 
-  /// Ajouter un animal à la campagne
-  Future<void> addAnimalToCampaign(String campaignId, String animalId) async {
+  /// Ajouter un animal à la campagne avec security check
+  Future<void> addAnimalToCampaign(
+      String campaignId, String animalId, String farmId) async {
+    // Security check
+    final existing = await _dao.findById(campaignId);
+    if (existing == null || existing.farmId != farmId) {
+      throw Exception(
+          'Campaign not found or farm mismatch - Security violation');
+    }
+
     await _dao.addAnimalToCampaign(campaignId, animalId);
   }
 
-  /// Retirer un animal de la campagne
+  /// Retirer un animal de la campagne avec security check
   Future<void> removeAnimalFromCampaign(
-      String campaignId, String animalId) async {
+      String campaignId, String animalId, String farmId) async {
+    // Security check
+    final existing = await _dao.findById(campaignId);
+    if (existing == null || existing.farmId != farmId) {
+      throw Exception(
+          'Campaign not found or farm mismatch - Security violation');
+    }
+
     await _dao.removeAnimalFromCampaign(campaignId, animalId);
   }
 
@@ -134,10 +185,15 @@ class CampaignRepository {
 
   // ==================== Migration Support ====================
 
-  /// Insérer plusieurs campagnes (pour migration)
-  Future<void> insertAll(List<Campaign> campaigns) async {
+  /// Insérer plusieurs campagnes (pour migration) avec validation farmId
+  Future<void> insertAll(List<Campaign> campaigns, String farmId) async {
     for (final campaign in campaigns) {
-      await create(campaign);
+      // Vérifier que toutes les campagnes appartiennent à cette ferme
+      if (campaign.farmId != farmId) {
+        throw Exception(
+            'Farm ID mismatch in campaign ${campaign.id} - Security violation');
+      }
+      await create(campaign, farmId);
     }
   }
 
@@ -145,7 +201,7 @@ class CampaignRepository {
   Future<void> deleteAllByFarm(String farmId) async {
     final campaigns = await findAllByFarm(farmId);
     for (final campaign in campaigns) {
-      await delete(campaign.id);
+      await delete(campaign.id, farmId);
     }
   }
 

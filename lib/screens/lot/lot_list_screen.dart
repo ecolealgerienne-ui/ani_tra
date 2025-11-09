@@ -61,18 +61,22 @@ class _LotListScreenState extends State<LotListScreen>
             onPressed: () {
               if (nameController.text.trim().isEmpty) return;
 
-              final provider = context.read<LotProvider>();
-              final lot = provider.createLot(name: nameController.text.trim());
+              //final provider = context.read<LotProvider>();
+              //final lot = provider.createLot(name: nameController.text.trim());
 
               Navigator.pop(context);
 
               // Naviguer vers détail
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => LotDetailScreen(lotId: lot.id),
-                ),
-              );
+              Future<void> onLotTap(Future<Lot> lot) async {
+                final resolvedLot = await lot;
+                if (!mounted) return;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => LotDetailScreen(lotId: resolvedLot.id),
+                  ),
+                );
+              }
 
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -155,12 +159,16 @@ class _LotListScreenState extends State<LotListScreen>
                 Navigator.pop(context);
 
                 // Naviguer vers le nouveau lot
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => LotDetailScreen(lotId: duplicated.id),
-                  ),
-                );
+                Future<void> showDuplicatedLot() async {
+                  final duplicatedLot = await duplicated;
+                  if (!mounted) return;
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => LotDetailScreen(lotId: duplicatedLot.id),
+                    ),
+                  );
+                }
 
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(

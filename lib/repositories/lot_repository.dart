@@ -3,12 +3,10 @@ import 'dart:convert';
 import '../models/lot.dart';
 import '../drift/database.dart';
 import '../drift/daos/lot_dao.dart';
-//import '../drift/tables/lots_table.dart';
 import 'package:drift/drift.dart' as drift;
 
 /// Repository pour gérer la persistance des lots
-///
-/// Fait le pont entre les models Dart et la base de données Drift
+/// Phase 1C: Avec security checks farmId
 class LotRepository {
   final LotDao _dao;
 
@@ -22,10 +20,17 @@ class LotRepository {
     return data.map(_toLot).toList();
   }
 
-  /// Récupérer un lot par son ID
-  Future<Lot?> findById(String id) async {
+  /// Récupérer un lot par son ID (avec vérification farmId)
+  Future<Lot?> findById(String id, String farmId) async {
     final data = await _dao.findById(id);
-    return data != null ? _toLot(data) : null;
+    if (data == null) return null;
+
+    // Security check
+    if (data.farmId != farmId) {
+      throw Exception('Farm ID mismatch - Security violation');
+    }
+
+    return _toLot(data);
   }
 
   /// Récupérer les lots ouverts (non complétés) d'une ferme
@@ -72,44 +77,92 @@ class LotRepository {
     return data.map(_toLot).toList();
   }
 
-  /// Créer un nouveau lot
-  Future<Lot> create(Lot lot) async {
+  /// Créer un nouveau lot avec validation farmId
+  Future<Lot> create(Lot lot, String farmId) async {
+    // Security check: vérifier que le lot appartient à cette ferme
+    if (lot.farmId != farmId) {
+      throw Exception('Farm ID mismatch - Security violation');
+    }
+
     final companion = _toCompanion(lot, isUpdate: false);
     await _dao.insertLot(companion);
     return lot;
   }
 
-  /// Mettre à jour un lot
-  Future<Lot> update(Lot lot) async {
+  /// Mettre à jour un lot avec security check
+  Future<Lot> update(Lot lot, String farmId) async {
+    // Security check: vérifier l'ownership
+    final existing = await _dao.findById(lot.id);
+    if (existing == null || existing.farmId != farmId) {
+      throw Exception('Lot not found or farm mismatch - Security violation');
+    }
+
+    // Double-check: le lot à updater doit aussi matcher
+    if (lot.farmId != farmId) {
+      throw Exception('Farm ID mismatch - Security violation');
+    }
+
     final companion = _toCompanion(lot, isUpdate: true);
     await _dao.updateLot(companion);
     return lot;
   }
 
-  /// Supprimer un lot
-  Future<void> delete(String id) async {
+  /// Supprimer un lot avec security check
+  Future<void> delete(String id, String farmId) async {
+    // Security check: vérifier l'ownership
+    final existing = await _dao.findById(id);
+    if (existing == null || existing.farmId != farmId) {
+      throw Exception('Lot not found or farm mismatch - Security violation');
+    }
+
     await _dao.deleteLot(id);
   }
 
   // ==================== Business Logic ====================
 
-  /// Marquer un lot comme complété
-  Future<void> markAsCompleted(String id) async {
+  /// Marquer un lot comme complété avec security check
+  Future<void> markAsCompleted(String id, String farmId) async {
+    // Security check
+    final existing = await _dao.findById(id);
+    if (existing == null || existing.farmId != farmId) {
+      throw Exception('Lot not found or farm mismatch - Security violation');
+    }
+
     await _dao.markAsCompleted(id);
   }
 
-  /// Ajouter un animal au lot
-  Future<void> addAnimalToLot(String lotId, String animalId) async {
+  /// Ajouter un animal au lot avec security check
+  Future<void> addAnimalToLot(
+      String lotId, String animalId, String farmId) async {
+    // Security check
+    final existing = await _dao.findById(lotId);
+    if (existing == null || existing.farmId != farmId) {
+      throw Exception('Lot not found or farm mismatch - Security violation');
+    }
+
     await _dao.addAnimalToLot(lotId, animalId);
   }
 
-  /// Retirer un animal du lot
-  Future<void> removeAnimalFromLot(String lotId, String animalId) async {
+  /// Retirer un animal du lot avec security check
+  Future<void> removeAnimalFromLot(
+      String lotId, String animalId, String farmId) async {
+    // Security check
+    final existing = await _dao.findById(lotId);
+    if (existing == null || existing.farmId != farmId) {
+      throw Exception('Lot not found or farm mismatch - Security violation');
+    }
+
     await _dao.removeAnimalFromLot(lotId, animalId);
   }
 
-  /// Définir le type du lot
-  Future<void> setLotType(String id, LotType type) async {
+  /// Définir le type du lot avec security check
+  Future<void> setLotType(String id, LotType type, String farmId) async {
+    // Security check
+    final existing = await _dao.findById(id);
+    if (existing == null || existing.farmId != farmId) {
+      throw Exception('Lot not found or farm mismatch - Security violation');
+    }
+
     await _dao.setLotType(id, type.name);
   }
 
@@ -143,10 +196,15 @@ class LotRepository {
 
   // ==================== Migration Support ====================
 
-  /// Insérer plusieurs lots (pour migration)
-  Future<void> insertAll(List<Lot> lots) async {
+  /// Insérer plusieurs lots (pour migration) avec validation farmId
+  Future<void> insertAll(List<Lot> lots, String farmId) async {
     for (final lot in lots) {
-      await create(lot);
+      // Vérifier que tous les lots appartiennent à cette ferme
+      if (lot.farmId != farmId) {
+        throw Exception(
+            'Farm ID mismatch in lot ${lot.id} - Security violation');
+      }
+      await create(lot, farmId);
     }
   }
 
@@ -154,7 +212,7 @@ class LotRepository {
   Future<void> deleteAllByFarm(String farmId) async {
     final lots = await findAllByFarm(farmId);
     for (final lot in lots) {
-      await delete(lot.id);
+      await delete(lot.id, farmId);
     }
   }
 

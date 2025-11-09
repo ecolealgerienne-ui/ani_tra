@@ -2,60 +2,123 @@
 
 import 'package:flutter/foundation.dart';
 import '../models/vaccination.dart';
+import '../repositories/vaccination_repository.dart';
 import 'auth_provider.dart';
 
+/// VaccinationProvider - Phase 1C
+/// CHANGEMENT: Utilise Repository pour Vaccinations (SQLite)
 class VaccinationProvider extends ChangeNotifier {
   final AuthProvider _authProvider;
+  final VaccinationRepository _repository;
   String _currentFarmId;
 
-  VaccinationProvider(this._authProvider)
+  // Données principales (cache local)
+  final List<Vaccination> _allVaccinations = [];
+
+  // Loading state
+  bool _isLoading = false;
+
+  VaccinationProvider(this._authProvider, this._repository)
       : _currentFarmId = _authProvider.currentFarmId {
     _authProvider.addListener(_onFarmChanged);
+    _loadVaccinationsFromRepository();
   }
 
   void _onFarmChanged() {
     if (_currentFarmId != _authProvider.currentFarmId) {
       _currentFarmId = _authProvider.currentFarmId;
-      notifyListeners();
+      _loadVaccinationsFromRepository();
     }
   }
 
-  // === Données en mémoire (MOCK) ===
-  final List<Vaccination> _allVaccinations = [];
-
-  // === Getters ===
+  // ==================== Getters ====================
 
   List<Vaccination> get vaccinations => List.unmodifiable(
-        _allVaccinations.where((v) => v.farmId == _authProvider.currentFarmId),
-      );
+      _allVaccinations.where((v) => v.farmId == _authProvider.currentFarmId));
 
-  void setVaccinations(List<Vaccination> items) {
-    _allVaccinations.clear();
-    _allVaccinations.addAll(items);
+  bool get isLoading => _isLoading;
+
+  // ==================== Repository Loading ====================
+
+  Future<void> _loadVaccinationsFromRepository() async {
+    if (_currentFarmId.isEmpty) return;
+
+    _isLoading = true;
     notifyListeners();
-  }
 
-  void addVaccination(Vaccination vaccination) {
-    _allVaccinations.add(vaccination);
-    notifyListeners();
-  }
-
-  void updateVaccination(Vaccination updated) {
-    final index = _allVaccinations.indexWhere((v) => v.id == updated.id);
-    if (index != -1) {
-      _allVaccinations[index] = updated;
+    try {
+      final farmVaccinations = await _repository.getAll(_currentFarmId);
+      _allVaccinations.removeWhere((v) => v.farmId == _currentFarmId);
+      _allVaccinations.addAll(farmVaccinations);
+    } catch (e) {
+      debugPrint('❌ Error loading vaccinations from repository: $e');
+    } finally {
+      _isLoading = false;
       notifyListeners();
     }
   }
 
-  void removeVaccination(String id) {
-    _allVaccinations.removeWhere((v) => v.id == id);
-    notifyListeners();
+  void setVaccinations(List<Vaccination> items) {
+    _migrateVaccinationsToRepository(items);
   }
 
+  Future<void> _migrateVaccinationsToRepository(List<Vaccination> vaccinations) async {
+    for (final vaccination in vaccinations) {
+      try {
+        await _repository.create(vaccination, vaccination.farmId);
+      } catch (e) {
+        debugPrint('⚠️ Vaccination ${vaccination.id} already exists or error: $e');
+      }
+    }
+    await _loadVaccinationsFromRepository();
+  }
+
+  // ==================== CRUD ====================
+
+  Future<void> addVaccination(Vaccination vaccination) async {
+    final vaccinationWithFarm = vaccination.copyWith(farmId: _authProvider.currentFarmId);
+
+    try {
+      await _repository.create(vaccinationWithFarm, _authProvider.currentFarmId);
+      _allVaccinations.add(vaccinationWithFarm);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('❌ Error adding vaccination: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> updateVaccination(Vaccination updated) async {
+    try {
+      await _repository.update(updated, _authProvider.currentFarmId);
+      
+      final index = _allVaccinations.indexWhere((v) => v.id == updated.id);
+      if (index != -1) {
+        _allVaccinations[index] = updated;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('❌ Error updating vaccination: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> removeVaccination(String id) async {
+    try {
+      await _repository.delete(id, _authProvider.currentFarmId);
+      
+      _allVaccinations.removeWhere((v) => v.id == id);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('❌ Error removing vaccination: $e');
+      rethrow;
+    }
+  }
+
+  // ==================== Query Methods ====================
+
   List<Vaccination> getVaccinationsForAnimal(String animalId) {
-    return _allVaccinations
-        .where((v) => v.farmId == _authProvider.currentFarmId)
+    return vaccinations
         .where((v) => v.animalId == animalId || v.animalIds.contains(animalId))
         .toList()
       ..sort((a, b) => b.vaccinationDate.compareTo(a.vaccinationDate));
@@ -63,24 +126,21 @@ class VaccinationProvider extends ChangeNotifier {
 
   List<Vaccination> getRecentVaccinations({int days = 30}) {
     final cutoff = DateTime.now().subtract(Duration(days: days));
-    return _allVaccinations
-        .where((v) => v.farmId == _authProvider.currentFarmId)
+    return vaccinations
         .where((v) => v.vaccinationDate.isAfter(cutoff))
         .toList()
       ..sort((a, b) => b.vaccinationDate.compareTo(a.vaccinationDate));
   }
 
   List<Vaccination> getVaccinationsWithRemindersDue() {
-    return _allVaccinations
-        .where((v) => v.farmId == _authProvider.currentFarmId)
+    return vaccinations
         .where((v) => v.isReminderDue)
         .toList()
       ..sort((a, b) => a.nextDueDate!.compareTo(b.nextDueDate!));
   }
 
   List<Vaccination> getVaccinationsInWithdrawalPeriod() {
-    return _allVaccinations
-        .where((v) => v.farmId == _authProvider.currentFarmId)
+    return vaccinations
         .where((v) => v.isInWithdrawalPeriod)
         .toList()
       ..sort((a, b) =>
@@ -88,16 +148,14 @@ class VaccinationProvider extends ChangeNotifier {
   }
 
   bool isAnimalVaccinatedFor(String animalId, String disease) {
-    return _allVaccinations.any((v) =>
-        v.farmId == _authProvider.currentFarmId &&
+    return vaccinations.any((v) =>
         (v.animalId == animalId || v.animalIds.contains(animalId)) &&
         v.disease == disease);
   }
 
   Vaccination? getLastVaccinationFor(String animalId, String disease) {
-    final history = _allVaccinations
+    final history = vaccinations
         .where((v) =>
-            v.farmId == _authProvider.currentFarmId &&
             (v.animalId == animalId || v.animalIds.contains(animalId)) &&
             v.disease == disease)
         .toList()
@@ -105,7 +163,11 @@ class VaccinationProvider extends ChangeNotifier {
     return history.isNotEmpty ? history.first : null;
   }
 
-  // === Synchronisation (placeholder) ===
+  // ==================== Refresh ====================
+
+  Future<void> refresh() async {
+    await _loadVaccinationsFromRepository();
+  }
 
   Future<void> syncToServer() async {
     await Future.delayed(const Duration(milliseconds: 100));

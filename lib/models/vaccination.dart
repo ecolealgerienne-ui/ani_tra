@@ -9,10 +9,10 @@ enum VaccinationType {
   recommandee, // Vaccination recommandée
   optionnelle, // Vaccination optionnelle
 
-/// ⚠️ IMPORTANT : Les labels FR sont hardcodés ici car VaccinationPriority
-/// est un ENUM sans accès au BuildContext.
-///
-/// La traduction se fera au niveau Provider/UI qui a accès au context.
+  /// ⚠️ IMPORTANT : Les labels FR sont hardcodés ici car VaccinationPriority
+  /// est un ENUM sans accès au BuildContext.
+  ///
+  /// La traduction se fera au niveau Provider/UI qui a accès au context.
 }
 
 extension VaccinationTypeExtension on VaccinationType {
@@ -144,6 +144,7 @@ class Vaccination implements SyncableEntity {
   // === CRUD ===
 
   Vaccination copyWith({
+    String? farmId,
     String? animalId,
     List<String>? animalIds,
     String? protocolId,
@@ -167,7 +168,7 @@ class Vaccination implements SyncableEntity {
   }) {
     return Vaccination(
       id: id,
-      farmId: farmId,
+      farmId: farmId ?? this.farmId,
       animalId: animalId ?? this.animalId,
       animalIds: animalIds ?? this.animalIds,
       protocolId: protocolId ?? this.protocolId,

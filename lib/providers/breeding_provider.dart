@@ -2,128 +2,174 @@
 
 import 'package:flutter/foundation.dart';
 import '../models/breeding.dart';
+import '../repositories/breeding_repository.dart';
 import 'auth_provider.dart';
 
-/// Provider pour la gestion des reproductions
-/// Mode MOCK : Données en mémoire uniquement
+/// BreedingProvider - Phase 1C
+/// CHANGEMENT: Utilise Repository pour Breedings (SQLite)
 class BreedingProvider extends ChangeNotifier {
   final AuthProvider _authProvider;
+  final BreedingRepository _repository;
   String _currentFarmId;
 
-  BreedingProvider(this._authProvider)
+  // Données principales (cache local)
+  final List<Breeding> _allBreedings = [];
+
+  // Loading state
+  bool _isLoading = false;
+
+  BreedingProvider(this._authProvider, this._repository)
       : _currentFarmId = _authProvider.currentFarmId {
     _authProvider.addListener(_onFarmChanged);
+    _loadBreedingsFromRepository();
   }
 
   void _onFarmChanged() {
     if (_currentFarmId != _authProvider.currentFarmId) {
       _currentFarmId = _authProvider.currentFarmId;
-      notifyListeners();
+      _loadBreedingsFromRepository();
     }
   }
 
-  // === Données en mémoire (MOCK) ===
-  List<Breeding> _allBreedings = [];
+  // ==================== Getters ====================
 
-  // === Getters ===
-
-  /// Toutes les reproductions
   List<Breeding> get breedings => List.unmodifiable(
-    _allBreedings.where((item) => item.farmId == _authProvider.currentFarmId)
-  );
+      _allBreedings.where((b) => b.farmId == _authProvider.currentFarmId));
 
-  /// Nombre total de reproductions
-  int get count => _allBreedings.length;
+  bool get isLoading => _isLoading;
 
-  /// Reproductions par animal (mère)
-  List<Breeding> getByMother(String motherId) {
-    return _allBreedings.where((b) => b.motherId == motherId).toList()
-      ..sort((a, b) => b.breedingDate.compareTo(a.breedingDate));
-  }
+  int get count => breedings.length;
 
-  /// Reproductions par père
-  List<Breeding> getByFather(String fatherId) {
-    return _allBreedings.where((b) => b.fatherId == fatherId).toList()
-      ..sort((a, b) => b.breedingDate.compareTo(a.breedingDate));
-  }
-
-  /// Reproductions en attente
   List<Breeding> get pending {
-    return _allBreedings.where((b) => b.status == BreedingStatus.pending).toList()
+    return breedings.where((b) => b.status == BreedingStatus.pending).toList()
       ..sort((a, b) => a.expectedBirthDate.compareTo(b.expectedBirthDate));
   }
 
-  /// Reproductions terminées
   List<Breeding> get completed {
-    return _allBreedings
-        .where((b) => b.status == BreedingStatus.completed)
-        .toList()
+    return breedings.where((b) => b.status == BreedingStatus.completed).toList()
       ..sort((a, b) => b.actualBirthDate!.compareTo(a.actualBirthDate!));
   }
 
-  /// Reproductions en retard
   List<Breeding> get overdue {
-    return _allBreedings.where((b) => b.isOverdue).toList()
+    return breedings.where((b) => b.isOverdue).toList()
       ..sort((a, b) => a.expectedBirthDate.compareTo(b.expectedBirthDate));
   }
 
-  /// Mises-bas imminentes (< 7 jours)
   List<Breeding> get birthSoon {
-    return _allBreedings.where((b) => b.isBirthSoon).toList()
+    return breedings.where((b) => b.isBirthSoon).toList()
       ..sort((a, b) =>
           a.daysUntilExpectedBirth.compareTo(b.daysUntilExpectedBirth));
   }
 
-  /// Reproductions échouées
   List<Breeding> get failed {
-    return _allBreedings.where((b) => b.hasFailed).toList()
+    return breedings.where((b) => b.hasFailed).toList()
       ..sort((a, b) => b.breedingDate.compareTo(a.breedingDate));
   }
 
-  /// Reproductions par méthode
+  // ==================== Repository Loading ====================
+
+  Future<void> _loadBreedingsFromRepository() async {
+    if (_currentFarmId.isEmpty) return;
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final farmBreedings = await _repository.getAll(_currentFarmId);
+      _allBreedings.removeWhere((b) => b.farmId == _currentFarmId);
+      _allBreedings.addAll(farmBreedings);
+    } catch (e) {
+      debugPrint('❌ Error loading breedings from repository: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> loadMockData(List<Breeding> mockBreedings) async {
+    await _migrateBreedingsToRepository(mockBreedings);
+  }
+
+  Future<void> _migrateBreedingsToRepository(List<Breeding> breedings) async {
+    for (final breeding in breedings) {
+      try {
+        await _repository.create(breeding, breeding.farmId);
+      } catch (e) {
+        debugPrint('⚠️ Breeding ${breeding.id} already exists or error: $e');
+      }
+    }
+    await _loadBreedingsFromRepository();
+  }
+
+  // ==================== Query Methods ====================
+
+  List<Breeding> getByMother(String motherId) {
+    return breedings.where((b) => b.motherId == motherId).toList()
+      ..sort((a, b) => b.breedingDate.compareTo(a.breedingDate));
+  }
+
+  List<Breeding> getByFather(String fatherId) {
+    return breedings.where((b) => b.fatherId == fatherId).toList()
+      ..sort((a, b) => b.breedingDate.compareTo(a.breedingDate));
+  }
+
   List<Breeding> getByMethod(BreedingMethod method) {
-    return _allBreedings.where((b) => b.method == method).toList()
+    return breedings.where((b) => b.method == method).toList()
       ..sort((a, b) => b.breedingDate.compareTo(a.breedingDate));
   }
 
-  /// Trouver par ID
   Breeding? getById(String id) {
     try {
-      return _allBreedings.firstWhere((b) => b.id == id);
+      return breedings.firstWhere((b) => b.id == id);
     } catch (e) {
       return null;
     }
   }
 
-  // === Méthodes CRUD (MOCK) ===
+  // ==================== CRUD ====================
 
-  /// Ajouter une reproduction
   Future<void> add(Breeding breeding) async {
-    await Future.delayed(const Duration(milliseconds: 100)); // Simulate async
-    _allBreedings.add(breeding);
-    notifyListeners();
-  }
-
-  /// Mettre à jour une reproduction
-  Future<void> update(Breeding breeding) async {
-    await Future.delayed(const Duration(milliseconds: 100));
-    final index = _allBreedings.indexWhere((b) => b.id == breeding.id);
-    if (index != -1) {
-      _allBreedings[index] = breeding.markAsModified();
+    try {
+      await _repository.create(breeding, _authProvider.currentFarmId);
+      _allBreedings.add(breeding);
       notifyListeners();
+    } catch (e) {
+      debugPrint('❌ Error adding breeding: $e');
+      rethrow;
     }
   }
 
-  /// Supprimer une reproduction
-  Future<void> delete(String id) async {
-    await Future.delayed(const Duration(milliseconds: 100));
-    _allBreedings.removeWhere((b) => b.id == id);
-    notifyListeners();
+  Future<void> update(Breeding breeding) async {
+    try {
+      final updated = breeding.markAsModified();
+      await _repository.update(updated, _authProvider.currentFarmId);
+
+      final index = _allBreedings.indexWhere((b) => b.id == breeding.id);
+      if (index != -1) {
+        _allBreedings[index] = updated;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('❌ Error updating breeding: $e');
+      rethrow;
+    }
   }
 
-  /// Enregistrer une nouvelle reproduction
+  Future<void> delete(String id) async {
+    try {
+      await _repository.delete(id, _authProvider.currentFarmId);
+
+      _allBreedings.removeWhere((b) => b.id == id);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('❌ Error deleting breeding: $e');
+      rethrow;
+    }
+  }
+
+  // ==================== Business Methods ====================
+
   Future<Breeding> recordBreeding({
-    required String farmId,
     required String motherId,
     String? fatherId,
     String? fatherName,
@@ -135,10 +181,8 @@ class BreedingProvider extends ChangeNotifier {
     String? veterinarianName,
     String? notes,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 100));
-
     final breeding = Breeding(
-      farmId: farmId,
+      farmId: _authProvider.currentFarmId,
       motherId: motherId,
       fatherId: fatherId,
       fatherName: fatherName,
@@ -156,7 +200,6 @@ class BreedingProvider extends ChangeNotifier {
     return breeding;
   }
 
-  /// Enregistrer la mise-bas
   Future<void> recordBirth(
     String breedingId, {
     required DateTime birthDate,
@@ -176,7 +219,6 @@ class BreedingProvider extends ChangeNotifier {
     await update(updated);
   }
 
-  /// Marquer comme échec
   Future<void> markAsFailed(String breedingId, String reason) async {
     final breeding = getById(breedingId);
     if (breeding == null) return;
@@ -189,7 +231,6 @@ class BreedingProvider extends ChangeNotifier {
     await update(updated);
   }
 
-  /// Marquer comme avortement
   Future<void> markAsAborted(
     String breedingId, {
     required DateTime abortionDate,
@@ -209,19 +250,17 @@ class BreedingProvider extends ChangeNotifier {
     await update(updated);
   }
 
-  // === Statistiques ===
+  // ==================== Statistics ====================
 
-  /// Taux de réussite (%) des reproductions
   double get successRate {
-    if (_allBreedings.isEmpty) return 0.0;
-    final completed = _allBreedings.where((b) => b.isCompleted).length;
-    return (completed / _allBreedings.length) * 100;
+    if (breedings.isEmpty) return 0.0;
+    final completedCount = breedings.where((b) => b.isCompleted).length;
+    return (completedCount / breedings.length) * 100;
   }
 
-  /// Nombre moyen de petits par portée
   double get averageOffspringCount {
     final completedWithOffspring =
-        _allBreedings.where((b) => b.isCompleted && b.actualOffspringCount > 0);
+        breedings.where((b) => b.isCompleted && b.actualOffspringCount > 0);
     if (completedWithOffspring.isEmpty) return 0.0;
 
     final totalOffspring = completedWithOffspring.fold<int>(
@@ -232,10 +271,9 @@ class BreedingProvider extends ChangeNotifier {
     return totalOffspring / completedWithOffspring.length;
   }
 
-  /// Durée moyenne de gestation (jours)
   double get averageGestationDays {
     final completedWithGestation =
-        _allBreedings.where((b) => b.gestationDays != null);
+        breedings.where((b) => b.gestationDays != null);
     if (completedWithGestation.isEmpty) return 0.0;
 
     final totalDays = completedWithGestation.fold<int>(
@@ -246,60 +284,46 @@ class BreedingProvider extends ChangeNotifier {
     return totalDays / completedWithGestation.length;
   }
 
-  /// Nombre de reproductions par méthode
   Map<BreedingMethod, int> getCountsByMethod() {
     final counts = <BreedingMethod, int>{};
-    for (final breeding in _allBreedings) {
+    for (final breeding in breedings) {
       counts[breeding.method] = (counts[breeding.method] ?? 0) + 1;
     }
     return counts;
   }
 
-  /// Reproductions ce mois
   int get thisMonthCount {
     final now = DateTime.now();
-    return _allBreedings.where((b) {
+    return breedings.where((b) {
       return b.breedingDate.year == now.year &&
           b.breedingDate.month == now.month;
     }).length;
   }
 
-  /// Mises-bas ce mois
   int get birthsThisMonth {
     final now = DateTime.now();
-    return _allBreedings.where((b) {
+    return breedings.where((b) {
       return b.actualBirthDate != null &&
           b.actualBirthDate!.year == now.year &&
           b.actualBirthDate!.month == now.month;
     }).length;
   }
 
-  // === Chargement initial (MOCK) ===
+  // ==================== Utilities ====================
 
-  /// Charger les données de mock
-  Future<void> loadMockData(List<Breeding> mockBreedings) async {
-    await Future.delayed(const Duration(milliseconds: 200));
-    _allBreedings = mockBreedings;
-    notifyListeners();
-  }
-
-  /// Réinitialiser les données
   void clear() {
     _allBreedings.clear();
     notifyListeners();
   }
 
-  // === Synchronisation (MOCK - ne fait rien) ===
-
-  /// Synchroniser avec le serveur (placeholder)
   Future<void> syncToServer() async {
-    // TODO: Implémenter quand serveur prêt
     await Future.delayed(const Duration(milliseconds: 100));
   }
 
-  /// Marquer comme synchronisé (placeholder)
-  void _markAsSynced(String id, String serverVersion) {
-    // TODO: Implémenter quand serveur prêt
+  // ==================== Refresh ====================
+
+  Future<void> refresh() async {
+    await _loadBreedingsFromRepository();
   }
 
   @override

@@ -51,12 +51,16 @@ class _BatchCreateScreenState extends State<BatchCreateScreen> {
     );
 
     // Naviguer vers l'écran de scan
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => BatchScanScreen(batch: batch),
-      ),
-    );
+    Future<void> startScan() async {
+      final resolvedBatch = await batch;
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => BatchScanScreen(batch: resolvedBatch),
+        ),
+      );
+    }
   }
 
   @override
@@ -92,7 +96,8 @@ class _BatchCreateScreenState extends State<BatchCreateScreen> {
 
             // Description
             Text(
-              AppLocalizations.of(context).translate(AppStrings.batchDescription),
+              AppLocalizations.of(context)
+                  .translate(AppStrings.batchDescription),
               style: TextStyle(
                 fontSize: AppConstants.batchCreateDescriptionSize,
                 color: Colors.grey.shade700,
@@ -213,8 +218,10 @@ class _BatchCreateScreenState extends State<BatchCreateScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepPurple,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: AppConstants.batchCreateButtonPadding),
-                minimumSize: const Size(double.infinity, AppConstants.batchCreateButtonHeight),
+                padding: const EdgeInsets.symmetric(
+                    vertical: AppConstants.batchCreateButtonPadding),
+                minimumSize: const Size(
+                    double.infinity, AppConstants.batchCreateButtonHeight),
               ),
             ),
 
@@ -258,18 +265,25 @@ class _PurposeCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(AppConstants.batchCreateCardRadius),
       child: Container(
         decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha: AppConstants.batchCreateCardAlpha) : Colors.white,
-          borderRadius: BorderRadius.circular(AppConstants.batchCreateCardRadius),
+          color: isSelected
+              ? color.withValues(alpha: AppConstants.batchCreateCardAlpha)
+              : Colors.white,
+          borderRadius:
+              BorderRadius.circular(AppConstants.batchCreateCardRadius),
           border: Border.all(
             color: isSelected ? color : Colors.grey.shade300,
-            width: isSelected ? AppConstants.batchCreateCardBorderSelected : AppConstants.batchCreateCardBorderNormal,
+            width: isSelected
+                ? AppConstants.batchCreateCardBorderSelected
+                : AppConstants.batchCreateCardBorderNormal,
           ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: color.withValues(alpha: AppConstants.batchCreateCardShadowAlpha),
+                    color: color.withValues(
+                        alpha: AppConstants.batchCreateCardShadowAlpha),
                     blurRadius: AppConstants.batchCreateCardShadowBlur,
-                    offset: const Offset(0, AppConstants.batchCreateCardShadowOffset),
+                    offset: const Offset(
+                        0, AppConstants.batchCreateCardShadowOffset),
                   ),
                 ]
               : null,
@@ -293,7 +307,8 @@ class _PurposeCard extends StatelessWidget {
             ),
             if (isSelected)
               Container(
-                margin: const EdgeInsets.only(top: AppConstants.batchCreateCardCheckMargin),
+                margin: const EdgeInsets.only(
+                    top: AppConstants.batchCreateCardCheckMargin),
                 child: Icon(
                   Icons.check_circle,
                   color: color,

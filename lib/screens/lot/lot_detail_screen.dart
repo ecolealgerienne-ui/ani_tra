@@ -556,8 +556,8 @@ class LotDetailScreen extends StatelessWidget {
         subtitle: Text(animal.displayName),
         trailing: !lot.completed
             ? IconButton(
-                icon:
-                    const Icon(Icons.remove_circle, color: AppConstants.statusDanger),
+                icon: const Icon(Icons.remove_circle,
+                    color: AppConstants.statusDanger),
                 onPressed: () {
                   context
                       .read<LotProvider>()
@@ -777,14 +777,16 @@ class LotDetailScreen extends StatelessWidget {
                       keepType: keepType,
                       keepAnimals: keepAnimals,
                     );
-
-                Navigator.pop(context);
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => LotDetailScreen(lotId: duplicated.id),
-                  ),
-                );
+                Future<void> showDuplicateDialog() async {
+                  Navigator.pop(context);
+                  final duplicatedLot = await duplicated;
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => LotDetailScreen(lotId: duplicatedLot.id),
+                    ),
+                  );
+                }
 
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
