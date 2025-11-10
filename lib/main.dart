@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-import 'models/animal.dart';
+//import 'models/animal.dart';
 import 'providers/animal_provider.dart';
 import 'providers/sync_provider.dart';
 import 'providers/qr_provider.dart';
@@ -26,17 +26,14 @@ import 'providers/auth_provider.dart';
 import 'providers/reminder_provider.dart';
 import 'providers/veterinarian_provider.dart';
 import 'i18n/app_localizations.dart';
-import 'i18n/app_strings.dart';
+//import 'i18n/app_strings.dart';
 import 'utils/constants.dart';
 import 'screens/home/home_screen.dart';
-import 'screens/animal/animal_detail_screen.dart';
-import 'screens/animal/animal_list_screen.dart';
-import 'screens/animal/animal_finder_screen.dart';
+//import 'screens/animal/animal_detail_screen.dart';
+//import 'screens/animal/animal_list_screen.dart';
+//import 'screens/animal/animal_finder_screen.dart';
 import 'screens/animal/universal_scanner_screen.dart';
-import 'screens/sync/sync_screen.dart';
-import 'data/mock_data.dart';
-import 'data/mocks/mock_vaccination_references.dart';
-import 'data/mocks/mock_veterinarians.dart';
+//import 'screens/sync/sync_screen.dart';
 import 'drift/database.dart';
 import 'repositories/animal_repository.dart';
 import 'repositories/weight_repository.dart';
@@ -48,6 +45,10 @@ import 'repositories/lot_repository.dart';
 import 'repositories/campaign_repository.dart';
 import 'repositories/breeding_repository.dart';
 import 'repositories/document_repository.dart';
+import 'database_initializer.dart';
+
+AppDatabase? _appDatabase;
+bool _dbInitialized = false;
 
 // Instance globale du plugin de notifications
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -59,6 +60,21 @@ void main() async {
   // Initialiser les fuseaux horaires
   tz.initializeTimeZones();
   tz.setLocalLocation(tz.getLocation(AppConstants.defaultTimezone));
+
+  // Initialize Database ET récupérer l'instance
+  //final database = await DatabaseInitializer.initialize();
+  // Initialiser la DB une seule fois
+  debugPrint('✅ the  main() DB initialized: $_dbInitialized');
+
+  if (!_dbInitialized) {
+    _appDatabase = await DatabaseInitializer.initialize();
+    _dbInitialized = true;
+    debugPrint('✅ DB initialisée');
+  } else {
+    debugPrint('⏭️ DB déjà initialisée, skip');
+  }
+
+  final database = _appDatabase!;
 
   // Initialiser les notifications
   const AndroidInitializationSettings initializationSettingsAndroid =
@@ -82,9 +98,6 @@ void main() async {
       debugPrint('Notification cliquée: ${response.payload}');
     },
   );
-
-  // Initialize Database
-  final database = AppDatabase();
 
   // Initialize ALL Repositories
   final animalRepository = AnimalRepository(database);
@@ -177,47 +190,24 @@ class MyApp extends StatelessWidget {
           create: (_) => ReminderProvider(flutterLocalNotificationsPlugin),
         ),
 
-        // === AnimalProvider (avec Repository) ===
+        // === AnimalProvider (charge depuis DB) ===
         ChangeNotifierProxyProvider<AuthProvider, AnimalProvider>(
-          create: (context) {
-            final auth = context.read<AuthProvider>();
-            final provider =
-                AnimalProvider(auth, context.read<AnimalRepository>());
-            provider.initializeWithMockData(
-              MockData.generateAnimals(),
-              MockData.generateProducts(),
-              MockData.generateTreatments(),
-              MockData.generateMovements(),
-            );
-            return provider;
-          },
+          create: (context) => AnimalProvider(
+              context.read<AuthProvider>(), context.read<AnimalRepository>()),
           update: (context, auth, previous) =>
               previous ??
               AnimalProvider(auth, context.read<AnimalRepository>()),
         ),
 
-        // === BatchProvider (avec Repository) ===
+        // === BatchProvider (charge depuis DB) ===
         ChangeNotifierProxyProvider<AuthProvider, BatchProvider>(
-          create: (context) {
-            final auth = context.read<AuthProvider>();
-            final provider =
-                BatchProvider(auth, context.read<BatchRepository>());
-            provider.initializeWithMockData(MockData.generateBatches());
-            return provider;
-          },
+          create: (context) => BatchProvider(
+              context.read<AuthProvider>(), context.read<BatchRepository>()),
           update: (context, auth, previous) =>
               previous ?? BatchProvider(auth, context.read<BatchRepository>()),
         ),
 
-        // === LotProvider (avec Repository) ===
-        ChangeNotifierProxyProvider<AuthProvider, LotProvider>(
-          create: (context) => LotProvider(
-              context.read<AuthProvider>(), context.read<LotRepository>()),
-          update: (context, auth, previous) =>
-              previous ?? LotProvider(auth, context.read<LotRepository>()),
-        ),
-
-        // === CampaignProvider (avec Repository) ===
+        // === CampaignProvider (charge depuis DB) ===
         ChangeNotifierProxyProvider<AuthProvider, CampaignProvider>(
           create: (context) => CampaignProvider(
               context.read<AuthProvider>(), context.read<CampaignRepository>()),
@@ -226,51 +216,41 @@ class MyApp extends StatelessWidget {
               CampaignProvider(auth, context.read<CampaignRepository>()),
         ),
 
-        // === WeightProvider (avec Repository) ===
+        // === LotProvider (charge depuis DB) ===
+        ChangeNotifierProxyProvider<AuthProvider, LotProvider>(
+          create: (context) => LotProvider(
+              context.read<AuthProvider>(), context.read<LotRepository>()),
+          update: (context, auth, previous) =>
+              previous ?? LotProvider(auth, context.read<LotRepository>()),
+        ),
+
+        // === WeightProvider (charge depuis DB) ===
         ChangeNotifierProxyProvider<AuthProvider, WeightProvider>(
-          create: (context) {
-            final auth = context.read<AuthProvider>();
-            final provider =
-                WeightProvider(auth, context.read<WeightRepository>());
-            provider.setWeights(MockData.generateWeights());
-            return provider;
-          },
+          create: (context) => WeightProvider(
+              context.read<AuthProvider>(), context.read<WeightRepository>()),
           update: (context, auth, previous) =>
               previous ??
               WeightProvider(auth, context.read<WeightRepository>()),
         ),
 
-        // === VaccinationReferenceProvider ===
+        // === VaccinationReferenceProvider (charge depuis DB) ===
         ChangeNotifierProxyProvider<AuthProvider, VaccinationReferenceProvider>(
-          create: (context) {
-            final auth = context.read<AuthProvider>();
-            final provider = VaccinationReferenceProvider(auth);
-            provider.setReferences(
-              vaccines: MockVaccinationReferences.generateVaccines(),
-              diseases: MockVaccinationReferences.generateDiseases(),
-              routes: MockVaccinationReferences.generateRoutes(),
-            );
-            return provider;
-          },
+          create: (context) =>
+              VaccinationReferenceProvider(context.read<AuthProvider>()),
           update: (context, auth, previous) =>
               previous ?? VaccinationReferenceProvider(auth),
         ),
 
-        // === VaccinationProvider (avec Repository) ===
+        // === VaccinationProvider (charge depuis DB) ===
         ChangeNotifierProxyProvider<AuthProvider, VaccinationProvider>(
-          create: (context) {
-            final auth = context.read<AuthProvider>();
-            final provider = VaccinationProvider(
-                auth, context.read<VaccinationRepository>());
-            provider.setVaccinations(MockData.generateVaccinations());
-            return provider;
-          },
+          create: (context) => VaccinationProvider(context.read<AuthProvider>(),
+              context.read<VaccinationRepository>()),
           update: (context, auth, previous) =>
               previous ??
               VaccinationProvider(auth, context.read<VaccinationRepository>()),
         ),
 
-        // === DocumentProvider (avec Repository) ===
+        // === DocumentProvider (charge depuis DB) ===
         ChangeNotifierProxyProvider<AuthProvider, DocumentProvider>(
           create: (context) => DocumentProvider(
               context.read<AuthProvider>(), context.read<DocumentRepository>()),
@@ -279,7 +259,7 @@ class MyApp extends StatelessWidget {
               DocumentProvider(auth, context.read<DocumentRepository>()),
         ),
 
-        // === BreedingProvider (avec Repository) ===
+        // === BreedingProvider (charge depuis DB) ===
         ChangeNotifierProxyProvider<AuthProvider, BreedingProvider>(
           create: (context) => BreedingProvider(
               context.read<AuthProvider>(), context.read<BreedingRepository>()),
@@ -288,15 +268,11 @@ class MyApp extends StatelessWidget {
               BreedingProvider(auth, context.read<BreedingRepository>()),
         ),
 
-        // === VeterinarianProvider (avec Repository) ===
+        // === VeterinarianProvider (charge depuis DB) ===
         ChangeNotifierProxyProvider<AuthProvider, VeterinarianProvider>(
-          create: (context) {
-            final auth = context.read<AuthProvider>();
-            final provider = VeterinarianProvider(
-                auth, context.read<VeterinarianRepository>());
-            provider.loadMockVets(MockVeterinarians.generateVeterinarians());
-            return provider;
-          },
+          create: (context) => VeterinarianProvider(
+              context.read<AuthProvider>(),
+              context.read<VeterinarianRepository>()),
           update: (context, auth, previous) =>
               previous ??
               VeterinarianProvider(
@@ -382,104 +358,10 @@ class MainNavigation extends StatefulWidget {
 }
 
 class _MainNavigationState extends State<MainNavigation> {
-  int _selectedIndex = 0;
-
-  List<Widget> _getScreens() {
-    return [
-      const HomeScreen(),
-      _ScanTabScreen(onAnimalSelected: (animal) {
-        setState(() {
-          _selectedIndex = 0;
-        });
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AnimalDetailScreen(preloadedAnimal: animal),
-          ),
-        );
-      }),
-      const AnimalListScreen(),
-      const SyncScreen(),
-    ];
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    final screens = _getScreens();
-
-    return Scaffold(
-      body: screens[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        selectedItemColor: Colors.green,
-        unselectedItemColor: Colors.grey,
-        items: [
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.home),
-            label: AppLocalizations.of(context).translate(AppStrings.home),
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.qr_code_scanner),
-            label: AppLocalizations.of(context).translate(AppStrings.scan),
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.list),
-            label: AppLocalizations.of(context).translate(AppStrings.animals),
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.sync),
-            label: AppLocalizations.of(context).translate(AppStrings.sync),
-          ),
-        ],
-      ),
+    return const Scaffold(
+      body: HomeScreen(),
     );
-  }
-}
-
-/// Widget pour l'onglet Scan qui gère la navigation vers la fiche animal
-class _ScanTabScreen extends StatelessWidget {
-  final Function(Animal) onAnimalSelected;
-
-  const _ScanTabScreen({required this.onAnimalSelected});
-
-  @override
-  Widget build(BuildContext context) {
-    return Builder(
-      builder: (context) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _navigateToScanner(context);
-        });
-
-        return const Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(),
-          ),
-        );
-      },
-    );
-  }
-
-  Future<void> _navigateToScanner(BuildContext context) async {
-    final animal = await Navigator.push<Animal>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AnimalFinderScreen(
-          mode: AnimalFinderMode.single,
-          title: AppLocalizations.of(context).translate(AppStrings.scanAnimal),
-        ),
-      ),
-    );
-
-    if (animal != null) {
-      onAnimalSelected(animal);
-    }
   }
 }

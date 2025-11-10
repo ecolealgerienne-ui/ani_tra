@@ -306,7 +306,8 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
               .translate(AppStrings.groupedHealthTreatment),
           color: AppConstants.primaryBlue,
           onTap: () async {
-            await Navigator.push(
+            /// Capturer le retour de MedicalActScreen (true = validé, false/null = annulé)
+            final validationResult = await Navigator.push<bool?>(
               context,
               MaterialPageRoute(
                 builder: (_) => MedicalActScreen(
@@ -318,19 +319,25 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
               ),
             );
 
-            // Après retour de medical_act_screen, finaliser le lot
+            /// ✅ Vérifier que l'acte médical a été VALIDÉ (pas annulé)
+            if (validationResult != true) {
+              // L'utilisateur a annulé ou il y a eu une erreur
+              return;
+            }
+
+            // Après retour de medical_act_screen validé, finaliser le lot
             if (!mounted) return;
             final lotProvider = context.read<LotProvider>();
             final syncProvider = context.read<SyncProvider>();
 
-            final success = lotProvider.finalizeLot(
+            final success = await lotProvider.finalizeLot(
               widget.lotId,
               type: LotType.treatment,
               notes:
                   _notesController.text.isEmpty ? null : _notesController.text,
             );
 
-            if (await success) {
+            if (success) {
               syncProvider.incrementPendingData();
               if (mounted) {
                 Navigator.pop(context);

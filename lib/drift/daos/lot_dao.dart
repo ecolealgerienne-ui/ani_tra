@@ -14,19 +14,24 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
   Future<List<LotsTableData>> findAllByFarm(String farmId) {
     return (select(lotsTable)
           ..where((t) => t.farmId.equals(farmId))
+          ..where((t) => t.deletedAt.isNull())
           ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
         .get();
   }
 
   // 2. Get lot by ID
   Future<LotsTableData?> findById(String id) {
-    return (select(lotsTable)..where((t) => t.id.equals(id))).getSingleOrNull();
+    return (select(lotsTable)
+          ..where((t) => t.id.equals(id))
+          ..where((t) => t.deletedAt.isNull()))
+        .getSingleOrNull();
   }
 
   // 3. Get open lots (not completed) for a farm
   Future<List<LotsTableData>> findOpenByFarm(String farmId) {
     return (select(lotsTable)
           ..where((t) => t.farmId.equals(farmId) & t.completed.equals(false))
+          ..where((t) => t.deletedAt.isNull())
           ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
         .get();
   }
@@ -35,6 +40,7 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
   Future<List<LotsTableData>> findCompletedByFarm(String farmId) {
     return (select(lotsTable)
           ..where((t) => t.farmId.equals(farmId) & t.completed.equals(true))
+          ..where((t) => t.deletedAt.isNull())
           ..orderBy([(t) => OrderingTerm.desc(t.completedAt)]))
         .get();
   }
@@ -43,6 +49,7 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
   Future<List<LotsTableData>> findByTypeAndFarm(String type, String farmId) {
     return (select(lotsTable)
           ..where((t) => t.farmId.equals(farmId) & t.type.equals(type))
+          ..where((t) => t.deletedAt.isNull())
           ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
         .get();
   }
@@ -51,6 +58,7 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
   Future<List<LotsTableData>> findWithoutTypeByFarm(String farmId) {
     return (select(lotsTable)
           ..where((t) => t.farmId.equals(farmId) & t.type.isNull())
+          ..where((t) => t.deletedAt.isNull())
           ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
         .get();
   }
@@ -71,6 +79,7 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
     return (select(lotsTable)
           ..where(
               (t) => t.farmId.equals(farmId) & t.productId.equals(productId))
+          ..where((t) => t.deletedAt.isNull())
           ..orderBy([(t) => OrderingTerm.desc(t.treatmentDate)]))
         .get();
   }
@@ -81,6 +90,7 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
     return (select(lotsTable)
           ..where((t) =>
               t.farmId.equals(farmId) & t.veterinarianId.equals(veterinarianId))
+          ..where((t) => t.deletedAt.isNull())
           ..orderBy([(t) => OrderingTerm.desc(t.treatmentDate)]))
         .get();
   }
@@ -95,9 +105,15 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
     return update(lotsTable).replace(lot);
   }
 
-  // 12. Delete lot
-  Future<int> deleteLot(String id) {
-    return (delete(lotsTable)..where((t) => t.id.equals(id))).go();
+  // 12. Soft-delete lot (audit trail)
+  Future<int> softDelete(String id, String farmId) {
+    return (update(lotsTable)
+          ..where((t) => t.id.equals(id))
+          ..where((t) => t.farmId.equals(farmId)))
+        .write(LotsTableCompanion(
+      deletedAt: Value(DateTime.now()),
+      updatedAt: Value(DateTime.now()),
+    ));
   }
 
   // 13. Mark lot as completed
@@ -165,7 +181,8 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
   Future<int> countByFarm(String farmId) async {
     final query = selectOnly(lotsTable)
       ..addColumns([lotsTable.id.count()])
-      ..where(lotsTable.farmId.equals(farmId));
+      ..where(lotsTable.farmId.equals(farmId))
+      ..where(lotsTable.deletedAt.isNull());
 
     final result = await query.getSingleOrNull();
     return result?.read(lotsTable.id.count()) ?? 0;
@@ -176,7 +193,8 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
     final query = selectOnly(lotsTable)
       ..addColumns([lotsTable.id.count()])
       ..where(
-          lotsTable.farmId.equals(farmId) & lotsTable.completed.equals(false));
+          lotsTable.farmId.equals(farmId) & lotsTable.completed.equals(false))
+      ..where(lotsTable.deletedAt.isNull());
 
     final result = await query.getSingleOrNull();
     return result?.read(lotsTable.id.count()) ?? 0;
@@ -186,7 +204,8 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
   Future<int> countByTypeAndFarm(String type, String farmId) async {
     final query = selectOnly(lotsTable)
       ..addColumns([lotsTable.id.count()])
-      ..where(lotsTable.farmId.equals(farmId) & lotsTable.type.equals(type));
+      ..where(lotsTable.farmId.equals(farmId) & lotsTable.type.equals(type))
+      ..where(lotsTable.deletedAt.isNull());
 
     final result = await query.getSingleOrNull();
     return result?.read(lotsTable.id.count()) ?? 0;
@@ -196,6 +215,7 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
   Future<List<LotsTableData>> findUnsyncedByFarm(String farmId) {
     return (select(lotsTable)
           ..where((t) => t.farmId.equals(farmId) & t.synced.equals(false))
+          ..where((t) => t.deletedAt.isNull())
           ..orderBy([(t) => OrderingTerm.asc(t.updatedAt)]))
         .get();
   }
@@ -209,6 +229,7 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
               t.type.equals('treatment') &
               t.withdrawalEndDate.isSmallerOrEqualValue(beforeDate) &
               t.completed.equals(false))
+          ..where((t) => t.deletedAt.isNull())
           ..orderBy([(t) => OrderingTerm.asc(t.withdrawalEndDate)]))
         .get();
   }

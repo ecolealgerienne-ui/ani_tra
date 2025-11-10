@@ -74,6 +74,19 @@ class _AnimalDetailScreenState extends State<AnimalDetailScreen> {
     });
   }
 
+  // ✅ NOUVELLE MÉTHODE: Recharger l'animal après le retour de DeathScreen
+  void _reloadAnimalAfterDeath() {
+    final updatedAnimal =
+        context.read<AnimalProvider>().getAnimalById(_scannedAnimal!.id);
+
+    if (updatedAnimal != null) {
+      setState(() {
+        _scannedAnimal = updatedAnimal;
+      });
+      debugPrint('✅ Animal reloaded: ${updatedAnimal.status}');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_scannedAnimal == null) {
@@ -132,7 +145,10 @@ class _AnimalDetailScreenState extends State<AnimalDetailScreen> {
               child: TabBarView(
                 children: [
                   _InfosTab(animal: _scannedAnimal!),
-                  _SoinsTab(animal: _scannedAnimal!),
+                  _SoinsTab(
+                    animal: _scannedAnimal!,
+                    onDeathScreenReturn: _reloadAnimalAfterDeath,
+                  ),
                   _GenealogieTab(animal: _scannedAnimal!),
                 ],
               ),
@@ -161,6 +177,9 @@ class _AnimalHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final maleLabel = AppLocalizations.of(context).translate(AppStrings.male);
+    final femaleLabel =
+        AppLocalizations.of(context).translate(AppStrings.female);
     return Container(
       padding: const EdgeInsets.all(16),
       color: Colors.blue[50],
@@ -181,8 +200,9 @@ class _AnimalHeader extends StatelessWidget {
                   style: const TextStyle(
                       fontSize: 18, fontWeight: FontWeight.bold),
                 ),
+
                 Text(
-                  '${animal.sex == AnimalSex.male ? '♂️ \${AppLocalizations.of(context).translate(AppStrings.male)}' : '♀️ \${AppLocalizations.of(context).translate(AppStrings.female)}'} · ${_getAgeFormatted()}',
+                  '${animal.sex == AnimalSex.male ? '♂️ $maleLabel' : '♀️ $femaleLabel'} · ${_getAgeFormatted()}',
                   style: TextStyle(color: Colors.grey[700]),
                 ),
                 // ÉTAPE 7 : Afficher Type et Race
@@ -201,7 +221,7 @@ class _AnimalHeader extends StatelessWidget {
               ],
             ),
           ),
-          _StatusBadge(status: animal.status),
+          _StatusBadge(animalId: animal.id),
         ],
       ),
     );
@@ -209,12 +229,21 @@ class _AnimalHeader extends StatelessWidget {
 }
 
 class _StatusBadge extends StatelessWidget {
-  final AnimalStatus status;
+  final String animalId; // ← Changer de 'status' à 'animalId'
 
-  const _StatusBadge({required this.status});
+  const _StatusBadge({required this.animalId});
 
   @override
   Widget build(BuildContext context) {
+    // ✅ Récupérer l'animal FRAIS du provider
+    final animalProvider = context.watch<AnimalProvider>();
+    final animal = animalProvider.getAnimalById(animalId);
+
+    if (animal == null) {
+      return const SizedBox.shrink();
+    }
+
+    final status = animal.status;
     Color color;
     String label;
 
@@ -335,7 +364,9 @@ class _InfosTab extends StatelessWidget {
     final weightProvider = context.watch<WeightProvider>();
 
     // Récupérer l'animal à jour depuis le Provider (au cas où il a changé)
-    final currentAnimal = animalProvider.getAnimalById(animal.id) ?? animal;
+    //final currentAnimal = animalProvider.getAnimalById(animal.id) ?? animal;
+    final currentAnimal =
+        context.watch<AnimalProvider>().getAnimalById(animal.id) ?? animal;
 
     // Obtenir le dernier poids
     final allWeights = weightProvider.weights
@@ -353,7 +384,9 @@ class _InfosTab extends StatelessWidget {
         break;
       }
     }
-
+    final maleLabel = AppLocalizations.of(context).translate(AppStrings.male);
+    final femaleLabel =
+        AppLocalizations.of(context).translate(AppStrings.female);
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -370,10 +403,11 @@ class _InfosTab extends StatelessWidget {
                 _InfoRow(
                     label: 'N° Officiel', value: currentAnimal.officialNumber!),
               _InfoRow(
-                  label: 'Sexe',
-                  value: currentAnimal.sex == AnimalSex.male
-                      ? '♂️ \${AppLocalizations.of(context).translate(AppStrings.male)}'
-                      : '♀️ \${AppLocalizations.of(context).translate(AppStrings.female)}'),
+                label: 'Sexe',
+                value: currentAnimal.sex == AnimalSex.male
+                    ? '♂️ $maleLabel'
+                    : '♀️ $femaleLabel',
+              ),
               _InfoRow(
                   label: AppLocalizations.of(context)
                       .translate(AppStrings.statusAnimal),
@@ -609,8 +643,12 @@ class _InfosTab extends StatelessWidget {
 
 class _SoinsTab extends StatelessWidget {
   final Animal animal;
+  final VoidCallback? onDeathScreenReturn;
 
-  const _SoinsTab({required this.animal});
+  const _SoinsTab({
+    required this.animal,
+    this.onDeathScreenReturn,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -704,12 +742,12 @@ class _SoinsTab extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => MedicalActScreen(
-                    mode: MedicalActMode.singleAnimal,
-                    animalId: animal.id,
-                  ),
+                  builder: (context) => MedicalActScreen(
+                      mode: MedicalActMode.singleAnimal, animalId: animal.id),
                 ),
-              );
+              ).then((_) {
+                onDeathScreenReturn?.call();
+              });
             },
             icon: const Icon(Icons.medical_services),
             label: const Text('Traiter'),
@@ -1419,7 +1457,7 @@ class _VaccinationCard extends StatelessWidget {
                             : AppLocalizations.of(context)
                                 .translate(AppStrings.reminderInDays)
                                 .replaceAll('{days}',
-                                    '\${vaccination.daysUntilReminder}'),
+                                    '${vaccination.daysUntilReminder}'),
                         style: TextStyle(
                           fontSize: 12,
                           color: vaccination.isReminderDue

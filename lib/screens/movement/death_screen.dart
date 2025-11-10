@@ -26,6 +26,7 @@ class _DeathScreenState extends State<DeathScreen> {
   final _notesController = TextEditingController();
   DateTime _deathDate = DateTime.now();
   bool _isScanning = false;
+  bool _isConfirming = false; // ← Nouveau: tracking de confirmation
   final _random = Random();
 
   @override
@@ -84,44 +85,69 @@ class _DeathScreenState extends State<DeathScreen> {
     }
   }
 
-  void _confirmDeath() {
+  // ✅ FIXE: Rendre async et attendre l'update avant pop
+  Future<void> _confirmDeath() async {
     final animal = _scannedAnimal ?? widget.animal;
     if (animal == null) return;
+
+    setState(() => _isConfirming = true);
 
     final animalProvider = context.read<AnimalProvider>();
     final syncProvider = context.read<SyncProvider>();
 
-    // Create death movement
-    final movement = Movement(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      animalId: animal.id,
-      type: MovementType.death,
-      movementDate: _deathDate,
-      notes: _notesController.text.isEmpty
-          ? AppLocalizations.of(context).translate(AppStrings.causeNotSpecified)
-          : _notesController.text,
-      createdAt: DateTime.now(),
-    );
+    try {
+      // Create death movement
+      final movement = Movement(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        animalId: animal.id,
+        type: MovementType.death,
+        movementDate: _deathDate,
+        notes: _notesController.text.isEmpty
+            ? AppLocalizations.of(context)
+                .translate(AppStrings.causeNotSpecified)
+            : _notesController.text,
+        createdAt: DateTime.now(),
+      );
 
-    animalProvider.addMovement(movement);
+      animalProvider.addMovement(movement);
 
-    // Mettre à jour le statut de l'animal à "mort"
-    final updatedAnimal = animal.copyWith(status: AnimalStatus.dead);
-    animalProvider.updateAnimal(updatedAnimal);
+      // ✅ Mettre à jour le statut de l'animal à "mort"
+      // IMPORTANT: Attendre l'update (await) pour que le provider notifie les listeners
+      final updatedAnimal = animal.copyWith(status: AnimalStatus.dead);
+      await animalProvider.updateAnimal(updatedAnimal);
 
-    syncProvider.incrementPendingData();
+      debugPrint('✅ Animal ${animal.id} marked as dead in DB and provider');
 
-    if (!mounted) return;
+      syncProvider.incrementPendingData();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-            AppLocalizations.of(context).translate(AppStrings.deathRecorded)),
-        backgroundColor: Colors.grey,
-      ),
-    );
+      if (!mounted) return;
 
-    Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              AppLocalizations.of(context).translate(AppStrings.deathRecorded)),
+          backgroundColor: Colors.grey,
+        ),
+      );
+
+      // ✅ Retour APRÈS que la mise à jour soit complète
+      Navigator.pop(context);
+    } catch (e) {
+      debugPrint('❌ Error marking animal as dead: $e');
+
+      if (!mounted) return;
+
+      setState(() => _isConfirming = false);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context).translate(AppStrings.error),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -282,8 +308,20 @@ class _DeathScreenState extends State<DeathScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: _confirmDeath,
-                icon: const Icon(Icons.delete_forever),
+                onPressed: _isConfirming
+                    ? null
+                    : _confirmDeath, // ← Désactiver pendant la sauvegarde
+                icon: _isConfirming
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : const Icon(Icons.delete_forever),
                 label: Text(AppLocalizations.of(context)
                     .translate(AppStrings.confirmDeath)),
                 style: ElevatedButton.styleFrom(

@@ -270,6 +270,8 @@ class AppDatabase extends _$AppDatabase {
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_animals_mother_id ON animals(mother_id)',
     );
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_animals_deleted_at ON animals(deleted_at);');
   }
 
   // ───────────────────────────────────────────────────────
@@ -296,6 +298,8 @@ class AppDatabase extends _$AppDatabase {
         'CREATE INDEX IF NOT EXISTS idx_breeds_is_active ON breeds(is_active)');
     await customStatement(
         'CREATE INDEX IF NOT EXISTS idx_breeds_name_fr ON breeds(name_fr)');
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_breedings_deleted_at ON breedings(deleted_at);');
   }
 
   // ───────────────────────────────────────────────────────
@@ -320,6 +324,8 @@ class AppDatabase extends _$AppDatabase {
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_medical_products_name ON medical_products(name)',
     );
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_medical_products_deleted_at ON medical_products(deleted_at);');
   }
 
   /// Crée les indexes pour la table vaccines
@@ -358,6 +364,8 @@ class AppDatabase extends _$AppDatabase {
       'CREATE INDEX IF NOT EXISTS idx_vaccines_farm_name '
       'ON vaccines(farm_id, name);',
     );
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_vaccines_deleted_at ON vaccines(deleted_at);');
   }
 
   /// Crée les indexes pour la table veterinarians
@@ -416,6 +424,8 @@ class AppDatabase extends _$AppDatabase {
       'CREATE INDEX IF NOT EXISTS idx_veterinarians_farm_default '
       'ON veterinarians(farm_id, is_default);',
     );
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_veterinarians_deleted_at ON veterinarians(deleted_at);');
   }
 
   /// Crée les indexes pour la table treatments
@@ -481,6 +491,8 @@ class AppDatabase extends _$AppDatabase {
       'CREATE INDEX IF NOT EXISTS idx_treatments_farm_withdrawal '
       'ON treatments(farm_id, withdrawal_end_date);',
     );
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_treatments_deleted_at ON treatments(deleted_at);');
   }
 
   /// Crée les indexes pour la table vaccinations
@@ -553,6 +565,8 @@ class AppDatabase extends _$AppDatabase {
       'CREATE INDEX IF NOT EXISTS idx_vaccinations_farm_reminder '
       'ON vaccinations(farm_id, next_due_date);',
     );
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_vaccinations_deleted_at ON vaccinations(deleted_at);');
   }
 
   /// Crée les indexes pour la table weights
@@ -604,6 +618,8 @@ class AppDatabase extends _$AppDatabase {
       'CREATE INDEX IF NOT EXISTS idx_weights_animal_date '
       'ON weights(animal_id, recorded_at);',
     );
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_weights_deleted_at ON weights(deleted_at);');
   }
 
   /// Crée les indexes pour la table movements
@@ -674,6 +690,8 @@ class AppDatabase extends _$AppDatabase {
       'CREATE INDEX IF NOT EXISTS idx_movements_farm_type_date '
       'ON movements(farm_id, type, movement_date);',
     );
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_movements_deleted_at ON movements(deleted_at);');
   }
 
   /// Créer les indexes pour la table batches
@@ -697,6 +715,8 @@ class AppDatabase extends _$AppDatabase {
     // Index composite farm_id + completed (query la plus fréquente)
     await customStatement(
         'CREATE INDEX idx_batches_farm_completed ON batches(farm_id, completed);');
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_batches_deleted_at ON batches(deleted_at);');
   }
 
   /// Créer les indexes pour la table lots
@@ -734,6 +754,8 @@ class AppDatabase extends _$AppDatabase {
     // Index sur withdrawal_end_date (alertes rémanence)
     await customStatement(
         'CREATE INDEX idx_lots_withdrawal_end_date ON lots(withdrawal_end_date);');
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_lots_deleted_at ON lots(deleted_at);');
   }
 
   /// Créer les indexes pour la table campaigns
@@ -765,6 +787,8 @@ class AppDatabase extends _$AppDatabase {
     // Index sur withdrawal_end_date (alertes rémanence)
     await customStatement(
         'CREATE INDEX idx_campaigns_withdrawal_end_date ON campaigns(withdrawal_end_date);');
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_campaigns_deleted_at ON campaigns(deleted_at);');
   }
 
   /// Créer les indexes pour la table breedings
@@ -857,6 +881,9 @@ class AppDatabase extends _$AppDatabase {
       'CREATE INDEX IF NOT EXISTS idx_breedings_farm_status_date '
       'ON breedings(farm_id, status, expected_birth_date);',
     );
+
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_breedings_deleted_at ON breedings(deleted_at);');
   }
 
   /// Créer les indexes pour la table documents
@@ -935,6 +962,8 @@ class AppDatabase extends _$AppDatabase {
       'CREATE INDEX IF NOT EXISTS idx_documents_farm_upload '
       'ON documents(farm_id, upload_date);',
     );
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_documents_deleted_at ON documents(deleted_at);');
   }
 
   // ═══════════════════════════════════════════════════════════

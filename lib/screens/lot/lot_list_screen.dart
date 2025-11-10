@@ -58,33 +58,50 @@ class _LotListScreenState extends State<LotListScreen>
                 Text(AppLocalizations.of(context).translate(AppStrings.cancel)),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               if (nameController.text.trim().isEmpty) return;
 
-              //final provider = context.read<LotProvider>();
-              //final lot = provider.createLot(name: nameController.text.trim());
+              // ✅ Créer le lot via provider
+              final provider = context.read<LotProvider>();
 
-              Navigator.pop(context);
+              try {
+                final lot = await provider.createLot(
+                  name: nameController.text.trim(),
+                );
 
-              // Naviguer vers détail
-              Future<void> onLotTap(Future<Lot> lot) async {
-                final resolvedLot = await lot;
+                if (!mounted) return;
+                Navigator.pop(context);
+
+                // ✅ Afficher confirmation
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(AppLocalizations.of(context)
+                        .translate(AppStrings.lotCreated)),
+                    backgroundColor: AppConstants.successGreen,
+                  ),
+                );
+
+                // ✅ Naviguer vers détail du lot
+                await Future.delayed(const Duration(milliseconds: 300));
                 if (!mounted) return;
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => LotDetailScreen(lotId: resolvedLot.id),
+                    builder: (_) => LotDetailScreen(lotId: lot.id),
+                  ),
+                );
+              } catch (e) {
+                if (!mounted) return;
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      AppLocalizations.of(context).translate(AppStrings.error),
+                    ),
+                    backgroundColor: AppConstants.statusDanger,
                   ),
                 );
               }
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(AppLocalizations.of(context)
-                      .translate(AppStrings.lotCreated)),
-                  backgroundColor: AppConstants.successGreen,
-                ),
-              );
             },
             child:
                 Text(AppLocalizations.of(context).translate(AppStrings.save)),
@@ -147,34 +164,33 @@ class _LotListScreenState extends State<LotListScreen>
                   AppLocalizations.of(context).translate(AppStrings.cancel)),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 final provider = context.read<LotProvider>();
-                final duplicated = provider.duplicateLot(
+                final duplicated = await provider.duplicateLot(
                   lot,
                   newName: nameController.text.trim(),
                   keepType: keepType,
                   keepAnimals: keepAnimals,
                 );
 
+                if (!mounted) return;
                 Navigator.pop(context);
-
-                // Naviguer vers le nouveau lot
-                Future<void> showDuplicatedLot() async {
-                  final duplicatedLot = await duplicated;
-                  if (!mounted) return;
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => LotDetailScreen(lotId: duplicatedLot.id),
-                    ),
-                  );
-                }
 
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(AppLocalizations.of(context)
                         .translate(AppStrings.lotDuplicated)),
                     backgroundColor: AppConstants.successGreen,
+                  ),
+                );
+
+                // Naviguer vers le nouveau lot
+                await Future.delayed(const Duration(milliseconds: 300));
+                if (!mounted) return;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => LotDetailScreen(lotId: duplicated.id),
                   ),
                 );
               },
@@ -206,16 +222,18 @@ class _LotListScreenState extends State<LotListScreen>
             onPressed: () {
               context.read<LotProvider>().deleteLot(lot.id);
               Navigator.pop(context);
+
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(AppLocalizations.of(context)
                       .translate(AppStrings.lotDeleted)),
-                  backgroundColor: AppConstants.statusDanger,
+                  backgroundColor: AppConstants.successGreen,
                 ),
               );
             },
             style: ElevatedButton.styleFrom(
-                backgroundColor: AppConstants.statusDanger),
+              backgroundColor: AppConstants.statusDanger,
+            ),
             child:
                 Text(AppLocalizations.of(context).translate(AppStrings.delete)),
           ),
@@ -226,59 +244,61 @@ class _LotListScreenState extends State<LotListScreen>
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<LotProvider>();
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context).translate(AppStrings.myLots)),
+        title: Text(AppLocalizations.of(context).translate(AppStrings.lots)),
         bottom: TabBar(
           controller: _tabController,
           tabs: [
             Tab(
-                text:
-                    '${AppLocalizations.of(context).translate(AppStrings.openLots)} (${provider.openLotsCount})'),
+              text: AppLocalizations.of(context).translate(AppStrings.openLots),
+            ),
             Tab(
-                text:
-                    '${AppLocalizations.of(context).translate(AppStrings.closedLots)} (${provider.closedLotsCount})'),
+              text:
+                  AppLocalizations.of(context).translate(AppStrings.closedLots),
+            ),
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildLotsList(provider.openLots, isOpen: true),
-          _buildLotsList(provider.closedLots, isOpen: false),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: _createLot,
-        icon: const Icon(Icons.add),
-        label:
-            Text(AppLocalizations.of(context).translate(AppStrings.createLot)),
+        tooltip: AppLocalizations.of(context).translate(AppStrings.createLot),
+        child: const Icon(Icons.add),
+      ),
+      body: Consumer<LotProvider>(
+        builder: (context, lotProvider, _) {
+          return TabBarView(
+            controller: _tabController,
+            children: [
+              // Onglet: Lots ouverts
+              _buildLotList(context, lotProvider.openLots),
+              // Onglet: Lots fermés
+              _buildLotList(context, lotProvider.closedLots),
+            ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildLotsList(List<Lot> lots, {required bool isOpen}) {
+  Widget _buildLotList(BuildContext context, List<Lot> lots) {
     if (lots.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              isOpen ? Icons.inbox_outlined : Icons.archive_outlined,
-              size: AppConstants.iconSizeLarge,
-              color: Colors.grey.shade400,
+              Icons.inventory_2,
+              size: 64,
+              color: Colors.grey.shade300,
             ),
             const SizedBox(height: AppConstants.spacingMedium),
             Text(
-              isOpen
-                  ? AppLocalizations.of(context).translate(AppStrings.noOpenLot)
-                  : AppLocalizations.of(context)
-                      .translate(AppStrings.noClosedLot),
+              AppLocalizations.of(context).translate(AppStrings.noLots),
               style: TextStyle(
-                  fontSize: AppConstants.fontSizeBody,
-                  color: Colors.grey.shade600),
+                fontSize: AppConstants.fontSizeSubtitle,
+                color: Colors.grey.shade600,
+              ),
             ),
           ],
         ),
@@ -286,13 +306,12 @@ class _LotListScreenState extends State<LotListScreen>
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.only(bottom: AppConstants.fabPaddingBottom),
+      padding: const EdgeInsets.all(AppConstants.spacingMedium),
       itemCount: lots.length,
       itemBuilder: (context, index) {
         final lot = lots[index];
         return _LotCard(
           lot: lot,
-          isOpen: isOpen,
           onTap: () {
             Navigator.push(
               context,
@@ -309,16 +328,15 @@ class _LotListScreenState extends State<LotListScreen>
   }
 }
 
+/// Widget: Carte de lot
 class _LotCard extends StatelessWidget {
   final Lot lot;
-  final bool isOpen;
   final VoidCallback onTap;
   final VoidCallback onDuplicate;
   final VoidCallback onDelete;
 
   const _LotCard({
     required this.lot,
-    required this.isOpen,
     required this.onTap,
     required this.onDuplicate,
     required this.onDelete,
@@ -327,242 +345,224 @@ class _LotCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('dd/MM/yyyy');
+    final isOpen = lot.isOpen;
 
     return Card(
-      margin: const EdgeInsets.symmetric(
-          horizontal: AppConstants.spacingMedium,
-          vertical: AppConstants.spacingSmall),
+      margin: const EdgeInsets.only(bottom: AppConstants.spacingMedium),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
         child: Padding(
           padding: const EdgeInsets.all(AppConstants.spacingMedium),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // En-tête
-              Row(
-                children: [
-                  // Icône type
-                  Container(
-                    padding: const EdgeInsets.all(AppConstants.spacingSmall),
-                    decoration: BoxDecoration(
-                      color: _getTypeColor()
-                          .withValues(alpha: AppConstants.opacityLight),
-                      borderRadius:
-                          BorderRadius.circular(AppConstants.borderRadiusSmall),
-                    ),
-                    child: Text(
-                      lot.type?.icon ?? '📋',
-                      style: const TextStyle(
-                          fontSize: AppConstants.iconSizeMedium),
-                    ),
-                  ),
-                  const SizedBox(width: AppConstants.spacingSmall),
-
-                  // Nom + Type
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          lot.name,
-                          style: const TextStyle(
-                            fontSize: AppConstants.fontSizeBody,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: AppConstants.spacingTiny),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppConstants.spacingSmall,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: _getTypeColor(),
-                            borderRadius: BorderRadius.circular(
-                                AppConstants.borderRadiusSmall),
-                          ),
-                          child: Text(
-                            lot.type?.label ??
-                                AppLocalizations.of(context)
-                                    .translate(AppStrings.typeNotDefined),
-                            style: const TextStyle(
-                              fontSize: AppConstants.fontSizeTiny,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Statut
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: AppConstants.spacingSmall,
-                        vertical: AppConstants.spacingTiny),
-                    decoration: BoxDecoration(
-                      color:
-                          isOpen ? Colors.green.shade50 : Colors.grey.shade200,
-                      borderRadius:
-                          BorderRadius.circular(AppConstants.borderRadiusSmall),
-                      border: Border.all(
-                        color: isOpen ? AppConstants.successGreen : Colors.grey,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          isOpen ? Icons.lock_open : Icons.lock,
-                          size: AppConstants.iconSizeTiny,
-                          color:
-                              isOpen ? AppConstants.successGreen : Colors.grey,
-                        ),
-                        const SizedBox(width: AppConstants.spacingTiny),
-                        Text(
-                          AppLocalizations.of(context).translate(isOpen
-                              ? AppStrings.lotOpened
-                              : AppStrings.lotClosed),
-                          style: TextStyle(
-                            fontSize: AppConstants.fontSizeTiny,
-                            fontWeight: FontWeight.bold,
-                            color: isOpen ? Colors.green.shade700 : Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: AppConstants.spacingSmall),
-
-              // Infos
-              Row(
-                children: [
-                  const Icon(Icons.pets,
-                      size: AppConstants.iconSizeSmall, color: Colors.grey),
-                  const SizedBox(width: AppConstants.spacingTiny),
-                  Text(
-                    '${lot.animalCount} ${AppLocalizations.of(context).translate(AppStrings.animals)}',
-                    style: const TextStyle(
-                        fontSize: AppConstants.fontSizeSubtitle),
-                  ),
-                  const SizedBox(width: AppConstants.spacingMedium),
-                  const Icon(Icons.calendar_today,
-                      size: AppConstants.iconSizeSmall, color: Colors.grey),
-                  const SizedBox(width: AppConstants.spacingTiny),
-                  Text(
-                    dateFormat.format(lot.createdAt),
-                    style: const TextStyle(
-                        fontSize: AppConstants.fontSizeSubtitle),
-                  ),
-                ],
-              ),
-
-              // Infos spécifiques selon type
-              if (lot.type == LotType.treatment && lot.productName != null) ...[
-                const SizedBox(height: AppConstants.spacingSmall),
-                Row(
-                  children: [
-                    const Icon(Icons.medication,
-                        size: AppConstants.iconSizeSmall,
-                        color: AppConstants.primaryBlue),
-                    const SizedBox(width: AppConstants.spacingTiny),
-                    Text(
-                      lot.productName!,
-                      style: const TextStyle(
-                          fontSize: AppConstants.fontSizeSubtitle),
-                    ),
-                  ],
-                ),
-              ],
-
-              if (lot.type == LotType.sale && lot.buyerName != null) ...[
-                const SizedBox(height: AppConstants.spacingSmall),
-                Row(
-                  children: [
-                    const Icon(Icons.person,
-                        size: AppConstants.iconSizeSmall,
-                        color: AppConstants.successGreen),
-                    const SizedBox(width: AppConstants.spacingTiny),
-                    Text(
-                      lot.buyerName!,
-                      style: const TextStyle(
-                          fontSize: AppConstants.fontSizeSubtitle),
-                    ),
-                    if (lot.totalPrice != null) ...[
-                      const SizedBox(width: AppConstants.spacingSmall),
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            // En-tête: nom + type + statut
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
-                        '${lot.totalPrice!.toStringAsFixed(2)}€',
+                        lot.name,
                         style: const TextStyle(
-                          fontSize: AppConstants.fontSizeSubtitle,
+                          fontSize: AppConstants.fontSizeSectionTitle,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
-                  ],
+                  ),
                 ),
               ],
+            ),
 
-              if (lot.type == LotType.slaughter &&
-                  lot.slaughterhouseName != null) ...[
-                const SizedBox(height: AppConstants.spacingSmall),
-                Row(
-                  children: [
-                    const Icon(Icons.factory,
-                        size: AppConstants.iconSizeSmall, color: Colors.grey),
-                    const SizedBox(width: AppConstants.spacingTiny),
-                    Text(
-                      lot.slaughterhouseName!,
-                      style: const TextStyle(
-                          fontSize: AppConstants.fontSizeSubtitle),
-                    ),
-                  ],
-                ),
-              ],
+            const SizedBox(height: AppConstants.spacingSmall),
 
-              const SizedBox(height: AppConstants.spacingSmall),
-
-              // Actions
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton.icon(
-                    onPressed: onDuplicate,
-                    icon: const Icon(Icons.content_copy,
-                        size: AppConstants.iconSizeSmall),
-                    label: Text(
-                      AppLocalizations.of(context)
-                          .translate(AppStrings.duplicate),
-                      style:
-                          const TextStyle(fontSize: AppConstants.fontSizeSmall),
+            // Type et Statut
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppConstants.spacingSmall,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: _getTypeColor(),
+                    borderRadius:
+                        BorderRadius.circular(AppConstants.borderRadiusSmall),
+                  ),
+                  child: Text(
+                    lot.type?.label ??
+                        AppLocalizations.of(context)
+                            .translate(AppStrings.typeNotDefined),
+                    style: const TextStyle(
+                      fontSize: AppConstants.fontSizeTiny,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  if (isOpen) ...[
-                    const SizedBox(width: AppConstants.spacingSmall),
-                    TextButton.icon(
-                      onPressed: onDelete,
-                      icon: const Icon(Icons.delete,
-                          size: AppConstants.iconSizeSmall),
-                      label: Text(
-                        AppLocalizations.of(context)
-                            .translate(AppStrings.delete),
-                        style: const TextStyle(
-                            fontSize: AppConstants.fontSizeSmall),
+                ),
+                const SizedBox(width: AppConstants.spacingSmall),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppConstants.spacingSmall,
+                      vertical: AppConstants.spacingTiny),
+                  decoration: BoxDecoration(
+                    color: isOpen ? Colors.green.shade50 : Colors.grey.shade200,
+                    borderRadius:
+                        BorderRadius.circular(AppConstants.borderRadiusSmall),
+                    border: Border.all(
+                      color: isOpen ? AppConstants.successGreen : Colors.grey,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        isOpen ? Icons.lock_open : Icons.lock,
+                        size: AppConstants.iconSizeTiny,
+                        color: isOpen ? AppConstants.successGreen : Colors.grey,
                       ),
-                      style: TextButton.styleFrom(
-                        foregroundColor: AppConstants.statusDanger,
+                      const SizedBox(width: AppConstants.spacingTiny),
+                      Text(
+                        AppLocalizations.of(context).translate(isOpen
+                            ? AppStrings.lotOpened
+                            : AppStrings.lotClosed),
+                        style: TextStyle(
+                          fontSize: AppConstants.fontSizeTiny,
+                          fontWeight: FontWeight.bold,
+                          color: isOpen ? Colors.green.shade700 : Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: AppConstants.spacingSmall),
+
+            // Infos: animaux + date
+            Row(
+              children: [
+                const Icon(Icons.pets,
+                    size: AppConstants.iconSizeSmall, color: Colors.grey),
+                const SizedBox(width: AppConstants.spacingTiny),
+                Text(
+                  '${lot.animalCount} ${AppLocalizations.of(context).translate(AppStrings.animals)}',
+                  style:
+                      const TextStyle(fontSize: AppConstants.fontSizeSubtitle),
+                ),
+                const SizedBox(width: AppConstants.spacingMedium),
+                const Icon(Icons.calendar_today,
+                    size: AppConstants.iconSizeSmall, color: Colors.grey),
+                const SizedBox(width: AppConstants.spacingTiny),
+                Text(
+                  dateFormat.format(lot.createdAt),
+                  style:
+                      const TextStyle(fontSize: AppConstants.fontSizeSubtitle),
+                ),
+              ],
+            ),
+
+            // Infos spécifiques selon type
+            if (lot.type == LotType.treatment && lot.productName != null) ...[
+              const SizedBox(height: AppConstants.spacingSmall),
+              Row(
+                children: [
+                  const Icon(Icons.medication,
+                      size: AppConstants.iconSizeSmall,
+                      color: AppConstants.primaryBlue),
+                  const SizedBox(width: AppConstants.spacingTiny),
+                  Text(
+                    lot.productName!,
+                    style: const TextStyle(
+                        fontSize: AppConstants.fontSizeSubtitle),
+                  ),
+                ],
+              ),
+            ],
+
+            if (lot.type == LotType.sale && lot.buyerName != null) ...[
+              const SizedBox(height: AppConstants.spacingSmall),
+              Row(
+                children: [
+                  const Icon(Icons.person,
+                      size: AppConstants.iconSizeSmall,
+                      color: AppConstants.successGreen),
+                  const SizedBox(width: AppConstants.spacingTiny),
+                  Text(
+                    lot.buyerName!,
+                    style: const TextStyle(
+                        fontSize: AppConstants.fontSizeSubtitle),
+                  ),
+                  if (lot.totalPrice != null) ...[
+                    const SizedBox(width: AppConstants.spacingSmall),
+                    Text(
+                      '${lot.totalPrice!.toStringAsFixed(2)}€',
+                      style: const TextStyle(
+                        fontSize: AppConstants.fontSizeSubtitle,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
                 ],
               ),
             ],
-          ),
+
+            if (lot.type == LotType.slaughter &&
+                lot.slaughterhouseName != null) ...[
+              const SizedBox(height: AppConstants.spacingSmall),
+              Row(
+                children: [
+                  const Icon(Icons.factory,
+                      size: AppConstants.iconSizeSmall, color: Colors.grey),
+                  const SizedBox(width: AppConstants.spacingTiny),
+                  Text(
+                    lot.slaughterhouseName!,
+                    style: const TextStyle(
+                        fontSize: AppConstants.fontSizeSubtitle),
+                  ),
+                ],
+              ),
+            ],
+
+            const SizedBox(height: AppConstants.spacingSmall),
+
+            // Actions
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton.icon(
+                  onPressed: onDuplicate,
+                  icon: const Icon(Icons.content_copy,
+                      size: AppConstants.iconSizeSmall),
+                  label: Text(
+                    AppLocalizations.of(context)
+                        .translate(AppStrings.duplicate),
+                    style:
+                        const TextStyle(fontSize: AppConstants.fontSizeSmall),
+                  ),
+                ),
+                if (isOpen) ...[
+                  const SizedBox(width: AppConstants.spacingSmall),
+                  TextButton.icon(
+                    onPressed: onDelete,
+                    icon: const Icon(Icons.delete,
+                        size: AppConstants.iconSizeSmall),
+                    label: Text(
+                      AppLocalizations.of(context).translate(AppStrings.delete),
+                      style:
+                          const TextStyle(fontSize: AppConstants.fontSizeSmall),
+                    ),
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppConstants.statusDanger,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ]),
         ),
       ),
     );

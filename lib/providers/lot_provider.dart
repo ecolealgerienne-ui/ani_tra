@@ -110,10 +110,15 @@ class LotProvider extends ChangeNotifier {
     );
 
     try {
+      debugPrint(
+          '📹 Creating lot: name=$name, farmId=$_authProvider.currentFarmId, type=$type');
       await _repository.create(lot, _authProvider.currentFarmId);
+      debugPrint('✅ Lot created in DB: ${lot.id}');
       _allLots.add(lot);
+      debugPrint('✅ Lot added to memory. Total: ${_allLots.length}');
       _activeLot = lot;
       notifyListeners();
+      debugPrint('✅ notifyListeners called');
       return lot;
     } catch (e) {
       debugPrint('❌ Error creating lot: $e');
@@ -162,6 +167,15 @@ class LotProvider extends ChangeNotifier {
     return true;
   }
 
+  // ==================== FIXE RACE CONDITION ====================
+  /// ✅ IMPORTANT: Mettre à jour _activeLot IMMÉDIATEMENT avant l'await
+  /// pour éviter la race condition lors des scans rapides
+  ///
+  /// Bug avant: Scans rapides → chaque scan lit _activeLot non-mis-à-jour
+  /// Résultat: Seul le dernier animal persiste
+  ///
+  /// Fix: Mettre à jour _activeLot PUIS sauvegarder en DB
+
   Future<bool> addAnimalToActiveLot(String animalId) async {
     final lot = _activeLot;
     if (lot == null || lot.completed) return false;
@@ -169,8 +183,27 @@ class LotProvider extends ChangeNotifier {
 
     final updatedIds = [...lot.animalIds, animalId];
     final updated = lot.copyWith(animalIds: updatedIds);
-    await updateLot(updated);
-    return true;
+
+    // ✅ ÉTAPE 1: Mettre à jour _activeLot IMMÉDIATEMENT
+    // avant l'await pour éviter la race condition lors des scans rapides
+    _activeLot = updated;
+    notifyListeners();
+
+    debugPrint(
+        '📱 Animal $animalId added to lot (mem). Total: ${updated.animalCount}');
+
+    // ✅ ÉTAPE 2: Puis sauvegarder en DB (peut prendre du temps)
+    try {
+      await updateLot(updated);
+      debugPrint('✅ Animal $animalId saved to DB');
+      return true;
+    } catch (e) {
+      // ✅ ÉTAPE 3: Si la sauvegarde échoue, rollback à l'état précédent
+      debugPrint('❌ Error saving animal $animalId to DB: $e');
+      _activeLot = lot;
+      notifyListeners();
+      return false;
+    }
   }
 
   Future<bool> removeAnimalFromActiveLot(String animalId) async {
@@ -180,8 +213,25 @@ class LotProvider extends ChangeNotifier {
 
     final updatedIds = lot.animalIds.where((id) => id != animalId).toList();
     final updated = lot.copyWith(animalIds: updatedIds);
-    await updateLot(updated);
-    return true;
+
+    // ✅ Mettre à jour _activeLot IMMÉDIATEMENT
+    _activeLot = updated;
+    notifyListeners();
+
+    debugPrint(
+        '📱 Animal $animalId removed from lot (mem). Total: ${updated.animalCount}');
+
+    try {
+      await updateLot(updated);
+      debugPrint('✅ Animal $animalId removal saved to DB');
+      return true;
+    } catch (e) {
+      // Revenir à l'état précédent si la sauvegarde échoue
+      debugPrint('❌ Error removing animal $animalId from DB: $e');
+      _activeLot = lot;
+      notifyListeners();
+      return false;
+    }
   }
 
   Future<bool> removeAnimalFromLot(String lotId, String animalId) async {

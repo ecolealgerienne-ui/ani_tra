@@ -15,13 +15,16 @@ class CampaignDao extends DatabaseAccessor<AppDatabase>
   Future<List<CampaignsTableData>> findAllByFarm(String farmId) {
     return (select(campaignsTable)
           ..where((t) => t.farmId.equals(farmId))
+          ..where((t) => t.deletedAt.isNull())
           ..orderBy([(t) => OrderingTerm.desc(t.campaignDate)]))
         .get();
   }
 
   // 2. Get campaign by ID
   Future<CampaignsTableData?> findById(String id) {
-    return (select(campaignsTable)..where((t) => t.id.equals(id)))
+    return (select(campaignsTable)
+          ..where((t) => t.id.equals(id))
+          ..where((t) => t.deletedAt.isNull()))
         .getSingleOrNull();
   }
 
@@ -29,6 +32,7 @@ class CampaignDao extends DatabaseAccessor<AppDatabase>
   Future<List<CampaignsTableData>> findActiveByFarm(String farmId) {
     return (select(campaignsTable)
           ..where((t) => t.farmId.equals(farmId) & t.completed.equals(false))
+          ..where((t) => t.deletedAt.isNull())
           ..orderBy([(t) => OrderingTerm.desc(t.campaignDate)]))
         .get();
   }
@@ -37,6 +41,7 @@ class CampaignDao extends DatabaseAccessor<AppDatabase>
   Future<List<CampaignsTableData>> findCompletedByFarm(String farmId) {
     return (select(campaignsTable)
           ..where((t) => t.farmId.equals(farmId) & t.completed.equals(true))
+          ..where((t) => t.deletedAt.isNull())
           ..orderBy([(t) => OrderingTerm.desc(t.campaignDate)]))
         .get();
   }
@@ -47,6 +52,7 @@ class CampaignDao extends DatabaseAccessor<AppDatabase>
     return (select(campaignsTable)
           ..where(
               (t) => t.farmId.equals(farmId) & t.productId.equals(productId))
+          ..where((t) => t.deletedAt.isNull())
           ..orderBy([(t) => OrderingTerm.desc(t.campaignDate)]))
         .get();
   }
@@ -57,6 +63,7 @@ class CampaignDao extends DatabaseAccessor<AppDatabase>
     return (select(campaignsTable)
           ..where((t) =>
               t.farmId.equals(farmId) & t.veterinarianId.equals(veterinarianId))
+          ..where((t) => t.deletedAt.isNull())
           ..orderBy([(t) => OrderingTerm.desc(t.campaignDate)]))
         .get();
   }
@@ -80,6 +87,7 @@ class CampaignDao extends DatabaseAccessor<AppDatabase>
               t.farmId.equals(farmId) &
               t.withdrawalEndDate.isSmallerOrEqualValue(beforeDate) &
               t.completed.equals(false))
+          ..where((t) => t.deletedAt.isNull())
           ..orderBy([(t) => OrderingTerm.asc(t.withdrawalEndDate)]))
         .get();
   }
@@ -92,6 +100,7 @@ class CampaignDao extends DatabaseAccessor<AppDatabase>
               t.farmId.equals(farmId) &
               t.campaignDate.isBiggerOrEqualValue(startDate) &
               t.campaignDate.isSmallerOrEqualValue(endDate))
+          ..where((t) => t.deletedAt.isNull())
           ..orderBy([(t) => OrderingTerm.desc(t.campaignDate)]))
         .get();
   }
@@ -106,9 +115,15 @@ class CampaignDao extends DatabaseAccessor<AppDatabase>
     return update(campaignsTable).replace(campaign);
   }
 
-  // 12. Delete campaign
-  Future<int> deleteCampaign(String id) {
-    return (delete(campaignsTable)..where((t) => t.id.equals(id))).go();
+  // 12. Soft-delete campaign (audit trail)
+  Future<int> softDelete(String id, String farmId) {
+    return (update(campaignsTable)
+          ..where((t) => t.id.equals(id))
+          ..where((t) => t.farmId.equals(farmId)))
+        .write(CampaignsTableCompanion(
+      deletedAt: Value(DateTime.now()),
+      updatedAt: Value(DateTime.now()),
+    ));
   }
 
   // 13. Mark campaign as completed
@@ -167,7 +182,8 @@ class CampaignDao extends DatabaseAccessor<AppDatabase>
   Future<int> countByFarm(String farmId) async {
     final query = selectOnly(campaignsTable)
       ..addColumns([campaignsTable.id.count()])
-      ..where(campaignsTable.farmId.equals(farmId));
+      ..where(campaignsTable.farmId.equals(farmId))
+      ..where(campaignsTable.deletedAt.isNull());
 
     final result = await query.getSingleOrNull();
     return result?.read(campaignsTable.id.count()) ?? 0;
@@ -178,7 +194,8 @@ class CampaignDao extends DatabaseAccessor<AppDatabase>
     final query = selectOnly(campaignsTable)
       ..addColumns([campaignsTable.id.count()])
       ..where(campaignsTable.farmId.equals(farmId) &
-          campaignsTable.completed.equals(false));
+          campaignsTable.completed.equals(false))
+      ..where(campaignsTable.deletedAt.isNull());
 
     final result = await query.getSingleOrNull();
     return result?.read(campaignsTable.id.count()) ?? 0;
@@ -189,7 +206,8 @@ class CampaignDao extends DatabaseAccessor<AppDatabase>
     final query = selectOnly(campaignsTable)
       ..addColumns([campaignsTable.id.count()])
       ..where(campaignsTable.farmId.equals(farmId) &
-          campaignsTable.productId.equals(productId));
+          campaignsTable.productId.equals(productId))
+      ..where(campaignsTable.deletedAt.isNull());
 
     final result = await query.getSingleOrNull();
     return result?.read(campaignsTable.id.count()) ?? 0;
@@ -199,6 +217,7 @@ class CampaignDao extends DatabaseAccessor<AppDatabase>
   Future<List<CampaignsTableData>> findUnsyncedByFarm(String farmId) {
     return (select(campaignsTable)
           ..where((t) => t.farmId.equals(farmId) & t.synced.equals(false))
+          ..where((t) => t.deletedAt.isNull())
           ..orderBy([(t) => OrderingTerm.asc(t.updatedAt)]))
         .get();
   }

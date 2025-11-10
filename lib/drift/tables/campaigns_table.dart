@@ -38,6 +38,9 @@ class CampaignsTable extends Table {
   DateTimeColumn get lastSyncedAt =>
       dateTime().nullable().named('last_synced_at')();
   TextColumn get serverVersion => text().nullable().named('server_version')();
+  
+  // Soft-delete (audit trail)
+  DateTimeColumn get deletedAt => dateTime().nullable().named('deleted_at')();
 
   @override
   Set<Column> get primaryKey => {id};

@@ -170,10 +170,7 @@ class AlertProvider extends ChangeNotifier {
     _alerts = newAlerts;
     notifyListeners();
 
-    debugPrint('🎯 Alertes recalculées : ${_alerts.length} alertes');
-    debugPrint('   🚨 Urgent: $urgentAlertCount');
-    debugPrint('   ⚠️ Important: $importantAlertCount');
-    debugPrint('   📋 Routine: ${routineAlerts.length}');
+    
   }
 
   /// Calculer alertes de rémanence

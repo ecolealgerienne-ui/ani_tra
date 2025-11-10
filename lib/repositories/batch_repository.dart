@@ -97,7 +97,7 @@ class BatchRepository {
       throw Exception('Batch not found or farm mismatch - Security violation');
     }
 
-    await _dao.deleteBatch(id);
+    await _dao.softDelete(id, farmId);
   }
 
   // ==================== Business Logic ====================

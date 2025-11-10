@@ -14,13 +14,16 @@ class BatchDao extends DatabaseAccessor<AppDatabase> with _$BatchDaoMixin {
   Future<List<BatchesTableData>> findAllByFarm(String farmId) {
     return (select(batchesTable)
           ..where((t) => t.farmId.equals(farmId))
+          ..where((t) => t.deletedAt.isNull())
           ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
         .get();
   }
 
   // 2. Get batch by ID
   Future<BatchesTableData?> findById(String id) {
-    return (select(batchesTable)..where((t) => t.id.equals(id)))
+    return (select(batchesTable)
+          ..where((t) => t.id.equals(id))
+          ..where((t) => t.deletedAt.isNull()))
         .getSingleOrNull();
   }
 
@@ -28,6 +31,7 @@ class BatchDao extends DatabaseAccessor<AppDatabase> with _$BatchDaoMixin {
   Future<List<BatchesTableData>> findActiveByFarm(String farmId) {
     return (select(batchesTable)
           ..where((t) => t.farmId.equals(farmId) & t.completed.equals(false))
+          ..where((t) => t.deletedAt.isNull())
           ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
         .get();
   }
@@ -36,6 +40,7 @@ class BatchDao extends DatabaseAccessor<AppDatabase> with _$BatchDaoMixin {
   Future<List<BatchesTableData>> findCompletedByFarm(String farmId) {
     return (select(batchesTable)
           ..where((t) => t.farmId.equals(farmId) & t.completed.equals(true))
+          ..where((t) => t.deletedAt.isNull())
           ..orderBy([(t) => OrderingTerm.desc(t.usedAt)]))
         .get();
   }
@@ -45,6 +50,7 @@ class BatchDao extends DatabaseAccessor<AppDatabase> with _$BatchDaoMixin {
       String purpose, String farmId) {
     return (select(batchesTable)
           ..where((t) => t.farmId.equals(farmId) & t.purpose.equals(purpose))
+          ..where((t) => t.deletedAt.isNull())
           ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
         .get();
   }
@@ -70,9 +76,15 @@ class BatchDao extends DatabaseAccessor<AppDatabase> with _$BatchDaoMixin {
     return update(batchesTable).replace(batch);
   }
 
-  // 9. Delete batch
-  Future<int> deleteBatch(String id) {
-    return (delete(batchesTable)..where((t) => t.id.equals(id))).go();
+  // 9. Soft-delete batch (audit trail)
+  Future<int> softDelete(String id, String farmId) {
+    return (update(batchesTable)
+          ..where((t) => t.id.equals(id))
+          ..where((t) => t.farmId.equals(farmId)))
+        .write(BatchesTableCompanion(
+      deletedAt: Value(DateTime.now()),
+      updatedAt: Value(DateTime.now()),
+    ));
   }
 
   // 10. Mark batch as completed
@@ -129,7 +141,8 @@ class BatchDao extends DatabaseAccessor<AppDatabase> with _$BatchDaoMixin {
   Future<int> countByFarm(String farmId) async {
     final query = selectOnly(batchesTable)
       ..addColumns([batchesTable.id.count()])
-      ..where(batchesTable.farmId.equals(farmId));
+      ..where(batchesTable.farmId.equals(farmId))
+      ..where(batchesTable.deletedAt.isNull());
 
     final result = await query.getSingleOrNull();
     return result?.read(batchesTable.id.count()) ?? 0;
@@ -140,7 +153,8 @@ class BatchDao extends DatabaseAccessor<AppDatabase> with _$BatchDaoMixin {
     final query = selectOnly(batchesTable)
       ..addColumns([batchesTable.id.count()])
       ..where(batchesTable.farmId.equals(farmId) &
-          batchesTable.completed.equals(false));
+          batchesTable.completed.equals(false))
+      ..where(batchesTable.deletedAt.isNull());
 
     final result = await query.getSingleOrNull();
     return result?.read(batchesTable.id.count()) ?? 0;
@@ -150,6 +164,7 @@ class BatchDao extends DatabaseAccessor<AppDatabase> with _$BatchDaoMixin {
   Future<List<BatchesTableData>> findUnsyncedByFarm(String farmId) {
     return (select(batchesTable)
           ..where((t) => t.farmId.equals(farmId) & t.synced.equals(false))
+          ..where((t) => t.deletedAt.isNull())
           ..orderBy([(t) => OrderingTerm.asc(t.updatedAt)]))
         .get();
   }

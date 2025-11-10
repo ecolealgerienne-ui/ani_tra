@@ -119,7 +119,7 @@ class CampaignRepository {
           'Campaign not found or farm mismatch - Security violation');
     }
 
-    await _dao.deleteCampaign(id);
+    await _dao.softDelete(id, farmId);
   }
 
   // ==================== Business Logic ====================

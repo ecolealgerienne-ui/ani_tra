@@ -282,7 +282,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
   }
 
   /// Sauvegarder l'acte médical
-  Future<void> _saveAct() async {
+  Future<bool> _saveAct() async {
     if (_selectedProduct == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -291,7 +291,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
           backgroundColor: Colors.red,
         ),
       );
-      return;
+      return false;
     }
 
     // Valider le dosage uniquement pour les animaux individuels
@@ -306,7 +306,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
             backgroundColor: Colors.red,
           ),
         );
-        return;
+        return false;
       }
       dose = parsedDose;
     } else {
@@ -425,8 +425,10 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
           backgroundColor: Colors.green,
         ),
       );
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(true);
+      return true;
     }
+    return false;
   }
 
   @override

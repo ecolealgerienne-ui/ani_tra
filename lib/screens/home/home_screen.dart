@@ -17,7 +17,7 @@ import '../../models/alert_type.dart';
 
 import '../animal/animal_list_screen.dart';
 import '../animal/animal_detail_screen.dart';
-import '../animal/animal_finder_screen.dart';
+//import '../animal/animal_finder_screen.dart';
 import '../lot/lot_list_screen.dart';
 import '../settings/settings_screen.dart';
 import '../alert/alerts_screen.dart';
@@ -277,34 +277,34 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       // FAB Scanner
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          final animal = await Navigator.push<Animal>(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AnimalFinderScreen(
-                mode: AnimalFinderMode.single,
-                title: AppLocalizations.of(context)
-                    .translate(AppStrings.identifyAnimal),
-              ),
-            ),
-          );
+      // floatingActionButton: FloatingActionButton.extended(
+      //   onPressed: () async {
+      //     final animal = await Navigator.push<Animal>(
+      //       context,
+      //       MaterialPageRoute(
+      //         builder: (context) => AnimalFinderScreen(
+      //           mode: AnimalFinderMode.single,
+      //           title: AppLocalizations.of(context)
+      //               .translate(AppStrings.identifyAnimal),
+      //         ),
+      //       ),
+      //     );
 
-          if (!mounted) return;
-          if (animal != null) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AnimalDetailScreen(
-                  preloadedAnimal: animal,
-                ),
-              ),
-            );
-          }
-        },
-        icon: const Icon(Icons.qr_code_scanner),
-        label: Text(AppLocalizations.of(context).translate(AppStrings.scanner)),
-      ),
+      //     if (!mounted) return;
+      //     if (animal != null) {
+      //       Navigator.push(
+      //         context,
+      //         MaterialPageRoute(
+      //           builder: (context) => AnimalDetailScreen(
+      //             preloadedAnimal: animal,
+      //           ),
+      //         ),
+      //       );
+      //     }
+      //   },
+      //   icon: const Icon(Icons.qr_code_scanner),
+      //   label: Text(AppLocalizations.of(context).translate(AppStrings.scanner)),
+      // ),
     );
   }
 

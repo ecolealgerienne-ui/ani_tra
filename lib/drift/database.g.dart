@@ -49,6 +49,16 @@ class $FarmsTableTable extends FarmsTable
   late final GeneratedColumn<String> groupName = GeneratedColumn<String>(
       'group_name', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _isDefaultMeta =
+      const VerificationMeta('isDefault');
+  @override
+  late final GeneratedColumn<bool> isDefault = GeneratedColumn<bool>(
+      'is_default', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_default" IN (0, 1))'),
+      defaultValue: const Constant(false));
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -70,6 +80,7 @@ class $FarmsTableTable extends FarmsTable
         cheptelNumber,
         groupId,
         groupName,
+        isDefault,
         createdAt,
         updatedAt
       ];
@@ -120,6 +131,10 @@ class $FarmsTableTable extends FarmsTable
       context.handle(_groupNameMeta,
           groupName.isAcceptableOrUnknown(data['group_name']!, _groupNameMeta));
     }
+    if (data.containsKey('is_default')) {
+      context.handle(_isDefaultMeta,
+          isDefault.isAcceptableOrUnknown(data['is_default']!, _isDefaultMeta));
+    }
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
@@ -155,6 +170,8 @@ class $FarmsTableTable extends FarmsTable
           .read(DriftSqlType.string, data['${effectivePrefix}group_id']),
       groupName: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}group_name']),
+      isDefault: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_default'])!,
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
@@ -176,6 +193,7 @@ class FarmsTableData extends DataClass implements Insertable<FarmsTableData> {
   final String? cheptelNumber;
   final String? groupId;
   final String? groupName;
+  final bool isDefault;
   final DateTime createdAt;
   final DateTime updatedAt;
   const FarmsTableData(
@@ -186,6 +204,7 @@ class FarmsTableData extends DataClass implements Insertable<FarmsTableData> {
       this.cheptelNumber,
       this.groupId,
       this.groupName,
+      required this.isDefault,
       required this.createdAt,
       required this.updatedAt});
   @override
@@ -204,6 +223,7 @@ class FarmsTableData extends DataClass implements Insertable<FarmsTableData> {
     if (!nullToAbsent || groupName != null) {
       map['group_name'] = Variable<String>(groupName);
     }
+    map['is_default'] = Variable<bool>(isDefault);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
@@ -224,6 +244,7 @@ class FarmsTableData extends DataClass implements Insertable<FarmsTableData> {
       groupName: groupName == null && nullToAbsent
           ? const Value.absent()
           : Value(groupName),
+      isDefault: Value(isDefault),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -240,6 +261,7 @@ class FarmsTableData extends DataClass implements Insertable<FarmsTableData> {
       cheptelNumber: serializer.fromJson<String?>(json['cheptelNumber']),
       groupId: serializer.fromJson<String?>(json['groupId']),
       groupName: serializer.fromJson<String?>(json['groupName']),
+      isDefault: serializer.fromJson<bool>(json['isDefault']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -255,6 +277,7 @@ class FarmsTableData extends DataClass implements Insertable<FarmsTableData> {
       'cheptelNumber': serializer.toJson<String?>(cheptelNumber),
       'groupId': serializer.toJson<String?>(groupId),
       'groupName': serializer.toJson<String?>(groupName),
+      'isDefault': serializer.toJson<bool>(isDefault),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
@@ -268,6 +291,7 @@ class FarmsTableData extends DataClass implements Insertable<FarmsTableData> {
           Value<String?> cheptelNumber = const Value.absent(),
           Value<String?> groupId = const Value.absent(),
           Value<String?> groupName = const Value.absent(),
+          bool? isDefault,
           DateTime? createdAt,
           DateTime? updatedAt}) =>
       FarmsTableData(
@@ -279,6 +303,7 @@ class FarmsTableData extends DataClass implements Insertable<FarmsTableData> {
             cheptelNumber.present ? cheptelNumber.value : this.cheptelNumber,
         groupId: groupId.present ? groupId.value : this.groupId,
         groupName: groupName.present ? groupName.value : this.groupName,
+        isDefault: isDefault ?? this.isDefault,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
       );
@@ -293,6 +318,7 @@ class FarmsTableData extends DataClass implements Insertable<FarmsTableData> {
           : this.cheptelNumber,
       groupId: data.groupId.present ? data.groupId.value : this.groupId,
       groupName: data.groupName.present ? data.groupName.value : this.groupName,
+      isDefault: data.isDefault.present ? data.isDefault.value : this.isDefault,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -308,6 +334,7 @@ class FarmsTableData extends DataClass implements Insertable<FarmsTableData> {
           ..write('cheptelNumber: $cheptelNumber, ')
           ..write('groupId: $groupId, ')
           ..write('groupName: $groupName, ')
+          ..write('isDefault: $isDefault, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -316,7 +343,7 @@ class FarmsTableData extends DataClass implements Insertable<FarmsTableData> {
 
   @override
   int get hashCode => Object.hash(id, name, location, ownerId, cheptelNumber,
-      groupId, groupName, createdAt, updatedAt);
+      groupId, groupName, isDefault, createdAt, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -328,6 +355,7 @@ class FarmsTableData extends DataClass implements Insertable<FarmsTableData> {
           other.cheptelNumber == this.cheptelNumber &&
           other.groupId == this.groupId &&
           other.groupName == this.groupName &&
+          other.isDefault == this.isDefault &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -340,6 +368,7 @@ class FarmsTableCompanion extends UpdateCompanion<FarmsTableData> {
   final Value<String?> cheptelNumber;
   final Value<String?> groupId;
   final Value<String?> groupName;
+  final Value<bool> isDefault;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
@@ -351,6 +380,7 @@ class FarmsTableCompanion extends UpdateCompanion<FarmsTableData> {
     this.cheptelNumber = const Value.absent(),
     this.groupId = const Value.absent(),
     this.groupName = const Value.absent(),
+    this.isDefault = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -363,6 +393,7 @@ class FarmsTableCompanion extends UpdateCompanion<FarmsTableData> {
     this.cheptelNumber = const Value.absent(),
     this.groupId = const Value.absent(),
     this.groupName = const Value.absent(),
+    this.isDefault = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
@@ -380,6 +411,7 @@ class FarmsTableCompanion extends UpdateCompanion<FarmsTableData> {
     Expression<String>? cheptelNumber,
     Expression<String>? groupId,
     Expression<String>? groupName,
+    Expression<bool>? isDefault,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
@@ -392,6 +424,7 @@ class FarmsTableCompanion extends UpdateCompanion<FarmsTableData> {
       if (cheptelNumber != null) 'cheptel_number': cheptelNumber,
       if (groupId != null) 'group_id': groupId,
       if (groupName != null) 'group_name': groupName,
+      if (isDefault != null) 'is_default': isDefault,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
@@ -406,6 +439,7 @@ class FarmsTableCompanion extends UpdateCompanion<FarmsTableData> {
       Value<String?>? cheptelNumber,
       Value<String?>? groupId,
       Value<String?>? groupName,
+      Value<bool>? isDefault,
       Value<DateTime>? createdAt,
       Value<DateTime>? updatedAt,
       Value<int>? rowid}) {
@@ -417,6 +451,7 @@ class FarmsTableCompanion extends UpdateCompanion<FarmsTableData> {
       cheptelNumber: cheptelNumber ?? this.cheptelNumber,
       groupId: groupId ?? this.groupId,
       groupName: groupName ?? this.groupName,
+      isDefault: isDefault ?? this.isDefault,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
@@ -447,6 +482,9 @@ class FarmsTableCompanion extends UpdateCompanion<FarmsTableData> {
     if (groupName.present) {
       map['group_name'] = Variable<String>(groupName.value);
     }
+    if (isDefault.present) {
+      map['is_default'] = Variable<bool>(isDefault.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -469,6 +507,7 @@ class FarmsTableCompanion extends UpdateCompanion<FarmsTableData> {
           ..write('cheptelNumber: $cheptelNumber, ')
           ..write('groupId: $groupId, ')
           ..write('groupName: $groupName, ')
+          ..write('isDefault: $isDefault, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
@@ -11870,6 +11909,12 @@ class $BatchesTableTable extends BatchesTable
   late final GeneratedColumn<String> serverVersion = GeneratedColumn<String>(
       'server_version', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _deletedAtMeta =
+      const VerificationMeta('deletedAt');
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+      'deleted_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -11884,7 +11929,8 @@ class $BatchesTableTable extends BatchesTable
         createdAt,
         updatedAt,
         lastSyncedAt,
-        serverVersion
+        serverVersion,
+        deletedAt
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -11967,6 +12013,10 @@ class $BatchesTableTable extends BatchesTable
           serverVersion.isAcceptableOrUnknown(
               data['server_version']!, _serverVersionMeta));
     }
+    if (data.containsKey('deleted_at')) {
+      context.handle(_deletedAtMeta,
+          deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta));
+    }
     return context;
   }
 
@@ -12002,6 +12052,8 @@ class $BatchesTableTable extends BatchesTable
           DriftSqlType.dateTime, data['${effectivePrefix}last_synced_at']),
       serverVersion: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}server_version']),
+      deletedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}deleted_at']),
     );
   }
 
@@ -12026,6 +12078,7 @@ class BatchesTableData extends DataClass
   final DateTime updatedAt;
   final DateTime? lastSyncedAt;
   final String? serverVersion;
+  final DateTime? deletedAt;
   const BatchesTableData(
       {required this.id,
       required this.farmId,
@@ -12039,7 +12092,8 @@ class BatchesTableData extends DataClass
       required this.createdAt,
       required this.updatedAt,
       this.lastSyncedAt,
-      this.serverVersion});
+      this.serverVersion,
+      this.deletedAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -12063,6 +12117,9 @@ class BatchesTableData extends DataClass
     }
     if (!nullToAbsent || serverVersion != null) {
       map['server_version'] = Variable<String>(serverVersion);
+    }
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
     }
     return map;
   }
@@ -12088,6 +12145,9 @@ class BatchesTableData extends DataClass
       serverVersion: serverVersion == null && nullToAbsent
           ? const Value.absent()
           : Value(serverVersion),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
     );
   }
 
@@ -12108,6 +12168,7 @@ class BatchesTableData extends DataClass
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       lastSyncedAt: serializer.fromJson<DateTime?>(json['lastSyncedAt']),
       serverVersion: serializer.fromJson<String?>(json['serverVersion']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
     );
   }
   @override
@@ -12127,6 +12188,7 @@ class BatchesTableData extends DataClass
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'lastSyncedAt': serializer.toJson<DateTime?>(lastSyncedAt),
       'serverVersion': serializer.toJson<String?>(serverVersion),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
     };
   }
 
@@ -12143,7 +12205,8 @@ class BatchesTableData extends DataClass
           DateTime? createdAt,
           DateTime? updatedAt,
           Value<DateTime?> lastSyncedAt = const Value.absent(),
-          Value<String?> serverVersion = const Value.absent()}) =>
+          Value<String?> serverVersion = const Value.absent(),
+          Value<DateTime?> deletedAt = const Value.absent()}) =>
       BatchesTableData(
         id: id ?? this.id,
         farmId: farmId ?? this.farmId,
@@ -12160,6 +12223,7 @@ class BatchesTableData extends DataClass
             lastSyncedAt.present ? lastSyncedAt.value : this.lastSyncedAt,
         serverVersion:
             serverVersion.present ? serverVersion.value : this.serverVersion,
+        deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
       );
   BatchesTableData copyWithCompanion(BatchesTableCompanion data) {
     return BatchesTableData(
@@ -12182,6 +12246,7 @@ class BatchesTableData extends DataClass
       serverVersion: data.serverVersion.present
           ? data.serverVersion.value
           : this.serverVersion,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
     );
   }
 
@@ -12200,7 +12265,8 @@ class BatchesTableData extends DataClass
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('lastSyncedAt: $lastSyncedAt, ')
-          ..write('serverVersion: $serverVersion')
+          ..write('serverVersion: $serverVersion, ')
+          ..write('deletedAt: $deletedAt')
           ..write(')'))
         .toString();
   }
@@ -12219,7 +12285,8 @@ class BatchesTableData extends DataClass
       createdAt,
       updatedAt,
       lastSyncedAt,
-      serverVersion);
+      serverVersion,
+      deletedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -12236,7 +12303,8 @@ class BatchesTableData extends DataClass
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.lastSyncedAt == this.lastSyncedAt &&
-          other.serverVersion == this.serverVersion);
+          other.serverVersion == this.serverVersion &&
+          other.deletedAt == this.deletedAt);
 }
 
 class BatchesTableCompanion extends UpdateCompanion<BatchesTableData> {
@@ -12253,6 +12321,7 @@ class BatchesTableCompanion extends UpdateCompanion<BatchesTableData> {
   final Value<DateTime> updatedAt;
   final Value<DateTime?> lastSyncedAt;
   final Value<String?> serverVersion;
+  final Value<DateTime?> deletedAt;
   final Value<int> rowid;
   const BatchesTableCompanion({
     this.id = const Value.absent(),
@@ -12268,6 +12337,7 @@ class BatchesTableCompanion extends UpdateCompanion<BatchesTableData> {
     this.updatedAt = const Value.absent(),
     this.lastSyncedAt = const Value.absent(),
     this.serverVersion = const Value.absent(),
+    this.deletedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   BatchesTableCompanion.insert({
@@ -12284,6 +12354,7 @@ class BatchesTableCompanion extends UpdateCompanion<BatchesTableData> {
     required DateTime updatedAt,
     this.lastSyncedAt = const Value.absent(),
     this.serverVersion = const Value.absent(),
+    this.deletedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : id = Value(id),
         farmId = Value(farmId),
@@ -12306,6 +12377,7 @@ class BatchesTableCompanion extends UpdateCompanion<BatchesTableData> {
     Expression<DateTime>? updatedAt,
     Expression<DateTime>? lastSyncedAt,
     Expression<String>? serverVersion,
+    Expression<DateTime>? deletedAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -12322,6 +12394,7 @@ class BatchesTableCompanion extends UpdateCompanion<BatchesTableData> {
       if (updatedAt != null) 'updated_at': updatedAt,
       if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
       if (serverVersion != null) 'server_version': serverVersion,
+      if (deletedAt != null) 'deleted_at': deletedAt,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -12340,6 +12413,7 @@ class BatchesTableCompanion extends UpdateCompanion<BatchesTableData> {
       Value<DateTime>? updatedAt,
       Value<DateTime?>? lastSyncedAt,
       Value<String?>? serverVersion,
+      Value<DateTime?>? deletedAt,
       Value<int>? rowid}) {
     return BatchesTableCompanion(
       id: id ?? this.id,
@@ -12355,6 +12429,7 @@ class BatchesTableCompanion extends UpdateCompanion<BatchesTableData> {
       updatedAt: updatedAt ?? this.updatedAt,
       lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
       serverVersion: serverVersion ?? this.serverVersion,
+      deletedAt: deletedAt ?? this.deletedAt,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -12401,6 +12476,9 @@ class BatchesTableCompanion extends UpdateCompanion<BatchesTableData> {
     if (serverVersion.present) {
       map['server_version'] = Variable<String>(serverVersion.value);
     }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -12423,6 +12501,7 @@ class BatchesTableCompanion extends UpdateCompanion<BatchesTableData> {
           ..write('updatedAt: $updatedAt, ')
           ..write('lastSyncedAt: $lastSyncedAt, ')
           ..write('serverVersion: $serverVersion, ')
+          ..write('deletedAt: $deletedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -12599,6 +12678,12 @@ class $LotsTableTable extends LotsTable
   late final GeneratedColumn<String> serverVersion = GeneratedColumn<String>(
       'server_version', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _deletedAtMeta =
+      const VerificationMeta('deletedAt');
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+      'deleted_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -12627,7 +12712,8 @@ class $LotsTableTable extends LotsTable
         createdAt,
         updatedAt,
         lastSyncedAt,
-        serverVersion
+        serverVersion,
+        deletedAt
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -12788,6 +12874,10 @@ class $LotsTableTable extends LotsTable
           serverVersion.isAcceptableOrUnknown(
               data['server_version']!, _serverVersionMeta));
     }
+    if (data.containsKey('deleted_at')) {
+      context.handle(_deletedAtMeta,
+          deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta));
+    }
     return context;
   }
 
@@ -12851,6 +12941,8 @@ class $LotsTableTable extends LotsTable
           DriftSqlType.dateTime, data['${effectivePrefix}last_synced_at']),
       serverVersion: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}server_version']),
+      deletedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}deleted_at']),
     );
   }
 
@@ -12888,6 +12980,7 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
   final DateTime updatedAt;
   final DateTime? lastSyncedAt;
   final String? serverVersion;
+  final DateTime? deletedAt;
   const LotsTableData(
       {required this.id,
       required this.farmId,
@@ -12915,7 +13008,8 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
       required this.createdAt,
       required this.updatedAt,
       this.lastSyncedAt,
-      this.serverVersion});
+      this.serverVersion,
+      this.deletedAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -12984,6 +13078,9 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
     if (!nullToAbsent || serverVersion != null) {
       map['server_version'] = Variable<String>(serverVersion);
     }
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
     return map;
   }
 
@@ -13051,6 +13148,9 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
       serverVersion: serverVersion == null && nullToAbsent
           ? const Value.absent()
           : Value(serverVersion),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
     );
   }
 
@@ -13087,6 +13187,7 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       lastSyncedAt: serializer.fromJson<DateTime?>(json['lastSyncedAt']),
       serverVersion: serializer.fromJson<String?>(json['serverVersion']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
     );
   }
   @override
@@ -13120,6 +13221,7 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'lastSyncedAt': serializer.toJson<DateTime?>(lastSyncedAt),
       'serverVersion': serializer.toJson<String?>(serverVersion),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
     };
   }
 
@@ -13150,7 +13252,8 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
           DateTime? createdAt,
           DateTime? updatedAt,
           Value<DateTime?> lastSyncedAt = const Value.absent(),
-          Value<String?> serverVersion = const Value.absent()}) =>
+          Value<String?> serverVersion = const Value.absent(),
+          Value<DateTime?> deletedAt = const Value.absent()}) =>
       LotsTableData(
         id: id ?? this.id,
         farmId: farmId ?? this.farmId,
@@ -13193,6 +13296,7 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
             lastSyncedAt.present ? lastSyncedAt.value : this.lastSyncedAt,
         serverVersion:
             serverVersion.present ? serverVersion.value : this.serverVersion,
+        deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
       );
   LotsTableData copyWithCompanion(LotsTableCompanion data) {
     return LotsTableData(
@@ -13249,6 +13353,7 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
       serverVersion: data.serverVersion.present
           ? data.serverVersion.value
           : this.serverVersion,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
     );
   }
 
@@ -13281,7 +13386,8 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('lastSyncedAt: $lastSyncedAt, ')
-          ..write('serverVersion: $serverVersion')
+          ..write('serverVersion: $serverVersion, ')
+          ..write('deletedAt: $deletedAt')
           ..write(')'))
         .toString();
   }
@@ -13314,7 +13420,8 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
         createdAt,
         updatedAt,
         lastSyncedAt,
-        serverVersion
+        serverVersion,
+        deletedAt
       ]);
   @override
   bool operator ==(Object other) =>
@@ -13346,7 +13453,8 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.lastSyncedAt == this.lastSyncedAt &&
-          other.serverVersion == this.serverVersion);
+          other.serverVersion == this.serverVersion &&
+          other.deletedAt == this.deletedAt);
 }
 
 class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
@@ -13377,6 +13485,7 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
   final Value<DateTime> updatedAt;
   final Value<DateTime?> lastSyncedAt;
   final Value<String?> serverVersion;
+  final Value<DateTime?> deletedAt;
   final Value<int> rowid;
   const LotsTableCompanion({
     this.id = const Value.absent(),
@@ -13406,6 +13515,7 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
     this.updatedAt = const Value.absent(),
     this.lastSyncedAt = const Value.absent(),
     this.serverVersion = const Value.absent(),
+    this.deletedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   LotsTableCompanion.insert({
@@ -13436,6 +13546,7 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
     required DateTime updatedAt,
     this.lastSyncedAt = const Value.absent(),
     this.serverVersion = const Value.absent(),
+    this.deletedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : id = Value(id),
         farmId = Value(farmId),
@@ -13471,6 +13582,7 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
     Expression<DateTime>? updatedAt,
     Expression<DateTime>? lastSyncedAt,
     Expression<String>? serverVersion,
+    Expression<DateTime>? deletedAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -13501,6 +13613,7 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
       if (updatedAt != null) 'updated_at': updatedAt,
       if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
       if (serverVersion != null) 'server_version': serverVersion,
+      if (deletedAt != null) 'deleted_at': deletedAt,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -13533,6 +13646,7 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
       Value<DateTime>? updatedAt,
       Value<DateTime?>? lastSyncedAt,
       Value<String?>? serverVersion,
+      Value<DateTime?>? deletedAt,
       Value<int>? rowid}) {
     return LotsTableCompanion(
       id: id ?? this.id,
@@ -13562,6 +13676,7 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
       updatedAt: updatedAt ?? this.updatedAt,
       lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
       serverVersion: serverVersion ?? this.serverVersion,
+      deletedAt: deletedAt ?? this.deletedAt,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -13650,6 +13765,9 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
     if (serverVersion.present) {
       map['server_version'] = Variable<String>(serverVersion.value);
     }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -13686,6 +13804,7 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
           ..write('updatedAt: $updatedAt, ')
           ..write('lastSyncedAt: $lastSyncedAt, ')
           ..write('serverVersion: $serverVersion, ')
+          ..write('deletedAt: $deletedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -13798,6 +13917,12 @@ class $CampaignsTableTable extends CampaignsTable
   late final GeneratedColumn<String> serverVersion = GeneratedColumn<String>(
       'server_version', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _deletedAtMeta =
+      const VerificationMeta('deletedAt');
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+      'deleted_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -13815,7 +13940,8 @@ class $CampaignsTableTable extends CampaignsTable
         createdAt,
         updatedAt,
         lastSyncedAt,
-        serverVersion
+        serverVersion,
+        deletedAt
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -13926,6 +14052,10 @@ class $CampaignsTableTable extends CampaignsTable
           serverVersion.isAcceptableOrUnknown(
               data['server_version']!, _serverVersionMeta));
     }
+    if (data.containsKey('deleted_at')) {
+      context.handle(_deletedAtMeta,
+          deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta));
+    }
     return context;
   }
 
@@ -13968,6 +14098,8 @@ class $CampaignsTableTable extends CampaignsTable
           DriftSqlType.dateTime, data['${effectivePrefix}last_synced_at']),
       serverVersion: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}server_version']),
+      deletedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}deleted_at']),
     );
   }
 
@@ -13995,6 +14127,7 @@ class CampaignsTableData extends DataClass
   final DateTime updatedAt;
   final DateTime? lastSyncedAt;
   final String? serverVersion;
+  final DateTime? deletedAt;
   const CampaignsTableData(
       {required this.id,
       required this.farmId,
@@ -14011,7 +14144,8 @@ class CampaignsTableData extends DataClass
       required this.createdAt,
       required this.updatedAt,
       this.lastSyncedAt,
-      this.serverVersion});
+      this.serverVersion,
+      this.deletedAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -14038,6 +14172,9 @@ class CampaignsTableData extends DataClass
     }
     if (!nullToAbsent || serverVersion != null) {
       map['server_version'] = Variable<String>(serverVersion);
+    }
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
     }
     return map;
   }
@@ -14068,6 +14205,9 @@ class CampaignsTableData extends DataClass
       serverVersion: serverVersion == null && nullToAbsent
           ? const Value.absent()
           : Value(serverVersion),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
     );
   }
 
@@ -14092,6 +14232,7 @@ class CampaignsTableData extends DataClass
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       lastSyncedAt: serializer.fromJson<DateTime?>(json['lastSyncedAt']),
       serverVersion: serializer.fromJson<String?>(json['serverVersion']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
     );
   }
   @override
@@ -14114,6 +14255,7 @@ class CampaignsTableData extends DataClass
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'lastSyncedAt': serializer.toJson<DateTime?>(lastSyncedAt),
       'serverVersion': serializer.toJson<String?>(serverVersion),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
     };
   }
 
@@ -14133,7 +14275,8 @@ class CampaignsTableData extends DataClass
           DateTime? createdAt,
           DateTime? updatedAt,
           Value<DateTime?> lastSyncedAt = const Value.absent(),
-          Value<String?> serverVersion = const Value.absent()}) =>
+          Value<String?> serverVersion = const Value.absent(),
+          Value<DateTime?> deletedAt = const Value.absent()}) =>
       CampaignsTableData(
         id: id ?? this.id,
         farmId: farmId ?? this.farmId,
@@ -14156,6 +14299,7 @@ class CampaignsTableData extends DataClass
             lastSyncedAt.present ? lastSyncedAt.value : this.lastSyncedAt,
         serverVersion:
             serverVersion.present ? serverVersion.value : this.serverVersion,
+        deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
       );
   CampaignsTableData copyWithCompanion(CampaignsTableCompanion data) {
     return CampaignsTableData(
@@ -14190,6 +14334,7 @@ class CampaignsTableData extends DataClass
       serverVersion: data.serverVersion.present
           ? data.serverVersion.value
           : this.serverVersion,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
     );
   }
 
@@ -14211,7 +14356,8 @@ class CampaignsTableData extends DataClass
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('lastSyncedAt: $lastSyncedAt, ')
-          ..write('serverVersion: $serverVersion')
+          ..write('serverVersion: $serverVersion, ')
+          ..write('deletedAt: $deletedAt')
           ..write(')'))
         .toString();
   }
@@ -14233,7 +14379,8 @@ class CampaignsTableData extends DataClass
       createdAt,
       updatedAt,
       lastSyncedAt,
-      serverVersion);
+      serverVersion,
+      deletedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -14253,7 +14400,8 @@ class CampaignsTableData extends DataClass
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.lastSyncedAt == this.lastSyncedAt &&
-          other.serverVersion == this.serverVersion);
+          other.serverVersion == this.serverVersion &&
+          other.deletedAt == this.deletedAt);
 }
 
 class CampaignsTableCompanion extends UpdateCompanion<CampaignsTableData> {
@@ -14273,6 +14421,7 @@ class CampaignsTableCompanion extends UpdateCompanion<CampaignsTableData> {
   final Value<DateTime> updatedAt;
   final Value<DateTime?> lastSyncedAt;
   final Value<String?> serverVersion;
+  final Value<DateTime?> deletedAt;
   final Value<int> rowid;
   const CampaignsTableCompanion({
     this.id = const Value.absent(),
@@ -14291,6 +14440,7 @@ class CampaignsTableCompanion extends UpdateCompanion<CampaignsTableData> {
     this.updatedAt = const Value.absent(),
     this.lastSyncedAt = const Value.absent(),
     this.serverVersion = const Value.absent(),
+    this.deletedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   CampaignsTableCompanion.insert({
@@ -14310,6 +14460,7 @@ class CampaignsTableCompanion extends UpdateCompanion<CampaignsTableData> {
     required DateTime updatedAt,
     this.lastSyncedAt = const Value.absent(),
     this.serverVersion = const Value.absent(),
+    this.deletedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : id = Value(id),
         farmId = Value(farmId),
@@ -14338,6 +14489,7 @@ class CampaignsTableCompanion extends UpdateCompanion<CampaignsTableData> {
     Expression<DateTime>? updatedAt,
     Expression<DateTime>? lastSyncedAt,
     Expression<String>? serverVersion,
+    Expression<DateTime>? deletedAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -14357,6 +14509,7 @@ class CampaignsTableCompanion extends UpdateCompanion<CampaignsTableData> {
       if (updatedAt != null) 'updated_at': updatedAt,
       if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
       if (serverVersion != null) 'server_version': serverVersion,
+      if (deletedAt != null) 'deleted_at': deletedAt,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -14378,6 +14531,7 @@ class CampaignsTableCompanion extends UpdateCompanion<CampaignsTableData> {
       Value<DateTime>? updatedAt,
       Value<DateTime?>? lastSyncedAt,
       Value<String?>? serverVersion,
+      Value<DateTime?>? deletedAt,
       Value<int>? rowid}) {
     return CampaignsTableCompanion(
       id: id ?? this.id,
@@ -14396,6 +14550,7 @@ class CampaignsTableCompanion extends UpdateCompanion<CampaignsTableData> {
       updatedAt: updatedAt ?? this.updatedAt,
       lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
       serverVersion: serverVersion ?? this.serverVersion,
+      deletedAt: deletedAt ?? this.deletedAt,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -14451,6 +14606,9 @@ class CampaignsTableCompanion extends UpdateCompanion<CampaignsTableData> {
     if (serverVersion.present) {
       map['server_version'] = Variable<String>(serverVersion.value);
     }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -14476,6 +14634,7 @@ class CampaignsTableCompanion extends UpdateCompanion<CampaignsTableData> {
           ..write('updatedAt: $updatedAt, ')
           ..write('lastSyncedAt: $lastSyncedAt, ')
           ..write('serverVersion: $serverVersion, ')
+          ..write('deletedAt: $deletedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -14556,6 +14715,7 @@ typedef $$FarmsTableTableCreateCompanionBuilder = FarmsTableCompanion Function({
   Value<String?> cheptelNumber,
   Value<String?> groupId,
   Value<String?> groupName,
+  Value<bool> isDefault,
   required DateTime createdAt,
   required DateTime updatedAt,
   Value<int> rowid,
@@ -14568,6 +14728,7 @@ typedef $$FarmsTableTableUpdateCompanionBuilder = FarmsTableCompanion Function({
   Value<String?> cheptelNumber,
   Value<String?> groupId,
   Value<String?> groupName,
+  Value<bool> isDefault,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
   Value<int> rowid,
@@ -14602,6 +14763,9 @@ class $$FarmsTableTableFilterComposer
 
   ColumnFilters<String> get groupName => $composableBuilder(
       column: $table.groupName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isDefault => $composableBuilder(
+      column: $table.isDefault, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
@@ -14641,6 +14805,9 @@ class $$FarmsTableTableOrderingComposer
   ColumnOrderings<String> get groupName => $composableBuilder(
       column: $table.groupName, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<bool> get isDefault => $composableBuilder(
+      column: $table.isDefault, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
@@ -14677,6 +14844,9 @@ class $$FarmsTableTableAnnotationComposer
 
   GeneratedColumn<String> get groupName =>
       $composableBuilder(column: $table.groupName, builder: (column) => column);
+
+  GeneratedColumn<bool> get isDefault =>
+      $composableBuilder(column: $table.isDefault, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -14718,6 +14888,7 @@ class $$FarmsTableTableTableManager extends RootTableManager<
             Value<String?> cheptelNumber = const Value.absent(),
             Value<String?> groupId = const Value.absent(),
             Value<String?> groupName = const Value.absent(),
+            Value<bool> isDefault = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
@@ -14730,6 +14901,7 @@ class $$FarmsTableTableTableManager extends RootTableManager<
             cheptelNumber: cheptelNumber,
             groupId: groupId,
             groupName: groupName,
+            isDefault: isDefault,
             createdAt: createdAt,
             updatedAt: updatedAt,
             rowid: rowid,
@@ -14742,6 +14914,7 @@ class $$FarmsTableTableTableManager extends RootTableManager<
             Value<String?> cheptelNumber = const Value.absent(),
             Value<String?> groupId = const Value.absent(),
             Value<String?> groupName = const Value.absent(),
+            Value<bool> isDefault = const Value.absent(),
             required DateTime createdAt,
             required DateTime updatedAt,
             Value<int> rowid = const Value.absent(),
@@ -14754,6 +14927,7 @@ class $$FarmsTableTableTableManager extends RootTableManager<
             cheptelNumber: cheptelNumber,
             groupId: groupId,
             groupName: groupName,
+            isDefault: isDefault,
             createdAt: createdAt,
             updatedAt: updatedAt,
             rowid: rowid,
@@ -19653,6 +19827,7 @@ typedef $$BatchesTableTableCreateCompanionBuilder = BatchesTableCompanion
   required DateTime updatedAt,
   Value<DateTime?> lastSyncedAt,
   Value<String?> serverVersion,
+  Value<DateTime?> deletedAt,
   Value<int> rowid,
 });
 typedef $$BatchesTableTableUpdateCompanionBuilder = BatchesTableCompanion
@@ -19670,6 +19845,7 @@ typedef $$BatchesTableTableUpdateCompanionBuilder = BatchesTableCompanion
   Value<DateTime> updatedAt,
   Value<DateTime?> lastSyncedAt,
   Value<String?> serverVersion,
+  Value<DateTime?> deletedAt,
   Value<int> rowid,
 });
 
@@ -19720,6 +19896,9 @@ class $$BatchesTableTableFilterComposer
 
   ColumnFilters<String> get serverVersion => $composableBuilder(
       column: $table.serverVersion, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+      column: $table.deletedAt, builder: (column) => ColumnFilters(column));
 }
 
 class $$BatchesTableTableOrderingComposer
@@ -19772,6 +19951,9 @@ class $$BatchesTableTableOrderingComposer
   ColumnOrderings<String> get serverVersion => $composableBuilder(
       column: $table.serverVersion,
       builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+      column: $table.deletedAt, builder: (column) => ColumnOrderings(column));
 }
 
 class $$BatchesTableTableAnnotationComposer
@@ -19821,6 +20003,9 @@ class $$BatchesTableTableAnnotationComposer
 
   GeneratedColumn<String> get serverVersion => $composableBuilder(
       column: $table.serverVersion, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
 }
 
 class $$BatchesTableTableTableManager extends RootTableManager<
@@ -19862,6 +20047,7 @@ class $$BatchesTableTableTableManager extends RootTableManager<
             Value<DateTime> updatedAt = const Value.absent(),
             Value<DateTime?> lastSyncedAt = const Value.absent(),
             Value<String?> serverVersion = const Value.absent(),
+            Value<DateTime?> deletedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               BatchesTableCompanion(
@@ -19878,6 +20064,7 @@ class $$BatchesTableTableTableManager extends RootTableManager<
             updatedAt: updatedAt,
             lastSyncedAt: lastSyncedAt,
             serverVersion: serverVersion,
+            deletedAt: deletedAt,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -19894,6 +20081,7 @@ class $$BatchesTableTableTableManager extends RootTableManager<
             required DateTime updatedAt,
             Value<DateTime?> lastSyncedAt = const Value.absent(),
             Value<String?> serverVersion = const Value.absent(),
+            Value<DateTime?> deletedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               BatchesTableCompanion.insert(
@@ -19910,6 +20098,7 @@ class $$BatchesTableTableTableManager extends RootTableManager<
             updatedAt: updatedAt,
             lastSyncedAt: lastSyncedAt,
             serverVersion: serverVersion,
+            deletedAt: deletedAt,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
@@ -19962,6 +20151,7 @@ typedef $$LotsTableTableCreateCompanionBuilder = LotsTableCompanion Function({
   required DateTime updatedAt,
   Value<DateTime?> lastSyncedAt,
   Value<String?> serverVersion,
+  Value<DateTime?> deletedAt,
   Value<int> rowid,
 });
 typedef $$LotsTableTableUpdateCompanionBuilder = LotsTableCompanion Function({
@@ -19992,6 +20182,7 @@ typedef $$LotsTableTableUpdateCompanionBuilder = LotsTableCompanion Function({
   Value<DateTime> updatedAt,
   Value<DateTime?> lastSyncedAt,
   Value<String?> serverVersion,
+  Value<DateTime?> deletedAt,
   Value<int> rowid,
 });
 
@@ -20090,6 +20281,9 @@ class $$LotsTableTableFilterComposer
 
   ColumnFilters<String> get serverVersion => $composableBuilder(
       column: $table.serverVersion, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+      column: $table.deletedAt, builder: (column) => ColumnFilters(column));
 }
 
 class $$LotsTableTableOrderingComposer
@@ -20192,6 +20386,9 @@ class $$LotsTableTableOrderingComposer
   ColumnOrderings<String> get serverVersion => $composableBuilder(
       column: $table.serverVersion,
       builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+      column: $table.deletedAt, builder: (column) => ColumnOrderings(column));
 }
 
 class $$LotsTableTableAnnotationComposer
@@ -20283,6 +20480,9 @@ class $$LotsTableTableAnnotationComposer
 
   GeneratedColumn<String> get serverVersion => $composableBuilder(
       column: $table.serverVersion, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
 }
 
 class $$LotsTableTableTableManager extends RootTableManager<
@@ -20338,6 +20538,7 @@ class $$LotsTableTableTableManager extends RootTableManager<
             Value<DateTime> updatedAt = const Value.absent(),
             Value<DateTime?> lastSyncedAt = const Value.absent(),
             Value<String?> serverVersion = const Value.absent(),
+            Value<DateTime?> deletedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               LotsTableCompanion(
@@ -20368,6 +20569,7 @@ class $$LotsTableTableTableManager extends RootTableManager<
             updatedAt: updatedAt,
             lastSyncedAt: lastSyncedAt,
             serverVersion: serverVersion,
+            deletedAt: deletedAt,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -20398,6 +20600,7 @@ class $$LotsTableTableTableManager extends RootTableManager<
             required DateTime updatedAt,
             Value<DateTime?> lastSyncedAt = const Value.absent(),
             Value<String?> serverVersion = const Value.absent(),
+            Value<DateTime?> deletedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               LotsTableCompanion.insert(
@@ -20428,6 +20631,7 @@ class $$LotsTableTableTableManager extends RootTableManager<
             updatedAt: updatedAt,
             lastSyncedAt: lastSyncedAt,
             serverVersion: serverVersion,
+            deletedAt: deletedAt,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
@@ -20470,6 +20674,7 @@ typedef $$CampaignsTableTableCreateCompanionBuilder = CampaignsTableCompanion
   required DateTime updatedAt,
   Value<DateTime?> lastSyncedAt,
   Value<String?> serverVersion,
+  Value<DateTime?> deletedAt,
   Value<int> rowid,
 });
 typedef $$CampaignsTableTableUpdateCompanionBuilder = CampaignsTableCompanion
@@ -20490,6 +20695,7 @@ typedef $$CampaignsTableTableUpdateCompanionBuilder = CampaignsTableCompanion
   Value<DateTime> updatedAt,
   Value<DateTime?> lastSyncedAt,
   Value<String?> serverVersion,
+  Value<DateTime?> deletedAt,
   Value<int> rowid,
 });
 
@@ -20552,6 +20758,9 @@ class $$CampaignsTableTableFilterComposer
 
   ColumnFilters<String> get serverVersion => $composableBuilder(
       column: $table.serverVersion, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+      column: $table.deletedAt, builder: (column) => ColumnFilters(column));
 }
 
 class $$CampaignsTableTableOrderingComposer
@@ -20617,6 +20826,9 @@ class $$CampaignsTableTableOrderingComposer
   ColumnOrderings<String> get serverVersion => $composableBuilder(
       column: $table.serverVersion,
       builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+      column: $table.deletedAt, builder: (column) => ColumnOrderings(column));
 }
 
 class $$CampaignsTableTableAnnotationComposer
@@ -20675,6 +20887,9 @@ class $$CampaignsTableTableAnnotationComposer
 
   GeneratedColumn<String> get serverVersion => $composableBuilder(
       column: $table.serverVersion, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
 }
 
 class $$CampaignsTableTableTableManager extends RootTableManager<
@@ -20720,6 +20935,7 @@ class $$CampaignsTableTableTableManager extends RootTableManager<
             Value<DateTime> updatedAt = const Value.absent(),
             Value<DateTime?> lastSyncedAt = const Value.absent(),
             Value<String?> serverVersion = const Value.absent(),
+            Value<DateTime?> deletedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               CampaignsTableCompanion(
@@ -20739,6 +20955,7 @@ class $$CampaignsTableTableTableManager extends RootTableManager<
             updatedAt: updatedAt,
             lastSyncedAt: lastSyncedAt,
             serverVersion: serverVersion,
+            deletedAt: deletedAt,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -20758,6 +20975,7 @@ class $$CampaignsTableTableTableManager extends RootTableManager<
             required DateTime updatedAt,
             Value<DateTime?> lastSyncedAt = const Value.absent(),
             Value<String?> serverVersion = const Value.absent(),
+            Value<DateTime?> deletedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               CampaignsTableCompanion.insert(
@@ -20777,6 +20995,7 @@ class $$CampaignsTableTableTableManager extends RootTableManager<
             updatedAt: updatedAt,
             lastSyncedAt: lastSyncedAt,
             serverVersion: serverVersion,
+            deletedAt: deletedAt,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
