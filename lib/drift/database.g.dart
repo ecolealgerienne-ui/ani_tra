@@ -12540,6 +12540,11 @@ class $LotsTableTable extends LotsTable
   late final GeneratedColumn<String> animalIdsJson = GeneratedColumn<String>(
       'animal_ids_json', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+      'status', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _completedMeta =
       const VerificationMeta('completed');
   @override
@@ -12678,12 +12683,6 @@ class $LotsTableTable extends LotsTable
   late final GeneratedColumn<String> serverVersion = GeneratedColumn<String>(
       'server_version', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _deletedAtMeta =
-      const VerificationMeta('deletedAt');
-  @override
-  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
-      'deleted_at', aliasedName, true,
-      type: DriftSqlType.dateTime, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -12691,6 +12690,7 @@ class $LotsTableTable extends LotsTable
         name,
         type,
         animalIdsJson,
+        status,
         completed,
         completedAt,
         productId,
@@ -12712,8 +12712,7 @@ class $LotsTableTable extends LotsTable
         createdAt,
         updatedAt,
         lastSyncedAt,
-        serverVersion,
-        deletedAt
+        serverVersion
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -12753,6 +12752,10 @@ class $LotsTableTable extends LotsTable
               data['animal_ids_json']!, _animalIdsJsonMeta));
     } else if (isInserting) {
       context.missing(_animalIdsJsonMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(_statusMeta,
+          status.isAcceptableOrUnknown(data['status']!, _statusMeta));
     }
     if (data.containsKey('completed')) {
       context.handle(_completedMeta,
@@ -12874,10 +12877,6 @@ class $LotsTableTable extends LotsTable
           serverVersion.isAcceptableOrUnknown(
               data['server_version']!, _serverVersionMeta));
     }
-    if (data.containsKey('deleted_at')) {
-      context.handle(_deletedAtMeta,
-          deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta));
-    }
     return context;
   }
 
@@ -12897,6 +12896,8 @@ class $LotsTableTable extends LotsTable
           .read(DriftSqlType.string, data['${effectivePrefix}type']),
       animalIdsJson: attachedDatabase.typeMapping.read(
           DriftSqlType.string, data['${effectivePrefix}animal_ids_json'])!,
+      status: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}status']),
       completed: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}completed'])!,
       completedAt: attachedDatabase.typeMapping
@@ -12941,8 +12942,6 @@ class $LotsTableTable extends LotsTable
           DriftSqlType.dateTime, data['${effectivePrefix}last_synced_at']),
       serverVersion: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}server_version']),
-      deletedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}deleted_at']),
     );
   }
 
@@ -12958,6 +12957,7 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
   final String name;
   final String? type;
   final String animalIdsJson;
+  final String? status;
   final bool completed;
   final DateTime? completedAt;
   final String? productId;
@@ -12980,13 +12980,13 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
   final DateTime updatedAt;
   final DateTime? lastSyncedAt;
   final String? serverVersion;
-  final DateTime? deletedAt;
   const LotsTableData(
       {required this.id,
       required this.farmId,
       required this.name,
       this.type,
       required this.animalIdsJson,
+      this.status,
       required this.completed,
       this.completedAt,
       this.productId,
@@ -13008,8 +13008,7 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
       required this.createdAt,
       required this.updatedAt,
       this.lastSyncedAt,
-      this.serverVersion,
-      this.deletedAt});
+      this.serverVersion});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -13020,6 +13019,9 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
       map['type'] = Variable<String>(type);
     }
     map['animal_ids_json'] = Variable<String>(animalIdsJson);
+    if (!nullToAbsent || status != null) {
+      map['status'] = Variable<String>(status);
+    }
     map['completed'] = Variable<bool>(completed);
     if (!nullToAbsent || completedAt != null) {
       map['completed_at'] = Variable<DateTime>(completedAt);
@@ -13078,9 +13080,6 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
     if (!nullToAbsent || serverVersion != null) {
       map['server_version'] = Variable<String>(serverVersion);
     }
-    if (!nullToAbsent || deletedAt != null) {
-      map['deleted_at'] = Variable<DateTime>(deletedAt);
-    }
     return map;
   }
 
@@ -13091,6 +13090,8 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
       name: Value(name),
       type: type == null && nullToAbsent ? const Value.absent() : Value(type),
       animalIdsJson: Value(animalIdsJson),
+      status:
+          status == null && nullToAbsent ? const Value.absent() : Value(status),
       completed: Value(completed),
       completedAt: completedAt == null && nullToAbsent
           ? const Value.absent()
@@ -13148,9 +13149,6 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
       serverVersion: serverVersion == null && nullToAbsent
           ? const Value.absent()
           : Value(serverVersion),
-      deletedAt: deletedAt == null && nullToAbsent
-          ? const Value.absent()
-          : Value(deletedAt),
     );
   }
 
@@ -13163,6 +13161,7 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
       name: serializer.fromJson<String>(json['name']),
       type: serializer.fromJson<String?>(json['type']),
       animalIdsJson: serializer.fromJson<String>(json['animalIdsJson']),
+      status: serializer.fromJson<String?>(json['status']),
       completed: serializer.fromJson<bool>(json['completed']),
       completedAt: serializer.fromJson<DateTime?>(json['completedAt']),
       productId: serializer.fromJson<String?>(json['productId']),
@@ -13187,7 +13186,6 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       lastSyncedAt: serializer.fromJson<DateTime?>(json['lastSyncedAt']),
       serverVersion: serializer.fromJson<String?>(json['serverVersion']),
-      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
     );
   }
   @override
@@ -13199,6 +13197,7 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
       'name': serializer.toJson<String>(name),
       'type': serializer.toJson<String?>(type),
       'animalIdsJson': serializer.toJson<String>(animalIdsJson),
+      'status': serializer.toJson<String?>(status),
       'completed': serializer.toJson<bool>(completed),
       'completedAt': serializer.toJson<DateTime?>(completedAt),
       'productId': serializer.toJson<String?>(productId),
@@ -13221,7 +13220,6 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'lastSyncedAt': serializer.toJson<DateTime?>(lastSyncedAt),
       'serverVersion': serializer.toJson<String?>(serverVersion),
-      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
     };
   }
 
@@ -13231,6 +13229,7 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
           String? name,
           Value<String?> type = const Value.absent(),
           String? animalIdsJson,
+          Value<String?> status = const Value.absent(),
           bool? completed,
           Value<DateTime?> completedAt = const Value.absent(),
           Value<String?> productId = const Value.absent(),
@@ -13252,14 +13251,14 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
           DateTime? createdAt,
           DateTime? updatedAt,
           Value<DateTime?> lastSyncedAt = const Value.absent(),
-          Value<String?> serverVersion = const Value.absent(),
-          Value<DateTime?> deletedAt = const Value.absent()}) =>
+          Value<String?> serverVersion = const Value.absent()}) =>
       LotsTableData(
         id: id ?? this.id,
         farmId: farmId ?? this.farmId,
         name: name ?? this.name,
         type: type.present ? type.value : this.type,
         animalIdsJson: animalIdsJson ?? this.animalIdsJson,
+        status: status.present ? status.value : this.status,
         completed: completed ?? this.completed,
         completedAt: completedAt.present ? completedAt.value : this.completedAt,
         productId: productId.present ? productId.value : this.productId,
@@ -13296,7 +13295,6 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
             lastSyncedAt.present ? lastSyncedAt.value : this.lastSyncedAt,
         serverVersion:
             serverVersion.present ? serverVersion.value : this.serverVersion,
-        deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
       );
   LotsTableData copyWithCompanion(LotsTableCompanion data) {
     return LotsTableData(
@@ -13307,6 +13305,7 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
       animalIdsJson: data.animalIdsJson.present
           ? data.animalIdsJson.value
           : this.animalIdsJson,
+      status: data.status.present ? data.status.value : this.status,
       completed: data.completed.present ? data.completed.value : this.completed,
       completedAt:
           data.completedAt.present ? data.completedAt.value : this.completedAt,
@@ -13353,7 +13352,6 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
       serverVersion: data.serverVersion.present
           ? data.serverVersion.value
           : this.serverVersion,
-      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
     );
   }
 
@@ -13365,6 +13363,7 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
           ..write('name: $name, ')
           ..write('type: $type, ')
           ..write('animalIdsJson: $animalIdsJson, ')
+          ..write('status: $status, ')
           ..write('completed: $completed, ')
           ..write('completedAt: $completedAt, ')
           ..write('productId: $productId, ')
@@ -13386,8 +13385,7 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('lastSyncedAt: $lastSyncedAt, ')
-          ..write('serverVersion: $serverVersion, ')
-          ..write('deletedAt: $deletedAt')
+          ..write('serverVersion: $serverVersion')
           ..write(')'))
         .toString();
   }
@@ -13399,6 +13397,7 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
         name,
         type,
         animalIdsJson,
+        status,
         completed,
         completedAt,
         productId,
@@ -13420,8 +13419,7 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
         createdAt,
         updatedAt,
         lastSyncedAt,
-        serverVersion,
-        deletedAt
+        serverVersion
       ]);
   @override
   bool operator ==(Object other) =>
@@ -13432,6 +13430,7 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
           other.name == this.name &&
           other.type == this.type &&
           other.animalIdsJson == this.animalIdsJson &&
+          other.status == this.status &&
           other.completed == this.completed &&
           other.completedAt == this.completedAt &&
           other.productId == this.productId &&
@@ -13453,8 +13452,7 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.lastSyncedAt == this.lastSyncedAt &&
-          other.serverVersion == this.serverVersion &&
-          other.deletedAt == this.deletedAt);
+          other.serverVersion == this.serverVersion);
 }
 
 class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
@@ -13463,6 +13461,7 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
   final Value<String> name;
   final Value<String?> type;
   final Value<String> animalIdsJson;
+  final Value<String?> status;
   final Value<bool> completed;
   final Value<DateTime?> completedAt;
   final Value<String?> productId;
@@ -13485,7 +13484,6 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
   final Value<DateTime> updatedAt;
   final Value<DateTime?> lastSyncedAt;
   final Value<String?> serverVersion;
-  final Value<DateTime?> deletedAt;
   final Value<int> rowid;
   const LotsTableCompanion({
     this.id = const Value.absent(),
@@ -13493,6 +13491,7 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
     this.name = const Value.absent(),
     this.type = const Value.absent(),
     this.animalIdsJson = const Value.absent(),
+    this.status = const Value.absent(),
     this.completed = const Value.absent(),
     this.completedAt = const Value.absent(),
     this.productId = const Value.absent(),
@@ -13515,7 +13514,6 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
     this.updatedAt = const Value.absent(),
     this.lastSyncedAt = const Value.absent(),
     this.serverVersion = const Value.absent(),
-    this.deletedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   LotsTableCompanion.insert({
@@ -13524,6 +13522,7 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
     required String name,
     this.type = const Value.absent(),
     required String animalIdsJson,
+    this.status = const Value.absent(),
     this.completed = const Value.absent(),
     this.completedAt = const Value.absent(),
     this.productId = const Value.absent(),
@@ -13546,7 +13545,6 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
     required DateTime updatedAt,
     this.lastSyncedAt = const Value.absent(),
     this.serverVersion = const Value.absent(),
-    this.deletedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : id = Value(id),
         farmId = Value(farmId),
@@ -13560,6 +13558,7 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
     Expression<String>? name,
     Expression<String>? type,
     Expression<String>? animalIdsJson,
+    Expression<String>? status,
     Expression<bool>? completed,
     Expression<DateTime>? completedAt,
     Expression<String>? productId,
@@ -13582,7 +13581,6 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
     Expression<DateTime>? updatedAt,
     Expression<DateTime>? lastSyncedAt,
     Expression<String>? serverVersion,
-    Expression<DateTime>? deletedAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -13591,6 +13589,7 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
       if (name != null) 'name': name,
       if (type != null) 'type': type,
       if (animalIdsJson != null) 'animal_ids_json': animalIdsJson,
+      if (status != null) 'status': status,
       if (completed != null) 'completed': completed,
       if (completedAt != null) 'completed_at': completedAt,
       if (productId != null) 'product_id': productId,
@@ -13613,7 +13612,6 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
       if (updatedAt != null) 'updated_at': updatedAt,
       if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
       if (serverVersion != null) 'server_version': serverVersion,
-      if (deletedAt != null) 'deleted_at': deletedAt,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -13624,6 +13622,7 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
       Value<String>? name,
       Value<String?>? type,
       Value<String>? animalIdsJson,
+      Value<String?>? status,
       Value<bool>? completed,
       Value<DateTime?>? completedAt,
       Value<String?>? productId,
@@ -13646,7 +13645,6 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
       Value<DateTime>? updatedAt,
       Value<DateTime?>? lastSyncedAt,
       Value<String?>? serverVersion,
-      Value<DateTime?>? deletedAt,
       Value<int>? rowid}) {
     return LotsTableCompanion(
       id: id ?? this.id,
@@ -13654,6 +13652,7 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
       name: name ?? this.name,
       type: type ?? this.type,
       animalIdsJson: animalIdsJson ?? this.animalIdsJson,
+      status: status ?? this.status,
       completed: completed ?? this.completed,
       completedAt: completedAt ?? this.completedAt,
       productId: productId ?? this.productId,
@@ -13676,7 +13675,6 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
       updatedAt: updatedAt ?? this.updatedAt,
       lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
       serverVersion: serverVersion ?? this.serverVersion,
-      deletedAt: deletedAt ?? this.deletedAt,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -13698,6 +13696,9 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
     }
     if (animalIdsJson.present) {
       map['animal_ids_json'] = Variable<String>(animalIdsJson.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
     }
     if (completed.present) {
       map['completed'] = Variable<bool>(completed.value);
@@ -13765,9 +13766,6 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
     if (serverVersion.present) {
       map['server_version'] = Variable<String>(serverVersion.value);
     }
-    if (deletedAt.present) {
-      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
-    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -13782,6 +13780,7 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
           ..write('name: $name, ')
           ..write('type: $type, ')
           ..write('animalIdsJson: $animalIdsJson, ')
+          ..write('status: $status, ')
           ..write('completed: $completed, ')
           ..write('completedAt: $completedAt, ')
           ..write('productId: $productId, ')
@@ -13804,7 +13803,6 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
           ..write('updatedAt: $updatedAt, ')
           ..write('lastSyncedAt: $lastSyncedAt, ')
           ..write('serverVersion: $serverVersion, ')
-          ..write('deletedAt: $deletedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -20129,6 +20127,7 @@ typedef $$LotsTableTableCreateCompanionBuilder = LotsTableCompanion Function({
   required String name,
   Value<String?> type,
   required String animalIdsJson,
+  Value<String?> status,
   Value<bool> completed,
   Value<DateTime?> completedAt,
   Value<String?> productId,
@@ -20151,7 +20150,6 @@ typedef $$LotsTableTableCreateCompanionBuilder = LotsTableCompanion Function({
   required DateTime updatedAt,
   Value<DateTime?> lastSyncedAt,
   Value<String?> serverVersion,
-  Value<DateTime?> deletedAt,
   Value<int> rowid,
 });
 typedef $$LotsTableTableUpdateCompanionBuilder = LotsTableCompanion Function({
@@ -20160,6 +20158,7 @@ typedef $$LotsTableTableUpdateCompanionBuilder = LotsTableCompanion Function({
   Value<String> name,
   Value<String?> type,
   Value<String> animalIdsJson,
+  Value<String?> status,
   Value<bool> completed,
   Value<DateTime?> completedAt,
   Value<String?> productId,
@@ -20182,7 +20181,6 @@ typedef $$LotsTableTableUpdateCompanionBuilder = LotsTableCompanion Function({
   Value<DateTime> updatedAt,
   Value<DateTime?> lastSyncedAt,
   Value<String?> serverVersion,
-  Value<DateTime?> deletedAt,
   Value<int> rowid,
 });
 
@@ -20209,6 +20207,9 @@ class $$LotsTableTableFilterComposer
 
   ColumnFilters<String> get animalIdsJson => $composableBuilder(
       column: $table.animalIdsJson, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get status => $composableBuilder(
+      column: $table.status, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<bool> get completed => $composableBuilder(
       column: $table.completed, builder: (column) => ColumnFilters(column));
@@ -20281,9 +20282,6 @@ class $$LotsTableTableFilterComposer
 
   ColumnFilters<String> get serverVersion => $composableBuilder(
       column: $table.serverVersion, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
-      column: $table.deletedAt, builder: (column) => ColumnFilters(column));
 }
 
 class $$LotsTableTableOrderingComposer
@@ -20310,6 +20308,9 @@ class $$LotsTableTableOrderingComposer
   ColumnOrderings<String> get animalIdsJson => $composableBuilder(
       column: $table.animalIdsJson,
       builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get status => $composableBuilder(
+      column: $table.status, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<bool> get completed => $composableBuilder(
       column: $table.completed, builder: (column) => ColumnOrderings(column));
@@ -20386,9 +20387,6 @@ class $$LotsTableTableOrderingComposer
   ColumnOrderings<String> get serverVersion => $composableBuilder(
       column: $table.serverVersion,
       builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
-      column: $table.deletedAt, builder: (column) => ColumnOrderings(column));
 }
 
 class $$LotsTableTableAnnotationComposer
@@ -20414,6 +20412,9 @@ class $$LotsTableTableAnnotationComposer
 
   GeneratedColumn<String> get animalIdsJson => $composableBuilder(
       column: $table.animalIdsJson, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
 
   GeneratedColumn<bool> get completed =>
       $composableBuilder(column: $table.completed, builder: (column) => column);
@@ -20480,9 +20481,6 @@ class $$LotsTableTableAnnotationComposer
 
   GeneratedColumn<String> get serverVersion => $composableBuilder(
       column: $table.serverVersion, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get deletedAt =>
-      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
 }
 
 class $$LotsTableTableTableManager extends RootTableManager<
@@ -20516,6 +20514,7 @@ class $$LotsTableTableTableManager extends RootTableManager<
             Value<String> name = const Value.absent(),
             Value<String?> type = const Value.absent(),
             Value<String> animalIdsJson = const Value.absent(),
+            Value<String?> status = const Value.absent(),
             Value<bool> completed = const Value.absent(),
             Value<DateTime?> completedAt = const Value.absent(),
             Value<String?> productId = const Value.absent(),
@@ -20538,7 +20537,6 @@ class $$LotsTableTableTableManager extends RootTableManager<
             Value<DateTime> updatedAt = const Value.absent(),
             Value<DateTime?> lastSyncedAt = const Value.absent(),
             Value<String?> serverVersion = const Value.absent(),
-            Value<DateTime?> deletedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               LotsTableCompanion(
@@ -20547,6 +20545,7 @@ class $$LotsTableTableTableManager extends RootTableManager<
             name: name,
             type: type,
             animalIdsJson: animalIdsJson,
+            status: status,
             completed: completed,
             completedAt: completedAt,
             productId: productId,
@@ -20569,7 +20568,6 @@ class $$LotsTableTableTableManager extends RootTableManager<
             updatedAt: updatedAt,
             lastSyncedAt: lastSyncedAt,
             serverVersion: serverVersion,
-            deletedAt: deletedAt,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -20578,6 +20576,7 @@ class $$LotsTableTableTableManager extends RootTableManager<
             required String name,
             Value<String?> type = const Value.absent(),
             required String animalIdsJson,
+            Value<String?> status = const Value.absent(),
             Value<bool> completed = const Value.absent(),
             Value<DateTime?> completedAt = const Value.absent(),
             Value<String?> productId = const Value.absent(),
@@ -20600,7 +20599,6 @@ class $$LotsTableTableTableManager extends RootTableManager<
             required DateTime updatedAt,
             Value<DateTime?> lastSyncedAt = const Value.absent(),
             Value<String?> serverVersion = const Value.absent(),
-            Value<DateTime?> deletedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               LotsTableCompanion.insert(
@@ -20609,6 +20607,7 @@ class $$LotsTableTableTableManager extends RootTableManager<
             name: name,
             type: type,
             animalIdsJson: animalIdsJson,
+            status: status,
             completed: completed,
             completedAt: completedAt,
             productId: productId,
@@ -20631,7 +20630,6 @@ class $$LotsTableTableTableManager extends RootTableManager<
             updatedAt: updatedAt,
             lastSyncedAt: lastSyncedAt,
             serverVersion: serverVersion,
-            deletedAt: deletedAt,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0

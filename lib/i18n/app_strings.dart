@@ -450,6 +450,15 @@ class AppStrings {
   static const String activeStatus = 'activeStatus';
   static const String urgentStatus = 'urgentStatus';
 
+  // ==================== LOT STATUS ====================
+  static const String lotStatusOpen = 'lotStatusOpen';
+  static const String lotStatusClosed = 'lotStatusClosed';
+  static const String lotStatusArchived = 'lotStatusArchived';
+  static const String archiveLot = 'archiveLot';
+  static const String archiveConfirm = 'archiveConfirm';
+  static const String archiveConfirmMessage = 'archiveConfirmMessage';
+  static const String lotArchived = 'lotArchived';
+
   // ============ MEDICAL & EVENTS (24) ============
   static const String recordSale = 'recordSale';
   static const String confirmSale = 'confirmSale';
@@ -715,6 +724,14 @@ class AppStrings {
   static const String buyerFarmId = 'buyerFarmId';
   static const String slaughterhouseName = 'slaughterhouseName';
   static const String slaughterhouseId = 'slaughterhouseId';
+
+  // ========== Slaughter SCREENS ==========
+  static const String recordSlaughter = 'recordSlaughter';
+  static const String animalsToSlaughter = 'animalsToSlaughter';
+  static const String confirmSlaughter = 'confirmSlaughter';
+
+  // ========== Slaughter SCREENS ==========
+  static const String animalsForSale = 'animalsForSale';
 
   // ANIMAL FINDER
   static const String identifyAnimals = 'identifyAnimals';

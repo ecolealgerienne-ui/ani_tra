@@ -17,10 +17,16 @@ class LotsTable extends Table {
   // Type nullable: 'treatment', 'sale', 'slaughter', ou NULL
   TextColumn get type => text().nullable()();
   
-  // âš¡ IMPORTANT: animal_ids stockÃ© en JSON
+  // ⚡ IMPORTANT: animal_ids stocké en JSON
   // Exemple: '["animal-1", "animal-2", "animal-3"]'
   TextColumn get animalIdsJson => text().named('animal_ids_json')();
   
+  // PHASE 1: ADD - Status nullable: 'open', 'closed', 'archived'
+  TextColumn get status => text()
+    .nullable()
+    .named('status')();
+  
+  // PHASE 1: KEEP - for backward-compatibility during migration
   BoolColumn get completed => boolean().withDefault(const Constant(false))();
   DateTimeColumn get completedAt => dateTime().nullable().named('completed_at')();
 
@@ -53,9 +59,6 @@ class LotsTable extends Table {
   DateTimeColumn get updatedAt => dateTime().named('updated_at')();
   DateTimeColumn get lastSyncedAt => dateTime().nullable().named('last_synced_at')();
   TextColumn get serverVersion => text().nullable().named('server_version')();
-  
-  // Soft-delete (audit trail)
-  DateTimeColumn get deletedAt => dateTime().nullable().named('deleted_at')();
 
   @override
   Set<Column> get primaryKey => {id};

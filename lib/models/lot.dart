@@ -45,6 +45,18 @@ extension LotTypeExt on LotType {
   }
 }
 
+/// Statut du lot
+enum LotStatus {
+  /// Lot ouvert, modifiable
+  open,
+
+  /// Lot fermé, non modifiable
+  closed,
+
+  /// Lot archivé, vue-seulement
+  archived,
+}
+
 /// Modèle Lot unifié (Traitement/Vente/Abattage)
 ///
 /// Permet de gérer différents types de lots dans un seul modèle :
@@ -69,7 +81,10 @@ class Lot implements SyncableEntity {
   /// Liste des IDs d'animaux dans le lot
   final List<String> animalIds;
 
-  /// Le lot est-il complété (fermé) ?
+  /// Statut du lot (PHASE 1: nullable pour backward-compat)
+  final LotStatus? status;
+
+  /// Le lot est-il complété (fermé) ? (PHASE 1: KEEP pour migration)
   final bool completed;
 
   /// Date de fermeture du lot
@@ -158,6 +173,7 @@ class Lot implements SyncableEntity {
     required this.name,
     this.type,
     this.animalIds = const [],
+    this.status,
     this.completed = false,
     this.completedAt,
     // Traitement
@@ -195,10 +211,13 @@ class Lot implements SyncableEntity {
   int get animalCount => animalIds.length;
 
   /// Le lot est-il ouvert (modifiable) ?
-  bool get isOpen => !completed;
+  bool get isOpen => status == LotStatus.open || (!completed && status == null);
 
   /// Le lot est-il fermé (non modifiable) ?
-  bool get isClosed => completed;
+  bool get isClosed => status == LotStatus.closed || (completed && status == null);
+
+  /// Le lot est-il archivé ?
+  bool get isArchived => status == LotStatus.archived;
 
   /// Le lot est-il vide ?
   bool get isEmpty => animalIds.isEmpty;
@@ -216,6 +235,7 @@ class Lot implements SyncableEntity {
     LotType? type,
     bool clearType = false,
     List<String>? animalIds,
+    LotStatus? status,
     bool? completed,
     DateTime? completedAt,
     bool clearCompletedAt = false,
@@ -251,6 +271,7 @@ class Lot implements SyncableEntity {
       name: name ?? this.name,
       type: clearType ? null : (type ?? this.type),
       animalIds: animalIds ?? this.animalIds,
+      status: status ?? this.status,
       completed: completed ?? this.completed,
       completedAt: clearCompletedAt ? null : (completedAt ?? this.completedAt),
       // Traitement
@@ -301,6 +322,7 @@ class Lot implements SyncableEntity {
   /// Marquer comme complété
   Lot markAsCompleted() {
     return copyWith(
+      status: LotStatus.closed,
       completed: true,
       completedAt: DateTime.now(),
       synced: false,
@@ -338,6 +360,7 @@ class Lot implements SyncableEntity {
       'name': name,
       'type': type?.name,
       'animalIds': animalIds,
+      'status': status?.name,
       'completed': completed,
       'completedAt': completedAt?.toIso8601String(),
       // Traitement
@@ -381,6 +404,12 @@ class Lot implements SyncableEntity {
           : null,
       animalIds:
           List<String>.from(json['animalIds'] ?? json['animal_ids'] ?? []),
+      status: json['status'] != null
+          ? LotStatus.values.firstWhere((e) => e.name == json['status'],
+              orElse: () => (json['completed'] ?? false)
+                  ? LotStatus.closed
+                  : LotStatus.open)
+          : null,
       completed: json['completed'] ?? false,
       completedAt: json['completedAt'] != null || json['completed_at'] != null
           ? DateTime.parse(json['completedAt'] ?? json['completed_at'])
@@ -437,7 +466,7 @@ class Lot implements SyncableEntity {
   @override
   String toString() {
     return 'Lot(id: $id, name: $name, type: ${type?.label ?? "Non défini"}, '
-        'animalCount: $animalCount, completed: $completed, synced: $synced)';
+        'status: ${status?.name ?? "N/A"}, animalCount: $animalCount, synced: $synced)';
   }
 
   @override

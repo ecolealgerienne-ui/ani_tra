@@ -1112,8 +1112,8 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                     Text(AppLocalizations.of(context).translate(AppStrings.sex),
                         style: const TextStyle(fontWeight: FontWeight.w600)),
                     CheckboxListTile(
-                      title: const Text(
-                          '♂️ \${AppLocalizations.of(context).translate(AppStrings.male)}'),
+                      title: Text(
+                          '♂️ ${AppLocalizations.of(context).translate(AppStrings.male)}'),
                       value: _sexes.contains(AnimalSex.male),
                       onChanged: (checked) {
                         setState(() {
@@ -1126,8 +1126,8 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                       },
                     ),
                     CheckboxListTile(
-                      title: const Text(
-                          '♀️ \${AppLocalizations.of(context).translate(AppStrings.female)}'),
+                      title: Text(
+                          '♀️ ${AppLocalizations.of(context).translate(AppStrings.female)}'),
                       value: _sexes.contains(AnimalSex.female),
                       onChanged: (checked) {
                         setState(() {

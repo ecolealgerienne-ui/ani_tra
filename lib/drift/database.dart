@@ -754,8 +754,9 @@ class AppDatabase extends _$AppDatabase {
     // Index sur withdrawal_end_date (alertes rémanence)
     await customStatement(
         'CREATE INDEX idx_lots_withdrawal_end_date ON lots(withdrawal_end_date);');
-    await customStatement(
-        'CREATE INDEX IF NOT EXISTS idx_lots_deleted_at ON lots(deleted_at);');
+    // PHASE 1: REMOVED - deleted_at column doesn't exist in lots table
+    // await customStatement(
+    //     'CREATE INDEX IF NOT EXISTS idx_lots_deleted_at ON lots(deleted_at);');
   }
 
   /// Créer les indexes pour la table campaigns

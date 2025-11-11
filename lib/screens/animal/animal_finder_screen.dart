@@ -23,6 +23,8 @@ class AnimalFinderScreen extends StatefulWidget {
   final List<Animal> initialSelection;
   final String title;
   final List<AnimalStatus>? allowedStatuses;
+  final String? lotId;
+  final List<String>? animalIdsInLot;
 
   const AnimalFinderScreen({
     super.key,
@@ -30,6 +32,8 @@ class AnimalFinderScreen extends StatefulWidget {
     this.initialSelection = const [],
     this.title = '',
     this.allowedStatuses,
+    this.lotId,
+    this.animalIdsInLot,
   });
 
   @override
@@ -58,6 +62,12 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
   List<Animal> _getAvailableAnimals() {
     final animalProvider = context.read<AnimalProvider>();
     List<Animal> animals = animalProvider.animals;
+
+    // ✅ Si on filtre par lot, afficher seulement les animaux DISPONIBLES (pas déjà dans CE lot)
+    if (widget.animalIdsInLot != null) {
+      animals =
+          animals.where((a) => !widget.animalIdsInLot!.contains(a.id)).toList();
+    }
 
     if (widget.allowedStatuses != null) {
       animals = animals

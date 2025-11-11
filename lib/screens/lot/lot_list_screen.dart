@@ -1,14 +1,15 @@
-// lib/screens/lot_list_screen.dart
+// lib/screens/lot/lot_list_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
 import '../../providers/lot_provider.dart';
+import '../../providers/animal_provider.dart';
 import '../../models/lot.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
-import '../lot/lot_detail_screen.dart';
+import 'lot_detail_screen.dart';
 
 class LotListScreen extends StatefulWidget {
   const LotListScreen({super.key});
@@ -17,20 +18,14 @@ class LotListScreen extends StatefulWidget {
   State<LotListScreen> createState() => _LotListScreenState();
 }
 
-class _LotListScreenState extends State<LotListScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _LotListScreenState extends State<LotListScreen> {
+  // PHASE 1B: State variable for status filter (replaces TabController)
+  late LotStatus _selectedStatus = LotStatus.open;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
+    _selectedStatus = LotStatus.open; // Default to open lots
   }
 
   void _createLot() {
@@ -142,8 +137,7 @@ class _LotListScreenState extends State<LotListScreen>
               CheckboxListTile(
                 title: Text(AppLocalizations.of(context)
                     .translate(AppStrings.keepAnimals)),
-                subtitle: Text(
-                    '${lot.animalCount} ${AppLocalizations.of(context).translate(AppStrings.animals)}'),
+                subtitle: Text(_buildAnimalCountDisplay(context, lot)),
                 value: keepAnimals,
                 onChanged: (val) => setState(() => keepAnimals = val ?? true),
               ),
@@ -242,23 +236,199 @@ class _LotListScreenState extends State<LotListScreen>
     );
   }
 
+  // PHASE 1B: Archive lot dialog
+  void _archiveLot(Lot lot) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title:
+            Text(AppLocalizations.of(context).translate(AppStrings.archiveLot)),
+        content: Text(
+            '${AppLocalizations.of(context).translate(AppStrings.archiveConfirmMessage)}: ${lot.name}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child:
+                Text(AppLocalizations.of(context).translate(AppStrings.cancel)),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final success =
+                  await context.read<LotProvider>().archiveLot(lot.id);
+              if (!mounted) return;
+              Navigator.pop(context);
+
+              if (success) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(AppLocalizations.of(context)
+                        .translate(AppStrings.lotArchived)),
+                    backgroundColor: AppConstants.successGreen,
+                  ),
+                );
+              }
+            },
+            child: Text(AppLocalizations.of(context)
+                .translate(AppStrings.lotStatusArchived)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // PHASE 1B: Get status label for subtitle
+  String _getStatusLabel(LotStatus status) {
+    switch (status) {
+      case LotStatus.open:
+        return AppLocalizations.of(context).translate(AppStrings.lotStatusOpen);
+      case LotStatus.closed:
+        return AppLocalizations.of(context)
+            .translate(AppStrings.lotStatusClosed);
+      case LotStatus.archived:
+        return AppLocalizations.of(context)
+            .translate(AppStrings.lotStatusArchived);
+    }
+  }
+
+  // PHASE 1B: Helper to display animal count based on lot status and type
+  String _buildAnimalCountDisplay(BuildContext context, Lot lot) {
+    final lotProvider = context.read<LotProvider>();
+    final animalProvider = context.read<AnimalProvider>();
+
+    if (lot.status == LotStatus.open) {
+      // OUVERTS: afficher seulement les animaux ACTIFS
+      final activeCount =
+          lotProvider.getActiveAnimalCount(lot.id, animalProvider.animals);
+      return '$activeCount ${AppLocalizations.of(context).translate(AppStrings.animals)}';
+    } else {
+      // FERMÉS/ARCHIVÉS
+      final totalCount = lotProvider.getTotalAnimalCount(lot.id);
+
+      // PHASE 1B: Pour VENTE et ABATTAGE: tous inactifs par construction
+      // Afficher juste le total sans "(X actifs)"
+      if (lot.type == LotType.sale || lot.type == LotType.slaughter) {
+        return '$totalCount ${AppLocalizations.of(context).translate(AppStrings.animals)}';
+      }
+
+      // Pour TRAITEMENT: certains peuvent rester vivants
+      // Afficher avec le nombre d'actifs
+      final activeCount =
+          lotProvider.getActiveAnimalCount(lot.id, animalProvider.animals);
+
+      if (totalCount == activeCount) {
+        // Si tous sont toujours actifs
+        return '$totalCount ${AppLocalizations.of(context).translate(AppStrings.animals)}';
+      } else {
+        // Afficher le format "5 animaux (3 actifs)"
+        final animalsLabel =
+            AppLocalizations.of(context).translate(AppStrings.animals);
+        return '$totalCount $animalsLabel ($activeCount ${AppLocalizations.of(context).translate(AppStrings.active).toLowerCase()})';
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context).translate(AppStrings.lots)),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: [
-            Tab(
-              text: AppLocalizations.of(context).translate(AppStrings.openLots),
-            ),
-            Tab(
-              text:
-                  AppLocalizations.of(context).translate(AppStrings.closedLots),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(AppLocalizations.of(context).translate(AppStrings.lots)),
+            // PHASE 1B: Dynamic subtitle with count
+            Consumer<LotProvider>(
+              builder: (context, lotProvider, _) {
+                final count = _selectedStatus == LotStatus.open
+                    ? lotProvider.openLotsCount
+                    : _selectedStatus == LotStatus.closed
+                        ? lotProvider.closedLotsCount
+                        : lotProvider.archivedLotsCount;
+
+                return Text(
+                  '${_getStatusLabel(_selectedStatus)} ($count)',
+                  style: Theme.of(context).textTheme.bodySmall,
+                );
+              },
             ),
           ],
         ),
+        actions: [
+          // PHASE 1B: Menu button with all statuses
+          Consumer<LotProvider>(
+            builder: (context, lotProvider, _) {
+              return PopupMenuButton<LotStatus>(
+                onSelected: (LotStatus status) {
+                  setState(() {
+                    _selectedStatus = status;
+                  });
+                },
+                itemBuilder: (BuildContext context) =>
+                    <PopupMenuEntry<LotStatus>>[
+                  PopupMenuItem<LotStatus>(
+                    value: LotStatus.open,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Expanded(
+                          child: Text(AppLocalizations.of(context)
+                              .translate(AppStrings.openLots)),
+                        ),
+                        const SizedBox(width: AppConstants.spacingSmall),
+                        Text(
+                          '(${lotProvider.openLotsCount})',
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: AppConstants.fontSizeSmall,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem<LotStatus>(
+                    value: LotStatus.closed,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Expanded(
+                          child: Text(AppLocalizations.of(context)
+                              .translate(AppStrings.closedLots)),
+                        ),
+                        const SizedBox(width: AppConstants.spacingSmall),
+                        Text(
+                          '(${lotProvider.closedLotsCount})',
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: AppConstants.fontSizeSmall,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem<LotStatus>(
+                    value: LotStatus.archived,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Expanded(
+                          child: Text(AppLocalizations.of(context)
+                              .translate(AppStrings.lotStatusArchived)),
+                        ),
+                        const SizedBox(width: AppConstants.spacingSmall),
+                        Text(
+                          '(${lotProvider.archivedLotsCount})',
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: AppConstants.fontSizeSmall,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _createLot,
@@ -267,15 +437,14 @@ class _LotListScreenState extends State<LotListScreen>
       ),
       body: Consumer<LotProvider>(
         builder: (context, lotProvider, _) {
-          return TabBarView(
-            controller: _tabController,
-            children: [
-              // Onglet: Lots ouverts
-              _buildLotList(context, lotProvider.openLots),
-              // Onglet: Lots fermés
-              _buildLotList(context, lotProvider.closedLots),
-            ],
-          );
+          // PHASE 1B: Get lots based on selected status
+          final lots = _selectedStatus == LotStatus.open
+              ? lotProvider.openLots
+              : _selectedStatus == LotStatus.closed
+                  ? lotProvider.closedLots
+                  : lotProvider.archivedLots;
+
+          return _buildLotList(context, lots);
         },
       ),
     );
@@ -310,8 +479,18 @@ class _LotListScreenState extends State<LotListScreen>
       itemCount: lots.length,
       itemBuilder: (context, index) {
         final lot = lots[index];
+
+        // PHASE 1B: Determine which actions to show based on status
+        final showDelete = _selectedStatus == LotStatus.open;
+        final showArchive = _selectedStatus == LotStatus.closed;
+        final isViewOnly = _selectedStatus == LotStatus.archived;
+
+        // PHASE 1B: Calculate animal count display based on lot status
+        final animalCountDisplay = _buildAnimalCountDisplay(context, lot);
+
         return _LotCard(
           lot: lot,
+          animalCountDisplay: animalCountDisplay,
           onTap: () {
             Navigator.push(
               context,
@@ -321,7 +500,9 @@ class _LotListScreenState extends State<LotListScreen>
             );
           },
           onDuplicate: () => _showDuplicateDialog(lot),
-          onDelete: () => _deleteLot(lot),
+          onDelete: showDelete ? () => _deleteLot(lot) : null,
+          onArchive: showArchive ? () => _archiveLot(lot) : null,
+          isViewOnly: isViewOnly,
         );
       },
     );
@@ -329,22 +510,29 @@ class _LotListScreenState extends State<LotListScreen>
 }
 
 /// Widget: Carte de lot
+/// PHASE 1B: UPDATED - Add isViewOnly parameter and animalCountDisplay
 class _LotCard extends StatelessWidget {
   final Lot lot;
   final VoidCallback onTap;
   final VoidCallback onDuplicate;
-  final VoidCallback onDelete;
+  final VoidCallback? onDelete;
+  final VoidCallback? onArchive;
+  final bool isViewOnly;
+  final String animalCountDisplay;
 
   const _LotCard({
     required this.lot,
     required this.onTap,
     required this.onDuplicate,
     required this.onDelete,
+    this.onArchive,
+    this.isViewOnly = false,
+    required this.animalCountDisplay,
   });
 
   @override
   Widget build(BuildContext context) {
-    final dateFormat = DateFormat('dd/MM/yyyy');
+    //final dateFormat = DateFormat('dd/MM/yyyy');
     final isOpen = lot.isOpen;
 
     return Card(
@@ -449,7 +637,7 @@ class _LotCard extends StatelessWidget {
                     size: AppConstants.iconSizeSmall, color: Colors.grey),
                 const SizedBox(width: AppConstants.spacingTiny),
                 Text(
-                  '${lot.animalCount} ${AppLocalizations.of(context).translate(AppStrings.animals)}',
+                  animalCountDisplay,
                   style:
                       const TextStyle(fontSize: AppConstants.fontSizeSubtitle),
                 ),
@@ -458,7 +646,7 @@ class _LotCard extends StatelessWidget {
                     size: AppConstants.iconSizeSmall, color: Colors.grey),
                 const SizedBox(width: AppConstants.spacingTiny),
                 Text(
-                  dateFormat.format(lot.createdAt),
+                  DateFormat('dd/MM/yyyy').format(lot.createdAt),
                   style:
                       const TextStyle(fontSize: AppConstants.fontSizeSubtitle),
                 ),
@@ -529,22 +717,27 @@ class _LotCard extends StatelessWidget {
 
             const SizedBox(height: AppConstants.spacingSmall),
 
-            // Actions
+            // Actions (PHASE 1B: Updated based on status)
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                TextButton.icon(
-                  onPressed: onDuplicate,
-                  icon: const Icon(Icons.content_copy,
-                      size: AppConstants.iconSizeSmall),
-                  label: Text(
-                    AppLocalizations.of(context)
-                        .translate(AppStrings.duplicate),
-                    style:
-                        const TextStyle(fontSize: AppConstants.fontSizeSmall),
+                // PHASE 1B: Show Duplicate only if not archived (not view-only)
+                if (!isViewOnly) ...[
+                  TextButton.icon(
+                    onPressed: onDuplicate,
+                    icon: const Icon(Icons.content_copy,
+                        size: AppConstants.iconSizeSmall),
+                    label: Text(
+                      AppLocalizations.of(context)
+                          .translate(AppStrings.duplicate),
+                      style:
+                          const TextStyle(fontSize: AppConstants.fontSizeSmall),
+                    ),
                   ),
-                ),
-                if (isOpen) ...[
+                ],
+
+                // PHASE 1B: Show Delete only for open lots
+                if (onDelete != null) ...[
                   const SizedBox(width: AppConstants.spacingSmall),
                   TextButton.icon(
                     onPressed: onDelete,
@@ -557,6 +750,25 @@ class _LotCard extends StatelessWidget {
                     ),
                     style: TextButton.styleFrom(
                       foregroundColor: AppConstants.statusDanger,
+                    ),
+                  ),
+                ],
+
+                // PHASE 1B: Show Archive only for closed lots
+                if (onArchive != null) ...[
+                  const SizedBox(width: AppConstants.spacingSmall),
+                  TextButton.icon(
+                    onPressed: onArchive,
+                    icon: const Icon(Icons.archive,
+                        size: AppConstants.iconSizeSmall),
+                    label: Text(
+                      AppLocalizations.of(context)
+                          .translate(AppStrings.lotStatusArchived),
+                      style:
+                          const TextStyle(fontSize: AppConstants.fontSizeSmall),
+                    ),
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppConstants.warningOrange,
                     ),
                   ),
                 ],

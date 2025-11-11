@@ -28,57 +28,82 @@ class LotDetailScreen extends StatelessWidget {
         title:
             Text(AppLocalizations.of(context).translate(AppStrings.lotDetail)),
         actions: [
-          PopupMenuButton<String>(
-            onSelected: (value) => _handleMenuAction(context, value),
-            itemBuilder: (context) {
-              final lot = context.read<LotProvider>().getLotById(lotId);
-              if (lot == null) return [];
+          Consumer<LotProvider>(
+            builder: (context, lotProvider, _) {
+              final lot = lotProvider.getLotById(lotId);
 
-              return [
-                if (!lot.completed)
-                  PopupMenuItem(
-                    value: 'rename',
-                    child: Row(
-                      children: [
-                        const Icon(Icons.edit,
-                            size: AppConstants.iconSizeRegular),
-                        const SizedBox(width: AppConstants.spacingSmall),
-                        Text(AppLocalizations.of(context)
-                            .translate(AppStrings.rename)),
-                      ],
-                    ),
-                  ),
-                PopupMenuItem(
-                  value: 'duplicate',
-                  child: Row(
-                    children: [
-                      const Icon(Icons.content_copy,
-                          size: AppConstants.iconSizeRegular),
-                      const SizedBox(width: AppConstants.spacingSmall),
-                      Text(AppLocalizations.of(context)
-                          .translate(AppStrings.duplicate)),
-                    ],
-                  ),
-                ),
-                if (!lot.completed)
-                  PopupMenuItem(
-                    value: 'delete',
-                    child: Row(
-                      children: [
-                        const Icon(Icons.delete,
-                            size: AppConstants.iconSizeRegular,
-                            color: AppConstants.statusDanger),
-                        const SizedBox(width: AppConstants.spacingSmall),
-                        Text(
-                          AppLocalizations.of(context)
-                              .translate(AppStrings.delete),
-                          style:
-                              const TextStyle(color: AppConstants.statusDanger),
+              // PHASE 1B: Hide menu button for archived lots (view-only)
+              if (lot != null && lot.status == LotStatus.archived) {
+                return const SizedBox.shrink();
+              }
+
+              return PopupMenuButton<String>(
+                onSelected: (value) => _handleMenuAction(context, value),
+                itemBuilder: (context) {
+                  final lot = context.read<LotProvider>().getLotById(lotId);
+                  if (lot == null) return [];
+
+                  return [
+                    if (lot.status == LotStatus.open)
+                      PopupMenuItem(
+                        value: 'rename',
+                        child: Row(
+                          children: [
+                            const Icon(Icons.edit,
+                                size: AppConstants.iconSizeRegular),
+                            const SizedBox(width: AppConstants.spacingSmall),
+                            Text(AppLocalizations.of(context)
+                                .translate(AppStrings.rename)),
+                          ],
                         ),
-                      ],
+                      ),
+                    PopupMenuItem(
+                      value: 'duplicate',
+                      child: Row(
+                        children: [
+                          const Icon(Icons.content_copy,
+                              size: AppConstants.iconSizeRegular),
+                          const SizedBox(width: AppConstants.spacingSmall),
+                          Text(AppLocalizations.of(context)
+                              .translate(AppStrings.duplicate)),
+                        ],
+                      ),
                     ),
-                  ),
-              ];
+                    // PHASE 1: ADD - Archive button for closed lots
+                    if (lot.status == LotStatus.closed)
+                      PopupMenuItem(
+                        value: 'archive',
+                        child: Row(
+                          children: [
+                            const Icon(Icons.archive,
+                                size: AppConstants.iconSizeRegular),
+                            const SizedBox(width: AppConstants.spacingSmall),
+                            Text(AppLocalizations.of(context)
+                                .translate(AppStrings.lotStatusArchived)),
+                          ],
+                        ),
+                      ),
+                    if (lot.status == LotStatus.open)
+                      PopupMenuItem(
+                        value: 'delete',
+                        child: Row(
+                          children: [
+                            const Icon(Icons.delete,
+                                size: AppConstants.iconSizeRegular,
+                                color: AppConstants.statusDanger),
+                            const SizedBox(width: AppConstants.spacingSmall),
+                            Text(
+                              AppLocalizations.of(context)
+                                  .translate(AppStrings.delete),
+                              style: const TextStyle(
+                                  color: AppConstants.statusDanger),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ];
+                },
+              );
             },
           ),
         ],
@@ -123,7 +148,8 @@ class LotDetailScreen extends StatelessWidget {
               if (lot.type != null) _buildTypeSection(context, lot),
               _buildStatisticsSection(context, lot, animals),
               _buildAnimalsSection(context, lot, animals),
-              if (!lot.completed) _buildActionsSection(context, lot),
+              if (lot.status == LotStatus.open)
+                _buildActionsSection(context, lot, animals),
               const SizedBox(height: AppConstants.fabPaddingBottom),
             ],
           );
@@ -136,7 +162,10 @@ class LotDetailScreen extends StatelessWidget {
     final animals = <Animal>[];
     for (final animalId in lot.animalIds) {
       final animal = provider.getAnimalById(animalId);
-      if (animal != null) animals.add(animal);
+      // ✅ Inclure seulement les animaux ACTIFS
+      if (animal != null && animal.status == AnimalStatus.alive) {
+        animals.add(animal);
+      }
     }
     return animals;
   }
@@ -202,11 +231,18 @@ class LotDetailScreen extends StatelessWidget {
   }
 
   Widget _buildStatusSection(BuildContext context, Lot lot) {
-    final isCompleted = lot.completed;
-    final statusColor = isCompleted ? Colors.grey : AppConstants.successGreen;
-    final statusIcon = isCompleted ? Icons.lock : Icons.lock_open;
-    final statusText = AppLocalizations.of(context)
-        .translate(isCompleted ? AppStrings.lotClosed : AppStrings.lotOpened);
+    final isClosed =
+        lot.status == LotStatus.closed || lot.status == LotStatus.archived;
+    final statusColor = isClosed ? Colors.grey : AppConstants.successGreen;
+    final statusIcon = isClosed ? Icons.lock : Icons.lock_open;
+    final statusText =
+        AppLocalizations.of(context).translate(lot.status == LotStatus.open
+            ? AppStrings.lotOpened
+            : lot.status == LotStatus.closed
+                ? AppStrings.lotClosed
+                : lot.status == LotStatus.archived
+                    ? AppStrings.lotArchived
+                    : AppStrings.lotOpened);
 
     return Padding(
       padding: const EdgeInsets.all(AppConstants.spacingMedium),
@@ -241,7 +277,7 @@ class LotDetailScreen extends StatelessWidget {
                       color: statusColor,
                     ),
                   ),
-                  if (isCompleted && lot.completedAt != null)
+                  if (isClosed && lot.completedAt != null)
                     Text(
                       '${AppLocalizations.of(context).translate(AppStrings.onThe)} ${DateFormat('dd/MM/yyyy').format(lot.completedAt!)}',
                       style: TextStyle(
@@ -383,7 +419,7 @@ class LotDetailScreen extends StatelessWidget {
             child: _buildStatCard(
               context,
               AppLocalizations.of(context).translate(AppStrings.animals),
-              '${lot.animalCount}',
+              '${animals.length}',
               Icons.pets,
               AppConstants.primaryBlue,
             ),
@@ -473,6 +509,8 @@ class LotDetailScreen extends StatelessWidget {
                           title: AppLocalizations.of(context)
                               .translate(AppStrings.scanAnimals),
                           allowedStatuses: const [AnimalStatus.alive],
+                          lotId: lot.id,
+                          animalIdsInLot: lot.animalIds,
                         ),
                       ),
                     );
@@ -576,7 +614,8 @@ class LotDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActionsSection(BuildContext context, Lot lot) {
+  Widget _buildActionsSection(
+      BuildContext context, Lot lot, List<Animal> animals) {
     final l10n = AppLocalizations.of(context);
 
     return Padding(
@@ -586,7 +625,7 @@ class LotDetailScreen extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
-              onPressed: lot.animalIds.isEmpty
+              onPressed: animals.isEmpty
                   ? null
                   : () {
                       Navigator.push(
@@ -673,6 +712,9 @@ class LotDetailScreen extends StatelessWidget {
       case 'duplicate':
         _showDuplicateDialog(context, lot);
         break;
+      case 'archive':
+        _showArchiveDialog(context, lot);
+        break;
       case 'delete':
         _showDeleteDialog(context, lot);
         break;
@@ -749,7 +791,7 @@ class LotDetailScreen extends StatelessWidget {
                 title: Text(AppLocalizations.of(context)
                     .translate(AppStrings.keepAnimals)),
                 subtitle: Text(
-                    '${lot.animalCount} ${AppLocalizations.of(context).translate(AppStrings.animals).toLowerCase()}'),
+                    '${context.read<LotProvider>().getActiveAnimalCount(lot.id, context.read<AnimalProvider>().animals)} ${AppLocalizations.of(context).translate(AppStrings.animals).toLowerCase()}'),
                 value: keepAnimals,
                 onChanged: (val) => setState(() => keepAnimals = val ?? true),
               ),
@@ -837,6 +879,49 @@ class LotDetailScreen extends StatelessWidget {
                 backgroundColor: AppConstants.statusDanger),
             child:
                 Text(AppLocalizations.of(context).translate(AppStrings.delete)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // PHASE 1: ADD - Archive dialog
+  void _showArchiveDialog(BuildContext context, Lot lot) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title:
+            Text(AppLocalizations.of(context).translate(AppStrings.archiveLot)),
+        content: Text(AppLocalizations.of(context)
+            .translate(AppStrings.lotArchived)
+            .replaceAll('{name}', lot.name)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child:
+                Text(AppLocalizations.of(context).translate(AppStrings.cancel)),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final success =
+                  await context.read<LotProvider>().archiveLot(lot.id);
+              if (!context.mounted) return;
+              Navigator.pop(context);
+              if (success) {
+                Navigator.pop(context); // Revenir à la list
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      AppLocalizations.of(context)
+                          .translate(AppStrings.lotArchived),
+                    ),
+                    backgroundColor: AppConstants.successGreen,
+                  ),
+                );
+              }
+            },
+            child: Text(AppLocalizations.of(context)
+                .translate(AppStrings.lotStatusArchived)),
           ),
         ],
       ),

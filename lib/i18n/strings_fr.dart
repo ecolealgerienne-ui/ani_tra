@@ -379,6 +379,16 @@ const Map<String, String> stringsFr = {
   'scanOneAnimal': 'Scanner un animal',
   'scanAnimalsOneByOne': 'Scannez les animaux un par un',
 
+  // ==================== LOT STATUS ====================
+  'lotStatusOpen': 'Ouvert',
+  'lotStatusClosed': 'Fermé',
+  'lotStatusArchived': 'Archivé',
+  'archiveLot': 'Archiver le lot',
+  'archiveConfirm': 'Archiver le lot ?',
+  'archiveConfirmMessage':
+      'Êtes-vous sûr de vouloir archiver ce lot ? Cette action est irréversible.',
+  'lotArchived': 'Lot archivé avec succès',
+
   // ============ LOT SCREENS ============
   'lots': 'Lots',
   'noLots': 'Aucun lot',
@@ -408,7 +418,7 @@ const Map<String, String> stringsFr = {
   'treatmentWillApply': 'Le traitement sera appliqué aux animaux du lot',
   'buyerName': 'Nom de l\'acheteur *',
   'farmNumber': 'N° Exploitation (optionnel)',
-  'pricePerAnimal': 'Prix par animal (€) *',
+  'pricePerAnimal': 'Prix par animal (€)',
   'fieldRequired': 'Champ obligatoire',
   'deleteLotConfirm': 'Supprimer "{name}" ?',
   'vetValidated': '✅ {name} validé',
@@ -718,6 +728,14 @@ const Map<String, String> stringsFr = {
   'buyerFarmId': 'Identifiant de la ferme acheteuse',
   'slaughterhouseName': 'Nom de l’abattoir',
   'slaughterhouseId': 'Identifiant de l’abattoir',
+
+  // ========== Slaughter SCREENS ==========
+  'recordSlaughter': 'Enregistrer un abattage',
+  'animalsToSlaughter': 'Animaux à abattre',
+  'confirmSlaughter': 'Confirmer l\'abattage',
+
+  // ========== Slaughter SCREENS ==========
+  'animalsForSale': 'Animaux à vendre',
 
   // ANIMAL FINDER
   'identifyAnimals': 'Identifier animaux',

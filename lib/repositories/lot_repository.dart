@@ -6,7 +6,7 @@ import '../drift/daos/lot_dao.dart';
 import 'package:drift/drift.dart' as drift;
 
 /// Repository pour gérer la persistance des lots
-/// Phase 1C: Avec security checks farmId
+/// Phase 1C: Avec security checks farmId + Phase 1B: LotStatus support
 class LotRepository {
   final LotDao _dao;
 
@@ -39,7 +39,19 @@ class LotRepository {
     return data.map(_toLot).toList();
   }
 
-  /// Récupérer les lots complétés d'une ferme
+  /// Récupérer les lots fermés d'une ferme
+  Future<List<Lot>> findClosedByFarm(String farmId) async {
+    final data = await _dao.findClosedByFarm(farmId);
+    return data.map(_toLot).toList();
+  }
+
+  /// PHASE 1: ADD - Récupérer les lots archivés d'une ferme
+  Future<List<Lot>> findArchivedByFarm(String farmId) async {
+    final data = await _dao.findArchivedByFarm(farmId);
+    return data.map(_toLot).toList();
+  }
+
+  /// Récupérer les lots complétés d'une ferme (closed + archived)
   Future<List<Lot>> findCompletedByFarm(String farmId) async {
     final data = await _dao.findCompletedByFarm(farmId);
     return data.map(_toLot).toList();
@@ -115,7 +127,7 @@ class LotRepository {
       throw Exception('Lot not found or farm mismatch - Security violation');
     }
 
-    await _dao.softDelete(id, farmId);
+    await _dao.deleteLot(id);
   }
 
   // ==================== Business Logic ====================
@@ -129,6 +141,28 @@ class LotRepository {
     }
 
     await _dao.markAsCompleted(id);
+  }
+
+  /// PHASE 1: ADD - Marquer un lot comme fermé
+  Future<void> markAsClosed(String id, String farmId) async {
+    // Security check
+    final existing = await _dao.findById(id);
+    if (existing == null || existing.farmId != farmId) {
+      throw Exception('Lot not found or farm mismatch - Security violation');
+    }
+
+    await _dao.markAsClosed(id);
+  }
+
+  /// PHASE 1: ADD - Archiver un lot
+  Future<void> archiveLot(String id, String farmId) async {
+    // Security check
+    final existing = await _dao.findById(id);
+    if (existing == null || existing.farmId != farmId) {
+      throw Exception('Lot not found or farm mismatch - Security violation');
+    }
+
+    await _dao.markAsArchived(id);
   }
 
   /// Ajouter un animal au lot avec security check
@@ -216,9 +250,14 @@ class LotRepository {
     }
   }
 
+  // PHASE 2: ADD - Migration helper (run once to populate status from completed)
+  Future<int> migrateStatusFromCompleted() async {
+    return await _dao.migrateStatusFromCompleted();
+  }
+
   // ==================== Conversion Methods ====================
 
-  /// Convertir LotsTableData en Lot
+  /// PHASE 1: MODIFY - Convertir LotsTableData en Lot avec status fallback
   Lot _toLot(LotsTableData data) {
     // Décoder le JSON des animal_ids
     List<String> animalIds = [];
@@ -241,12 +280,27 @@ class LotRepository {
       }
     }
 
+    // PHASE 1: Décoder status avec fallback à completed
+    LotStatus? status;
+    if (data.status != null) {
+      try {
+        status = LotStatus.values.byName(data.status!);
+      } catch (e) {
+        // Fallback: déduire depuis completed
+        status = data.completed ? LotStatus.closed : LotStatus.open;
+      }
+    } else {
+      // Pas de status? Fallback à completed boolean
+      status = data.completed ? LotStatus.closed : LotStatus.open;
+    }
+
     return Lot(
       id: data.id,
       farmId: data.farmId,
       name: data.name,
       type: type,
       animalIds: animalIds,
+      status: status,
       completed: data.completed,
       completedAt: data.completedAt,
       // Treatment fields
@@ -277,7 +331,7 @@ class LotRepository {
     );
   }
 
-  /// Convertir Lot en LotsTableCompanion
+  /// PHASE 1: MODIFY - Convertir Lot en LotsTableCompanion avec status
   LotsTableCompanion _toCompanion(Lot lot, {required bool isUpdate}) {
     // Encoder animal_ids en JSON
     final animalIdsJson = jsonEncode(lot.animalIds);
@@ -288,6 +342,10 @@ class LotRepository {
       name: drift.Value(lot.name),
       type: drift.Value(lot.type?.name),
       animalIdsJson: drift.Value(animalIdsJson),
+      // PHASE 1: ADD - Encoder status
+      status: lot.status != null 
+        ? drift.Value(lot.status!.name) 
+        : const drift.Value(null),
       completed: drift.Value(lot.completed),
       completedAt: drift.Value(lot.completedAt),
       // Treatment fields

@@ -1,16 +1,16 @@
-// lib/screens/movement/sale_screen.dart
+// lib/screens/movement/slaughter_screen.dart
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
 
-class SaleScreen extends StatefulWidget {
+class SlaughterScreen extends StatefulWidget {
   final String? lotId;
   final List<String>? animalIds;
   final int animalCount;
 
-  const SaleScreen({
+  const SlaughterScreen({
     super.key,
     this.lotId,
     this.animalIds,
@@ -18,26 +18,24 @@ class SaleScreen extends StatefulWidget {
   });
 
   @override
-  State<SaleScreen> createState() => _SaleScreenState();
+  State<SlaughterScreen> createState() => _SlaughterScreenState();
 }
 
-class _SaleScreenState extends State<SaleScreen> {
+class _SlaughterScreenState extends State<SlaughterScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _buyerNameController = TextEditingController();
-  final _buyerFarmIdController = TextEditingController();
-  final _pricePerAnimalController = TextEditingController();
-  DateTime _saleDate = DateTime.now();
+  final _slaughterhouseNameController = TextEditingController();
+  final _slaughterhouseIdController = TextEditingController();
+  DateTime _slaughterDate = DateTime.now();
   bool _isConfirming = false;
 
   @override
   void dispose() {
-    _buyerNameController.dispose();
-    _buyerFarmIdController.dispose();
-    _pricePerAnimalController.dispose();
+    _slaughterhouseNameController.dispose();
+    _slaughterhouseIdController.dispose();
     super.dispose();
   }
 
-  Future<void> _confirmSale() async {
+  Future<void> _confirmSlaughter() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isConfirming = true);
@@ -72,8 +70,8 @@ class _SaleScreenState extends State<SaleScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title:
-            Text(AppLocalizations.of(context).translate(AppStrings.recordSale)),
+        title: Text(
+            AppLocalizations.of(context).translate(AppStrings.recordSlaughter)),
       ),
       body: Form(
         key: _formKey,
@@ -89,7 +87,7 @@ class _SaleScreenState extends State<SaleScreen> {
                   children: [
                     Text(
                       AppLocalizations.of(context)
-                          .translate(AppStrings.animalsForSale),
+                          .translate(AppStrings.animalsToSlaughter),
                       style: const TextStyle(
                         fontSize: AppConstants.fontSizeSubtitle,
                         color: Colors.grey,
@@ -109,62 +107,35 @@ class _SaleScreenState extends State<SaleScreen> {
             ),
             const SizedBox(height: AppConstants.spacingLarge),
 
-            // Acheteur
+            // Abattoir
             TextFormField(
-              controller: _buyerNameController,
+              controller: _slaughterhouseNameController,
               decoration: InputDecoration(
                 labelText: AppLocalizations.of(context)
-                    .translate(AppStrings.buyerName),
+                    .translate(AppStrings.slaughterhouseName),
                 border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.person),
+                prefixIcon: const Icon(Icons.factory),
               ),
               validator: (value) => value == null || value.isEmpty
                   ? AppLocalizations.of(context)
-                      .translate(AppStrings.buyerNameRequired)
+                      .translate(AppStrings.fieldRequired)
                   : null,
             ),
             const SizedBox(height: AppConstants.spacingMedium),
 
-            // N° Exploitation
+            // N° Abattoir
             TextField(
-              controller: _buyerFarmIdController,
+              controller: _slaughterhouseIdController,
               decoration: InputDecoration(
                 labelText: AppLocalizations.of(context)
-                    .translate(AppStrings.buyerFarmId),
+                    .translate(AppStrings.slaughterhouseId),
                 border: const OutlineInputBorder(),
                 prefixIcon: const Icon(Icons.badge),
               ),
             ),
             const SizedBox(height: AppConstants.spacingMedium),
 
-            // Prix par animal (optionnel)
-            TextFormField(
-              controller: _pricePerAnimalController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: AppLocalizations.of(context)
-                    .translate(AppStrings.pricePerAnimal),
-                hintText: '(optionnel)',
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.euro),
-              ),
-              validator: (value) {
-                // Le prix est optionnel - accepter un champ vide
-                if (value == null || value.isEmpty) {
-                  return null;
-                }
-                // Si rempli, vérifier que c'est un nombre positif
-                final price = double.tryParse(value);
-                if (price == null || price <= 0) {
-                  return AppLocalizations.of(context)
-                      .translate(AppStrings.invalidPrice);
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: AppConstants.spacingMedium),
-
-            // Date vente
+            // Date abattage
             ListTile(
               contentPadding: EdgeInsets.zero,
               shape: RoundedRectangleBorder(
@@ -173,20 +144,20 @@ class _SaleScreenState extends State<SaleScreen> {
                 side: BorderSide(color: Colors.grey.shade400),
               ),
               leading: const Icon(Icons.calendar_today),
-              title: Text(
-                  AppLocalizations.of(context).translate(AppStrings.saleDate)),
-              subtitle: Text(dateFormat.format(_saleDate)),
+              title: Text(AppLocalizations.of(context)
+                  .translate(AppStrings.dateSlaughter)),
+              subtitle: Text(dateFormat.format(_slaughterDate)),
               trailing: const Icon(Icons.chevron_right),
               onTap: () async {
                 final date = await showDatePicker(
                   context: context,
-                  initialDate: _saleDate,
-                  firstDate: DateTime.now()
-                      .subtract(const Duration(days: AppConstants.maxPastDays)),
-                  lastDate: DateTime.now(),
+                  initialDate: _slaughterDate,
+                  firstDate: DateTime.now(),
+                  lastDate: DateTime.now()
+                      .add(const Duration(days: AppConstants.maxFutureDays)),
                 );
                 if (date != null) {
-                  setState(() => _saleDate = date);
+                  setState(() => _slaughterDate = date);
                 }
               },
             ),
@@ -215,7 +186,7 @@ class _SaleScreenState extends State<SaleScreen> {
         const SizedBox(width: 16),
         Expanded(
           child: FilledButton(
-            onPressed: _isConfirming ? null : _confirmSale,
+            onPressed: _isConfirming ? null : _confirmSlaughter,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
@@ -235,7 +206,7 @@ class _SaleScreenState extends State<SaleScreen> {
                 Flexible(
                   child: Text(
                     AppLocalizations.of(context)
-                        .translate(AppStrings.confirmSale),
+                        .translate(AppStrings.confirmSlaughter),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),

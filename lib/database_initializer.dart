@@ -308,13 +308,14 @@ class DatabaseInitializer {
         debugPrint('$_tag:   ⚠️ Batch: $e');
       }
 
-      // Lots
+      // Lots - PHASE 1: ADD status field
       try {
         await db.lotDao.insertLot(LotsTableCompanion.insert(
           id: 'lot_001',
           farmId: 'farm_default',
           name: 'Lot de traitement #1',
           animalIdsJson: '["anim_001"]',
+          status: const Value('open'), // PHASE 1: ADD
           completed: const Value(false),
           synced: const Value(false),
           createdAt: now,
