@@ -285,24 +285,47 @@ class _SaleScreenState extends State<SaleScreen> {
 
             const SizedBox(height: 24),
 
-            // Confirm Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _confirmSale,
-                icon: const Icon(Icons.check),
-                label: Text(AppLocalizations.of(context)
-                    .translate(AppStrings.confirmSale)),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
-                ),
-              ),
-            ),
+            // Action Buttons (Cancel + Confirm)
+            _buildActionButtons(),
           ],
         ],
       ),
+    );
+  }
+
+  /// Construire les boutons d'action (Annuler + Confirmer)
+  Widget _buildActionButtons() {
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child:
+                Text(AppLocalizations.of(context).translate(AppStrings.cancel)),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: FilledButton(
+            onPressed: _confirmSale,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.check, size: 20),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    AppLocalizations.of(context)
+                        .translate(AppStrings.confirmSale),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

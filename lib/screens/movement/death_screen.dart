@@ -305,35 +305,58 @@ class _DeathScreenState extends State<DeathScreen> {
             const SizedBox(height: 24),
 
             // Confirm Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _isConfirming
-                    ? null
-                    : _confirmDeath, // ← Désactiver pendant la sauvegarde
-                icon: _isConfirming
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      )
-                    : const Icon(Icons.delete_forever),
-                label: Text(AppLocalizations.of(context)
-                    .translate(AppStrings.confirmDeath)),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: Colors.grey.shade700,
-                  foregroundColor: Colors.white,
-                ),
-              ),
-            ),
+
+            // Action Buttons (Cancel + Confirm)
+            _buildActionButtons(),
           ],
         ],
       ),
+    );
+  }
+
+  /// Construire les boutons d'action (Annuler + Confirmer)
+  Widget _buildActionButtons() {
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child:
+                Text(AppLocalizations.of(context).translate(AppStrings.cancel)),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: FilledButton(
+            onPressed: _isConfirming ? null : _confirmDeath,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (_isConfirming)
+                  const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                else
+                  const Icon(Icons.delete_forever, size: 20),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    AppLocalizations.of(context)
+                        .translate(AppStrings.confirmDeath),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
