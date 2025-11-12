@@ -3,7 +3,7 @@
 import 'package:drift/drift.dart';
 
 /// Table pour les vaccinations
-/// 
+///
 /// Stocke les vaccinations appliquées aux animaux avec:
 /// - Lien vers animal(aux) (FK → animals OU liste JSON)
 /// - Informations protocole et vaccin
@@ -22,7 +22,7 @@ class VaccinationsTable extends Table {
   // === Animal(aux) concerné(s) ===
   /// ID animal simple (vaccination individuelle) - nullable
   TextColumn get animalId => text().nullable().named('animal_id')();
-  
+
   /// Liste IDs animaux (JSON array) pour vaccination de groupe
   /// Ex: ["animal-1", "animal-2", "animal-3"]
   TextColumn get animalIds => text().named('animal_ids')();
@@ -30,10 +30,10 @@ class VaccinationsTable extends Table {
   // === Protocole ===
   TextColumn get protocolId => text().nullable().named('protocol_id')();
   TextColumn get vaccineName => text().named('vaccine_name')();
-  
+
   /// Type: "obligatoire", "recommandee", "optionnelle" (VaccinationType enum)
   TextColumn get type => text()();
-  
+
   TextColumn get disease => text()();
 
   // === Administration ===
@@ -45,20 +45,24 @@ class VaccinationsTable extends Table {
 
   // === Acteurs ===
   TextColumn get veterinarianId => text().nullable().named('veterinarian_id')();
-  TextColumn get veterinarianName => text().nullable().named('veterinarian_name')();
+  TextColumn get veterinarianName =>
+      text().nullable().named('veterinarian_name')();
 
   // === Rappel ===
-  DateTimeColumn get nextDueDate => dateTime().nullable().named('next_due_date')();
+  DateTimeColumn get nextDueDate =>
+      dateTime().nullable().named('next_due_date')();
 
   // === Délai d'attente ===
-  IntColumn get withdrawalPeriodDays => integer().named('withdrawal_period_days')();
+  IntColumn get withdrawalPeriodDays =>
+      integer().named('withdrawal_period_days')();
 
   // === Notes ===
   TextColumn get notes => text().nullable()();
 
   // === Sync fields (Phase 2 ready) ===
   BoolColumn get synced => boolean().withDefault(const Constant(false))();
-  DateTimeColumn get lastSyncedAt => dateTime().nullable().named('last_synced_at')();
+  DateTimeColumn get lastSyncedAt =>
+      dateTime().nullable().named('last_synced_at')();
   IntColumn get serverVersion => integer().nullable().named('server_version')();
 
   // === Soft-delete ===
@@ -73,7 +77,9 @@ class VaccinationsTable extends Table {
 
   @override
   List<String> get customConstraints => [
-    'FOREIGN KEY (farm_id) REFERENCES farms(id)',
-    // Note: animalId nullable, pas de FK strict car peut être vaccination de groupe
-  ];
+        'FOREIGN KEY (farm_id) REFERENCES farms(id) ON DELETE CASCADE',
+        'CREATE INDEX IF NOT EXISTS idx_vaccinations_farm_id ON vaccinations(farm_id)',
+        'CREATE INDEX IF NOT EXISTS idx_vaccinations_farm_created ON vaccinations(farm_id, created_at DESC)',
+        'CREATE INDEX IF NOT EXISTS idx_vaccinations_deleted_at ON vaccinations(deleted_at)',
+      ];
 }

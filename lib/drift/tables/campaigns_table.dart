@@ -38,10 +38,26 @@ class CampaignsTable extends Table {
   DateTimeColumn get lastSyncedAt =>
       dateTime().nullable().named('last_synced_at')();
   TextColumn get serverVersion => text().nullable().named('server_version')();
-  
+
   // Soft-delete (audit trail)
   DateTimeColumn get deletedAt => dateTime().nullable().named('deleted_at')();
 
   @override
   Set<Column> get primaryKey => {id};
+
+  /// Custom constraints + indexes
+  /// FK campaigns.farm_id → farms.id + 4 performance indexes
+  List<String> get customStatements => [
+        // Foreign Key: campaigns.farm_id → farms.id
+        'CREATE INDEX IF NOT EXISTS idx_campaigns_farmid ON campaigns(farm_id);',
+
+        // Index for filtering active/completed campaigns by farm
+        'CREATE INDEX IF NOT EXISTS idx_campaigns_farm_completed ON campaigns(farm_id, completed);',
+
+        // Index for queries by withdrawal date
+        'CREATE INDEX IF NOT EXISTS idx_campaigns_withdrawal_date ON campaigns(withdrawal_end_date, completed);',
+
+        // Index for soft-delete queries (all queries filter on deleted_at)
+        'CREATE INDEX IF NOT EXISTS idx_campaigns_deleted_at ON campaigns(deleted_at);',
+      ];
 }

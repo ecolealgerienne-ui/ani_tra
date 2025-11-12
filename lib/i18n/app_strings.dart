@@ -871,4 +871,50 @@ class AppStrings {
   //section GENERAL ou NAVIGATION)
   static const String scan = 'scan';
   static const String home = 'home';
+
+  // ========== BREEDING SPECIFICS ==========
+  static const String breeding = 'breeding';
+  static const String breedings = 'breedings';
+  static const String noBreedings = 'noBreedings';
+  static const String newBreeding = 'newBreeding';
+
+// Breeding methods
+  static const String breedingMethod = 'breedingMethod';
+  static const String natural = 'natural';
+  static const String artificialInsemination = 'artificialInsemination';
+
+// Breeding dates
+  static const String breedingDate = 'breedingDate';
+  static const String expectedBirthDate = 'expectedBirthDate';
+  static const String actualBirthDate = 'actualBirthDate';
+
+// Breeding status (DIFFERENT from animal status)
+  static const String breedingStatus = 'breedingStatus';
+  static const String pending = 'pending';
+  static const String completedBreeding = 'completedBreeding';
+  static const String failedBreeding = 'failedBreeding';
+  static const String abortedBreeding = 'abortedBreeding';
+
+// Breeding data
+  static const String father = 'father';
+  static const String expectedOffspring = 'expectedOffspring';
+  static const String actualOffspring = 'actualOffspring';
+  static const String gestationDays = 'gestationDays';
+
+// Breeding alerts
+  static const String birthSoon = 'birthSoon';
+  static const String overdue = 'overdue';
+  static const String daysUntilBirth = 'daysUntilBirth';
+
+// Breeding actions
+  static const String recordBreeding = 'recordBreeding';
+  static const String recordBirth = 'recordBirth';
+  static const String markAsFailed = 'markAsFailed';
+  static const String markAsAborted = 'markAsAborted';
+  static const String breedingRecorded = 'breedingRecorded';
+  static const String birthRecorded = 'birthRecorded';
+
+// Statistics
+  static const String successRate = 'successRate';
+  static const String breedingThisMonth = 'breedingThisMonth';
 }

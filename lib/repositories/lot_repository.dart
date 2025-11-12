@@ -22,7 +22,7 @@ class LotRepository {
 
   /// Récupérer un lot par son ID (avec vérification farmId)
   Future<Lot?> findById(String id, String farmId) async {
-    final data = await _dao.findById(id);
+    final data = await _dao.findById(id, farmId);
     if (data == null) return null;
 
     // Security check
@@ -104,7 +104,7 @@ class LotRepository {
   /// Mettre à jour un lot avec security check
   Future<Lot> update(Lot lot, String farmId) async {
     // Security check: vérifier l'ownership
-    final existing = await _dao.findById(lot.id);
+    final existing = await _dao.findById(lot.id, farmId);
     if (existing == null || existing.farmId != farmId) {
       throw Exception('Lot not found or farm mismatch - Security violation');
     }
@@ -115,14 +115,14 @@ class LotRepository {
     }
 
     final companion = _toCompanion(lot, isUpdate: true);
-    await _dao.updateLot(companion);
+    await _dao.updateLot(companion, farmId);
     return lot;
   }
 
   /// Supprimer un lot avec security check
   Future<void> delete(String id, String farmId) async {
     // Security check: vérifier l'ownership
-    final existing = await _dao.findById(id);
+    final existing = await _dao.findById(id, farmId);
     if (existing == null || existing.farmId != farmId) {
       throw Exception('Lot not found or farm mismatch - Security violation');
     }
@@ -135,69 +135,69 @@ class LotRepository {
   /// Marquer un lot comme complété avec security check
   Future<void> markAsCompleted(String id, String farmId) async {
     // Security check
-    final existing = await _dao.findById(id);
+    final existing = await _dao.findById(id, farmId);
     if (existing == null || existing.farmId != farmId) {
       throw Exception('Lot not found or farm mismatch - Security violation');
     }
 
-    await _dao.markAsCompleted(id);
+    await _dao.markAsCompleted(id, farmId);
   }
 
   /// PHASE 1: ADD - Marquer un lot comme fermé
   Future<void> markAsClosed(String id, String farmId) async {
     // Security check
-    final existing = await _dao.findById(id);
+    final existing = await _dao.findById(id, farmId);
     if (existing == null || existing.farmId != farmId) {
       throw Exception('Lot not found or farm mismatch - Security violation');
     }
 
-    await _dao.markAsClosed(id);
+    await _dao.markAsClosed(id, farmId);
   }
 
   /// PHASE 1: ADD - Archiver un lot
   Future<void> archiveLot(String id, String farmId) async {
     // Security check
-    final existing = await _dao.findById(id);
+    final existing = await _dao.findById(id, farmId);
     if (existing == null || existing.farmId != farmId) {
       throw Exception('Lot not found or farm mismatch - Security violation');
     }
 
-    await _dao.markAsArchived(id);
+    await _dao.markAsArchived(id, farmId);
   }
 
   /// Ajouter un animal au lot avec security check
   Future<void> addAnimalToLot(
       String lotId, String animalId, String farmId) async {
     // Security check
-    final existing = await _dao.findById(lotId);
+    final existing = await _dao.findById(lotId, farmId);
     if (existing == null || existing.farmId != farmId) {
       throw Exception('Lot not found or farm mismatch - Security violation');
     }
 
-    await _dao.addAnimalToLot(lotId, animalId);
+    await _dao.addAnimalToLot(lotId, animalId, farmId);
   }
 
   /// Retirer un animal du lot avec security check
   Future<void> removeAnimalFromLot(
       String lotId, String animalId, String farmId) async {
     // Security check
-    final existing = await _dao.findById(lotId);
+    final existing = await _dao.findById(lotId, farmId);
     if (existing == null || existing.farmId != farmId) {
       throw Exception('Lot not found or farm mismatch - Security violation');
     }
 
-    await _dao.removeAnimalFromLot(lotId, animalId);
+    await _dao.removeAnimalFromLot(lotId, animalId, farmId);
   }
 
   /// Définir le type du lot avec security check
   Future<void> setLotType(String id, LotType type, String farmId) async {
     // Security check
-    final existing = await _dao.findById(id);
+    final existing = await _dao.findById(id, farmId);
     if (existing == null || existing.farmId != farmId) {
       throw Exception('Lot not found or farm mismatch - Security violation');
     }
 
-    await _dao.setLotType(id, type.name);
+    await _dao.setLotType(id, type.name, farmId);
   }
 
   /// Compter les lots d'une ferme
@@ -343,9 +343,9 @@ class LotRepository {
       type: drift.Value(lot.type?.name),
       animalIdsJson: drift.Value(animalIdsJson),
       // PHASE 1: ADD - Encoder status
-      status: lot.status != null 
-        ? drift.Value(lot.status!.name) 
-        : const drift.Value(null),
+      status: lot.status != null
+          ? drift.Value(lot.status!.name)
+          : const drift.Value(null),
       completed: drift.Value(lot.completed),
       completedAt: drift.Value(lot.completedAt),
       // Treatment fields

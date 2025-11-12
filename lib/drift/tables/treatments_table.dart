@@ -3,7 +3,7 @@
 import 'package:drift/drift.dart';
 
 /// Table pour les traitements médicaux
-/// 
+///
 /// Stocke les traitements appliqués aux animaux avec:
 /// - Lien vers l'animal (FK → animals)
 /// - Lien vers le produit (FK → medical_products)
@@ -27,17 +27,20 @@ class TreatmentsTable extends Table {
   TextColumn get productName => text().named('product_name')();
   RealColumn get dose => real()();
   DateTimeColumn get treatmentDate => dateTime().named('treatment_date')();
-  DateTimeColumn get withdrawalEndDate => dateTime().named('withdrawal_end_date')();
+  DateTimeColumn get withdrawalEndDate =>
+      dateTime().named('withdrawal_end_date')();
   TextColumn get notes => text().nullable()();
 
   // === Acteurs ===
   TextColumn get veterinarianId => text().nullable().named('veterinarian_id')();
-  TextColumn get veterinarianName => text().nullable().named('veterinarian_name')();
+  TextColumn get veterinarianName =>
+      text().nullable().named('veterinarian_name')();
   TextColumn get campaignId => text().nullable().named('campaign_id')();
 
   // === Sync fields (Phase 2 ready) ===
   BoolColumn get synced => boolean().withDefault(const Constant(false))();
-  DateTimeColumn get lastSyncedAt => dateTime().nullable().named('last_synced_at')();
+  DateTimeColumn get lastSyncedAt =>
+      dateTime().nullable().named('last_synced_at')();
   IntColumn get serverVersion => integer().nullable().named('server_version')();
 
   // === Soft-delete ===
@@ -52,8 +55,11 @@ class TreatmentsTable extends Table {
 
   @override
   List<String> get customConstraints => [
-    'FOREIGN KEY (farm_id) REFERENCES farms(id)',
-    'FOREIGN KEY (animal_id) REFERENCES animals(id)',
-    'FOREIGN KEY (product_id) REFERENCES medical_products(id)',
-  ];
+        'FOREIGN KEY (farm_id) REFERENCES farms(id) ON DELETE CASCADE',
+        'FOREIGN KEY (animal_id) REFERENCES animals(id)',
+        'FOREIGN KEY (product_id) REFERENCES medical_products(id)',
+        'CREATE INDEX IF NOT EXISTS idx_treatments_farm_id ON treatments(farm_id)',
+        'CREATE INDEX IF NOT EXISTS idx_treatments_farm_created ON treatments(farm_id, created_at DESC)',
+        'CREATE INDEX IF NOT EXISTS idx_treatments_deleted_at ON treatments(deleted_at)',
+      ];
 }

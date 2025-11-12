@@ -20,10 +20,11 @@ class CampaignDao extends DatabaseAccessor<AppDatabase>
         .get();
   }
 
-  // 2. Get campaign by ID
-  Future<CampaignsTableData?> findById(String id) {
+  // 2. Get campaign by ID (avec security check farmId)
+  Future<CampaignsTableData?> findById(String id, String farmId) {
     return (select(campaignsTable)
           ..where((t) => t.id.equals(id))
+          ..where((t) => t.farmId.equals(farmId))
           ..where((t) => t.deletedAt.isNull()))
         .getSingleOrNull();
   }
@@ -110,9 +111,10 @@ class CampaignDao extends DatabaseAccessor<AppDatabase>
     return into(campaignsTable).insert(campaign);
   }
 
-  // 11. Update campaign
-  Future<bool> updateCampaign(CampaignsTableCompanion campaign) {
-    return update(campaignsTable).replace(campaign);
+  // 11. Update campaign (avec farmId security check)
+  Future<int> updateCampaign(CampaignsTableCompanion campaign, String farmId) {
+    return (update(campaignsTable)..where((t) => t.farmId.equals(farmId)))
+        .write(campaign);
   }
 
   // 12. Soft-delete campaign (audit trail)
@@ -126,9 +128,12 @@ class CampaignDao extends DatabaseAccessor<AppDatabase>
     ));
   }
 
-  // 13. Mark campaign as completed
-  Future<int> markAsCompleted(String id) {
-    return (update(campaignsTable)..where((t) => t.id.equals(id))).write(
+  // 13. Mark campaign as completed (avec security check farmId)
+  Future<int> markAsCompleted(String id, String farmId) {
+    return (update(campaignsTable)
+          ..where((t) => t.id.equals(id))
+          ..where((t) => t.farmId.equals(farmId)))
+        .write(
       CampaignsTableCompanion(
         completed: const Value(true),
         synced: const Value(false),
@@ -137,16 +142,19 @@ class CampaignDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
-  // 14. Add animal to campaign
-  Future<void> addAnimalToCampaign(String campaignId, String animalId) async {
-    final campaign = await findById(campaignId);
+  // 14. Add animal to campaign (avec security check farmId)
+  Future<void> addAnimalToCampaign(
+      String campaignId, String animalId, String farmId) async {
+    final campaign = await findById(campaignId, farmId);
     if (campaign == null) return;
 
     final animalIds = _decodeAnimalIds(campaign.animalIdsJson);
     if (!animalIds.contains(animalId)) {
       animalIds.add(animalId);
 
-      await (update(campaignsTable)..where((t) => t.id.equals(campaignId)))
+      await (update(campaignsTable)
+            ..where((t) => t.id.equals(campaignId))
+            ..where((t) => t.farmId.equals(farmId)))
           .write(
         CampaignsTableCompanion(
           animalIdsJson: Value(_encodeAnimalIds(animalIds)),
@@ -157,17 +165,19 @@ class CampaignDao extends DatabaseAccessor<AppDatabase>
     }
   }
 
-  // 15. Remove animal from campaign
+  // 15. Remove animal from campaign (avec security check farmId)
   Future<void> removeAnimalFromCampaign(
-      String campaignId, String animalId) async {
-    final campaign = await findById(campaignId);
+      String campaignId, String animalId, String farmId) async {
+    final campaign = await findById(campaignId, farmId);
     if (campaign == null) return;
 
     final animalIds = _decodeAnimalIds(campaign.animalIdsJson);
     if (animalIds.contains(animalId)) {
       animalIds.remove(animalId);
 
-      await (update(campaignsTable)..where((t) => t.id.equals(campaignId)))
+      await (update(campaignsTable)
+            ..where((t) => t.id.equals(campaignId))
+            ..where((t) => t.farmId.equals(farmId)))
           .write(
         CampaignsTableCompanion(
           animalIdsJson: Value(_encodeAnimalIds(animalIds)),

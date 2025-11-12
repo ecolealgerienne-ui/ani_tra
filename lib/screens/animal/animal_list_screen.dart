@@ -1,5 +1,5 @@
 // lib/screens/animal_list_screen.dart
-// Version 2.0 - Intégration complète des alertes
+// Version 2.0 - IntÃ©gration complÃ¨te des alertes
 // PHASE 1+2 : Alertes prioritaires + Groupes collapsibles
 
 import 'package:flutter/material.dart';
@@ -15,6 +15,7 @@ import '../../models/alert_type.dart';
 import '../../models/alert_category.dart';
 import '../../models/breed.dart';
 import '../../data/animal_config.dart';
+import '../../providers/breed_provider.dart';
 
 import 'animal_detail_screen.dart';
 import 'add_animal_screen.dart';
@@ -24,10 +25,10 @@ import '../../i18n/app_strings.dart';
 //import '../../utils/constants.dart';
 
 class AnimalListScreen extends StatefulWidget {
-  /// Liste d'IDs à afficher uniquement (pour filtrer depuis une alerte)
+  /// Liste d'IDs Ã  afficher uniquement (pour filtrer depuis une alerte)
   final List<String>? filterAnimalIds;
 
-  /// Titre personnalisé si on vient d'une alerte
+  /// Titre personnalisÃ© si on vient d'une alerte
   final String? customTitle;
 
   const AnimalListScreen({
@@ -53,7 +54,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
   Set<String> _selectedSpecies = {};
   Set<String> _selectedBreeds = {};
 
-  // 🆕 Filtre alertes
+  // ðŸ†• Filtre alertes
   bool _showOnlyWithAlerts = false;
 
   // Group By - Initialisation intelligente
@@ -62,22 +63,22 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
   @override
   void initState() {
     super.initState();
-    // Si on vient d'une alerte avec filtre → Pas de groupement
-    // Sinon → Grouper par alertes par défaut
+    // Si on vient d'une alerte avec filtre â†’ Pas de groupement
+    // Sinon â†’ Grouper par alertes par dÃ©faut
     _groupBy = widget.filterAnimalIds != null
         ? GroupByOption.none
         : GroupByOption.alerts;
   }
 
-  // 🆕 État des sections collapsibles
+  // ðŸ†• Ã‰tat des sections collapsibles
   final Map<String, bool> _expandedSections = {
-    'urgent': true, // Ouvert par défaut
-    'important': true, // Ouvert par défaut
-    'routine': false, // Fermé par défaut
-    'noalert': true, // 🔧 OUVERT par défaut pour voir les animaux
+    'urgent': true, // Ouvert par dÃ©faut
+    'important': true, // Ouvert par dÃ©faut
+    'routine': false, // FermÃ© par dÃ©faut
+    'noalert': true, // ðŸ”§ OUVERT par dÃ©faut pour voir les animaux
   };
 
-  // État filtres drawer
+  // Ã‰tat filtres drawer
   int get _activeFilterCount {
     int count = 0;
     if (_selectedStatuses.length < 4) count++;
@@ -102,7 +103,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     var filtered = animals;
     final animalProvider = context.read<AnimalProvider>();
 
-    // 🆕 Si on vient d'une alerte, filtrer uniquement ces animaux
+    // ðŸ†• Si on vient d'une alerte, filtrer uniquement ces animaux
     if (widget.filterAnimalIds != null) {
       filtered = filtered
           .where((a) => widget.filterAnimalIds!.contains(a.id))
@@ -127,7 +128,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       filtered = filtered.where((a) => _selectedSexes.contains(a.sex)).toList();
     }
 
-    // Filtre âge
+    // Filtre Ã¢ge
     if (_selectedAgeRanges.isNotEmpty) {
       filtered = filtered.where((a) {
         final months = a.ageInMonths;
@@ -141,7 +142,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       }).toList();
     }
 
-    // Filtre rémanence
+    // Filtre rÃ©manence
     if (_hasActiveWithdrawal != null) {
       final animalProvider = context.read<AnimalProvider>();
       filtered = filtered.where((a) {
@@ -150,7 +151,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       }).toList();
     }
 
-    // Filtre mère
+    // Filtre mÃ¨re
     if (_motherEidFilter != null && _motherEidFilter!.isNotEmpty) {
       filtered = filtered.where((a) {
         if (a.motherId == null) return false;
@@ -177,7 +178,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       }).toList();
     }
 
-    // 🆕 Filtre "Avec alertes uniquement"
+    // ðŸ†• Filtre "Avec alertes uniquement"
     if (_showOnlyWithAlerts) {
       final alertProvider = context.read<AlertProvider>();
       filtered = filtered.where((a) {
@@ -195,7 +196,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       case GroupByOption.none:
         return {'all': animals};
 
-      // 🆕 NOUVEAU : Grouper par niveau d'alerte
+      // ðŸ†• NOUVEAU : Grouper par niveau d'alerte
       case GroupByOption.alerts:
         final alertProvider = context.read<AlertProvider>();
 
@@ -241,7 +242,9 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
 
       case GroupByOption.sex:
         for (final animal in animals) {
-          final key = animal.sex == AnimalSex.male ? '♂️ Mâles' : '♀️ Femelles';
+          final key = animal.sex == AnimalSex.male
+              ? 'â™‚ï¸ MÃ¢les'
+              : 'â™€ï¸ Femelles';
           groups.putIfAbsent(key, () => []).add(animal);
         }
         break;
@@ -251,13 +254,13 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
           final months = animal.ageInMonths;
           String key;
           if (months < 6) {
-            key = '🐑 < 6 mois';
+            key = 'ðŸ‘ < 6 mois';
           } else if (months < 12) {
-            key = '🐑 6-12 mois';
+            key = 'ðŸ‘ 6-12 mois';
           } else if (months < 24) {
-            key = '🐏 1-2 ans';
+            key = 'ðŸ 1-2 ans';
           } else {
-            key = '🐏 > 2 ans';
+            key = 'ðŸ > 2 ans';
           }
           groups.putIfAbsent(key, () => []).add(animal);
         }
@@ -268,16 +271,16 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
           String key;
           switch (animal.status) {
             case AnimalStatus.alive:
-              key = '🟢 Vivants';
+              key = 'ðŸŸ¢ Vivants';
               break;
             case AnimalStatus.sold:
-              key = '🟠 Vendus';
+              key = 'ðŸŸ  Vendus';
               break;
             case AnimalStatus.dead:
-              key = '🔴 Morts';
+              key = 'ðŸ”´ Morts';
               break;
             case AnimalStatus.slaughtered:
-              key = '🏭 Abattus';
+              key = 'ðŸ­ Abattus';
               break;
           }
           groups.putIfAbsent(key, () => []).add(animal);
@@ -288,8 +291,9 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
         final animalProvider = context.read<AnimalProvider>();
         for (final animal in animals) {
           final hasActive = animalProvider.hasActiveWithdrawal(animal.id);
-          final key =
-              hasActive ? '⚠️ Rémanence Active' : '✅ Rémanence Inactive';
+          final key = hasActive
+              ? 'âš ï¸ RÃ©manence Active'
+              : 'âœ… RÃ©manence Inactive';
           groups.putIfAbsent(key, () => []).add(animal);
         }
         break;
@@ -297,13 +301,13 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       case GroupByOption.mother:
         for (final animal in animals) {
           if (animal.motherId == null) {
-            groups.putIfAbsent('❓ Mère inconnue', () => []).add(animal);
+            groups.putIfAbsent('â“ MÃ¨re inconnue', () => []).add(animal);
           } else {
             final mother =
                 context.read<AnimalProvider>().getAnimalById(animal.motherId!);
             final key = mother != null
-                ? '👩 ${mother.officialNumber ?? mother.eid}'
-                : '❓ Mère inconnue';
+                ? 'ðŸ‘© ${mother.officialNumber ?? mother.eid}'
+                : 'â“ MÃ¨re inconnue';
             groups.putIfAbsent(key, () => []).add(animal);
           }
         }
@@ -312,7 +316,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       case GroupByOption.species:
         for (final animal in animals) {
           if (animal.speciesId == null) {
-            groups.putIfAbsent('❓ Type non défini', () => []).add(animal);
+            groups.putIfAbsent('â“ Type non dÃ©fini', () => []).add(animal);
           } else {
             final key = animal.fullDisplayFr.split(' - ').first;
             groups.putIfAbsent(key, () => []).add(animal);
@@ -323,7 +327,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       case GroupByOption.breed:
         for (final animal in animals) {
           if (animal.breedId == null) {
-            groups.putIfAbsent('❓ Race non définie', () => []).add(animal);
+            groups.putIfAbsent('â“ Race non dÃ©finie', () => []).add(animal);
           } else {
             final key = animal.breedNameFr;
             groups.putIfAbsent(key, () => []).add(animal);
@@ -335,7 +339,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     return groups;
   }
 
-  // 🆕 Obtenir la clé de section pour l'état collapsed
+  // ðŸ†• Obtenir la clÃ© de section pour l'Ã©tat collapsed
   String _getSectionKey(String groupName) {
     if (groupName.contains('URGENTS')) return 'urgent';
     if (groupName.contains('SURVEILLER')) return 'important';
@@ -350,7 +354,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       appBar: AppBar(
         title: Text(widget.customTitle ?? 'Animaux'),
         actions: [
-          // 🆕 Badge d'alertes
+          // ðŸ†• Badge d'alertes
           Consumer<AlertProvider>(
             builder: (context, alertProvider, child) {
               final alertCount = alertProvider.alertCount;
@@ -410,11 +414,11 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
           final filtered = _getFilteredAnimals(animalProvider.animals);
           final grouped = _getGroupedAnimals(filtered);
 
-          // 🆕 Tri des groupes pour mettre les alertes en premier
+          // ðŸ†• Tri des groupes pour mettre les alertes en premier
           final sortedKeys = grouped.keys.toList();
           if (_groupBy == GroupByOption.alerts) {
             final Map<String, int> priority = {
-              // ← Déclarer AVANT
+              // â† DÃ©clarer AVANT
               AppLocalizations.of(context).translate(AppStrings.urgent): 1,
               AppLocalizations.of(context).translate(AppStrings.toMonitor): 2,
               AppLocalizations.of(context).translate(AppStrings.routine): 3,
@@ -431,7 +435,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
               // Barre de recherche
               _buildSearchBar(),
 
-              // 🆕 Chips de filtre rapide
+              // ðŸ†• Chips de filtre rapide
               _buildQuickFilters(alertProvider, filtered.length),
 
               // Liste des animaux
@@ -489,7 +493,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
           suffixIcon: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Bouton clear (si texte présent)
+              // Bouton clear (si texte prÃ©sent)
               if (_searchController.text.isNotEmpty)
                 IconButton(
                   icon: const Icon(Icons.clear),
@@ -539,7 +543,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     }
   }
 
-  /// 🆕 Widget : Chips de filtre rapide
+  /// ðŸ†• Widget : Chips de filtre rapide
   Widget _buildQuickFilters(AlertProvider alertProvider, int totalCount) {
     return Container(
       height: 60,
@@ -610,7 +614,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     );
   }
 
-  /// 🆕 Widget : Section de groupe (collapsible si mode alertes)
+  /// ðŸ†• Widget : Section de groupe (collapsible si mode alertes)
   Widget _buildGroupSection(
     String groupName,
     List<Animal> animals,
@@ -705,7 +709,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     );
   }
 
-  /// 🆕 Widget : Carte d'animal avec badges d'alertes
+  /// ðŸ†• Widget : Carte d'animal avec badges d'alertes
   Widget _buildAnimalCard(
     Animal animal,
     List<Alert> alerts,
@@ -727,7 +731,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
-              // Icône espèce
+              // IcÃ´ne espÃ¨ce
               Container(
                 width: 48,
                 height: 48,
@@ -758,13 +762,13 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${animal.fullDisplayFr} • ${animal.ageFormatted}',
+                      '${animal.fullDisplayFr} â€¢ ${animal.ageFormatted}',
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.grey.shade600,
                       ),
                     ),
-                    // 🆕 Badges d'alertes
+                    // ðŸ†• Badges d'alertes
                     if (alerts.isNotEmpty) ...[
                       const SizedBox(height: 8),
                       Wrap(
@@ -844,7 +848,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     }
   }
 
-  /// Widget : État vide
+  /// Widget : Ã‰tat vide
   Widget _buildEmptyState() {
     return Center(
       child: Column(
@@ -857,7 +861,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Aucun animal trouvé',
+            'Aucun animal trouvÃ©',
             style: TextStyle(
               fontSize: 18,
               color: Colors.grey.shade600,
@@ -868,7 +872,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     );
   }
 
-  /// Drawer de filtres (à implémenter - garder l'existant)
+  /// Drawer de filtres (Ã  implÃ©menter - garder l'existant)
   void _showFiltersDrawer() {
     showModalBottomSheet(
       context: context,
@@ -909,9 +913,9 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
   }
 }
 
-// 🆕 Enum mis à jour avec option "alerts"
+// ðŸ†• Enum mis Ã  jour avec option "alerts"
 enum GroupByOption {
-  alerts, // 🆕 NOUVEAU en premier !
+  alerts, // ðŸ†• NOUVEAU en premier !
   none,
   sex,
   age,
@@ -924,7 +928,7 @@ enum GroupByOption {
 
 extension GroupByOptionExt on GroupByOption {
   String label(BuildContext context) {
-    // ← Ajouter BuildContext
+    // â† Ajouter BuildContext
     switch (this) {
       case GroupByOption.alerts:
         return AppLocalizations.of(context).translate(AppStrings.byAlert);
@@ -1000,7 +1004,7 @@ class _FiltersDrawer extends StatefulWidget {
   final Set<String> selectedSpecies; // NOUVEAU
   final Set<String> selectedBreeds; // NOUVEAU
   final Function(Set<AnimalStatus>, Set<AnimalSex>, Set<String>, bool?, String?,
-      Set<String>, Set<String>) onApply; // MODIFIÉ
+      Set<String>, Set<String>) onApply; // MODIFIÃ‰
   final VoidCallback onReset;
 
   const _FiltersDrawer({
@@ -1092,7 +1096,7 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                     ...AnimalStatus.values.map((status) {
                       return CheckboxListTile(
                         title: Text(_getStatusLabel(
-                            context, status)), // ← Ajouter context
+                            context, status)), // â† Ajouter context
                         value: _statuses.contains(status),
                         onChanged: (checked) {
                           setState(() {
@@ -1113,7 +1117,7 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                         style: const TextStyle(fontWeight: FontWeight.w600)),
                     CheckboxListTile(
                       title: Text(
-                          '♂️ ${AppLocalizations.of(context).translate(AppStrings.male)}'),
+                          'â™‚ï¸ ${AppLocalizations.of(context).translate(AppStrings.male)}'),
                       value: _sexes.contains(AnimalSex.male),
                       onChanged: (checked) {
                         setState(() {
@@ -1127,7 +1131,7 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                     ),
                     CheckboxListTile(
                       title: Text(
-                          '♀️ ${AppLocalizations.of(context).translate(AppStrings.female)}'),
+                          'â™€ï¸ ${AppLocalizations.of(context).translate(AppStrings.female)}'),
                       value: _sexes.contains(AnimalSex.female),
                       onChanged: (checked) {
                         setState(() {
@@ -1142,7 +1146,7 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
 
                     const Divider(),
 
-                    // Âge
+                    // Ã‚ge
                     Text(AppLocalizations.of(context).translate(AppStrings.age),
                         style: const TextStyle(fontWeight: FontWeight.w600)),
                     ...['< 6m', '6-12m', '1-2 ans', '> 2 ans'].map((range) {
@@ -1179,10 +1183,11 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                             } else {
                               _species.remove(species.id);
                               // Retirer les races de ce type
-                              final breedsToRemove =
-                                  AnimalConfig.getBreedsBySpecies(species.id)
-                                      .map((b) => b.id)
-                                      .toSet();
+                              final breedsToRemove = context
+                                  .read<BreedProvider>()
+                                  .getBySpeciesId(species.id)
+                                  .map((b) => b.id)
+                                  .toSet();
                               _breeds.removeAll(breedsToRemove);
                             }
                           });
@@ -1211,11 +1216,12 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                       )
                     else
                       ...() {
-                        // Obtenir toutes les races des types sélectionnés
+                        // Obtenir toutes les races des types sÃ©lectionnÃ©s
                         final availableBreeds = <Breed>[];
                         for (final speciesId in _species) {
-                          availableBreeds.addAll(
-                              AnimalConfig.getBreedsBySpecies(speciesId));
+                          availableBreeds.addAll(context
+                              .read<BreedProvider>()
+                              .getBySpeciesId(speciesId));
                         }
                         return availableBreeds.map((breed) {
                           return CheckboxListTile(
@@ -1242,7 +1248,7 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
 
                     const Divider(),
 
-                    // Rémanence
+                    // RÃ©manence
                     Text(
                         AppLocalizations.of(context)
                             .translate(AppStrings.withdrawal),
@@ -1273,7 +1279,7 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
 
                     const Divider(),
 
-                    // Mère
+                    // MÃ¨re
                     Text(
                         AppLocalizations.of(context)
                             .translate(AppStrings.mother),

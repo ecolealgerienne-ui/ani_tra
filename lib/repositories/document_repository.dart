@@ -1,6 +1,7 @@
 // lib/repositories/document_repository.dart
 
 import 'package:drift/drift.dart';
+import 'package:flutter/foundation.dart';
 import '../drift/database.dart';
 import '../models/document.dart';
 
@@ -35,6 +36,7 @@ class DocumentRepository {
   Future<void> create(Document document, String farmId) async {
     final companion = _mapToCompanion(document, farmId);
     await _db.documentDao.insertItem(companion);
+    debugPrint('✅ DOCUMENT créé: ${document.id} dans farm $farmId');
   }
 
   /// Met à jour un document existant
@@ -46,12 +48,17 @@ class DocumentRepository {
     }
 
     final companion = _mapToCompanion(document, farmId);
-    await _db.documentDao.updateItem(companion);
+    final result = await _db.documentDao.updateItem(companion, farmId);
+    if (result == 0) {
+      throw Exception('DOCUMENT update failed - no rows affected');
+    }
+    debugPrint('✅ DOCUMENT mis à jour: ${document.id} dans farm $farmId');
   }
 
   /// Supprime un document (soft-delete)
   Future<void> delete(String id, String farmId) async {
     await _db.documentDao.softDelete(id, farmId);
+    debugPrint('✅ DOCUMENT supprimé (soft): $id dans farm $farmId');
   }
 
   // === BUSINESS QUERIES ===

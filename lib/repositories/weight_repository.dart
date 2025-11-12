@@ -2,10 +2,11 @@
 
 import 'package:drift/drift.dart';
 import '../drift/database.dart';
+//import '../drift/tables/weights_table.dart';
 import '../models/weight_record.dart';
 
 /// Repository pour la gestion des pesées
-/// 
+///
 /// Couche business logic entre les providers et la base de données.
 /// Responsabilités:
 /// - Mapping Model ↔ Drift Companion
@@ -54,7 +55,7 @@ class WeightRepository {
     }
 
     final companion = _mapToCompanion(weight, farmId);
-    await _db.weightDao.updateItem(companion);
+    await _db.weightDao.updateItem(companion, farmId);
   }
 
   /// Supprime une pesée (soft-delete)
@@ -144,14 +145,14 @@ class WeightRepository {
   }
 
   /// Calcule le GMQ (Gain Moyen Quotidien) d'un animal
-  /// 
+  ///
   /// GMQ = (poids final - poids initial) / nombre de jours
   Future<double?> calculateAverageDailyGain(
     String farmId,
     String animalId,
   ) async {
     final weights = await getByAnimalId(farmId, animalId);
-    
+
     if (weights.length < 2) return null;
 
     // Tri par date (plus anciennes d'abord)

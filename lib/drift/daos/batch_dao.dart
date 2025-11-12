@@ -19,10 +19,11 @@ class BatchDao extends DatabaseAccessor<AppDatabase> with _$BatchDaoMixin {
         .get();
   }
 
-  // 2. Get batch by ID
-  Future<BatchesTableData?> findById(String id) {
+  // 2. Get batch by ID WITH farmId validation
+  Future<BatchesTableData?> findById(String id, String farmId) {
     return (select(batchesTable)
           ..where((t) => t.id.equals(id))
+          ..where((t) => t.farmId.equals(farmId))
           ..where((t) => t.deletedAt.isNull()))
         .getSingleOrNull();
   }
@@ -71,9 +72,12 @@ class BatchDao extends DatabaseAccessor<AppDatabase> with _$BatchDaoMixin {
     return into(batchesTable).insert(batch);
   }
 
-  // 8. Update batch
-  Future<bool> updateBatch(BatchesTableCompanion batch) {
-    return update(batchesTable).replace(batch);
+  // 8. Update batch WITH farmId validation - returns Future<int>
+  Future<int> updateBatch(BatchesTableCompanion batch, String farmId) {
+    return (update(batchesTable)
+          ..where((t) => t.id.equals(batch.id.value))
+          ..where((t) => t.farmId.equals(farmId)))
+        .write(batch);
   }
 
   // 9. Soft-delete batch (audit trail)
@@ -88,8 +92,11 @@ class BatchDao extends DatabaseAccessor<AppDatabase> with _$BatchDaoMixin {
   }
 
   // 10. Mark batch as completed
-  Future<int> markAsCompleted(String id) {
-    return (update(batchesTable)..where((t) => t.id.equals(id))).write(
+  Future<int> markAsCompleted(String id, String farmId) {
+    return (update(batchesTable)
+          ..where((t) => t.id.equals(id))
+          ..where((t) => t.farmId.equals(farmId)))
+        .write(
       BatchesTableCompanion(
         completed: const Value(true),
         usedAt: Value(DateTime.now()),
@@ -100,15 +107,18 @@ class BatchDao extends DatabaseAccessor<AppDatabase> with _$BatchDaoMixin {
   }
 
   // 11. Add animal to batch
-  Future<void> addAnimalToBatch(String batchId, String animalId) async {
-    final batch = await findById(batchId);
+  Future<void> addAnimalToBatch(String batchId, String animalId, String farmId) async {
+    final batch = await findById(batchId, farmId);
     if (batch == null) return;
 
     final animalIds = _decodeAnimalIds(batch.animalIdsJson);
     if (!animalIds.contains(animalId)) {
       animalIds.add(animalId);
 
-      await (update(batchesTable)..where((t) => t.id.equals(batchId))).write(
+      await (update(batchesTable)
+            ..where((t) => t.id.equals(batchId))
+            ..where((t) => t.farmId.equals(farmId)))
+          .write(
         BatchesTableCompanion(
           animalIdsJson: Value(_encodeAnimalIds(animalIds)),
           synced: const Value(false),
@@ -119,15 +129,18 @@ class BatchDao extends DatabaseAccessor<AppDatabase> with _$BatchDaoMixin {
   }
 
   // 12. Remove animal from batch
-  Future<void> removeAnimalFromBatch(String batchId, String animalId) async {
-    final batch = await findById(batchId);
+  Future<void> removeAnimalFromBatch(String batchId, String animalId, String farmId) async {
+    final batch = await findById(batchId, farmId);
     if (batch == null) return;
 
     final animalIds = _decodeAnimalIds(batch.animalIdsJson);
     if (animalIds.contains(animalId)) {
       animalIds.remove(animalId);
 
-      await (update(batchesTable)..where((t) => t.id.equals(batchId))).write(
+      await (update(batchesTable)
+            ..where((t) => t.id.equals(batchId))
+            ..where((t) => t.farmId.equals(farmId)))
+          .write(
         BatchesTableCompanion(
           animalIdsJson: Value(_encodeAnimalIds(animalIds)),
           synced: const Value(false),

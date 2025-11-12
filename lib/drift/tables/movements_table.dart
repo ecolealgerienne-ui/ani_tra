@@ -61,7 +61,10 @@ class MovementsTable extends Table {
 
   @override
   List<String> get customConstraints => [
-    'FOREIGN KEY (farm_id) REFERENCES farms(id)',
-    'FOREIGN KEY (animal_id) REFERENCES animals(id)',
+    'FOREIGN KEY (farm_id) REFERENCES farms(id) ON DELETE CASCADE',
+    'FOREIGN KEY (animal_id) REFERENCES animals(id) ON DELETE CASCADE',
+    'CREATE INDEX IF NOT EXISTS idx_movements_farm_id ON movements(farm_id)',
+    'CREATE INDEX IF NOT EXISTS idx_movements_farm_moved ON movements(farm_id, movement_date DESC)',
+    'CREATE INDEX IF NOT EXISTS idx_movements_deleted_at ON movements(deleted_at)',
   ];
 }

@@ -879,4 +879,43 @@ const Map<String, String> stringsFr = {
   //section GENERAL ou NAVIGATION)
   'scan': 'Scan',
   'home': 'Accueil',
+
+  // ========== BREEDING SPECIFICS ==========
+  'breeding': 'Reproduction',
+  'breedings': 'Reproductions',
+  'noBreedings': 'Aucune reproduction',
+  'newBreeding': 'Nouvelle reproduction',
+
+  'breedingMethod': 'Méthode de reproduction',
+  'natural': 'Saillie naturelle',
+  'artificialInsemination': 'Insémination artificielle',
+
+  'breedingDate': 'Date de saillie/IA',
+  'expectedBirthDate': 'Date de mise-bas prévue',
+  'actualBirthDate': 'Date de mise-bas réelle',
+
+  'breedingStatus': 'Statut de reproduction',
+  'pending': 'En attente',
+  'completedBreeding': 'Mise-bas effectuée',
+  'failedBreeding': 'Échec',
+  'abortedBreeding': 'Avortement',
+
+  'father': 'Père',
+  'expectedOffspring': 'Petits attendus',
+  'actualOffspring': 'Petits nés',
+  'gestationDays': 'Jours de gestation',
+
+  'birthSoon': 'Mise-bas proche',
+  'overdue': 'En retard',
+  'daysUntilBirth': 'Jours avant mise-bas',
+
+  'recordBreeding': 'Enregistrer une reproduction',
+  'recordBirth': 'Enregistrer une mise-bas',
+  'markAsFailed': 'Marquer comme échec',
+  'markAsAborted': 'Marquer comme avortement',
+  'breedingRecorded': 'Reproduction enregistrée',
+  'birthRecorded': 'Mise-bas enregistrée',
+
+  'successRate': 'Taux de réussite',
+  'breedingThisMonth': 'Reproductions ce mois',
 };

@@ -29,7 +29,7 @@ class MedicalProductDao extends DatabaseAccessor<AppDatabase>
         .get();
   }
 
-  // 3. Find by ID (with farmId security)
+  // 3. Find by ID (with farmId security) ✅ FIXED
   Future<MedicalProductsTableData?> findById(String id, String farmId) {
     return (select(medicalProductsTable)
           ..where((t) => t.id.equals(id))
@@ -112,9 +112,11 @@ class MedicalProductDao extends DatabaseAccessor<AppDatabase>
     return into(medicalProductsTable).insert(product);
   }
 
-  // 11. Update product
-  Future<bool> updateProduct(MedicalProductsTableCompanion product) {
-    return update(medicalProductsTable).replace(product);
+  // 11. Update product ✅ FIXED - Added farmId security + correct signature
+  Future<int> updateProduct(
+      MedicalProductsTableCompanion product, String farmId) {
+    return (update(medicalProductsTable)..where((t) => t.farmId.equals(farmId)))
+        .write(product);
   }
 
   // 12. Soft-delete product
@@ -149,7 +151,7 @@ class MedicalProductDao extends DatabaseAccessor<AppDatabase>
         .get();
   }
 
-  // 15. Mark as synced (Phase 2 ready)
+  // 15. Mark as synced (Phase 2 ready) ✅ Already has farmId
   Future<int> markSynced(String id, String farmId) {
     return (update(medicalProductsTable)
           ..where((t) => t.id.equals(id))
@@ -161,7 +163,7 @@ class MedicalProductDao extends DatabaseAccessor<AppDatabase>
     ));
   }
 
-  // 16. Update stock
+  // 16. Update stock ✅ Already has farmId
   Future<int> updateStock(String id, String farmId, double newStock) {
     return (update(medicalProductsTable)
           ..where((t) => t.id.equals(id))
@@ -173,7 +175,7 @@ class MedicalProductDao extends DatabaseAccessor<AppDatabase>
     ));
   }
 
-  // 17. Toggle active status
+  // 17. Toggle active status ✅ Already has farmId
   Future<int> toggleActive(String id, String farmId) async {
     final product = await findById(id, farmId);
     if (product == null) return 0;

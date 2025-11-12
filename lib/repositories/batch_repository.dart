@@ -22,7 +22,7 @@ class BatchRepository {
 
   /// Récupérer un batch par son ID (avec vérification farmId)
   Future<Batch?> findById(String id, String farmId) async {
-    final data = await _dao.findById(id);
+    final data = await _dao.findById(id, farmId);
     if (data == null) return null;
 
     // Security check
@@ -74,7 +74,7 @@ class BatchRepository {
   /// Mettre à jour un batch avec security check
   Future<Batch> update(Batch batch, String farmId) async {
     // Security check: vérifier l'ownership
-    final existing = await _dao.findById(batch.id);
+    final existing = await _dao.findById(batch.id, farmId);
     if (existing == null || existing.farmId != farmId) {
       throw Exception('Batch not found or farm mismatch - Security violation');
     }
@@ -85,14 +85,14 @@ class BatchRepository {
     }
 
     final companion = _toCompanion(batch, isUpdate: true);
-    await _dao.updateBatch(companion);
+    await _dao.updateBatch(companion, farmId);
     return batch;
   }
 
   /// Supprimer un batch avec security check
   Future<void> delete(String id, String farmId) async {
     // Security check: vérifier l'ownership
-    final existing = await _dao.findById(id);
+    final existing = await _dao.findById(id, farmId);
     if (existing == null || existing.farmId != farmId) {
       throw Exception('Batch not found or farm mismatch - Security violation');
     }
@@ -105,36 +105,36 @@ class BatchRepository {
   /// Marquer un batch comme complété avec security check
   Future<void> markAsCompleted(String id, String farmId) async {
     // Security check
-    final existing = await _dao.findById(id);
+    final existing = await _dao.findById(id, farmId);
     if (existing == null || existing.farmId != farmId) {
       throw Exception('Batch not found or farm mismatch - Security violation');
     }
 
-    await _dao.markAsCompleted(id);
+    await _dao.markAsCompleted(id, farmId);
   }
 
   /// Ajouter un animal au batch avec security check
   Future<void> addAnimalToBatch(
       String batchId, String animalId, String farmId) async {
     // Security check
-    final existing = await _dao.findById(batchId);
+    final existing = await _dao.findById(batchId, farmId);
     if (existing == null || existing.farmId != farmId) {
       throw Exception('Batch not found or farm mismatch - Security violation');
     }
 
-    await _dao.addAnimalToBatch(batchId, animalId);
+    await _dao.addAnimalToBatch(batchId, animalId, farmId);
   }
 
   /// Retirer un animal du batch avec security check
   Future<void> removeAnimalFromBatch(
       String batchId, String animalId, String farmId) async {
     // Security check
-    final existing = await _dao.findById(batchId);
+    final existing = await _dao.findById(batchId, farmId);
     if (existing == null || existing.farmId != farmId) {
       throw Exception('Batch not found or farm mismatch - Security violation');
     }
 
-    await _dao.removeAnimalFromBatch(batchId, animalId);
+    await _dao.removeAnimalFromBatch(batchId, animalId, farmId);
   }
 
   /// Compter les batches d'une ferme

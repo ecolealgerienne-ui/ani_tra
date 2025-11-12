@@ -5,7 +5,7 @@ import '../drift/database.dart';
 import '../models/treatment.dart';
 
 /// Repository pour la gestion des traitements
-/// 
+///
 /// Couche business logic entre les providers et la base de données.
 /// Responsabilités:
 /// - Mapping Model ↔ Drift Companion

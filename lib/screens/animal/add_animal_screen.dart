@@ -10,6 +10,7 @@ import '../../models/movement.dart';
 //import '../../models/scan_result.dart';
 
 import '../../providers/animal_provider.dart';
+import '../../providers/breed_provider.dart';
 import '../../providers/sync_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../data/animal_config.dart';
@@ -20,11 +21,11 @@ import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
 //import 'mother_history_screen.dart';
 
-/// Écran d'ajout rapide d'un animal
+/// Ã‰cran d'ajout rapide d'un animal
 ///
-/// Permet d'ajouter un animal via un formulaire simplifié
-/// Gère à la fois les naissances et les achats
-/// Crée automatiquement l'animal + le mouvement correspondant
+/// Permet d'ajouter un animal via un formulaire simplifiÃ©
+/// GÃ¨re Ã  la fois les naissances et les achats
+/// CrÃ©e automatiquement l'animal + le mouvement correspondant
 class AddAnimalScreen extends StatefulWidget {
   final String? scannedEID;
 
@@ -46,14 +47,14 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
   final _priceController = TextEditingController();
   final _notesController = TextEditingController();
 
-  // État du formulaire
+  // Ã‰tat du formulaire
   DateTime? _selectedBirthDate;
   AnimalSex? _selectedSex;
   String _selectedOrigin = 'Naissance';
   String? _selectedMotherId;
   String? _selectedMotherDisplay;
 
-  // ÉTAPE 5 : Type et Race
+  // Ã‰TAPE 5 : Type et Race
   String? _selectedSpeciesId;
   String? _selectedBreedId;
 
@@ -62,14 +63,14 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
   @override
   void initState() {
     super.initState();
-    // Date par défaut : aujourd'hui
+    // Date par dÃ©faut : aujourd'hui
     _selectedBirthDate = DateTime.now();
-    // Pré-remplir EID si fourni
+    // PrÃ©-remplir EID si fourni
     if (widget.scannedEID != null) {
       _primaryIdController.text = widget.scannedEID!;
     }
 
-    // ÉTAPE 5 : Charger les valeurs par défaut du SettingsProvider
+    // Ã‰TAPE 5 : Charger les valeurs par dÃ©faut du SettingsProvider
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final settings = context.read<SettingsProvider>();
       setState(() {
@@ -90,10 +91,10 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
     super.dispose();
   }
 
-  /// Générer un ID unique
+  /// GÃ©nÃ©rer un ID unique
   String _generateId() => _uuid.v4();
 
-  /// Scanner un animal pour pré-remplir l'EID
+  /// Scanner un animal pour prÃ©-remplir l'EID
   Future<void> _simulateScan() async {
     final animal = await Navigator.push<Animal>(
       context,
@@ -129,7 +130,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
     }
   }
 
-  /// Sélectionner la mère via scan
+  /// SÃ©lectionner la mÃ¨re via scan
   Future<void> _scanMother() async {
     final mother = await Navigator.push<Animal>(
       context,
@@ -143,7 +144,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
     );
 
     if (mother != null) {
-      // Vérifier que c'est une femelle
+      // VÃ©rifier que c'est une femelle
       if (mother.sex != AnimalSex.female) {
         if (mounted) {
           _showError(AppLocalizations.of(context)
@@ -170,7 +171,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
     }
   }
 
-  /// Sélectionner la date de naissance
+  /// SÃ©lectionner la date de naissance
   Future<void> _selectBirthDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -197,7 +198,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
       return;
     }
 
-    // Vérifications supplémentaires
+    // VÃ©rifications supplÃ©mentaires
 
     // Au moins un identifiant requis
     final hasEid = _primaryIdController.text.trim().isNotEmpty;
@@ -222,7 +223,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
       return;
     }
 
-    // 🆕 PART3 - Vérifier que la mère existe et est valide
+    // ðŸ†• PART3 - VÃ©rifier que la mÃ¨re existe et est valide
     if (_selectedMotherId != null) {
       final animalProvider = context.read<AnimalProvider>();
       final mother = animalProvider.getAnimalById(_selectedMotherId!);
@@ -236,7 +237,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
 
       // Validation PART3
       if (!mother.canBeMother) {
-        _showError('⚠️ ${mother.cannotBeMotherReason}');
+        _showError('âš ï¸ ${mother.cannotBeMotherReason}');
         return;
       }
     }
@@ -249,7 +250,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
       final animalProvider = context.read<AnimalProvider>();
       final syncProvider = context.read<SyncProvider>();
 
-      // 1. Créer l'animal
+      // 1. CrÃ©er l'animal
       final animal = Animal(
         id: _generateId(),
         currentEid: _primaryIdController.text.trim().isNotEmpty
@@ -264,7 +265,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
             : null,
         birthDate: _selectedBirthDate ?? DateTime.now(),
         motherId: _selectedMotherId,
-        // ÉTAPE 5 : Ajouter type et race
+        // Ã‰TAPE 5 : Ajouter type et race
         speciesId: _selectedSpeciesId,
         breedId: _selectedBreedId,
         visualId: _visualIdController.text.trim().isNotEmpty
@@ -274,7 +275,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
 
       animalProvider.addAnimal(animal);
 
-      // 2. Créer le mouvement correspondant
+      // 2. CrÃ©er le mouvement correspondant
       Movement? movement;
 
       if (_selectedOrigin ==
@@ -312,17 +313,17 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
       }
 
       if (movement != null) {
-        // Note: Les mouvements sont gérés via MovementProvider
-        // Pour l'instant, on les ignore dans cet écran simplifié
-        // TODO: Ajouter la gestion des mouvements si nécessaire
+        // Note: Les mouvements sont gÃ©rÃ©s via MovementProvider
+        // Pour l'instant, on les ignore dans cet Ã©cran simplifiÃ©
+        // TODO: Ajouter la gestion des mouvements si nÃ©cessaire
       }
 
-      // 3. Incrémenter les données en attente de sync
+      // 3. IncrÃ©menter les donnÃ©es en attente de sync
       syncProvider.incrementPendingData();
 
       if (!mounted) return;
 
-      // 4. Message de succès
+      // 4. Message de succÃ¨s
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(AppLocalizations.of(context)
@@ -332,7 +333,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
         ),
       );
 
-      // 5. Retour à l'écran précédent
+      // 5. Retour Ã  l'Ã©cran prÃ©cÃ©dent
       Navigator.pop(context, animal);
     } catch (e) {
       if (!mounted) return;
@@ -377,10 +378,10 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
           padding: const EdgeInsets.all(16),
           children: [
             // === Section : Identification ===
-            _buildSectionHeader('📋 Identification'),
+            _buildSectionHeader('ðŸ“‹ Identification'),
             const SizedBox(height: 16),
 
-            // EID / Numéro principal
+            // EID / NumÃ©ro principal
             TextFormField(
               controller: _primaryIdController,
               decoration: InputDecoration(
@@ -395,13 +396,13 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                   onPressed: _simulateScan,
                 ),
                 helperText:
-                    'Au moins un identifiant requis (EID, N° officiel ou ID visuel)',
+                    'Au moins un identifiant requis (EID, NÂ° officiel ou ID visuel)',
               ),
             ),
 
             const SizedBox(height: 16),
 
-            // Numéro officiel
+            // NumÃ©ro officiel
             TextFormField(
               controller: _officialNumberController,
               decoration: InputDecoration(
@@ -428,8 +429,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
 
             const SizedBox(height: 24),
 
-            // === ÉTAPE 5 : Section Type et Race ===
-            _buildSectionHeader('🐑 Type et Race'),
+            // === Ã‰TAPE 5 : Section Type et Race ===
+            _buildSectionHeader('ðŸ‘ Type et Race'),
             const SizedBox(height: 16),
 
             // Dropdown Type d'animal
@@ -452,9 +453,10 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
               onChanged: (value) {
                 setState(() {
                   _selectedSpeciesId = value;
-                  // Réinitialiser la race si on change de type
+                  // RÃ©initialiser la race si on change de type
                   if (value != null) {
-                    final breeds = AnimalConfig.getBreedsBySpecies(value);
+                    final breeds =
+                        context.read<BreedProvider>().getBySpeciesId(value);
                     if (breeds.isNotEmpty &&
                         (breeds.every((b) => b.id != _selectedBreedId))) {
                       _selectedBreedId = breeds.first.id;
@@ -493,7 +495,9 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                         child: Text(AppLocalizations.of(context)
                             .translate(AppStrings.noBreed)),
                       ),
-                      ...AnimalConfig.getBreedsBySpecies(_selectedSpeciesId!)
+                      ...context
+                          .read<BreedProvider>()
+                          .getBySpeciesId(_selectedSpeciesId!)
                           .map((breed) {
                         return DropdownMenuItem(
                           value: breed.id,
@@ -547,8 +551,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
 
             const SizedBox(height: 24),
 
-            // === Section : Caractéristiques ===
-            _buildSectionHeader('🐄 Caractéristiques'),
+            // === Section : CaractÃ©ristiques ===
+            _buildSectionHeader('ðŸ„ CaractÃ©ristiques'),
             const SizedBox(height: 16),
 
             // Sexe
@@ -637,7 +641,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
               onChanged: (value) {
                 setState(() {
                   _selectedOrigin = value!;
-                  // Réinitialiser les champs conditionnels
+                  // RÃ©initialiser les champs conditionnels
                   _selectedMotherId = null;
                   _selectedMotherDisplay = null;
                   _provenanceController.clear();
@@ -651,7 +655,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
             // Champs conditionnels selon l'origine
             if (_selectedOrigin ==
                 AppLocalizations.of(context).translate(AppStrings.birth)) ...[
-              // Mère
+              // MÃ¨re
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.family_restroom),
@@ -706,7 +710,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                 decoration: InputDecoration(
                   labelText: AppLocalizations.of(context)
                       .translate(AppStrings.provenance),
-                  hintText: 'Nom de la ferme ou éleveur',
+                  hintText: 'Nom de la ferme ou Ã©leveur',
                   prefixIcon: const Icon(Icons.place),
                 ),
               ),
@@ -721,7 +725,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                       .translate(AppStrings.purchasePrice),
                   hintText: '0.00',
                   prefixIcon: const Icon(Icons.euro),
-                  suffixText: '€',
+                  suffixText: 'â‚¬',
                 ),
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
@@ -817,7 +821,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
   }
 }
 
-/// Widget de dialogue pour scanner la mère
+/// Widget de dialogue pour scanner la mÃ¨re
 class _ScanMotherDialog extends StatefulWidget {
   final Function(String motherId, String motherDisplay) onMotherSelected;
 
@@ -841,7 +845,7 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
     super.dispose();
   }
 
-  /// Simuler le scan d'une mère
+  /// Simuler le scan d'une mÃ¨re
   void _simulateScan() {
     setState(() {
       _isScanning = true;
@@ -849,7 +853,7 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
       _scannedMother = null;
     });
 
-    // Simulation d'un délai de scan
+    // Simulation d'un dÃ©lai de scan
     Future.delayed(const Duration(milliseconds: 500), () {
       final animalProvider = context.read<AnimalProvider>();
 
@@ -868,7 +872,7 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
         return;
       }
 
-      // Prendre une femelle aléatoirement pour simuler
+      // Prendre une femelle alÃ©atoirement pour simuler
       final mockMother = (females..shuffle()).first;
 
       setState(() {
@@ -964,7 +968,7 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
               ),
             ],
 
-            // Informations de la mère scannée
+            // Informations de la mÃ¨re scannÃ©e
             if (_scannedMother != null) ...[
               const SizedBox(height: 16),
               Container(
@@ -983,7 +987,7 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
                             color: Colors.green.shade700, size: 20),
                         const SizedBox(width: 8),
                         const Text(
-                          'Mère détectée',
+                          'MÃ¨re dÃ©tectÃ©e',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
@@ -999,7 +1003,7 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
                       ),
                     if (_scannedMother!.officialNumber != null)
                       Text(
-                        'N° officiel: ${_scannedMother!.officialNumber}',
+                        'NÂ° officiel: ${_scannedMother!.officialNumber}',
                         style: const TextStyle(fontSize: 13),
                       ),
                     if (_scannedMother!.visualId != null)
@@ -1008,7 +1012,7 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
                         style: const TextStyle(fontSize: 13),
                       ),
                     Text(
-                      'Âge: ${_scannedMother!.ageInMonths} mois',
+                      'Ã‚ge: ${_scannedMother!.ageInMonths} mois',
                       style: const TextStyle(fontSize: 13),
                     ),
                   ],
@@ -1039,7 +1043,7 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        '✅ Mère ajoutée: ${_scannedMother!.officialNumber ?? _scannedMother!.eid ?? _scannedMother!.visualId ?? 'Animal ${_scannedMother!.id.substring(0, 8)}'}',
+                        'âœ… MÃ¨re ajoutÃ©e: ${_scannedMother!.officialNumber ?? _scannedMother!.eid ?? _scannedMother!.visualId ?? 'Animal ${_scannedMother!.id.substring(0, 8)}'}',
                       ),
                       backgroundColor: AppConstants.successGreen,
                       duration: const Duration(seconds: 2),
@@ -1087,9 +1091,9 @@ class _ScanEIDDialogState extends State<_ScanEIDDialog> {
       _scannedEID = null;
     });
 
-    // Simulation d'un délai de scan
+    // Simulation d'un dÃ©lai de scan
     Future.delayed(const Duration(milliseconds: 800), () {
-      // Génération d'un EID simulé au format FR + 13 chiffres
+      // GÃ©nÃ©ration d'un EID simulÃ© au format FR + 13 chiffres
       final random = DateTime.now().millisecondsSinceEpoch % 10000000000000;
       final mockEid = 'FR${random.toString().padLeft(13, '0')}';
 
@@ -1118,7 +1122,7 @@ class _ScanEIDDialogState extends State<_ScanEIDDialog> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Text(
-              'Placez le lecteur RFID près de l\'animal pour scanner son EID électronique.',
+              'Placez le lecteur RFID prÃ¨s de l\'animal pour scanner son EID Ã©lectronique.',
               style: TextStyle(
                 fontSize: 13,
                 color: Colors.grey,
@@ -1167,7 +1171,7 @@ class _ScanEIDDialogState extends State<_ScanEIDDialog> {
               ),
             ),
 
-            // Résultat du scan
+            // RÃ©sultat du scan
             if (_scannedEID != null) ...[
               const SizedBox(height: 16),
               Container(

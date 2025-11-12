@@ -18,18 +18,22 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
         .get();
   }
 
-  // 2. Get lot by ID
-  Future<LotsTableData?> findById(String id) {
-    return (select(lotsTable)..where((t) => t.id.equals(id))).getSingleOrNull();
+  // 2. Get lot by ID WITH farmId validation
+  Future<LotsTableData?> findById(String id, String farmId) {
+    return (select(lotsTable)
+          ..where((t) => t.id.equals(id))
+          ..where((t) => t.farmId.equals(farmId)))
+        .getSingleOrNull();
   }
 
   // 3. Get open lots (not completed) for a farm
   // PHASE 1: Add fallback logic for backward-compat
   Future<List<LotsTableData>> findOpenByFarm(String farmId) {
     return (select(lotsTable)
-          ..where((t) => t.farmId.equals(farmId) & 
-              (t.status.equals('open') | 
-               (t.status.isNull() & t.completed.equals(false))))
+          ..where((t) =>
+              t.farmId.equals(farmId) &
+              (t.status.equals('open') |
+                  (t.status.isNull() & t.completed.equals(false))))
           ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
         .get();
   }
@@ -37,9 +41,10 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
   // 4. Get completed lots for a farm (PHASE 1: includes archived)
   Future<List<LotsTableData>> findCompletedByFarm(String farmId) {
     return (select(lotsTable)
-          ..where((t) => t.farmId.equals(farmId) & 
-              (t.status.isIn(['closed', 'archived']) | 
-               (t.status.isNull() & t.completed.equals(true))))
+          ..where((t) =>
+              t.farmId.equals(farmId) &
+              (t.status.isIn(['closed', 'archived']) |
+                  (t.status.isNull() & t.completed.equals(true))))
           ..orderBy([(t) => OrderingTerm.desc(t.completedAt)]))
         .get();
   }
@@ -47,9 +52,10 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
   // PHASE 1: ADD - Get closed lots only (excluding archived)
   Future<List<LotsTableData>> findClosedByFarm(String farmId) {
     return (select(lotsTable)
-          ..where((t) => t.farmId.equals(farmId) & 
-              (t.status.equals('closed') | 
-               (t.status.isNull() & t.completed.equals(true))))
+          ..where((t) =>
+              t.farmId.equals(farmId) &
+              (t.status.equals('closed') |
+                  (t.status.isNull() & t.completed.equals(true))))
           ..orderBy([(t) => OrderingTerm.desc(t.completedAt)]))
         .get();
   }
@@ -113,9 +119,12 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
     return into(lotsTable).insert(lot);
   }
 
-  // 11. Update lot
-  Future<bool> updateLot(LotsTableCompanion lot) {
-    return update(lotsTable).replace(lot);
+  // 11. Update lot WITH farmId validation - returns Future<int>
+  Future<int> updateLot(LotsTableCompanion lot, String farmId) {
+    return (update(lotsTable)
+          ..where((t) => t.id.equals(lot.id.value))
+          ..where((t) => t.farmId.equals(farmId)))
+        .write(lot);
   }
 
   // 12. Delete lot
@@ -124,8 +133,11 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
   }
 
   // 13. Mark lot as completed (PHASE 1: KEEP for backward-compat, renamed to markAsClosed)
-  Future<int> markAsCompleted(String id) {
-    return (update(lotsTable)..where((t) => t.id.equals(id))).write(
+  Future<int> markAsCompleted(String id, String farmId) {
+    return (update(lotsTable)
+          ..where((t) => t.id.equals(id))
+          ..where((t) => t.farmId.equals(farmId)))
+        .write(
       LotsTableCompanion(
         status: const Value('closed'),
         completed: const Value(true),
@@ -137,8 +149,11 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
   }
 
   // PHASE 1: ADD - Mark lot as closed with status
-  Future<int> markAsClosed(String id) {
-    return (update(lotsTable)..where((t) => t.id.equals(id))).write(
+  Future<int> markAsClosed(String id, String farmId) {
+    return (update(lotsTable)
+          ..where((t) => t.id.equals(id))
+          ..where((t) => t.farmId.equals(farmId)))
+        .write(
       LotsTableCompanion(
         status: const Value('closed'),
         completed: const Value(true),
@@ -150,8 +165,11 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
   }
 
   // PHASE 1: ADD - Mark lot as archived
-  Future<int> markAsArchived(String id) {
-    return (update(lotsTable)..where((t) => t.id.equals(id))).write(
+  Future<int> markAsArchived(String id, String farmId) {
+    return (update(lotsTable)
+          ..where((t) => t.id.equals(id))
+          ..where((t) => t.farmId.equals(farmId)))
+        .write(
       LotsTableCompanion(
         status: const Value('archived'),
         synced: const Value(false),
@@ -161,15 +179,19 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
   }
 
   // 14. Add animal to lot
-  Future<void> addAnimalToLot(String lotId, String animalId) async {
-    final lot = await findById(lotId);
+  Future<void> addAnimalToLot(
+      String lotId, String animalId, String farmId) async {
+    final lot = await findById(lotId, farmId);
     if (lot == null) return;
 
     final animalIds = _decodeAnimalIds(lot.animalIdsJson);
     if (!animalIds.contains(animalId)) {
       animalIds.add(animalId);
 
-      await (update(lotsTable)..where((t) => t.id.equals(lotId))).write(
+      await (update(lotsTable)
+            ..where((t) => t.id.equals(lotId))
+            ..where((t) => t.farmId.equals(farmId)))
+          .write(
         LotsTableCompanion(
           animalIdsJson: Value(_encodeAnimalIds(animalIds)),
           synced: const Value(false),
@@ -180,15 +202,19 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
   }
 
   // 15. Remove animal from lot
-  Future<void> removeAnimalFromLot(String lotId, String animalId) async {
-    final lot = await findById(lotId);
+  Future<void> removeAnimalFromLot(
+      String lotId, String animalId, String farmId) async {
+    final lot = await findById(lotId, farmId);
     if (lot == null) return;
 
     final animalIds = _decodeAnimalIds(lot.animalIdsJson);
     if (animalIds.contains(animalId)) {
       animalIds.remove(animalId);
 
-      await (update(lotsTable)..where((t) => t.id.equals(lotId))).write(
+      await (update(lotsTable)
+            ..where((t) => t.id.equals(lotId))
+            ..where((t) => t.farmId.equals(farmId)))
+          .write(
         LotsTableCompanion(
           animalIdsJson: Value(_encodeAnimalIds(animalIds)),
           synced: const Value(false),
@@ -199,8 +225,11 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
   }
 
   // 16. Set lot type
-  Future<int> setLotType(String id, String type) {
-    return (update(lotsTable)..where((t) => t.id.equals(id))).write(
+  Future<int> setLotType(String id, String type, String farmId) {
+    return (update(lotsTable)
+          ..where((t) => t.id.equals(id))
+          ..where((t) => t.farmId.equals(farmId)))
+        .write(
       LotsTableCompanion(
         type: Value(type),
         synced: const Value(false),
@@ -223,9 +252,9 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
   Future<int> countOpenByFarm(String farmId) async {
     final query = selectOnly(lotsTable)
       ..addColumns([lotsTable.id.count()])
-      ..where(lotsTable.farmId.equals(farmId) & 
-          (lotsTable.status.equals('open') | 
-           (lotsTable.status.isNull() & lotsTable.completed.equals(false))));
+      ..where(lotsTable.farmId.equals(farmId) &
+          (lotsTable.status.equals('open') |
+              (lotsTable.status.isNull() & lotsTable.completed.equals(false))));
 
     final result = await query.getSingleOrNull();
     return result?.read(lotsTable.id.count()) ?? 0;
@@ -258,8 +287,8 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
               t.farmId.equals(farmId) &
               t.type.equals('treatment') &
               t.withdrawalEndDate.isSmallerOrEqualValue(beforeDate) &
-              (t.status.equals('open') | 
-               (t.status.isNull() & t.completed.equals(false))))
+              (t.status.equals('open') |
+                  (t.status.isNull() & t.completed.equals(false))))
           ..orderBy([(t) => OrderingTerm.asc(t.withdrawalEndDate)]))
         .get();
   }

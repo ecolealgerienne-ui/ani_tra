@@ -62,12 +62,14 @@ class VaccinationProvider extends ChangeNotifier {
     _migrateVaccinationsToRepository(items);
   }
 
-  Future<void> _migrateVaccinationsToRepository(List<Vaccination> vaccinations) async {
+  Future<void> _migrateVaccinationsToRepository(
+      List<Vaccination> vaccinations) async {
     for (final vaccination in vaccinations) {
       try {
         await _repository.create(vaccination, vaccination.farmId);
       } catch (e) {
-        debugPrint('⚠️ Vaccination ${vaccination.id} already exists or error: $e');
+        debugPrint(
+            '⚠️ Vaccination ${vaccination.id} already exists or error: $e');
       }
     }
     await _loadVaccinationsFromRepository();
@@ -76,10 +78,12 @@ class VaccinationProvider extends ChangeNotifier {
   // ==================== CRUD ====================
 
   Future<void> addVaccination(Vaccination vaccination) async {
-    final vaccinationWithFarm = vaccination.copyWith(farmId: _authProvider.currentFarmId);
+    final vaccinationWithFarm =
+        vaccination.copyWith(farmId: _authProvider.currentFarmId);
 
     try {
-      await _repository.create(vaccinationWithFarm, _authProvider.currentFarmId);
+      await _repository.create(
+          vaccinationWithFarm, _authProvider.currentFarmId);
       _allVaccinations.add(vaccinationWithFarm);
       notifyListeners();
     } catch (e) {
@@ -91,7 +95,7 @@ class VaccinationProvider extends ChangeNotifier {
   Future<void> updateVaccination(Vaccination updated) async {
     try {
       await _repository.update(updated, _authProvider.currentFarmId);
-      
+
       final index = _allVaccinations.indexWhere((v) => v.id == updated.id);
       if (index != -1) {
         _allVaccinations[index] = updated;
@@ -106,7 +110,7 @@ class VaccinationProvider extends ChangeNotifier {
   Future<void> removeVaccination(String id) async {
     try {
       await _repository.delete(id, _authProvider.currentFarmId);
-      
+
       _allVaccinations.removeWhere((v) => v.id == id);
       notifyListeners();
     } catch (e) {
@@ -126,23 +130,17 @@ class VaccinationProvider extends ChangeNotifier {
 
   List<Vaccination> getRecentVaccinations({int days = 30}) {
     final cutoff = DateTime.now().subtract(Duration(days: days));
-    return vaccinations
-        .where((v) => v.vaccinationDate.isAfter(cutoff))
-        .toList()
+    return vaccinations.where((v) => v.vaccinationDate.isAfter(cutoff)).toList()
       ..sort((a, b) => b.vaccinationDate.compareTo(a.vaccinationDate));
   }
 
   List<Vaccination> getVaccinationsWithRemindersDue() {
-    return vaccinations
-        .where((v) => v.isReminderDue)
-        .toList()
+    return vaccinations.where((v) => v.isReminderDue).toList()
       ..sort((a, b) => a.nextDueDate!.compareTo(b.nextDueDate!));
   }
 
   List<Vaccination> getVaccinationsInWithdrawalPeriod() {
-    return vaccinations
-        .where((v) => v.isInWithdrawalPeriod)
-        .toList()
+    return vaccinations.where((v) => v.isInWithdrawalPeriod).toList()
       ..sort((a, b) =>
           a.daysRemainingInWithdrawal.compareTo(b.daysRemainingInWithdrawal));
   }

@@ -8,7 +8,7 @@ import '../tables/veterinarians_table.dart';
 part 'veterinarian_dao.g.dart';
 
 /// DAO pour la gestion des vétérinaires
-/// 
+///
 /// Gère les opérations CRUD sur les vétérinaires avec:
 /// - Filtrage par farmId (multi-tenancy)
 /// - Soft-delete (audit trail)
@@ -22,7 +22,7 @@ class VeterinarianDao extends DatabaseAccessor<AppDatabase>
   // === REQUIRED METHODS ===
 
   /// Récupère tous les vétérinaires d'une ferme (non supprimés)
-  /// 
+  ///
   /// Filtre par:
   /// - farmId (multi-tenancy)
   /// - deletedAt IS NULL (soft-delete)
@@ -32,8 +32,7 @@ class VeterinarianDao extends DatabaseAccessor<AppDatabase>
           ..where((t) => t.farmId.equals(farmId))
           ..where((t) => t.deletedAt.isNull())
           ..orderBy([
-            (t) =>
-                OrderingTerm(expression: t.lastName, mode: OrderingMode.asc),
+            (t) => OrderingTerm(expression: t.lastName, mode: OrderingMode.asc),
             (t) =>
                 OrderingTerm(expression: t.firstName, mode: OrderingMode.asc),
           ]))
@@ -41,7 +40,7 @@ class VeterinarianDao extends DatabaseAccessor<AppDatabase>
   }
 
   /// Récupère un vétérinaire par ID avec vérification farmId
-  /// 
+  ///
   /// Security: Vérifie que le vétérinaire appartient bien à la ferme
   Future<VeterinariansTableData?> findById(String id, String farmId) {
     return (select(veterinariansTable)
@@ -62,7 +61,7 @@ class VeterinarianDao extends DatabaseAccessor<AppDatabase>
   }
 
   /// Soft-delete d'un vétérinaire
-  /// 
+  ///
   /// Ne supprime pas physiquement, marque comme supprimé
   /// pour garder l'audit trail et l'historique des interventions
   Future<int> softDelete(String id, String farmId) {
@@ -108,8 +107,7 @@ class VeterinarianDao extends DatabaseAccessor<AppDatabase>
           ..where((t) => t.isActive.equals(true))
           ..where((t) => t.deletedAt.isNull())
           ..orderBy([
-            (t) =>
-                OrderingTerm(expression: t.lastName, mode: OrderingMode.asc),
+            (t) => OrderingTerm(expression: t.lastName, mode: OrderingMode.asc),
             (t) =>
                 OrderingTerm(expression: t.firstName, mode: OrderingMode.asc),
           ]))
@@ -124,8 +122,7 @@ class VeterinarianDao extends DatabaseAccessor<AppDatabase>
           ..where((t) => t.isAvailable.equals(true))
           ..where((t) => t.deletedAt.isNull())
           ..orderBy([
-            (t) =>
-                OrderingTerm(expression: t.lastName, mode: OrderingMode.asc),
+            (t) => OrderingTerm(expression: t.lastName, mode: OrderingMode.asc),
             (t) =>
                 OrderingTerm(expression: t.firstName, mode: OrderingMode.asc),
           ]))
@@ -150,23 +147,20 @@ class VeterinarianDao extends DatabaseAccessor<AppDatabase>
           ..where((t) => t.deletedAt.isNull())
           ..orderBy([
             (t) => OrderingTerm(expression: t.rating, mode: OrderingMode.desc),
-            (t) =>
-                OrderingTerm(expression: t.lastName, mode: OrderingMode.asc),
+            (t) => OrderingTerm(expression: t.lastName, mode: OrderingMode.asc),
           ]))
         .get();
   }
 
   /// Récupère les vétérinaires avec service d'urgence
-  Future<List<VeterinariansTableData>> findWithEmergencyService(
-      String farmId) {
+  Future<List<VeterinariansTableData>> findWithEmergencyService(String farmId) {
     return (select(veterinariansTable)
           ..where((t) => t.farmId.equals(farmId))
           ..where((t) => t.emergencyService.equals(true))
           ..where((t) => t.isActive.equals(true))
           ..where((t) => t.deletedAt.isNull())
           ..orderBy([
-            (t) =>
-                OrderingTerm(expression: t.lastName, mode: OrderingMode.asc),
+            (t) => OrderingTerm(expression: t.lastName, mode: OrderingMode.asc),
           ]))
         .get();
   }
@@ -184,8 +178,7 @@ class VeterinarianDao extends DatabaseAccessor<AppDatabase>
               t.firstName.lower().like(pattern) |
               t.lastName.lower().like(pattern))
           ..orderBy([
-            (t) =>
-                OrderingTerm(expression: t.lastName, mode: OrderingMode.asc),
+            (t) => OrderingTerm(expression: t.lastName, mode: OrderingMode.asc),
             (t) =>
                 OrderingTerm(expression: t.firstName, mode: OrderingMode.asc),
           ]))

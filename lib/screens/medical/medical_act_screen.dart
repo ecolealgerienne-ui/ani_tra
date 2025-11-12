@@ -14,6 +14,7 @@ import '../../providers/animal_provider.dart';
 import '../../providers/weight_provider.dart';
 import '../../providers/reminder_provider.dart';
 import '../../providers/vaccination_provider.dart';
+import '../../providers/treatment_provider.dart';
 //import '../../providers/lot_provider.dart';
 //import '../../providers/sync_provider.dart';
 import '../../providers/veterinarian_provider.dart';
@@ -315,7 +316,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
     }
 
     final uuid = const Uuid();
-    final animalProvider = context.read<AnimalProvider>();
+    final treatmentProvider = context.read<TreatmentProvider>();
 
     // Sauvegarder selon le type d'acte
     if (_selectedType == ProductType.treatment) {
@@ -343,7 +344,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
               _notesController.text.isNotEmpty ? _notesController.text : null,
         );
 
-        animalProvider.addTreatment(treatment);
+        await treatmentProvider.addTreatment(treatment);
 
         // Créer des rappels si activés (uniquement pour le premier animal)
         if (_enableReminders &&

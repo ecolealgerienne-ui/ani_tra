@@ -7,7 +7,7 @@ import '../tables/treatments_table.dart';
 part 'treatment_dao.g.dart';
 
 /// DAO pour la gestion des traitements
-/// 
+///
 /// Gère les opérations CRUD sur les traitements avec:
 /// - Filtrage par farmId (multi-tenancy)
 /// - Filtrage par animal
@@ -21,7 +21,7 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
   // === REQUIRED METHODS ===
 
   /// Récupère tous les traitements d'une ferme (non supprimés)
-  /// 
+  ///
   /// Filtre par:
   /// - farmId (multi-tenancy)
   /// - deletedAt IS NULL (soft-delete)
@@ -38,7 +38,7 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
   }
 
   /// Récupère un traitement par ID avec vérification farmId
-  /// 
+  ///
   /// Security: Vérifie que le traitement appartient bien à la ferme
   Future<TreatmentsTableData?> findById(String id, String farmId) {
     return (select(treatmentsTable)
@@ -59,7 +59,7 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
   }
 
   /// Soft-delete d'un traitement
-  /// 
+  ///
   /// Ne supprime pas physiquement, marque comme supprimé
   /// pour garder l'audit trail et l'historique médical
   Future<int> softDelete(String id, String farmId) {
@@ -165,7 +165,7 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
   }
 
   /// Récupère les traitements avec délai d'attente actif
-  /// 
+  ///
   /// Traitements dont withdrawalEndDate > maintenant
   Future<List<TreatmentsTableData>> findActiveWithdrawalPeriods(
     String farmId,

@@ -34,9 +34,12 @@ class DocumentDao extends DatabaseAccessor<AppDatabase>
     return into(documentsTable).insert(document);
   }
 
-  /// 4. update - Vérifier farmId
-  Future<bool> updateItem(DocumentsTableCompanion document) {
-    return update(documentsTable).replace(document);
+  /// 4. update - B1 FIX: Pass farmId + .write() + security check
+  Future<int> updateItem(DocumentsTableCompanion document, String farmId) {
+    return (update(documentsTable)
+          ..where((t) => t.id.equals(document.id.value))
+          ..where((t) => t.farmId.equals(farmId)))
+        .write(document);
   }
 
   /// 5. softDelete - Soft-delete (pas hard delete)

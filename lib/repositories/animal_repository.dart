@@ -1,6 +1,7 @@
 // lib/repositories/animal_repository.dart
 import 'dart:convert';
 import 'package:drift/drift.dart';
+import 'package:flutter/foundation.dart';
 import '../drift/database.dart';
 import '../models/animal.dart';
 import '../models/eid_change.dart';
@@ -31,13 +32,15 @@ class AnimalRepository {
     return _mapToModel(item);
   }
 
-  /// 3. create - Créer avec farmId
+  /// 3. create - Créer avec farmId (A6: avec logging)
   Future<void> create(Animal animal, String farmId) async {
     final companion = _mapToCompanion(animal, farmId);
     await _db.animalDao.insertItem(companion);
+    debugPrint('✅ Animal créé: ${animal.id} dans farm $farmId');
   }
 
-  /// 4. update - Vérifier farmId
+  /// 4. update - Vérifier farmId (A6: avec logging)
+  /// ⚠️ B1 FIX: Pass farmId to updateItem() for mandatory security check
   Future<void> update(Animal animal, String farmId) async {
     // Security check
     final existing = await _db.animalDao.findById(animal.id, farmId);
@@ -46,12 +49,17 @@ class AnimalRepository {
     }
 
     final companion = _mapToCompanion(animal, farmId);
-    await _db.animalDao.updateItem(companion);
+    final result = await _db.animalDao.updateItem(companion, farmId);
+    if (result == 0) {
+      throw Exception('Animal update failed - no rows affected');
+    }
+    debugPrint('✅ Animal mis à jour: ${animal.id} dans farm $farmId');
   }
 
-  /// 5. delete - Soft-delete
+  /// 5. delete - Soft-delete (A6: avec logging)
   Future<void> delete(String id, String farmId) async {
     await _db.animalDao.softDelete(id, farmId);
+    debugPrint('✅ Animal supprimé (soft): $id dans farm $farmId');
   }
 
   /// 6. getUnsynced - Phase 2 ready
@@ -96,7 +104,7 @@ class AnimalRepository {
     return items.map((data) => _mapToModel(data)).toList();
   }
 
-  /// Compter animaux
+  /// Compter animaux (B3 optimisé)
   Future<int> count(String farmId) async {
     return await _db.animalDao.countByFarmId(farmId);
   }
@@ -107,11 +115,98 @@ class AnimalRepository {
     return items.map((data) => _mapToModel(data)).toList();
   }
 
+  // ==================== PRIORITY 3: AMÉLIORATIONS ====================
+
+  /// A1: Rechercher animaux nés entre deux dates
+  Future<List<Animal>> findByBirthDateRange(
+    String farmId,
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
+    final items = await _db.animalDao.findByBirthDateRange(
+      farmId,
+      startDate,
+      endDate,
+    );
+    return items.map((data) => _mapToModel(data)).toList();
+  }
+
+  /// A1: Rechercher animaux par plage d'âge (en jours)
+  Future<List<Animal>> findByAgeRangeInDays(
+    String farmId,
+    int minDays,
+    int maxDays,
+  ) async {
+    final items = await _db.animalDao.findByAgeRangeInDays(
+      farmId,
+      minDays,
+      maxDays,
+    );
+    return items.map((data) => _mapToModel(data)).toList();
+  }
+
+  /// A2: Recherche composée espèce + statut
+  Future<List<Animal>> findBySpeciesAndStatus(
+    String farmId,
+    String speciesId,
+    String status,
+  ) async {
+    final items = await _db.animalDao.findBySpeciesAndStatus(
+      farmId,
+      speciesId,
+      status,
+    );
+    return items.map((data) => _mapToModel(data)).toList();
+  }
+
+  /// A2: Recherche composée statut + sexe
+  Future<List<Animal>> findByStatusAndSex(
+    String farmId,
+    String status,
+    String sex,
+  ) async {
+    final items = await _db.animalDao.findByStatusAndSex(
+      farmId,
+      status,
+      sex,
+    );
+    return items.map((data) => _mapToModel(data)).toList();
+  }
+
+  /// A3: Obtenir femelles en âge de reproduction (logique métier)
+  Future<List<Animal>> getFemalesOfReproductiveAge(String farmId) async {
+    final items = await _db.animalDao.getFemalesOfReproductiveAge(farmId);
+    return items.map((data) => _mapToModel(data)).toList();
+  }
+
+  /// A4: Pagination support
+  Future<PaginatedAnimals> getAnimalsPaginated(
+    String farmId, {
+    required int page,
+    required int pageSize,
+  }) async {
+    final offset = (page - 1) * pageSize;
+    final items = await _db.animalDao.findByFarmIdPaginated(
+      farmId,
+      limit: pageSize,
+      offset: offset,
+    );
+    final total = await _db.animalDao.countByFarmIdForPagination(farmId);
+
+    return PaginatedAnimals(
+      animals: items.map((data) => _mapToModel(data)).toList(),
+      total: total,
+      page: page,
+      pageSize: pageSize,
+      totalPages: (total / pageSize).ceil(),
+    );
+  }
+
   // ==================== MAPPERS ====================
 
   /// Mapper AnimalsTableData vers Animal (model)
   Animal _mapToModel(AnimalsTableData data) {
-    // Decode eidHistory from JSON
+    // B4 FIX: Decode eidHistory from JSON avec logging
     List<EidChange>? eidHistory;
     if (data.eidHistory != null) {
       try {
@@ -120,7 +215,8 @@ class AnimalRepository {
             .map((e) => EidChange.fromJson(e as Map<String, dynamic>))
             .toList();
       } catch (e) {
-        // Si erreur parsing, laisser null
+        // B4: Logging d'erreur au lieu de silencieux
+        debugPrint('⚠️ ERREUR parsing eidHistory pour animal ${data.id}: $e');
         eidHistory = null;
       }
     }
@@ -180,4 +276,24 @@ class AnimalRepository {
       deletedAt: const Value.absent(), // Pas de soft-delete à la création
     );
   }
+}
+
+/// A4: Classe helper pour résultats paginés
+class PaginatedAnimals {
+  final List<Animal> animals;
+  final int total;
+  final int page;
+  final int pageSize;
+  final int totalPages;
+
+  PaginatedAnimals({
+    required this.animals,
+    required this.total,
+    required this.page,
+    required this.pageSize,
+    required this.totalPages,
+  });
+
+  bool get hasNextPage => page < totalPages;
+  bool get hasPreviousPage => page > 1;
 }

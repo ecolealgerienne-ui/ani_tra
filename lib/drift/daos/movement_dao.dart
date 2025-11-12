@@ -54,8 +54,13 @@ class MovementDao extends DatabaseAccessor<AppDatabase> with _$MovementDaoMixin 
   }
 
   /// Met à jour un mouvement existant
-  Future<bool> updateItem(MovementsTableCompanion item) {
-    return update(movementsTable).replace(item);
+  /// 
+  /// IMPORTANT: Requiert farmId pour la sécurité multi-tenancy
+  Future<int> updateItem(MovementsTableCompanion item, String farmId) {
+    return (update(movementsTable)
+          ..where((t) => t.id.equals(item.id.value))
+          ..where((t) => t.farmId.equals(farmId)))
+        .write(item);
   }
 
   /// Soft-delete d'un mouvement

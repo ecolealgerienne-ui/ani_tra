@@ -53,13 +53,18 @@ class WeightDao extends DatabaseAccessor<AppDatabase> with _$WeightDaoMixin {
   }
 
   /// Met à jour une pesée existante
-  Future<bool> updateItem(WeightsTableCompanion item) {
-    return update(weightsTable).replace(item);
+  /// 
+  /// IMPORTANT: Requiert farmId pour la sécurité multi-tenancy
+  Future<int> updateItem(WeightsTableCompanion item, String farmId) {
+    return (update(weightsTable)
+          ..where((t) => t.id.equals(item.id.value))
+          ..where((t) => t.farmId.equals(farmId)))
+        .write(item);
   }
 
   /// Soft-delete d'une pesée
   ///
-  /// Ne supprime pas physiquement, marque comme supprimé
+  /// Ne supprime pas physiquement, marque comme supprimée
   /// pour garder l'audit trail et l'historique de croissance
   Future<int> softDelete(String id, String farmId) {
     return (update(weightsTable)

@@ -291,6 +291,7 @@ class Vaccination implements SyncableEntity {
         other.vaccinationDate == vaccinationDate;
   }
 
+  //toto
   @override
   int get hashCode => Object.hash(id, vaccineName, disease, vaccinationDate);
 }

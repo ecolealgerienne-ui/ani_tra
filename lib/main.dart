@@ -19,9 +19,11 @@ import 'providers/weight_provider.dart';
 import 'providers/settings_provider.dart';
 import 'providers/alert_provider.dart';
 import 'providers/vaccination_provider.dart';
+import 'providers/treatment_provider.dart';
 import 'providers/vaccination_reference_provider.dart';
 import 'providers/document_provider.dart';
 import 'providers/breeding_provider.dart';
+import 'providers/breed_provider.dart';
 import 'providers/auth_provider.dart';
 import 'providers/reminder_provider.dart';
 import 'providers/veterinarian_provider.dart';
@@ -37,6 +39,7 @@ import 'screens/animal/universal_scanner_screen.dart';
 import 'drift/database.dart';
 import 'repositories/animal_repository.dart';
 import 'repositories/weight_repository.dart';
+import 'repositories/treatment_repository.dart';
 import 'repositories/vaccination_repository.dart';
 import 'repositories/veterinarian_repository.dart';
 import 'repositories/breed_repository.dart';
@@ -110,6 +113,7 @@ void main() async {
   final campaignRepository = CampaignRepository(database);
   final breedingRepository = BreedingRepository(database);
   final documentRepository = DocumentRepository(database);
+  final treatmentRepository = TreatmentRepository(database);
 
   runApp(MyApp(
     database: database,
@@ -123,6 +127,7 @@ void main() async {
     campaignRepository: campaignRepository,
     breedingRepository: breedingRepository,
     documentRepository: documentRepository,
+    treatmentRepository: treatmentRepository,
   ));
 }
 
@@ -138,6 +143,7 @@ class MyApp extends StatelessWidget {
   final CampaignRepository campaignRepository;
   final BreedingRepository breedingRepository;
   final DocumentRepository documentRepository;
+  final TreatmentRepository treatmentRepository;
 
   const MyApp({
     super.key,
@@ -152,6 +158,7 @@ class MyApp extends StatelessWidget {
     required this.campaignRepository,
     required this.breedingRepository,
     required this.documentRepository,
+    required this.treatmentRepository,
   });
 
   @override
@@ -170,6 +177,7 @@ class MyApp extends StatelessWidget {
         Provider<CampaignRepository>.value(value: campaignRepository),
         Provider<BreedingRepository>.value(value: breedingRepository),
         Provider<DocumentRepository>.value(value: documentRepository),
+        Provider<TreatmentRepository>.value(value: treatmentRepository),
 
         // === AuthProvider EN PREMIER ===
         ChangeNotifierProvider(create: (_) => AuthProvider()),
@@ -188,6 +196,11 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => ReminderProvider(flutterLocalNotificationsPlugin),
+        ),
+
+        // === BreedProvider (lookup table, lecture seule) ===
+        ChangeNotifierProvider(
+          create: (_) => BreedProvider(context.read<BreedRepository>()),
         ),
 
         // === AnimalProvider (charge depuis DB) ===
@@ -277,6 +290,15 @@ class MyApp extends StatelessWidget {
               previous ??
               VeterinarianProvider(
                   auth, context.read<VeterinarianRepository>()),
+        ),
+
+        // === TreatmentProvider (charge depuis DB) ===
+        ChangeNotifierProxyProvider<AuthProvider, TreatmentProvider>(
+          create: (context) => TreatmentProvider(context.read<AuthProvider>(),
+              context.read<TreatmentRepository>()),
+          update: (context, auth, previous) =>
+              previous ??
+              TreatmentProvider(auth, context.read<TreatmentRepository>()),
         ),
 
         // === AlertProvider (dépend de plusieurs providers) ===

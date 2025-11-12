@@ -51,7 +51,10 @@ class WeightsTable extends Table {
 
   @override
   List<String> get customConstraints => [
-    'FOREIGN KEY (farm_id) REFERENCES farms(id)',
-    'FOREIGN KEY (animal_id) REFERENCES animals(id)',
+    'FOREIGN KEY (farm_id) REFERENCES farms(id) ON DELETE CASCADE',
+    'FOREIGN KEY (animal_id) REFERENCES animals(id) ON DELETE CASCADE',
+    'CREATE INDEX IF NOT EXISTS idx_weights_farm_id ON weights(farm_id)',
+    'CREATE INDEX IF NOT EXISTS idx_weights_farm_recorded ON weights(farm_id, recorded_at DESC)',
+    'CREATE INDEX IF NOT EXISTS idx_weights_deleted_at ON weights(deleted_at)',
   ];
 }

@@ -8,7 +8,7 @@ import '../tables/vaccinations_table.dart';
 part 'vaccination_dao.g.dart';
 
 /// DAO pour la gestion des vaccinations
-/// 
+///
 /// Gère les opérations CRUD sur les vaccinations avec:
 /// - Filtrage par farmId (multi-tenancy)
 /// - Filtrage par animal (individuel ou groupe)
@@ -23,7 +23,7 @@ class VaccinationDao extends DatabaseAccessor<AppDatabase>
   // === REQUIRED METHODS ===
 
   /// Récupère toutes les vaccinations d'une ferme (non supprimées)
-  /// 
+  ///
   /// Filtre par:
   /// - farmId (multi-tenancy)
   /// - deletedAt IS NULL (soft-delete)
@@ -40,7 +40,7 @@ class VaccinationDao extends DatabaseAccessor<AppDatabase>
   }
 
   /// Récupère une vaccination par ID avec vérification farmId
-  /// 
+  ///
   /// Security: Vérifie que la vaccination appartient bien à la ferme
   Future<VaccinationsTableData?> findById(String id, String farmId) {
     return (select(vaccinationsTable)
@@ -61,7 +61,7 @@ class VaccinationDao extends DatabaseAccessor<AppDatabase>
   }
 
   /// Soft-delete d'une vaccination
-  /// 
+  ///
   /// Ne supprime pas physiquement, marque comme supprimé
   /// pour garder l'audit trail et l'historique médical
   Future<int> softDelete(String id, String farmId) {
@@ -101,7 +101,7 @@ class VaccinationDao extends DatabaseAccessor<AppDatabase>
   // === BUSINESS QUERIES ===
 
   /// Récupère les vaccinations d'un animal
-  /// 
+  ///
   /// Note: Filtrage sur animalId ET présence dans animalIds JSON
   /// nécessite traitement côté Dart car SQLite ne supporte pas JSON_CONTAINS
   Future<List<VaccinationsTableData>> findByAnimalId(
@@ -163,7 +163,7 @@ class VaccinationDao extends DatabaseAccessor<AppDatabase>
   }
 
   /// Récupère les vaccinations avec rappel à venir
-  /// 
+  ///
   /// nextDueDate != null ET nextDueDate > maintenant
   Future<List<VaccinationsTableData>> findUpcomingReminders(
     String farmId,
@@ -182,7 +182,7 @@ class VaccinationDao extends DatabaseAccessor<AppDatabase>
   }
 
   /// Récupère les vaccinations dont le rappel est en retard
-  /// 
+  ///
   /// nextDueDate != null ET nextDueDate < maintenant
   Future<List<VaccinationsTableData>> findOverdueReminders(
     String farmId,
@@ -201,7 +201,7 @@ class VaccinationDao extends DatabaseAccessor<AppDatabase>
   }
 
   /// Compte les vaccinations par animal
-  /// 
+  ///
   /// Note: Compte uniquement les vaccinations individuelles (animalId non null)
   Future<int> countByAnimalId(String farmId, String animalId) async {
     final result = await (selectOnly(vaccinationsTable)

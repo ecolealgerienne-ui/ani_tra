@@ -15,7 +15,7 @@ class BatchesTable extends Table {
   TextColumn get name => text()();
   TextColumn get purpose => text()(); // sale, slaughter, treatment, other
   
-  // âš¡ IMPORTANT: animal_ids stockÃ© en JSON
+  // ⚠️ IMPORTANT: animal_ids stocké en JSON
   // Exemple: '["animal-1", "animal-2", "animal-3"]'
   TextColumn get animalIdsJson => text().named('animal_ids_json')();
   
@@ -35,4 +35,20 @@ class BatchesTable extends Table {
 
   @override
   Set<Column> get primaryKey => {id};
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {farmId, name}, // Unique batch name par farm
+  ];
+
+  @override
+  List<String> get customConstraints => [
+    // FK vers farms (multi-tenancy)
+    'FOREIGN KEY (farm_id) REFERENCES farms(id) ON DELETE CASCADE',
+    
+    // Indexes pour performance
+    'CREATE INDEX IF NOT EXISTS idx_batches_farm_id ON batches(farm_id)',
+    'CREATE INDEX IF NOT EXISTS idx_batches_purpose ON batches(farm_id, purpose)',
+    'CREATE INDEX IF NOT EXISTS idx_batches_created_at ON batches(farm_id, created_at DESC)',
+  ];
 }

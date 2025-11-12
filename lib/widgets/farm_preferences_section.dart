@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/settings_provider.dart';
+import '../providers/breed_provider.dart';
 import '../data/animal_config.dart';
 import '../i18n/app_localizations.dart';
 import '../i18n/app_strings.dart';
@@ -21,7 +22,9 @@ class FarmPreferencesSection extends StatelessWidget {
           settingsProvider.defaultSpeciesId,
         );
         final currentBreed = settingsProvider.defaultBreedId != null
-            ? AnimalConfig.getBreedById(settingsProvider.defaultBreedId!)
+            ? context
+                .read<BreedProvider>()
+                .getById(settingsProvider.defaultBreedId!)
             : null;
 
         return Card(
@@ -194,7 +197,8 @@ class FarmPreferencesSection extends StatelessWidget {
           onChanged: (value) {
             if (value != null) {
               settingsProvider.setDefaultSpecies(value);
-              final breeds = AnimalConfig.getBreedsBySpecies(value);
+              final breeds =
+                  context.read<BreedProvider>().getBySpeciesId(value);
               if (breeds.isNotEmpty) {
                 settingsProvider.setDefaultBreed(breeds.first.id);
               } else {
@@ -229,9 +233,9 @@ class FarmPreferencesSection extends StatelessWidget {
     SettingsProvider settingsProvider,
   ) {
     final l10n = AppLocalizations.of(context);
-    final breeds = AnimalConfig.getBreedsBySpecies(
-      settingsProvider.defaultSpeciesId,
-    );
+    final breeds = context.read<BreedProvider>().getBySpeciesId(
+          settingsProvider.defaultSpeciesId,
+        );
 
     if (breeds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(

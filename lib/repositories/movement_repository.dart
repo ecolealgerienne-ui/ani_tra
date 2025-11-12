@@ -2,10 +2,11 @@
 
 import 'package:drift/drift.dart';
 import '../drift/database.dart';
+//import '../drift/tables/movements_table.dart';
 import '../models/movement.dart';
 
 /// Repository pour la gestion des mouvements d'animaux
-/// 
+///
 /// Couche business logic entre les providers et la base de données.
 /// Responsabilités:
 /// - Mapping Model ↔ Drift Companion
@@ -54,7 +55,7 @@ class MovementRepository {
     }
 
     final companion = _mapToCompanion(movement, farmId);
-    await _db.movementDao.updateItem(companion);
+    await _db.movementDao.updateItem(companion, farmId);
   }
 
   /// Supprime un mouvement (soft-delete)
@@ -236,8 +237,12 @@ class MovementRepository {
       toFarmId: movement.toFarmId != null
           ? Value(movement.toFarmId!)
           : const Value.absent(),
-      price: movement.price != null ? Value(movement.price!) : const Value.absent(),
-      notes: movement.notes != null ? Value(movement.notes!) : const Value.absent(),
+      price: movement.price != null
+          ? Value(movement.price!)
+          : const Value.absent(),
+      notes: movement.notes != null
+          ? Value(movement.notes!)
+          : const Value.absent(),
       buyerQrSignature: movement.buyerQrSignature != null
           ? Value(movement.buyerQrSignature!)
           : const Value.absent(),
