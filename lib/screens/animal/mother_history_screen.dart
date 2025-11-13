@@ -265,6 +265,8 @@ class MotherHistoryScreen extends StatelessWidget {
 
   String _getStatusLabel(BuildContext context, AnimalStatus status) {
     switch (status) {
+      case AnimalStatus.draft:
+        return AppLocalizations.of(context).translate(AppStrings.draftStatus);
       case AnimalStatus.alive:
         return AppLocalizations.of(context).translate(AppStrings.alive);
       case AnimalStatus.sold:

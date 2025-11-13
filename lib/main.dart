@@ -74,7 +74,7 @@ void main() async {
     _dbInitialized = true;
     debugPrint('✅ DB initialisée');
   } else {
-    debugPrint('⏭️ DB déjà initialisée, skip');
+    debugPrint('⭐️ DB déjà initialisée, skip');
   }
 
   final database = _appDatabase!;
@@ -199,8 +199,10 @@ class MyApp extends StatelessWidget {
         ),
 
         // === BreedProvider (lookup table, lecture seule) ===
-        ChangeNotifierProvider(
-          create: (_) => BreedProvider(context.read<BreedRepository>()),
+        // ✅ FIXE: Utiliser ChangeNotifierProxyProvider car BreedProvider extends ChangeNotifier
+        ChangeNotifierProxyProvider<BreedRepository, BreedProvider>(
+          create: (context) => BreedProvider(context.read<BreedRepository>()),
+          update: (context, repo, previous) => previous ?? BreedProvider(repo),
         ),
 
         // === AnimalProvider (charge depuis DB) ===

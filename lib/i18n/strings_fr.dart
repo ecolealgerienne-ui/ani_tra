@@ -757,10 +757,10 @@ const Map<String, String> stringsFr = {
 
 // ADD ANIMAL
   'identification': '📋 Identification',
-  'eidElectronic': 'EID (Numéro électronique)',
+  'eidElectronic': 'EID (Numéro électronique (optionnel))',
   'atLeastOneIdRequired':
       'Au moins un identifiant requis (EID, N° officiel ou ID visuel)',
-  'officialNumberOptional': 'Numéro officiel (optionnel)',
+  'officialNumberOptional': 'Numéro officiel',
   'visualIdOptional': 'ID visuel (optionnel)',
   'toIdentifyEasily': 'Pour identifier facilement l\'animal',
   'typeAndBreed': '🐑 Type et Race',
@@ -799,6 +799,7 @@ const Map<String, String> stringsFr = {
   'eidDetectedSuccess': 'EID détecté avec succès',
   'eidScanned': '✅ EID scanné: {eid}',
   'validate': 'Valider',
+  'exeIdVisuel': 'Rouge-42, Tache-Blanche...',
 
 // ANIMAL DETAIL
   'infos': 'Infos',
@@ -833,6 +834,7 @@ const Map<String, String> stringsFr = {
   'reminderLate': 'Rappel en retard',
   'reminderInDays': 'Rappel dans {days}j',
   'noMotherDeclared': 'Aucune mère déclarée',
+  'motherDetected': 'Mère détectée',
   'seeDetails': 'Voir les détails',
   'offspring': 'Progéniture',
   'noOffspring': 'Aucune progéniture enregistrée',
@@ -918,4 +920,29 @@ const Map<String, String> stringsFr = {
 
   'successRate': 'Taux de réussite',
   'breedingThisMonth': 'Reproductions ce mois',
+
+  /////
+  'animalsWithoutOfficialNumber': '⚠️ Sans numéro officiel',
+
+  // ============ ANIMAL STATUS & DRAFT SYSTEM ============
+  'draftStatus': 'Brouillon',
+  'validatedStatus': 'Validé',
+  'deadStatus': 'Mort',
+  'soldStatus': 'Vendu',
+  'slaughteredStatus': 'Abattu',
+
+  // ============ DRAFT ALERTS & ACTIONS ============
+  'draftAlertWarning': 'Brouillon depuis {hours}h - À valider ou supprimer',
+  'draftHardLimit': '⚠️ URGENT: Brouillon depuis {days}j - Action requise!',
+  'cannotAddCareOnDraft':
+      'Valide l\'animal d\'abord avant d\'ajouter des soins',
+  'validateAnimal': 'Valider l\'animal',
+  'confirmDelete': 'Confirmer la suppression',
+  'draftCreatedAt': 'Créé le {date} à {time}',
+  'validateFirst': 'Valide d\'abord',
+  'draftInBrouillon': 'En brouillon',
+  'draftModifiableUntilValidation':
+      'Mode brouillon - Modifie à volonté. Une fois validé, données immuables.',
+  'draftSinceHours': 'Brouillon depuis {hours} heures',
+  'animalsInAlert': '{count} animaux en brouillon depuis > 48h',
 };

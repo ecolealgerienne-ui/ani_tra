@@ -1,5 +1,5 @@
 // lib/screens/animal_list_screen.dart
-// Version 2.0 - IntÃ©gration complÃ¨te des alertes
+// Version 2.0 - IntÃƒÆ’Ã‚Â©gration complÃƒÆ’Ã‚Â¨te des alertes
 // PHASE 1+2 : Alertes prioritaires + Groupes collapsibles
 
 import 'package:flutter/material.dart';
@@ -15,20 +15,18 @@ import '../../models/alert_type.dart';
 import '../../models/alert_category.dart';
 import '../../models/breed.dart';
 import '../../data/animal_config.dart';
-import '../../providers/breed_provider.dart';
 
 import 'animal_detail_screen.dart';
 import 'add_animal_screen.dart';
 import 'animal_finder_screen.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
-//import '../../utils/constants.dart';
 
 class AnimalListScreen extends StatefulWidget {
-  /// Liste d'IDs Ã  afficher uniquement (pour filtrer depuis une alerte)
+  /// Liste d'IDs ÃƒÆ’Ã‚Â  afficher uniquement (pour filtrer depuis une alerte)
   final List<String>? filterAnimalIds;
 
-  /// Titre personnalisÃ© si on vient d'une alerte
+  /// Titre personnalisÃƒÆ’Ã‚Â© si on vient d'une alerte
   final String? customTitle;
 
   const AnimalListScreen({
@@ -54,7 +52,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
   Set<String> _selectedSpecies = {};
   Set<String> _selectedBreeds = {};
 
-  // ðŸ†• Filtre alertes
+  // ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã¢â‚¬Â¢ Filtre alertes
   bool _showOnlyWithAlerts = false;
 
   // Group By - Initialisation intelligente
@@ -63,22 +61,26 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
   @override
   void initState() {
     super.initState();
-    // Si on vient d'une alerte avec filtre â†’ Pas de groupement
-    // Sinon â†’ Grouper par alertes par dÃ©faut
+    // Si on vient d'une alerte avec filtre ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Pas de groupement
+    // Sinon ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Grouper par alertes par dÃƒÆ’Ã‚Â©faut
     _groupBy = widget.filterAnimalIds != null
         ? GroupByOption.none
         : GroupByOption.alerts;
   }
 
-  // ðŸ†• Ã‰tat des sections collapsibles
+  // ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã¢â‚¬Â¢ ÃƒÆ’Ã¢â‚¬Â°tat des sections collapsibles
   final Map<String, bool> _expandedSections = {
-    'urgent': true, // Ouvert par dÃ©faut
-    'important': true, // Ouvert par dÃ©faut
-    'routine': false, // FermÃ© par dÃ©faut
-    'noalert': true, // ðŸ”§ OUVERT par dÃ©faut pour voir les animaux
+    'urgent':
+        false, // Ouvert par dÃƒÂ©faut (prioritÃƒÂ©) // Ouvert par dÃƒÆ’Ã‚Â©faut
+    'important': false, // FermÃƒÂ© par dÃƒÂ©faut // Ouvert par dÃƒÆ’Ã‚Â©faut
+    'routine':
+        false, // FermÃƒÂ© par dÃƒÂ©faut // FermÃƒÆ’Ã‚Â© par dÃƒÆ’Ã‚Â©faut
+    'noalert':
+        false, // FermÃƒÂ© par dÃƒÂ©faut // ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â§ OUVERT par dÃƒÆ’Ã‚Â©faut pour voir les animaux
+    'withoutOfficialNumber': false, // TOUJOURS ouvert (rÃƒÂ©glementaire)
   };
 
-  // Ã‰tat filtres drawer
+  // ÃƒÆ’Ã¢â‚¬Â°tat filtres drawer
   int get _activeFilterCount {
     int count = 0;
     if (_selectedStatuses.length < 4) count++;
@@ -103,7 +105,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     var filtered = animals;
     final animalProvider = context.read<AnimalProvider>();
 
-    // ðŸ†• Si on vient d'une alerte, filtrer uniquement ces animaux
+    // ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã¢â‚¬Â¢ Si on vient d'une alerte, filtrer uniquement ces animaux
     if (widget.filterAnimalIds != null) {
       filtered = filtered
           .where((a) => widget.filterAnimalIds!.contains(a.id))
@@ -128,7 +130,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       filtered = filtered.where((a) => _selectedSexes.contains(a.sex)).toList();
     }
 
-    // Filtre Ã¢ge
+    // Filtre ÃƒÆ’Ã‚Â¢ge
     if (_selectedAgeRanges.isNotEmpty) {
       filtered = filtered.where((a) {
         final months = a.ageInMonths;
@@ -142,7 +144,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       }).toList();
     }
 
-    // Filtre rÃ©manence
+    // Filtre rÃƒÆ’Ã‚Â©manence
     if (_hasActiveWithdrawal != null) {
       final animalProvider = context.read<AnimalProvider>();
       filtered = filtered.where((a) {
@@ -151,7 +153,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       }).toList();
     }
 
-    // Filtre mÃ¨re
+    // Filtre mÃƒÆ’Ã‚Â¨re
     if (_motherEidFilter != null && _motherEidFilter!.isNotEmpty) {
       filtered = filtered.where((a) {
         if (a.motherId == null) return false;
@@ -178,7 +180,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       }).toList();
     }
 
-    // ðŸ†• Filtre "Avec alertes uniquement"
+    // ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã¢â‚¬Â¢ Filtre "Avec alertes uniquement"
     if (_showOnlyWithAlerts) {
       final alertProvider = context.read<AlertProvider>();
       filtered = filtered.where((a) {
@@ -196,7 +198,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       case GroupByOption.none:
         return {'all': animals};
 
-      // ðŸ†• NOUVEAU : Grouper par niveau d'alerte
+      // ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã¢â‚¬Â¢ NOUVEAU : Grouper par niveau d'alerte
       case GroupByOption.alerts:
         final alertProvider = context.read<AlertProvider>();
 
@@ -243,8 +245,8 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       case GroupByOption.sex:
         for (final animal in animals) {
           final key = animal.sex == AnimalSex.male
-              ? 'â™‚ï¸ MÃ¢les'
-              : 'â™€ï¸ Femelles';
+              ? 'ÃƒÂ¢Ã¢â€žÂ¢Ã¢â‚¬Å¡ÃƒÂ¯Ã‚Â¸Ã‚Â MÃƒÆ’Ã‚Â¢les'
+              : 'ÃƒÂ¢Ã¢â€žÂ¢Ã¢â€šÂ¬ÃƒÂ¯Ã‚Â¸Ã‚Â Femelles';
           groups.putIfAbsent(key, () => []).add(animal);
         }
         break;
@@ -254,13 +256,13 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
           final months = animal.ageInMonths;
           String key;
           if (months < 6) {
-            key = 'ðŸ‘ < 6 mois';
+            key = 'ÃƒÂ°Ã…Â¸Ã‚ÂÃ¢â‚¬Ëœ < 6 mois';
           } else if (months < 12) {
-            key = 'ðŸ‘ 6-12 mois';
+            key = 'ÃƒÂ°Ã…Â¸Ã‚ÂÃ¢â‚¬Ëœ 6-12 mois';
           } else if (months < 24) {
-            key = 'ðŸ 1-2 ans';
+            key = 'ÃƒÂ°Ã…Â¸Ã‚ÂÃ‚Â 1-2 ans';
           } else {
-            key = 'ðŸ > 2 ans';
+            key = 'ÃƒÂ°Ã…Â¸Ã‚ÂÃ‚Â > 2 ans';
           }
           groups.putIfAbsent(key, () => []).add(animal);
         }
@@ -270,17 +272,20 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
         for (final animal in animals) {
           String key;
           switch (animal.status) {
+            case AnimalStatus.draft:
+              key = '📋 Brouillons';
+              break;
             case AnimalStatus.alive:
-              key = 'ðŸŸ¢ Vivants';
+              key = 'ÃƒÂ°Ã…Â¸Ã…Â¸Ã‚Â¢ Vivants';
               break;
             case AnimalStatus.sold:
-              key = 'ðŸŸ  Vendus';
+              key = 'ÃƒÂ°Ã…Â¸Ã…Â¸Ã‚Â  Vendus';
               break;
             case AnimalStatus.dead:
-              key = 'ðŸ”´ Morts';
+              key = 'ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â´ Morts';
               break;
             case AnimalStatus.slaughtered:
-              key = 'ðŸ­ Abattus';
+              key = 'ÃƒÂ°Ã…Â¸Ã‚ÂÃ‚Â­ Abattus';
               break;
           }
           groups.putIfAbsent(key, () => []).add(animal);
@@ -292,8 +297,8 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
         for (final animal in animals) {
           final hasActive = animalProvider.hasActiveWithdrawal(animal.id);
           final key = hasActive
-              ? 'âš ï¸ RÃ©manence Active'
-              : 'âœ… RÃ©manence Inactive';
+              ? 'ÃƒÂ¢Ã…Â¡Ã‚Â ÃƒÂ¯Ã‚Â¸Ã‚Â RÃƒÆ’Ã‚Â©manence Active'
+              : 'ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ RÃƒÆ’Ã‚Â©manence Inactive';
           groups.putIfAbsent(key, () => []).add(animal);
         }
         break;
@@ -301,13 +306,15 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       case GroupByOption.mother:
         for (final animal in animals) {
           if (animal.motherId == null) {
-            groups.putIfAbsent('â“ MÃ¨re inconnue', () => []).add(animal);
+            groups
+                .putIfAbsent('ÃƒÂ¢Ã‚ÂÃ¢â‚¬Å“ MÃƒÆ’Ã‚Â¨re inconnue', () => [])
+                .add(animal);
           } else {
             final mother =
                 context.read<AnimalProvider>().getAnimalById(animal.motherId!);
             final key = mother != null
-                ? 'ðŸ‘© ${mother.officialNumber ?? mother.eid}'
-                : 'â“ MÃ¨re inconnue';
+                ? 'ÃƒÂ°Ã…Â¸Ã¢â‚¬ËœÃ‚Â© ${mother.officialNumber ?? mother.eid}'
+                : 'ÃƒÂ¢Ã‚ÂÃ¢â‚¬Å“ MÃƒÆ’Ã‚Â¨re inconnue';
             groups.putIfAbsent(key, () => []).add(animal);
           }
         }
@@ -316,7 +323,9 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       case GroupByOption.species:
         for (final animal in animals) {
           if (animal.speciesId == null) {
-            groups.putIfAbsent('â“ Type non dÃ©fini', () => []).add(animal);
+            groups
+                .putIfAbsent('ÃƒÂ¢Ã‚ÂÃ¢â‚¬Å“ Type non dÃƒÆ’Ã‚Â©fini', () => [])
+                .add(animal);
           } else {
             final key = animal.fullDisplayFr.split(' - ').first;
             groups.putIfAbsent(key, () => []).add(animal);
@@ -327,7 +336,10 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       case GroupByOption.breed:
         for (final animal in animals) {
           if (animal.breedId == null) {
-            groups.putIfAbsent('â“ Race non dÃ©finie', () => []).add(animal);
+            groups
+                .putIfAbsent(
+                    'ÃƒÂ¢Ã‚ÂÃ¢â‚¬Å“ Race non dÃƒÆ’Ã‚Â©finie', () => [])
+                .add(animal);
           } else {
             final key = animal.breedNameFr;
             groups.putIfAbsent(key, () => []).add(animal);
@@ -336,16 +348,125 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
         break;
     }
 
+    // Ã°Å¸â€ â€¢ SÃƒÂ©parer les animaux sans numÃƒÂ©ro officiel (TOUJOURS visibles en dernier)
+    final withoutOfficialNumber = animals
+        .where((a) => a.officialNumber == null || a.officialNumber!.isEmpty)
+        .toList();
+
+    if (withoutOfficialNumber.isNotEmpty) {
+      groups[AppLocalizations.of(context)
+              .translate(AppStrings.animalsWithoutOfficialNumber)] =
+          withoutOfficialNumber;
+    }
+
     return groups;
   }
 
-  // ðŸ†• Obtenir la clÃ© de section pour l'Ã©tat collapsed
+  // ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã¢â‚¬Â¢ Obtenir la clÃƒÆ’Ã‚Â© de section pour l'ÃƒÆ’Ã‚Â©tat collapsed
+  /// Ã°Å¸â€Â§ Obtenir les libellÃƒÂ©s des filtres appliquÃƒÂ©s
+  String _getAppliedFiltersLabel() {
+    final filters = <String>[];
+
+    // Statut - NE pas afficher si c'est le dÃƒÂ©faut (alive seulement)
+    if (_selectedStatuses.length < 4 &&
+        _selectedStatuses != {AnimalStatus.alive}) {
+      filters.add(AppLocalizations.of(context).translate(AppStrings.status));
+    }
+
+    // Sexe
+    if (_selectedSexes.isNotEmpty) {
+      filters.add(AppLocalizations.of(context).translate(AppStrings.sex));
+    }
+
+    // Ãƒâ€šge
+    if (_selectedAgeRanges.isNotEmpty) {
+      filters.add(AppLocalizations.of(context).translate(AppStrings.age));
+    }
+
+    // RÃƒÂ©manence
+    if (_hasActiveWithdrawal != null) {
+      filters.add('RÃƒÂ©manence');
+    }
+
+    // MÃƒÂ¨re
+    if (_motherEidFilter != null && _motherEidFilter!.isNotEmpty) {
+      filters.add(AppLocalizations.of(context).translate(AppStrings.mother));
+    }
+
+    // Lot
+    if (_batchIdFilter != null) {
+      filters.add(AppLocalizations.of(context).translate(AppStrings.batch));
+    }
+
+    // EspÃƒÂ¨ce
+    if (_selectedSpecies.isNotEmpty) {
+      filters.add(AppLocalizations.of(context).translate(AppStrings.species));
+    }
+
+    // Race
+    if (_selectedBreeds.isNotEmpty) {
+      filters.add(AppLocalizations.of(context).translate(AppStrings.breed));
+    }
+
+    if (filters.isEmpty) {
+      return '';
+    }
+    return 'Filtres: ${filters.join(', ')}';
+  }
+
   String _getSectionKey(String groupName) {
     if (groupName.contains('URGENTS')) return 'urgent';
     if (groupName.contains('SURVEILLER')) return 'important';
     if (groupName.contains('Routine')) return 'routine';
     if (groupName.contains('Sans alerte')) return 'noalert';
+    if (groupName.contains('Sans numÃƒÂ©ro')) return 'withoutOfficialNumber';
     return groupName;
+  }
+
+  /// Ã°Å¸â€Â§ RÃƒÂ©initialiser _expandedSections selon le mode GroupBy actuel
+  void _resetExpandedSections() {
+    _expandedSections.clear();
+    switch (_groupBy) {
+      case GroupByOption.none:
+        _expandedSections['all'] = false;
+        break;
+      case GroupByOption.alerts:
+        _expandedSections['urgent'] = false;
+        _expandedSections['important'] = false;
+        _expandedSections['routine'] = false;
+        _expandedSections['withoutOfficialNumber'] = false;
+        _expandedSections['noalert'] = false;
+        break;
+      case GroupByOption.sex:
+        _expandedSections['Ã¢â„¢â€šÃ¯Â¸Â MÃƒÂ¢les'] = false;
+        _expandedSections['Ã¢â„¢â‚¬Ã¯Â¸Â Femelles'] = false;
+        break;
+      case GroupByOption.age:
+        _expandedSections['Ã°Å¸Ââ€˜ < 6 mois'] = false;
+        _expandedSections['Ã°Å¸Ââ€˜ 6-12 mois'] = false;
+        _expandedSections['Ã°Å¸Ââ€˜ 1-2 ans'] = false;
+        _expandedSections['Ã°Å¸Ââ€˜ > 2 ans'] = false;
+        break;
+      case GroupByOption.status:
+        _expandedSections['Ã°Å¸Å¸Â¢ Vivants'] = false;
+        _expandedSections['Ã°Å¸Å¸Â  Vendus'] = false;
+        _expandedSections['Ã°Å¸â€™â‚¬ Morts'] = false;
+        _expandedSections['Ã°Å¸Â¦Â´ Abattus'] = false;
+        break;
+      case GroupByOption.withdrawal:
+        _expandedSections['Ã¢Å¡Â Ã¯Â¸Â RÃƒÂ©manence Active'] = false;
+        _expandedSections['Ã¢Å“â€¦ RÃƒÂ©manence Inactive'] = false;
+        break;
+      case GroupByOption.mother:
+        _expandedSections['Ã°Å¸Ââ€˜ MÃƒÂ¨re inconnue'] = false;
+        break;
+      case GroupByOption.species:
+        _expandedSections['Ã°Å¸Ââ€˜ Type non dÃƒÂ©fini'] = false;
+        break;
+      case GroupByOption.breed:
+        _expandedSections['Ã°Å¸Ââ€˜ Race non dÃƒÂ©finie'] = false;
+        break;
+    }
   }
 
   @override
@@ -354,7 +475,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       appBar: AppBar(
         title: Text(widget.customTitle ?? 'Animaux'),
         actions: [
-          // ðŸ†• Badge d'alertes
+          // ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã¢â‚¬Â¢ Badge d'alertes
           Consumer<AlertProvider>(
             builder: (context, alertProvider, child) {
               final alertCount = alertProvider.alertCount;
@@ -414,11 +535,22 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
           final filtered = _getFilteredAnimals(animalProvider.animals);
           final grouped = _getGroupedAnimals(filtered);
 
-          // ðŸ†• Tri des groupes pour mettre les alertes en premier
+          // ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã¢â‚¬Â¢ Tri des groupes pour mettre les alertes en premier
+          // Ã°Å¸â€Â§ Tri des groupes - Sans numÃƒÂ©ro officiel EN PREMIER toujours
           final sortedKeys = grouped.keys.toList();
+
+          // Ã°Å¸â€ â€¢ Extraire "Sans numÃƒÂ©ro officiel" et le mettre EN PREMIER toujours
+          final officialNumberKey = AppLocalizations.of(context)
+              .translate(AppStrings.animalsWithoutOfficialNumber);
+          final hasWithoutOfficialNumber =
+              sortedKeys.contains(officialNumberKey);
+          if (hasWithoutOfficialNumber) {
+            sortedKeys.remove(officialNumberKey);
+            sortedKeys.insert(0, officialNumberKey);
+          }
+
           if (_groupBy == GroupByOption.alerts) {
             final Map<String, int> priority = {
-              // â† DÃ©clarer AVANT
               AppLocalizations.of(context).translate(AppStrings.urgent): 1,
               AppLocalizations.of(context).translate(AppStrings.toMonitor): 2,
               AppLocalizations.of(context).translate(AppStrings.routine): 3,
@@ -426,6 +558,9 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
             };
 
             sortedKeys.sort((a, b) {
+              // "Sans numÃƒÂ©ro officiel" reste EN PREMIER
+              if (a == officialNumberKey) return -1;
+              if (b == officialNumberKey) return 1;
               return (priority[a] ?? 99).compareTo(priority[b] ?? 99);
             });
           }
@@ -435,7 +570,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
               // Barre de recherche
               _buildSearchBar(),
 
-              // ðŸ†• Chips de filtre rapide
+              // ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã¢â‚¬Â¢ Chips de filtre rapide
               _buildQuickFilters(alertProvider, filtered.length),
 
               // Liste des animaux
@@ -493,7 +628,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
           suffixIcon: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Bouton clear (si texte prÃ©sent)
+              // Bouton clear (si texte prÃƒÆ’Ã‚Â©sent)
               if (_searchController.text.isNotEmpty)
                 IconButton(
                   icon: const Icon(Icons.clear),
@@ -543,78 +678,101 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     }
   }
 
-  /// ðŸ†• Widget : Chips de filtre rapide
+  /// ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã¢â‚¬Â¢ Widget : Chips de filtre rapide + Affichage GroupBy et Filtres
   Widget _buildQuickFilters(AlertProvider alertProvider, int totalCount) {
-    return Container(
-      height: 60,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          // Chip "Avec alertes"
-          FilterChip(
-            label: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.warning_amber, size: 16),
-                const SizedBox(width: 4),
-                Text('Alertes (${alertProvider.alertCount})'),
-              ],
-            ),
-            selected: _showOnlyWithAlerts,
-            onSelected: (selected) {
-              setState(() {
-                _showOnlyWithAlerts = selected;
-              });
-            },
-          ),
-          const SizedBox(width: 8),
+    final hasFilters = _getAppliedFiltersLabel().isNotEmpty;
 
-          // Dropdown Group By
-          Expanded(
-            child: DropdownButtonFormField<GroupByOption>(
-              initialValue: _groupBy,
-              decoration: InputDecoration(
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Ligne contrÃƒÂ´les: Alertes + Dropdown GroupBy
+          Row(
+            children: [
+              // Chip "Avec alertes"
+              FilterChip(
+                label: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.warning_amber, size: 16),
+                    const SizedBox(width: 4),
+                    Text('Alertes (${alertProvider.alertCount})'),
+                  ],
                 ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                selected: _showOnlyWithAlerts,
+                onSelected: (selected) {
+                  setState(() {
+                    _showOnlyWithAlerts = selected;
+                  });
+                },
+              ),
+              const SizedBox(width: 12),
+
+              // Dropdown Group By
+              Expanded(
+                child: DropdownButtonFormField<GroupByOption>(
+                  initialValue: _groupBy,
+                  decoration: InputDecoration(
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  items: GroupByOption.values.map((option) {
+                    return DropdownMenuItem(
+                      value: option,
+                      child: Text(
+                        option.label(context),
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        _resetExpandedSections();
+                        _groupBy = value;
+                      });
+                    }
+                  },
                 ),
               ),
-              items: GroupByOption.values.map((option) {
-                return DropdownMenuItem(
-                  value: option,
-                  child: Text(
-                    option.label(context),
-                    style: const TextStyle(fontSize: 14),
-                  ),
-                );
-              }).toList(),
-              onChanged: (value) {
-                if (value != null) {
-                  setState(() {
-                    _groupBy = value;
-                  });
-                }
-              },
-            ),
+
+              const SizedBox(width: 12),
+              Text(
+                '$totalCount',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ],
           ),
 
-          const SizedBox(width: 8),
-          Text(
-            '$totalCount',
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
+          // Ligne affichage Filtres (si filtres appliquÃƒÂ©s)
+          if (hasFilters) ...[
+            const SizedBox(height: 8),
+            Text(
+              _getAppliedFiltersLabel(),
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey.shade600,
+                fontStyle: FontStyle.italic,
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );
   }
 
-  /// ðŸ†• Widget : Section de groupe (collapsible si mode alertes)
+  /// ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã¢â‚¬Â¢ Widget : Section de groupe (collapsible si mode alertes)
   Widget _buildGroupSection(
     String groupName,
     List<Animal> animals,
@@ -622,8 +780,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     AnimalProvider animalProvider,
   ) {
     final sectionKey = _getSectionKey(groupName);
-    final isExpanded = _expandedSections[sectionKey] ?? true;
-    final isAlertMode = _groupBy == GroupByOption.alerts;
+    final isExpanded = _expandedSections[sectionKey] ?? false;
 
     // Couleur selon le groupe
     Color getSectionColor() {
@@ -638,13 +795,11 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       children: [
         // Header de section
         InkWell(
-          onTap: isAlertMode
-              ? () {
-                  setState(() {
-                    _expandedSections[sectionKey] = !isExpanded;
-                  });
-                }
-              : null,
+          onTap: () {
+            setState(() {
+              _expandedSections[sectionKey] = !isExpanded;
+            });
+          },
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             margin: const EdgeInsets.only(bottom: 8),
@@ -682,18 +837,17 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                   ),
                 ),
                 const Spacer(),
-                if (isAlertMode)
-                  Icon(
-                    isExpanded ? Icons.expand_less : Icons.expand_more,
-                    color: getSectionColor(),
-                  ),
+                Icon(
+                  isExpanded ? Icons.expand_less : Icons.expand_more,
+                  color: getSectionColor(),
+                ),
               ],
             ),
           ),
         ),
 
         // Liste des animaux (collapsible)
-        if (isExpanded || !isAlertMode)
+        if (isExpanded)
           ...animals.map((animal) {
             final animalAlerts = alertProvider.getAlertsForAnimal(animal.id);
 
@@ -709,7 +863,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     );
   }
 
-  /// ðŸ†• Widget : Carte d'animal avec badges d'alertes
+  /// ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã¢â‚¬Â¢ Widget : Carte d'animal avec badges d'alertes
   Widget _buildAnimalCard(
     Animal animal,
     List<Alert> alerts,
@@ -731,7 +885,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
-              // IcÃ´ne espÃ¨ce
+              // IcÃƒÆ’Ã‚Â´ne espÃƒÆ’Ã‚Â¨ce
               Container(
                 width: 48,
                 height: 48,
@@ -754,7 +908,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      animal.displayName,
+                      animal.officialNumber ?? animal.displayName,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -762,13 +916,13 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${animal.fullDisplayFr} â€¢ ${animal.ageFormatted}',
+                      '${animal.fullDisplayFr} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ ${animal.ageFormatted}',
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.grey.shade600,
                       ),
                     ),
-                    // ðŸ†• Badges d'alertes
+                    // ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã¢â‚¬Â¢ Badges d'alertes
                     if (alerts.isNotEmpty) ...[
                       const SizedBox(height: 8),
                       Wrap(
@@ -848,7 +1002,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     }
   }
 
-  /// Widget : Ã‰tat vide
+  /// Widget : ÃƒÆ’Ã¢â‚¬Â°tat vide
   Widget _buildEmptyState() {
     return Center(
       child: Column(
@@ -861,7 +1015,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Aucun animal trouvÃ©',
+            'Aucun animal trouvÃƒÆ’Ã‚Â©',
             style: TextStyle(
               fontSize: 18,
               color: Colors.grey.shade600,
@@ -872,7 +1026,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     );
   }
 
-  /// Drawer de filtres (Ã  implÃ©menter - garder l'existant)
+  /// Drawer de filtres (ÃƒÆ’Ã‚Â  implÃƒÆ’Ã‚Â©menter - garder l'existant)
   void _showFiltersDrawer() {
     showModalBottomSheet(
       context: context,
@@ -913,9 +1067,9 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
   }
 }
 
-// ðŸ†• Enum mis Ã  jour avec option "alerts"
+// ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã¢â‚¬Â¢ Enum mis ÃƒÆ’Ã‚Â  jour avec option "alerts"
 enum GroupByOption {
-  alerts, // ðŸ†• NOUVEAU en premier !
+  alerts, // ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã¢â‚¬Â¢ NOUVEAU en premier !
   none,
   sex,
   age,
@@ -928,7 +1082,7 @@ enum GroupByOption {
 
 extension GroupByOptionExt on GroupByOption {
   String label(BuildContext context) {
-    // â† Ajouter BuildContext
+    // ÃƒÂ¢Ã¢â‚¬Â Ã‚Â Ajouter BuildContext
     switch (this) {
       case GroupByOption.alerts:
         return AppLocalizations.of(context).translate(AppStrings.byAlert);
@@ -1004,7 +1158,7 @@ class _FiltersDrawer extends StatefulWidget {
   final Set<String> selectedSpecies; // NOUVEAU
   final Set<String> selectedBreeds; // NOUVEAU
   final Function(Set<AnimalStatus>, Set<AnimalSex>, Set<String>, bool?, String?,
-      Set<String>, Set<String>) onApply; // MODIFIÃ‰
+      Set<String>, Set<String>) onApply; // MODIFIÃƒÆ’Ã¢â‚¬Â°
   final VoidCallback onReset;
 
   const _FiltersDrawer({
@@ -1095,8 +1249,8 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                         style: const TextStyle(fontWeight: FontWeight.w600)),
                     ...AnimalStatus.values.map((status) {
                       return CheckboxListTile(
-                        title: Text(_getStatusLabel(
-                            context, status)), // â† Ajouter context
+                        title: Text(_getStatusLabel(context,
+                            status)), // ÃƒÂ¢Ã¢â‚¬Â Ã‚Â Ajouter context
                         value: _statuses.contains(status),
                         onChanged: (checked) {
                           setState(() {
@@ -1117,7 +1271,7 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                         style: const TextStyle(fontWeight: FontWeight.w600)),
                     CheckboxListTile(
                       title: Text(
-                          'â™‚ï¸ ${AppLocalizations.of(context).translate(AppStrings.male)}'),
+                          'ÃƒÂ¢Ã¢â€žÂ¢Ã¢â‚¬Å¡ÃƒÂ¯Ã‚Â¸Ã‚Â ${AppLocalizations.of(context).translate(AppStrings.male)}'),
                       value: _sexes.contains(AnimalSex.male),
                       onChanged: (checked) {
                         setState(() {
@@ -1131,7 +1285,7 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                     ),
                     CheckboxListTile(
                       title: Text(
-                          'â™€ï¸ ${AppLocalizations.of(context).translate(AppStrings.female)}'),
+                          'ÃƒÂ¢Ã¢â€žÂ¢Ã¢â€šÂ¬ÃƒÂ¯Ã‚Â¸Ã‚Â ${AppLocalizations.of(context).translate(AppStrings.female)}'),
                       value: _sexes.contains(AnimalSex.female),
                       onChanged: (checked) {
                         setState(() {
@@ -1146,7 +1300,7 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
 
                     const Divider(),
 
-                    // Ã‚ge
+                    // ÃƒÆ’Ã¢â‚¬Å¡ge
                     Text(AppLocalizations.of(context).translate(AppStrings.age),
                         style: const TextStyle(fontWeight: FontWeight.w600)),
                     ...['< 6m', '6-12m', '1-2 ans', '> 2 ans'].map((range) {
@@ -1183,11 +1337,10 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                             } else {
                               _species.remove(species.id);
                               // Retirer les races de ce type
-                              final breedsToRemove = context
-                                  .read<BreedProvider>()
-                                  .getBySpeciesId(species.id)
-                                  .map((b) => b.id)
-                                  .toSet();
+                              final breedsToRemove =
+                                  AnimalConfig.getBreedsBySpecies(species.id)
+                                      .map((b) => b.id)
+                                      .toSet();
                               _breeds.removeAll(breedsToRemove);
                             }
                           });
@@ -1216,12 +1369,11 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                       )
                     else
                       ...() {
-                        // Obtenir toutes les races des types sÃ©lectionnÃ©s
+                        // Obtenir toutes les races des types sÃƒÆ’Ã‚Â©lectionnÃƒÆ’Ã‚Â©s
                         final availableBreeds = <Breed>[];
                         for (final speciesId in _species) {
-                          availableBreeds.addAll(context
-                              .read<BreedProvider>()
-                              .getBySpeciesId(speciesId));
+                          availableBreeds.addAll(
+                              AnimalConfig.getBreedsBySpecies(speciesId));
                         }
                         return availableBreeds.map((breed) {
                           return CheckboxListTile(
@@ -1248,7 +1400,7 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
 
                     const Divider(),
 
-                    // RÃ©manence
+                    // RÃƒÆ’Ã‚Â©manence
                     Text(
                         AppLocalizations.of(context)
                             .translate(AppStrings.withdrawal),
@@ -1279,7 +1431,7 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
 
                     const Divider(),
 
-                    // MÃ¨re
+                    // MÃƒÆ’Ã‚Â¨re
                     Text(
                         AppLocalizations.of(context)
                             .translate(AppStrings.mother),
@@ -1342,6 +1494,8 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
 
   String _getStatusLabel(BuildContext context, AnimalStatus status) {
     switch (status) {
+      case AnimalStatus.draft:
+        return AppLocalizations.of(context).translate(AppStrings.draftStatus);
       case AnimalStatus.alive:
         return AppLocalizations.of(context).translate(AppStrings.statusAlive);
       case AnimalStatus.sold:

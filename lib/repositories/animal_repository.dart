@@ -36,11 +36,11 @@ class AnimalRepository {
   Future<void> create(Animal animal, String farmId) async {
     final companion = _mapToCompanion(animal, farmId);
     await _db.animalDao.insertItem(companion);
-    debugPrint('✅ Animal créé: ${animal.id} dans farm $farmId');
+    debugPrint('🐑 Animal créé: ${animal.id} dans farm $farmId');
   }
 
   /// 4. update - Vérifier farmId (A6: avec logging)
-  /// ⚠️ B1 FIX: Pass farmId to updateItem() for mandatory security check
+  /// ⚡ B1 FIX: Pass farmId to updateItem() for mandatory security check
   Future<void> update(Animal animal, String farmId) async {
     // Security check
     final existing = await _db.animalDao.findById(animal.id, farmId);
@@ -53,13 +53,13 @@ class AnimalRepository {
     if (result == 0) {
       throw Exception('Animal update failed - no rows affected');
     }
-    debugPrint('✅ Animal mis à jour: ${animal.id} dans farm $farmId');
+    debugPrint('🐑 Animal mis à jour: ${animal.id} dans farm $farmId');
   }
 
   /// 5. delete - Soft-delete (A6: avec logging)
   Future<void> delete(String id, String farmId) async {
     await _db.animalDao.softDelete(id, farmId);
-    debugPrint('✅ Animal supprimé (soft): $id dans farm $farmId');
+    debugPrint('🐑 Animal supprimé (soft): $id dans farm $farmId');
   }
 
   /// 6. getUnsynced - Phase 2 ready
@@ -202,6 +202,73 @@ class AnimalRepository {
     );
   }
 
+  // ==================== DRAFT SYSTEM METHODS ====================
+
+  /// Valider un animal (DRAFT → ALIVE)
+  /// Rend l'animal immuable (sauf nom)
+  Future<void> validateAnimal(String id, String farmId) async {
+    // Security check
+    final existing = await _db.animalDao.findById(id, farmId);
+    if (existing == null || existing.farmId != farmId) {
+      throw Exception('Animal not found or farm mismatch');
+    }
+
+    final result = await _db.animalDao.validateAnimal(id, farmId);
+    if (result == 0) {
+      throw Exception('Animal validation failed - no rows affected');
+    }
+    debugPrint('✅ Animal validé: $id dans farm $farmId');
+  }
+
+  /// Supprimer un animal BROUILLON (vrai delete, pas soft-delete)
+  /// ⚠️ DRAFT only - une fois validé, on ne peut plus supprimer
+  Future<void> deleteDraftAnimal(String id, String farmId) async {
+    // Security check
+    final existing = await _db.animalDao.findById(id, farmId);
+    if (existing == null || existing.farmId != farmId) {
+      throw Exception('Animal not found or farm mismatch');
+    }
+
+    // Vérifier que c'est vraiment un brouillon
+    if (existing.status != 'draft' || existing.validatedAt != null) {
+      throw Exception('Cannot delete non-draft animal');
+    }
+
+    // Hard delete (pas soft-delete pour DRAFT)
+    await _db.animalDao.softDelete(id, farmId);
+    debugPrint('✅ Animal DRAFT supprimé: $id dans farm $farmId');
+  }
+
+  /// L'animal est-il modifiable?
+  /// ✅ DRAFT: tout modifiable
+  /// ✅ ALIVE: nom seulement (via repository)
+  /// ❌ DEAD/SOLD/SLAUGHTERED: rien
+  bool isAnimalModifiable(Animal animal) {
+    return animal.isDraft;
+  }
+
+  /// L'animal peut-il recevoir des soins?
+  /// ✅ ALIVE validé
+  /// ❌ DRAFT, DEAD, SOLD, SLAUGHTERED: non
+  bool canAnimalReceiveCare(Animal animal) {
+    return animal.canReceiveCare;
+  }
+
+  /// Obtenir tous les DRAFT d'une ferme
+  Future<List<Animal>> getDraftAnimals(String farmId) async {
+    final items = await _db.animalDao.findDraftAnimals(farmId);
+    return items.map((data) => _mapToModel(data)).toList();
+  }
+
+  /// Obtenir les DRAFT créés avant une date (pour alertes)
+  Future<List<Animal>> getDraftOlderThan(
+    String farmId,
+    DateTime beforeDate,
+  ) async {
+    final items = await _db.animalDao.findDraftOlderThan(farmId, beforeDate);
+    return items.map((data) => _mapToModel(data)).toList();
+  }
+
   // ==================== MAPPERS ====================
 
   /// Mapper AnimalsTableData vers Animal (model)
@@ -216,7 +283,7 @@ class AnimalRepository {
             .toList();
       } catch (e) {
         // B4: Logging d'erreur au lieu de silencieux
-        debugPrint('⚠️ ERREUR parsing eidHistory pour animal ${data.id}: $e');
+        debugPrint('⚡ ERREUR parsing eidHistory pour animal ${data.id}: $e');
         eidHistory = null;
       }
     }
@@ -231,6 +298,7 @@ class AnimalRepository {
       sex: AnimalSex.values.firstWhere((e) => e.name == data.sex),
       motherId: data.motherId,
       status: AnimalStatus.values.firstWhere((e) => e.name == data.status),
+      validatedAt: data.validatedAt,
       speciesId: data.speciesId,
       breedId: data.breedId,
       visualId: data.visualId,
@@ -263,6 +331,7 @@ class AnimalRepository {
       sex: Value(animal.sex.name),
       motherId: Value(animal.motherId),
       status: Value(animal.status.name),
+      validatedAt: Value(animal.validatedAt),
       speciesId: Value(animal.speciesId),
       breedId: Value(animal.breedId),
       visualId: Value(animal.visualId),
@@ -277,6 +346,8 @@ class AnimalRepository {
     );
   }
 }
+
+// ==================== HELPER CLASSES ====================
 
 /// A4: Classe helper pour résultats paginés
 class PaginatedAnimals {

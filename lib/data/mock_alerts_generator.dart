@@ -2,7 +2,6 @@
 // Générateur d'alertes mock pour tester le système
 
 import '../models/alert.dart';
-import '../models/alert_type.dart';
 
 /// Générateur d'alertes de test
 class MockAlertsGenerator {
@@ -10,8 +9,6 @@ class MockAlertsGenerator {
   ///
   /// À utiliser TEMPORAIREMENT dans AlertProvider pour tester
   static List<Alert> generateTestAlerts(List<String> animalIds) {
-    
-
     final alerts = <Alert>[];
 
     // 🚨 ALERTE URGENTE 1 : Rémanence critique

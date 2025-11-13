@@ -79,8 +79,6 @@ analyzer:
     - "**/generated/**"       # Dossier de génération
     - "build/**"              # Dossier de build
     - ".dart_tool/**"         # Outils Dart
-    - "lib/data/mock_*.dart"  # Fichiers mock (print() OK pour debug)
-
 
 # ┌────────────────────────────────────────────────────────────────────────────┐
 # │ 3. RÈGLES DE LINT (LINTER)                                                 │

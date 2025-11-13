@@ -116,14 +116,4 @@ class MockData {
       };
 
   // ==================== UTILITAIRES ====================
-
-  /// Affiche un rÃ©sumÃ© des donnÃ©es de test dans la console
-  static void printSummary() {
-    print('ðŸ“Š DonnÃ©es de Test - RÃ©sumÃ©');
-    print('â”' * 50);
-    stats.forEach((key, value) {
-      print('  $key: $value');
-    });
-    print('â”' * 50);
-  }
 }

@@ -9,7 +9,7 @@ part 'animal_dao.g.dart';
 class AnimalDao extends DatabaseAccessor<AppDatabase> with _$AnimalDaoMixin {
   AnimalDao(super.db);
 
-  // ==================== MÉTHODES OBLIGATOIRES ====================
+  // ==================== MÃ‰THODES OBLIGATOIRES ====================
 
   /// 1. findByFarmId - TOUJOURS filtrer par farmId
   Future<List<AnimalsTableData>> findByFarmId(String farmId) {
@@ -19,7 +19,7 @@ class AnimalDao extends DatabaseAccessor<AppDatabase> with _$AnimalDaoMixin {
         .get();
   }
 
-  /// 2. findById - Sécurité farmId
+  /// 2. findById - SÃ©curitÃ© farmId
   Future<AnimalsTableData?> findById(String id, String farmId) {
     return (select(animalsTable)
           ..where((t) => t.id.equals(id))
@@ -28,16 +28,16 @@ class AnimalDao extends DatabaseAccessor<AppDatabase> with _$AnimalDaoMixin {
         .getSingleOrNull();
   }
 
-  /// 3. insert - Créer avec farmId
+  /// 3. insert - CrÃ©er avec farmId
   Future<int> insertItem(AnimalsTableCompanion animal) {
     return into(animalsTable).insert(animal);
   }
 
-  /// 4. update - Vérifier farmId (B1 FIX: farmId parameter mandatory)
-  /// ⚠️ IMPORTANT: farmId est OBLIGATOIRE pour éviter les violations de multi-tenancy
-  /// 4. update - Vérifier farmId (B1 FIX: farmId parameter mandatory)
-  /// ⚠️ IMPORTANT: farmId est OBLIGATOIRE pour éviter les violations de multi-tenancy
-  /// Retourne le nombre de lignes affectées (doit être > 0)
+  /// 4. update - VÃ©rifier farmId (B1 FIX: farmId parameter mandatory)
+  /// âš ï¸ IMPORTANT: farmId est OBLIGATOIRE pour Ã©viter les violations de multi-tenancy
+  /// 4. update - VÃ©rifier farmId (B1 FIX: farmId parameter mandatory)
+  /// âš ï¸ IMPORTANT: farmId est OBLIGATOIRE pour Ã©viter les violations de multi-tenancy
+  /// Retourne le nombre de lignes affectÃ©es (doit Ãªtre > 0)
   Future<int> updateItem(AnimalsTableCompanion animal, String farmId) {
     return (update(animalsTable)
           ..where((t) => t.id.equals(animal.id.value))
@@ -77,7 +77,7 @@ class AnimalDao extends DatabaseAccessor<AppDatabase> with _$AnimalDaoMixin {
     ));
   }
 
-  // ==================== MÉTHODES MÉTIER SUPPLÉMENTAIRES ====================
+  // ==================== MÃ‰THODES MÃ‰TIER SUPPLÃ‰MENTAIRES ====================
 
   /// Rechercher par EID
   Future<AnimalsTableData?> findByEid(String eid, String farmId) {
@@ -88,7 +88,7 @@ class AnimalDao extends DatabaseAccessor<AppDatabase> with _$AnimalDaoMixin {
         .getSingleOrNull();
   }
 
-  /// Rechercher par numéro officiel
+  /// Rechercher par numÃ©ro officiel
   Future<AnimalsTableData?> findByOfficialNumber(
       String officialNumber, String farmId) {
     return (select(animalsTable)
@@ -98,7 +98,7 @@ class AnimalDao extends DatabaseAccessor<AppDatabase> with _$AnimalDaoMixin {
         .getSingleOrNull();
   }
 
-  /// Filtrer par espèce
+  /// Filtrer par espÃ¨ce
   Future<List<AnimalsTableData>> findBySpecies(
       String speciesId, String farmId) {
     return (select(animalsTable)
@@ -126,7 +126,7 @@ class AnimalDao extends DatabaseAccessor<AppDatabase> with _$AnimalDaoMixin {
         .get();
   }
 
-  /// B3 FIX: Compter animaux par farmId (optimisé)
+  /// B3 FIX: Compter animaux par farmId (optimisÃ©)
   Future<int> countByFarmId(String farmId) async {
     final count = countAll();
     final query = selectOnly(animalsTable)
@@ -138,7 +138,7 @@ class AnimalDao extends DatabaseAccessor<AppDatabase> with _$AnimalDaoMixin {
     return result.read(count) ?? 0;
   }
 
-  /// Obtenir les mères potentielles (femelles vivantes)
+  /// Obtenir les mÃ¨res potentielles (femelles vivantes)
   Future<List<AnimalsTableData>> getPotentialMothers(String farmId) {
     return (select(animalsTable)
           ..where((t) => t.sex.equals('female'))
@@ -148,7 +148,7 @@ class AnimalDao extends DatabaseAccessor<AppDatabase> with _$AnimalDaoMixin {
         .get();
   }
 
-  // ==================== PRIORITY 3: AMÉLIORATIONS ====================
+  // ==================== PRIORITY 3: AMÃ‰LIORATIONS ====================
 
   /// A1: Rechercher par plage de date de naissance
   Future<List<AnimalsTableData>> findByBirthDateRange(
@@ -163,7 +163,7 @@ class AnimalDao extends DatabaseAccessor<AppDatabase> with _$AnimalDaoMixin {
         .get();
   }
 
-  /// A1: Rechercher par plage d'âge en jours
+  /// A1: Rechercher par plage d'Ã¢ge en jours
   Future<List<AnimalsTableData>> findByAgeRangeInDays(
     String farmId,
     int minDays,
@@ -181,7 +181,7 @@ class AnimalDao extends DatabaseAccessor<AppDatabase> with _$AnimalDaoMixin {
         .get();
   }
 
-  /// A2: Recherche composée: espèce + statut
+  /// A2: Recherche composÃ©e: espÃ¨ce + statut
   Future<List<AnimalsTableData>> findBySpeciesAndStatus(
     String farmId,
     String speciesId,
@@ -195,7 +195,7 @@ class AnimalDao extends DatabaseAccessor<AppDatabase> with _$AnimalDaoMixin {
         .get();
   }
 
-  /// A2: Recherche composée: statut + sexe
+  /// A2: Recherche composÃ©e: statut + sexe
   Future<List<AnimalsTableData>> findByStatusAndSex(
     String farmId,
     String status,
@@ -209,7 +209,7 @@ class AnimalDao extends DatabaseAccessor<AppDatabase> with _$AnimalDaoMixin {
         .get();
   }
 
-  /// A3: Obtenir femelles en âge de reproduction (logique avancée)
+  /// A3: Obtenir femelles en Ã¢ge de reproduction (logique avancÃ©e)
   /// Utilise l'index idx_animals_farm_status pour perf
   Future<List<AnimalsTableData>> getFemalesOfReproductiveAge(String farmId) {
     return (select(animalsTable)
@@ -240,5 +240,43 @@ class AnimalDao extends DatabaseAccessor<AppDatabase> with _$AnimalDaoMixin {
   /// Compter total animaux par ferme (pour pagination)
   Future<int> countByFarmIdForPagination(String farmId) {
     return countByFarmId(farmId);
+  }
+
+  // ==================== DRAFT SYSTEM QUERIES ====================
+
+  /// Obtenir tous les animaux DRAFT (non validés) d'une ferme
+  Future<List<AnimalsTableData>> findDraftAnimals(String farmId) {
+    return (select(animalsTable)
+          ..where((t) => t.farmId.equals(farmId))
+          ..where((t) => t.status.equals('draft'))
+          ..where((t) => t.validatedAt.isNull())
+          ..where((t) => t.deletedAt.isNull()))
+        .get();
+  }
+
+  /// Obtenir les DRAFT créés avant une date donnée (pour alertes)
+  Future<List<AnimalsTableData>> findDraftOlderThan(
+    String farmId,
+    DateTime beforeDate,
+  ) {
+    return (select(animalsTable)
+          ..where((t) => t.farmId.equals(farmId))
+          ..where((t) => t.status.equals('draft'))
+          ..where((t) => t.validatedAt.isNull())
+          ..where((t) => t.createdAt.isSmallerThanValue(beforeDate))
+          ..where((t) => t.deletedAt.isNull()))
+        .get();
+  }
+
+  /// Valider un animal (mettre à jour status + validatedAt)
+  Future<int> validateAnimal(String id, String farmId) {
+    return (update(animalsTable)
+          ..where((t) => t.id.equals(id))
+          ..where((t) => t.farmId.equals(farmId)))
+        .write(AnimalsTableCompanion(
+      status: const Value('alive'),
+      validatedAt: Value(DateTime.now()),
+      updatedAt: Value(DateTime.now()),
+    ));
   }
 }

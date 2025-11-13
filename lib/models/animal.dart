@@ -7,17 +7,17 @@ import 'eid_change.dart';
 enum AnimalSex { male, female }
 
 /// Statut de l'animal
-enum AnimalStatus { alive, sold, dead, slaughtered }
+enum AnimalStatus { draft, alive, sold, dead, slaughtered }
 
-/// Modèle Animal avec traçabilité EID complète et support multi-espèces
+/// ModÃ¨le Animal avec traÃ§abilitÃ© EID complÃ¨te et support multi-espÃ¨ces
 ///
-/// Gère les informations d'un animal d'élevage avec :
-/// - Traçabilité complète des changements d'EID (puce RFID)
-/// - Support multi-espèces et races (multilingue)
+/// GÃ¨re les informations d'un animal d'Ã©levage avec :
+/// - TraÃ§abilitÃ© complÃ¨te des changements d'EID (puce RFID)
+/// - Support multi-espÃ¨ces et races (multilingue)
 /// - Synchronisation avec le serveur
 class Animal implements SyncableEntity {
   /// Identifiant PERMANENT de l'animal (UUID)
-  /// ⚠️ NE JAMAIS modifier cet ID - il sert de clé primaire en base de données
+  /// âš ï¸ NE JAMAIS modifier cet ID - il sert de clÃ© primaire en base de donnÃ©es
   @override
   final String id;
 
@@ -26,15 +26,15 @@ class Animal implements SyncableEntity {
   final String farmId;
 
   /// EID actuel (Electronic IDentification) - Code RFID de la puce
-  /// ✅ MODIFIABLE - Peut être changé si la puce est perdue/cassée
-  /// ℹ️ OPTIONNEL - Si null, utiliser visualId ou officialNumber
+  /// âœ… MODIFIABLE - Peut Ãªtre changÃ© si la puce est perdue/cassÃ©e
+  /// â„¹ï¸ OPTIONNEL - Si null, utiliser visualId ou officialNumber
   String? currentEid;
 
   /// Historique des changements d'EID
-  /// Permet la traçabilité complète des changements de puces
+  /// Permet la traÃ§abilitÃ© complÃ¨te des changements de puces
   List<EidChange>? eidHistory;
 
-  /// Numéro officiel (permanent, attribué par l'administration)
+  /// NumÃ©ro officiel (permanent, attribuÃ© par l'administration)
   final String? officialNumber;
 
   /// Date de naissance
@@ -43,45 +43,49 @@ class Animal implements SyncableEntity {
   /// Sexe de l'animal
   final AnimalSex sex;
 
-  /// ID de la mère (optionnel)
+  /// ID de la mÃ¨re (optionnel)
   final String? motherId;
+
 
   /// Statut actuel
   final AnimalStatus status;
 
+  /// Date de validation (NULL = DRAFT, NOT NULL = timestamp validation)
+  final DateTime? validatedAt;
+
   /// Type d'animal (species) - Ex: 'sheep', 'cattle', 'goat'
-  /// Utilisé avec animal_species.dart pour affichage multilingue
+  /// UtilisÃ© avec animal_species.dart pour affichage multilingue
   String? speciesId;
 
   /// Race (breed) - Ex: 'merinos', 'charolaise', 'alpine'
-  /// Utilisé avec breed.dart pour affichage multilingue
+  /// UtilisÃ© avec breed.dart pour affichage multilingue
   String? breedId;
 
-  /// ID visuel personnalisé pour identification de secours
-  /// Ex: "Rouge-42", "Tache-Blanche", "Oreille-Coupée"
+  /// ID visuel personnalisÃ© pour identification de secours
+  /// Ex: "Rouge-42", "Tache-Blanche", "Oreille-CoupÃ©e"
   final String? visualId;
 
   /// Photo optionnelle de l'animal
   final String? photoUrl;
 
-  /// Champ de compatibilité pour mock_data.dart
+  /// Champ de compatibilitÃ© pour mock_data.dart
   final int? days;
 
   // ==================== Champs SyncableEntity ====================
 
-  /// État de synchronisation avec le serveur
+  /// Ã‰tat de synchronisation avec le serveur
   @override
   final bool synced;
 
-  /// Date de création
+  /// Date de crÃ©ation
   @override
   final DateTime createdAt;
 
-  /// Date de dernière modification
+  /// Date de derniÃ¨re modification
   @override
   final DateTime updatedAt;
 
-  /// Date de dernière synchronisation
+  /// Date de derniÃ¨re synchronisation
   @override
   final DateTime? lastSyncedAt;
 
@@ -93,7 +97,7 @@ class Animal implements SyncableEntity {
 
   Animal({
     String? id,
-    this.farmId = 'mock-farm-001', // Valeur par défaut pour compatibilité mock
+    this.farmId = 'mock-farm-001', // Valeur par dÃ©faut pour compatibilitÃ© mock
     this.currentEid,
     this.eidHistory,
     this.officialNumber,
@@ -101,6 +105,7 @@ class Animal implements SyncableEntity {
     required this.sex,
     this.motherId,
     this.status = AnimalStatus.alive,
+    this.validatedAt,
     this.speciesId,
     this.breedId,
     this.visualId,
@@ -117,20 +122,39 @@ class Animal implements SyncableEntity {
 
   // ==================== Getters ====================
 
-  /// Âge de l'animal en jours
+  /// Ã‚ge de l'animal en jours
   int get ageInDays => DateTime.now().difference(birthDate).inDays;
 
-  /// Âge de l'animal en mois
+  /// Ã‚ge de l'animal en mois
   int get ageInMonths => (ageInDays / 30).floor();
 
-  /// Getter de compatibilité pour le code existant
-  /// @deprecated Utiliser currentEid à la place
+  /// 🔨 DRAFT SYSTEM HELPERS
+  
+  /// L'animal est-il en brouillon (jamais validé)?
+  bool get isDraft => status == AnimalStatus.draft && validatedAt == null;
+  
+  /// L'animal est-il validé (immuable)?
+  bool get isValidated => validatedAt != null;
+  
+  /// L'animal peut-il être modifié?
+  /// ✅ DRAFT: tout modifiable
+  /// ✅ ALIVE: nom seulement
+  /// ❌ DEAD/SOLD/SLAUGHTERED: rien
+  bool get isModifiable => isDraft;
+  
+  /// L'animal peut-il recevoir des soins?
+  /// ✅ ALIVE validé
+  /// ❌ DRAFT, DEAD, SOLD, SLAUGHTERED: non
+  bool get canReceiveCare => status == AnimalStatus.alive && isValidated;
+
+  /// Getter de compatibilitÃ© pour le code existant
+  /// @deprecated Utiliser currentEid Ã  la place
   String? get eid => currentEid;
 
-  /// L'animal a-t-il un type (species) défini ?
+  /// L'animal a-t-il un type (species) dÃ©fini ?
   bool get hasSpecies => speciesId != null && speciesId!.isNotEmpty;
 
-  /// L'animal a-t-il une race (breed) définie ?
+  /// L'animal a-t-il une race (breed) dÃ©finie ?
   bool get hasBreed => breedId != null && breedId!.isNotEmpty;
 
   /// L'animal a-t-il un historique d'EID ?
@@ -139,8 +163,8 @@ class Animal implements SyncableEntity {
   /// Nombre de changements d'EID
   int get eidChangeCount => eidHistory?.length ?? 0;
 
-  /// 🆕 PART3 - VALIDATION MÈRE
-  /// Peut-elle être mère ?
+  /// ðŸ†• PART3 - VALIDATION MÃˆRE
+  /// Peut-elle Ãªtre mÃ¨re ?
   bool get canBeMother {
     return sex == AnimalSex.female &&
         status == AnimalStatus.alive &&
@@ -159,7 +183,7 @@ class Animal implements SyncableEntity {
     }
   }
 
-  /// Raison pour laquelle elle ne peut pas être mère
+  /// Raison pour laquelle elle ne peut pas Ãªtre mÃ¨re
   String? get cannotBeMotherReason {
     if (sex != AnimalSex.female) {
       return 'L\'animal n\'est pas une femelle';
@@ -176,7 +200,7 @@ class Animal implements SyncableEntity {
   // ==================== GETTERS SAFE (JAMAIS NULL) ====================
 
   /// Identifiant principal pour l'affichage (JAMAIS NULL)
-  /// Priorité : visualId > officialNumber > currentEid > "Sans ID"
+  /// PrioritÃ© : visualId > officialNumber > currentEid > "Sans ID"
   String get displayId {
     if (visualId != null && visualId!.isNotEmpty) return visualId!;
     if (officialNumber != null && officialNumber!.isNotEmpty) {
@@ -197,12 +221,12 @@ class Animal implements SyncableEntity {
       parts.add('EID: $currentEid');
     }
     if (officialNumber != null && officialNumber!.isNotEmpty) {
-      parts.add('N°: $officialNumber');
+      parts.add('NÂ°: $officialNumber');
     }
-    return parts.isEmpty ? 'Sans identification' : parts.join(' • ');
+    return parts.isEmpty ? 'Sans identification' : parts.join(' â€¢ ');
   }
 
-  /// Numéro officiel safe (JAMAIS NULL)
+  /// NumÃ©ro officiel safe (JAMAIS NULL)
   String get safeOfficialNumber => officialNumber ?? '-';
 
   /// EID safe (JAMAIS NULL)
@@ -211,12 +235,12 @@ class Animal implements SyncableEntity {
   /// Visual ID safe (JAMAIS NULL)
   String get safeVisualId => visualId ?? '-';
 
-  // ==================== Méthodes ====================
+  // ==================== MÃ©thodes ====================
 
-  /// Changer l'EID de l'animal (en cas de puce perdue/cassée)
+  /// Changer l'EID de l'animal (en cas de puce perdue/cassÃ©e)
   ///
-  /// Crée automatiquement un enregistrement dans l'historique
-  /// et marque l'animal comme non synchronisé.
+  /// CrÃ©e automatiquement un enregistrement dans l'historique
+  /// et marque l'animal comme non synchronisÃ©.
   Animal changeEid({
     required String newEid,
     required String reason,
@@ -252,6 +276,7 @@ class Animal implements SyncableEntity {
     AnimalSex? sex,
     String? motherId,
     AnimalStatus? status,
+    DateTime? validatedAt,
     String? speciesId,
     String? breedId,
     String? visualId,
@@ -273,6 +298,7 @@ class Animal implements SyncableEntity {
       sex: sex ?? this.sex,
       motherId: motherId ?? this.motherId,
       status: status ?? this.status,
+      validatedAt: validatedAt ?? this.validatedAt,
       speciesId: speciesId ?? this.speciesId,
       breedId: breedId ?? this.breedId,
       visualId: visualId ?? this.visualId,
@@ -286,7 +312,7 @@ class Animal implements SyncableEntity {
     );
   }
 
-  /// Marquer comme synchronisé avec le serveur
+  /// Marquer comme synchronisÃ© avec le serveur
   Animal markAsSynced({required String serverVersion}) {
     return copyWith(
       synced: true,
@@ -295,7 +321,7 @@ class Animal implements SyncableEntity {
     );
   }
 
-  /// Marquer comme modifié (à synchroniser)
+  /// Marquer comme modifiÃ© (Ã  synchroniser)
   Animal markAsModified() {
     return copyWith(
       synced: false,
@@ -303,7 +329,7 @@ class Animal implements SyncableEntity {
     );
   }
 
-  // ==================== Sérialisation ====================
+  // ==================== SÃ©rialisation ====================
 
   /// Convertir en JSON
   Map<String, dynamic> toJson() {
@@ -317,6 +343,7 @@ class Animal implements SyncableEntity {
       'sex': sex.name,
       'mother_id': motherId,
       'status': status.name,
+      'validated_at': validatedAt?.toIso8601String(),
       'species_id': speciesId,
       'breed_id': breedId,
       'visual_id': visualId,
@@ -330,7 +357,7 @@ class Animal implements SyncableEntity {
     };
   }
 
-  /// Créer depuis JSON
+  /// CrÃ©er depuis JSON
   factory Animal.fromJson(Map<String, dynamic> json) {
     return Animal(
       id: json['id'],
@@ -339,7 +366,7 @@ class Animal implements SyncableEntity {
           'mock-farm-001',
       currentEid: json['current_eid'] ??
           json['currentEid'] ??
-          json['eid'], // Rétrocompatibilité
+          json['eid'], // RÃ©trocompatibilitÃ©
       eidHistory: json['eid_history'] != null || json['eidHistory'] != null
           ? ((json['eid_history'] ?? json['eidHistory']) as List)
               .map((e) => EidChange.fromJson(e as Map<String, dynamic>))
@@ -364,6 +391,7 @@ class Animal implements SyncableEntity {
           json['last_synced_at'] != null || json['lastSyncedAt'] != null
               ? DateTime.parse(json['last_synced_at'] ?? json['lastSyncedAt'])
               : null,
+      validatedAt: json['validated_at'] != null ? DateTime.parse(json['validated_at']) : null,
       serverVersion: json['server_version'] ?? json['serverVersion'],
     );
   }

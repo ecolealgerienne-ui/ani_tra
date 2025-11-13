@@ -13,7 +13,6 @@ import '../../utils/constants.dart';
 //import '../../models/product.dart';
 import '../../models/animal.dart';
 //import '../../models/veterinarian.dart';
-//import '../../data/mock_data.dart';
 import '../medical/medical_act_screen.dart';
 import '../movement/sale_screen.dart';
 import '../movement/slaughter_screen.dart';

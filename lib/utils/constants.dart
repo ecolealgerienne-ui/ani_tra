@@ -381,6 +381,12 @@ class AppConstants {
   static const double mainCardElevation = 2.0;
   static const double mainCardRadius = 12.0;
   static const double mainInputRadius = 8.0;
+
+  /// Délai avant alerte DRAFT (heures)
+  static const int draftAlertHours = 48;
+
+  /// Délai avant HARD LIMIT (supprimer ou valider obligatoire)
+  static const int draftAlertLimitHours = 168; // 7 jours
 }
 
 // ==================== DATABASE ====================

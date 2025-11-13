@@ -15,6 +15,7 @@ class BreedProvider extends ChangeNotifier {
 
   // Loading state
   bool _isLoading = false;
+  bool _initialized = false;
 
   BreedProvider(this._repository) {
     _loadBreedsFromRepository();
@@ -26,6 +27,8 @@ class BreedProvider extends ChangeNotifier {
 
   bool get isLoading => _isLoading;
 
+  bool get isInitialized => _initialized;
+
   int get count => _allBreeds.length;
 
   /// Toutes les races actives (ordonnées par displayOrder)
@@ -36,7 +39,12 @@ class BreedProvider extends ChangeNotifier {
 
   // ==================== Loading ====================
 
+  /// ✅ FIXE: Charger les races de manière fiable
+  /// Gère les erreurs sans bloquer l'app
   Future<void> _loadBreedsFromRepository() async {
+    // Éviter les appels multiples
+    if (_initialized || _isLoading) return;
+
     _isLoading = true;
     notifyListeners();
 
@@ -44,9 +52,12 @@ class BreedProvider extends ChangeNotifier {
       final breeds = await _repository.getAll();
       _allBreeds.clear();
       _allBreeds.addAll(breeds);
-      debugPrint('✅ Breeds chargées: ${_allBreeds.length} races');
+      _initialized = true;
+      debugPrint('✅ BreedProvider: ${_allBreeds.length} races chargées');
     } catch (e) {
-      debugPrint('❌ Erreur chargement breeds: $e');
+      debugPrint('❌ BreedProvider ERROR: $e');
+      _initialized = false;
+      // Ne pas réappeler - attendre un refresh()
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -119,14 +130,17 @@ class BreedProvider extends ChangeNotifier {
 
   void clear() {
     _allBreeds.clear();
+    _initialized = false;
     notifyListeners();
   }
 
   /// Rafraîchir depuis DB
   Future<void> refresh() async {
+    _initialized = false;
     await _loadBreedsFromRepository();
   }
 
   @override
-  String toString() => 'BreedProvider(${_allBreeds.length} breeds)';
+  String toString() =>
+      'BreedProvider(${_allBreeds.length} breeds, initialized=$_initialized)';
 }

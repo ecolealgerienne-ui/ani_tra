@@ -248,6 +248,10 @@ class _StatusBadge extends StatelessWidget {
     String label;
 
     switch (status) {
+      case AnimalStatus.draft:
+        color = Colors.amber;
+        label = AppLocalizations.of(context).translate(AppStrings.draftStatus);
+        break;
       case AnimalStatus.alive:
         color = AppConstants.successGreen;
         label = AppLocalizations.of(context).translate(AppStrings.statusAlive);
@@ -413,6 +417,9 @@ class _InfosTab extends StatelessWidget {
                       .translate(AppStrings.statusAnimal),
                   value: () {
                     switch (currentAnimal.status) {
+                      case AnimalStatus.draft:
+                        return AppLocalizations.of(context)
+                            .translate(AppStrings.draftStatus);
                       case AnimalStatus.alive:
                         return AppLocalizations.of(context)
                             .translate(AppStrings.statusAlive);

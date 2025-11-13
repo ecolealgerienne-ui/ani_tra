@@ -578,6 +578,12 @@ class $AnimalsTableTable extends AnimalsTable
   late final GeneratedColumn<String> status = GeneratedColumn<String>(
       'status', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _validatedAtMeta =
+      const VerificationMeta('validatedAt');
+  @override
+  late final GeneratedColumn<DateTime> validatedAt = GeneratedColumn<DateTime>(
+      'validated_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
   static const VerificationMeta _speciesIdMeta =
       const VerificationMeta('speciesId');
   @override
@@ -652,6 +658,7 @@ class $AnimalsTableTable extends AnimalsTable
         sex,
         motherId,
         status,
+        validatedAt,
         speciesId,
         breedId,
         photoUrl,
@@ -727,6 +734,12 @@ class $AnimalsTableTable extends AnimalsTable
           status.isAcceptableOrUnknown(data['status']!, _statusMeta));
     } else if (isInserting) {
       context.missing(_statusMeta);
+    }
+    if (data.containsKey('validated_at')) {
+      context.handle(
+          _validatedAtMeta,
+          validatedAt.isAcceptableOrUnknown(
+              data['validated_at']!, _validatedAtMeta));
     }
     if (data.containsKey('species_id')) {
       context.handle(_speciesIdMeta,
@@ -805,6 +818,8 @@ class $AnimalsTableTable extends AnimalsTable
           .read(DriftSqlType.string, data['${effectivePrefix}mother_id']),
       status: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}status'])!,
+      validatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}validated_at']),
       speciesId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}species_id']),
       breedId: attachedDatabase.typeMapping
@@ -846,6 +861,7 @@ class AnimalsTableData extends DataClass
   final String sex;
   final String? motherId;
   final String status;
+  final DateTime? validatedAt;
   final String? speciesId;
   final String? breedId;
   final String? photoUrl;
@@ -867,6 +883,7 @@ class AnimalsTableData extends DataClass
       required this.sex,
       this.motherId,
       required this.status,
+      this.validatedAt,
       this.speciesId,
       this.breedId,
       this.photoUrl,
@@ -900,6 +917,9 @@ class AnimalsTableData extends DataClass
       map['mother_id'] = Variable<String>(motherId);
     }
     map['status'] = Variable<String>(status);
+    if (!nullToAbsent || validatedAt != null) {
+      map['validated_at'] = Variable<DateTime>(validatedAt);
+    }
     if (!nullToAbsent || speciesId != null) {
       map['species_id'] = Variable<String>(speciesId);
     }
@@ -949,6 +969,9 @@ class AnimalsTableData extends DataClass
           ? const Value.absent()
           : Value(motherId),
       status: Value(status),
+      validatedAt: validatedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(validatedAt),
       speciesId: speciesId == null && nullToAbsent
           ? const Value.absent()
           : Value(speciesId),
@@ -988,6 +1011,7 @@ class AnimalsTableData extends DataClass
       sex: serializer.fromJson<String>(json['sex']),
       motherId: serializer.fromJson<String?>(json['motherId']),
       status: serializer.fromJson<String>(json['status']),
+      validatedAt: serializer.fromJson<DateTime?>(json['validatedAt']),
       speciesId: serializer.fromJson<String?>(json['speciesId']),
       breedId: serializer.fromJson<String?>(json['breedId']),
       photoUrl: serializer.fromJson<String?>(json['photoUrl']),
@@ -1014,6 +1038,7 @@ class AnimalsTableData extends DataClass
       'sex': serializer.toJson<String>(sex),
       'motherId': serializer.toJson<String?>(motherId),
       'status': serializer.toJson<String>(status),
+      'validatedAt': serializer.toJson<DateTime?>(validatedAt),
       'speciesId': serializer.toJson<String?>(speciesId),
       'breedId': serializer.toJson<String?>(breedId),
       'photoUrl': serializer.toJson<String?>(photoUrl),
@@ -1038,6 +1063,7 @@ class AnimalsTableData extends DataClass
           String? sex,
           Value<String?> motherId = const Value.absent(),
           String? status,
+          Value<DateTime?> validatedAt = const Value.absent(),
           Value<String?> speciesId = const Value.absent(),
           Value<String?> breedId = const Value.absent(),
           Value<String?> photoUrl = const Value.absent(),
@@ -1060,6 +1086,7 @@ class AnimalsTableData extends DataClass
         sex: sex ?? this.sex,
         motherId: motherId.present ? motherId.value : this.motherId,
         status: status ?? this.status,
+        validatedAt: validatedAt.present ? validatedAt.value : this.validatedAt,
         speciesId: speciesId.present ? speciesId.value : this.speciesId,
         breedId: breedId.present ? breedId.value : this.breedId,
         photoUrl: photoUrl.present ? photoUrl.value : this.photoUrl,
@@ -1089,6 +1116,8 @@ class AnimalsTableData extends DataClass
       sex: data.sex.present ? data.sex.value : this.sex,
       motherId: data.motherId.present ? data.motherId.value : this.motherId,
       status: data.status.present ? data.status.value : this.status,
+      validatedAt:
+          data.validatedAt.present ? data.validatedAt.value : this.validatedAt,
       speciesId: data.speciesId.present ? data.speciesId.value : this.speciesId,
       breedId: data.breedId.present ? data.breedId.value : this.breedId,
       photoUrl: data.photoUrl.present ? data.photoUrl.value : this.photoUrl,
@@ -1119,6 +1148,7 @@ class AnimalsTableData extends DataClass
           ..write('sex: $sex, ')
           ..write('motherId: $motherId, ')
           ..write('status: $status, ')
+          ..write('validatedAt: $validatedAt, ')
           ..write('speciesId: $speciesId, ')
           ..write('breedId: $breedId, ')
           ..write('photoUrl: $photoUrl, ')
@@ -1134,27 +1164,29 @@ class AnimalsTableData extends DataClass
   }
 
   @override
-  int get hashCode => Object.hash(
-      id,
-      farmId,
-      currentEid,
-      officialNumber,
-      visualId,
-      eidHistory,
-      birthDate,
-      sex,
-      motherId,
-      status,
-      speciesId,
-      breedId,
-      photoUrl,
-      days,
-      synced,
-      lastSyncedAt,
-      serverVersion,
-      deletedAt,
-      createdAt,
-      updatedAt);
+  int get hashCode => Object.hashAll([
+        id,
+        farmId,
+        currentEid,
+        officialNumber,
+        visualId,
+        eidHistory,
+        birthDate,
+        sex,
+        motherId,
+        status,
+        validatedAt,
+        speciesId,
+        breedId,
+        photoUrl,
+        days,
+        synced,
+        lastSyncedAt,
+        serverVersion,
+        deletedAt,
+        createdAt,
+        updatedAt
+      ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1169,6 +1201,7 @@ class AnimalsTableData extends DataClass
           other.sex == this.sex &&
           other.motherId == this.motherId &&
           other.status == this.status &&
+          other.validatedAt == this.validatedAt &&
           other.speciesId == this.speciesId &&
           other.breedId == this.breedId &&
           other.photoUrl == this.photoUrl &&
@@ -1192,6 +1225,7 @@ class AnimalsTableCompanion extends UpdateCompanion<AnimalsTableData> {
   final Value<String> sex;
   final Value<String?> motherId;
   final Value<String> status;
+  final Value<DateTime?> validatedAt;
   final Value<String?> speciesId;
   final Value<String?> breedId;
   final Value<String?> photoUrl;
@@ -1214,6 +1248,7 @@ class AnimalsTableCompanion extends UpdateCompanion<AnimalsTableData> {
     this.sex = const Value.absent(),
     this.motherId = const Value.absent(),
     this.status = const Value.absent(),
+    this.validatedAt = const Value.absent(),
     this.speciesId = const Value.absent(),
     this.breedId = const Value.absent(),
     this.photoUrl = const Value.absent(),
@@ -1237,6 +1272,7 @@ class AnimalsTableCompanion extends UpdateCompanion<AnimalsTableData> {
     required String sex,
     this.motherId = const Value.absent(),
     required String status,
+    this.validatedAt = const Value.absent(),
     this.speciesId = const Value.absent(),
     this.breedId = const Value.absent(),
     this.photoUrl = const Value.absent(),
@@ -1266,6 +1302,7 @@ class AnimalsTableCompanion extends UpdateCompanion<AnimalsTableData> {
     Expression<String>? sex,
     Expression<String>? motherId,
     Expression<String>? status,
+    Expression<DateTime>? validatedAt,
     Expression<String>? speciesId,
     Expression<String>? breedId,
     Expression<String>? photoUrl,
@@ -1289,6 +1326,7 @@ class AnimalsTableCompanion extends UpdateCompanion<AnimalsTableData> {
       if (sex != null) 'sex': sex,
       if (motherId != null) 'mother_id': motherId,
       if (status != null) 'status': status,
+      if (validatedAt != null) 'validated_at': validatedAt,
       if (speciesId != null) 'species_id': speciesId,
       if (breedId != null) 'breed_id': breedId,
       if (photoUrl != null) 'photo_url': photoUrl,
@@ -1314,6 +1352,7 @@ class AnimalsTableCompanion extends UpdateCompanion<AnimalsTableData> {
       Value<String>? sex,
       Value<String?>? motherId,
       Value<String>? status,
+      Value<DateTime?>? validatedAt,
       Value<String?>? speciesId,
       Value<String?>? breedId,
       Value<String?>? photoUrl,
@@ -1336,6 +1375,7 @@ class AnimalsTableCompanion extends UpdateCompanion<AnimalsTableData> {
       sex: sex ?? this.sex,
       motherId: motherId ?? this.motherId,
       status: status ?? this.status,
+      validatedAt: validatedAt ?? this.validatedAt,
       speciesId: speciesId ?? this.speciesId,
       breedId: breedId ?? this.breedId,
       photoUrl: photoUrl ?? this.photoUrl,
@@ -1382,6 +1422,9 @@ class AnimalsTableCompanion extends UpdateCompanion<AnimalsTableData> {
     }
     if (status.present) {
       map['status'] = Variable<String>(status.value);
+    }
+    if (validatedAt.present) {
+      map['validated_at'] = Variable<DateTime>(validatedAt.value);
     }
     if (speciesId.present) {
       map['species_id'] = Variable<String>(speciesId.value);
@@ -1432,6 +1475,7 @@ class AnimalsTableCompanion extends UpdateCompanion<AnimalsTableData> {
           ..write('sex: $sex, ')
           ..write('motherId: $motherId, ')
           ..write('status: $status, ')
+          ..write('validatedAt: $validatedAt, ')
           ..write('speciesId: $speciesId, ')
           ..write('breedId: $breedId, ')
           ..write('photoUrl: $photoUrl, ')
@@ -14968,6 +15012,7 @@ typedef $$AnimalsTableTableCreateCompanionBuilder = AnimalsTableCompanion
   required String sex,
   Value<String?> motherId,
   required String status,
+  Value<DateTime?> validatedAt,
   Value<String?> speciesId,
   Value<String?> breedId,
   Value<String?> photoUrl,
@@ -14992,6 +15037,7 @@ typedef $$AnimalsTableTableUpdateCompanionBuilder = AnimalsTableCompanion
   Value<String> sex,
   Value<String?> motherId,
   Value<String> status,
+  Value<DateTime?> validatedAt,
   Value<String?> speciesId,
   Value<String?> breedId,
   Value<String?> photoUrl,
@@ -15044,6 +15090,9 @@ class $$AnimalsTableTableFilterComposer
 
   ColumnFilters<String> get status => $composableBuilder(
       column: $table.status, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get validatedAt => $composableBuilder(
+      column: $table.validatedAt, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get speciesId => $composableBuilder(
       column: $table.speciesId, builder: (column) => ColumnFilters(column));
@@ -15115,6 +15164,9 @@ class $$AnimalsTableTableOrderingComposer
 
   ColumnOrderings<String> get status => $composableBuilder(
       column: $table.status, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get validatedAt => $composableBuilder(
+      column: $table.validatedAt, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get speciesId => $composableBuilder(
       column: $table.speciesId, builder: (column) => ColumnOrderings(column));
@@ -15188,6 +15240,9 @@ class $$AnimalsTableTableAnnotationComposer
   GeneratedColumn<String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
 
+  GeneratedColumn<DateTime> get validatedAt => $composableBuilder(
+      column: $table.validatedAt, builder: (column) => column);
+
   GeneratedColumn<String> get speciesId =>
       $composableBuilder(column: $table.speciesId, builder: (column) => column);
 
@@ -15255,6 +15310,7 @@ class $$AnimalsTableTableTableManager extends RootTableManager<
             Value<String> sex = const Value.absent(),
             Value<String?> motherId = const Value.absent(),
             Value<String> status = const Value.absent(),
+            Value<DateTime?> validatedAt = const Value.absent(),
             Value<String?> speciesId = const Value.absent(),
             Value<String?> breedId = const Value.absent(),
             Value<String?> photoUrl = const Value.absent(),
@@ -15278,6 +15334,7 @@ class $$AnimalsTableTableTableManager extends RootTableManager<
             sex: sex,
             motherId: motherId,
             status: status,
+            validatedAt: validatedAt,
             speciesId: speciesId,
             breedId: breedId,
             photoUrl: photoUrl,
@@ -15301,6 +15358,7 @@ class $$AnimalsTableTableTableManager extends RootTableManager<
             required String sex,
             Value<String?> motherId = const Value.absent(),
             required String status,
+            Value<DateTime?> validatedAt = const Value.absent(),
             Value<String?> speciesId = const Value.absent(),
             Value<String?> breedId = const Value.absent(),
             Value<String?> photoUrl = const Value.absent(),
@@ -15324,6 +15382,7 @@ class $$AnimalsTableTableTableManager extends RootTableManager<
             sex: sex,
             motherId: motherId,
             status: status,
+            validatedAt: validatedAt,
             speciesId: speciesId,
             breedId: breedId,
             photoUrl: photoUrl,

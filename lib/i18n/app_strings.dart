@@ -792,6 +792,7 @@ class AppStrings {
   static const String eidDetectedSuccess = 'eidDetectedSuccess';
   static const String eidScanned = 'eidScanned';
   static const String validate = 'validate';
+  static const String exeIdVisuel = 'validate';
 
 // ANIMAL DETAIL
   static const String infos = 'infos';
@@ -826,6 +827,7 @@ class AppStrings {
   static const String reminderLate = 'reminderLate';
   static const String reminderInDays = 'reminderInDays';
   static const String noMotherDeclared = 'noMotherDeclared';
+  static const String motherDetected = 'motherDetected';
   static const String seeDetails = 'seeDetails';
   static const String offspring = 'offspring';
   static const String noOffspring = 'noOffspring';
@@ -906,7 +908,7 @@ class AppStrings {
   static const String overdue = 'overdue';
   static const String daysUntilBirth = 'daysUntilBirth';
 
-// Breeding actions
+  // Breeding actions
   static const String recordBreeding = 'recordBreeding';
   static const String recordBirth = 'recordBirth';
   static const String markAsFailed = 'markAsFailed';
@@ -914,7 +916,32 @@ class AppStrings {
   static const String breedingRecorded = 'breedingRecorded';
   static const String birthRecorded = 'birthRecorded';
 
-// Statistics
+  // Statistics
   static const String successRate = 'successRate';
   static const String breedingThisMonth = 'breedingThisMonth';
+
+  ////////////
+  static const String animalsWithoutOfficialNumber =
+      'animalsWithoutOfficialNumber';
+
+  // ============ ANIMAL STATUS & DRAFT SYSTEM ============
+  static const String draftStatus = 'draftStatus';
+  static const String validatedStatus = 'validatedStatus';
+  static const String deadStatus = 'deadStatus';
+  static const String soldStatus = 'soldStatus';
+  static const String slaughteredStatus = 'slaughteredStatus';
+  
+  // ============ DRAFT ALERTS & ACTIONS ============
+  static const String draftAlertWarning = 'draftAlertWarning';
+  static const String draftHardLimit = 'draftHardLimit';
+  static const String cannotAddCareOnDraft = 'cannotAddCareOnDraft';
+  static const String validateAnimal = 'validateAnimal';
+  static const String confirmDelete = 'confirmDelete';
+  static const String draftCreatedAt = 'draftCreatedAt';
+  static const String validateFirst = 'validateFirst';
+  static const String draftInBrouillon = 'draftInBrouillon';
+  static const String draftModifiableUntilValidation = 'draftModifiableUntilValidation';
+  static const String draftSinceHours = 'draftSinceHours';
+  static const String animalsInAlert = 'animalsInAlert';
+
 }
