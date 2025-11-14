@@ -10,6 +10,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'providers/animal_provider.dart';
 import 'providers/sync_provider.dart';
 import 'providers/locale_provider.dart';
+import 'providers/settings_provider.dart';
 import 'providers/batch_provider.dart';
 import 'providers/campaign_provider.dart';
 import 'providers/lot_provider.dart';
@@ -204,6 +205,9 @@ class MyApp extends StatelessWidget {
 
         // === LocaleProvider (gestion langue) ===
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
+
+        // === SettingsProvider (legacy - farm preferences) ===
+        ChangeNotifierProvider(create: (_) => SettingsProvider()),
 
         // === SyncProvider (standalone) ===
         ChangeNotifierProvider(
