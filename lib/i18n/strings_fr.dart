@@ -198,7 +198,6 @@ const Map<String, String> stringsFr = {
   'selectDefaultBreed': 'Sélectionner la race par défaut',
   'veterinarianSettings': 'Paramètres vétérinaire',
   'veterinarianSettingsSubtitle': 'Vétérinaire par défaut',
-  'selectDefaultVeterinarian': 'Sélectionner le vétérinaire par défaut',
   'alertSettings': 'Paramètres d\'alertes',
   'alertSettingsSubtitle': 'Gérer les notifications et alertes',
   'manageAlertPreferences': 'Gérer les préférences d\'alertes',

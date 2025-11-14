@@ -200,7 +200,6 @@ class AppStrings {
   static const String selectDefaultBreed = 'selectDefaultBreed';
   static const String veterinarianSettings = 'veterinarianSettings';
   static const String veterinarianSettingsSubtitle = 'veterinarianSettingsSubtitle';
-  static const String selectDefaultVeterinarian = 'selectDefaultVeterinarian';
   static const String alertSettings = 'alertSettings';
   static const String alertSettingsSubtitle = 'alertSettingsSubtitle';
   static const String manageAlertPreferences = 'manageAlertPreferences';
