@@ -44,7 +44,7 @@ class _SaleScreenState extends State<SaleScreen> {
 
     try {
       // Simulate processing
-      await Future.delayed(const AppConstants.longAnimation);
+      await Future.delayed(AppConstants.longAnimation);
 
       if (!mounted) return;
 

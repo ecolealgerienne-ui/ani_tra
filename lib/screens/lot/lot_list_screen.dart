@@ -77,7 +77,7 @@ class _LotListScreenState extends State<LotListScreen> {
                 );
 
                 // ✅ Naviguer vers détail du lot
-                await Future.delayed(const AppConstants.mediumAnimation);
+                await Future.delayed(AppConstants.mediumAnimation);
                 if (!mounted) return;
                 Navigator.push(
                   context,
@@ -179,7 +179,7 @@ class _LotListScreenState extends State<LotListScreen> {
                 );
 
                 // Naviguer vers le nouveau lot
-                await Future.delayed(const AppConstants.mediumAnimation);
+                await Future.delayed(AppConstants.mediumAnimation);
                 if (!mounted) return;
                 Navigator.push(
                   context,

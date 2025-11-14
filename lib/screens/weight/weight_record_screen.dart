@@ -55,7 +55,7 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
     setState(() => _isScanning = true);
 
     HapticFeedback.mediumImpact();
-    await Future.delayed(const AppConstants.longAnimation);
+    await Future.delayed(AppConstants.longAnimation);
 
     final animalProvider = context.read<AnimalProvider>();
 

@@ -618,7 +618,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                 child: RefreshIndicator(
                   onRefresh: () async {
                     alertProvider.refresh();
-                    await Future.delayed(const AppConstants.longAnimation);
+                    await Future.delayed(AppConstants.longAnimation);
                   },
                   child: filtered.isEmpty
                       ? _buildEmptyState()

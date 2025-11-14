@@ -966,7 +966,7 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
     });
 
     // Simulation d'un dÃƒÂ©lai de scan
-    Future.delayed(const AppConstants.longAnimation, () {
+    Future.delayed(AppConstants.longAnimation, () {
       final animalProvider = context.read<AnimalProvider>();
 
       // Chercher une femelle dans le troupeau

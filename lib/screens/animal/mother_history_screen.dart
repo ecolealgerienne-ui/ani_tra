@@ -8,7 +8,7 @@ import '../../models/animal.dart';
 import '../../providers/animal_provider.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
-//import '../../utils/constants.dart';
+import '../../utils/constants.dart';
 
 /// Écran d'historique des portées d'une mère
 ///

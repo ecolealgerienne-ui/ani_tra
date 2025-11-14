@@ -42,7 +42,7 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
 
     try {
       // Simulate processing
-      await Future.delayed(const AppConstants.longAnimation);
+      await Future.delayed(AppConstants.longAnimation);
 
       if (!mounted) return;
 
