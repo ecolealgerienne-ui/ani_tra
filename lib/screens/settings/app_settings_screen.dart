@@ -313,23 +313,29 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
           title: l10n.translate(AppStrings.languageSection),
         ),
         const SizedBox(height: AppConstants.spacingSmall),
-        ListTile(
-          title: const Text('Français'),
-          leading: Radio<String>(
-            value: 'fr',
-            groupValue: localeProvider.locale.languageCode,
-            onChanged: (value) => localeProvider.setLocale(const Locale('fr')),
+        RadioGroup<String>(
+          groupValue: localeProvider.locale.languageCode,
+          onChanged: (value) {
+            if (value == 'fr') {
+              localeProvider.setLocale(const Locale('fr'));
+            } else if (value == 'ar') {
+              localeProvider.setLocale(const Locale('ar'));
+            }
+          },
+          child: Column(
+            children: [
+              ListTile(
+                title: const Text('Français'),
+                leading: const Radio<String>(value: 'fr'),
+                onTap: () => localeProvider.setLocale(const Locale('fr')),
+              ),
+              ListTile(
+                title: const Text('العربية'),
+                leading: const Radio<String>(value: 'ar'),
+                onTap: () => localeProvider.setLocale(const Locale('ar')),
+              ),
+            ],
           ),
-          onTap: () => localeProvider.setLocale(const Locale('fr')),
-        ),
-        ListTile(
-          title: const Text('العربية'),
-          leading: Radio<String>(
-            value: 'ar',
-            groupValue: localeProvider.locale.languageCode,
-            onChanged: (value) => localeProvider.setLocale(const Locale('ar')),
-          ),
-          onTap: () => localeProvider.setLocale(const Locale('ar')),
         ),
       ],
     );
@@ -510,49 +516,51 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
 
   void _showThemeColorDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final options = [
+      _ColorOption('blue', l10n.translate(AppStrings.colorBlue), Colors.blue),
+      _ColorOption('green', l10n.translate(AppStrings.colorGreen), Colors.green),
+      _ColorOption('purple', l10n.translate(AppStrings.colorPurple), Colors.purple),
+      _ColorOption('orange', l10n.translate(AppStrings.colorOrange), Colors.orange),
+    ];
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.translate(AppStrings.chooseColor)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _ColorOption('blue', l10n.translate(AppStrings.colorBlue), Colors.blue),
-            _ColorOption('green', l10n.translate(AppStrings.colorGreen), Colors.green),
-            _ColorOption('purple', l10n.translate(AppStrings.colorPurple), Colors.purple),
-            _ColorOption('orange', l10n.translate(AppStrings.colorOrange), Colors.orange),
-          ].map((option) {
-            return ListTile(
-              leading: Radio<String>(
-                value: option.value,
-                groupValue: _themeColor,
-                onChanged: (value) {
-                  setState(() => _themeColor = value!);
-                  _savePreference('theme_color', value!);
+        content: RadioGroup<String>(
+          groupValue: _themeColor,
+          onChanged: (value) {
+            setState(() => _themeColor = value!);
+            _savePreference('theme_color', value!);
+            Navigator.pop(context);
+          },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: options.map((option) {
+              return ListTile(
+                leading: Radio<String>(value: option.value),
+                title: Row(
+                  children: [
+                    Container(
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: option.color,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: AppConstants.spacingSmall),
+                    Text(option.name),
+                  ],
+                ),
+                onTap: () {
+                  setState(() => _themeColor = option.value);
+                  _savePreference('theme_color', option.value);
                   Navigator.pop(context);
                 },
-              ),
-              title: Row(
-                children: [
-                  Container(
-                    width: 24,
-                    height: 24,
-                    decoration: BoxDecoration(
-                      color: option.color,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: AppConstants.spacingSmall),
-                  Text(option.name),
-                ],
-              ),
-              onTap: () {
-                setState(() => _themeColor = option.value);
-                _savePreference('theme_color', option.value);
-                Navigator.pop(context);
-              },
-            );
-          }).toList(),
+              );
+            }).toList(),
+          ),
         ),
       ),
     );
@@ -564,27 +572,27 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.translate(AppStrings.autoLockTime)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [1, 5, 15, 30].map((minutes) {
-            return ListTile(
-              leading: Radio<int>(
-                value: minutes,
-                groupValue: _autoLockMinutes,
-                onChanged: (value) {
-                  setState(() => _autoLockMinutes = value!);
-                  _savePreference('auto_lock_minutes', value!);
+        content: RadioGroup<int>(
+          groupValue: _autoLockMinutes,
+          onChanged: (value) {
+            setState(() => _autoLockMinutes = value!);
+            _savePreference('auto_lock_minutes', value!);
+            Navigator.pop(context);
+          },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [1, 5, 15, 30].map((minutes) {
+              return ListTile(
+                leading: Radio<int>(value: minutes),
+                title: Text(_getAutoLockTimeLabel(l10n, minutes)),
+                onTap: () {
+                  setState(() => _autoLockMinutes = minutes);
+                  _savePreference('auto_lock_minutes', minutes);
                   Navigator.pop(context);
                 },
-              ),
-              title: Text(_getAutoLockTimeLabel(l10n, minutes)),
-              onTap: () {
-                setState(() => _autoLockMinutes = minutes);
-                _savePreference('auto_lock_minutes', minutes);
-                Navigator.pop(context);
-              },
-            );
-          }).toList(),
+              );
+            }).toList(),
+          ),
         ),
       ),
     );

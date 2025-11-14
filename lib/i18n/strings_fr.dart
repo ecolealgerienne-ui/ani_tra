@@ -1071,7 +1071,6 @@ const Map<String, String> stringsFr = {
   // ============ APP SETTINGS SCREEN ============
   'enableDarkMode': 'Activer le mode sombre',
   'biometricAuth': 'Authentification biométrique',
-  'useFingerprintFaceId': 'Utiliser empreinte digitale / Face ID',
   'lockAppInactivity': 'Verrouiller l\'app après inactivité',
   'autoLockTime': 'Délai de verrouillage automatique',
   'syncOnDemand': 'Synchronisation à la demande',

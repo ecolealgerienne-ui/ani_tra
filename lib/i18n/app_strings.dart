@@ -1067,7 +1067,6 @@ class AppStrings {
   // ============ APP SETTINGS SCREEN ============
   static const String enableDarkMode = 'enableDarkMode';
   static const String biometricAuth = 'biometricAuth';
-  static const String useFingerprintFaceId = 'useFingerprintFaceId';
   static const String lockAppInactivity = 'lockAppInactivity';
   static const String autoLockTime = 'autoLockTime';
   static const String syncOnDemand = 'syncOnDemand';
