@@ -324,9 +324,12 @@ class _FarmSelectionSection extends StatelessWidget {
       );
     }
 
+    // Find the current farm, or use the first farm if not found
+    // This should be safe because we already checked farms.isEmpty above
     final currentFarm = farms.firstWhere(
       (f) => f.id == currentFarmId,
-      orElse: () => farms.first,
+      orElse: () => farms.isNotEmpty ? farms.first :
+        throw StateError('No farms available - this should never happen'),
     );
 
     return Column(
@@ -506,12 +509,16 @@ class _BreedingPreferencesSection extends StatelessWidget {
             })
         .toList();
 
-    final selectedSpecies = speciesOptions.firstWhere(
-      (s) => s['id'] == defaultSpeciesId,
-      orElse: () => speciesOptions.first,
-    );
+    // Find selected species, fallback to first if not found (or default if list is empty)
+    final selectedSpecies = speciesOptions.isNotEmpty
+        ? speciesOptions.firstWhere(
+            (s) => s['id'] == defaultSpeciesId,
+            orElse: () => speciesOptions.first,
+          )
+        : {'id': 'sheep', 'name': 'Ovin'}; // Fallback if no species available
 
-    final Map<String, String>? selectedBreed = defaultBreedId != null
+    // Find selected breed, fallback to first if not found (or null if no breeds)
+    final Map<String, String>? selectedBreed = defaultBreedId != null && breedOptions.isNotEmpty
         ? breedOptions.firstWhere(
             (b) => b['id'] == defaultBreedId,
             orElse: () => breedOptions.first,
