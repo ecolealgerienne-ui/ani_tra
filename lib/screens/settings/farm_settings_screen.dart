@@ -463,10 +463,10 @@ class _BreedingPreferencesSection extends StatelessWidget {
       orElse: () => speciesOptions.first,
     );
 
-    final Map<String, String?>? selectedBreed = defaultBreedId != null
+    final Map<String, String>? selectedBreed = defaultBreedId != null
         ? breedOptions.firstWhere(
             (b) => b['id'] == defaultBreedId,
-            orElse: () => <String, String?>{'id': null, 'name': 'Aucune'},
+            orElse: () => breedOptions.first,
           )
         : null;
 
