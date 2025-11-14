@@ -11,6 +11,7 @@ import '../../widgets//farm_management_section.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
+import 'farm_settings_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -137,6 +138,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           // Farm Management Section (PHASE 4)
           const FarmManagementSection(),
+
+          const Divider(),
+
+          // Farm Settings (Phase 1)
+          ListTile(
+            leading: const Icon(Icons.settings),
+            title: Text(l10n.translate(AppStrings.farmSettings)),
+            subtitle: Text(l10n.translate(AppStrings.farmSettingsSubtitle)),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const FarmSettingsScreen(),
+                ),
+              );
+            },
+          ),
 
           const Divider(),
 

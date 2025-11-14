@@ -24,6 +24,9 @@ import 'providers/breed_provider.dart';
 import 'providers/auth_provider.dart';
 import 'providers/reminder_provider.dart';
 import 'providers/veterinarian_provider.dart';
+import 'providers/farm_provider.dart';
+import 'providers/farm_preferences_provider.dart';
+import 'providers/alert_configuration_provider.dart';
 import 'i18n/app_localizations.dart';
 //import 'i18n/app_strings.dart';
 import 'utils/constants.dart';
@@ -46,6 +49,8 @@ import 'repositories/campaign_repository.dart';
 import 'repositories/breeding_repository.dart';
 import 'repositories/document_repository.dart';
 import 'repositories/alert_configuration_repository.dart';
+import 'repositories/farm_repository.dart';
+import 'repositories/farm_preferences_repository.dart';
 import 'database_initializer.dart';
 
 AppDatabase? _appDatabase;
@@ -113,6 +118,8 @@ void main() async {
   final documentRepository = DocumentRepository(database);
   final treatmentRepository = TreatmentRepository(database);
   final alertConfigurationRepository = AlertConfigurationRepository(database);
+  final farmRepository = FarmRepository(database);
+  final farmPreferencesRepository = FarmPreferencesRepository(database);
 
   runApp(MyApp(
     database: database,
@@ -128,6 +135,8 @@ void main() async {
     documentRepository: documentRepository,
     treatmentRepository: treatmentRepository,
     alertConfigurationRepository: alertConfigurationRepository,
+    farmRepository: farmRepository,
+    farmPreferencesRepository: farmPreferencesRepository,
   ));
 }
 
@@ -145,6 +154,8 @@ class MyApp extends StatelessWidget {
   final DocumentRepository documentRepository;
   final TreatmentRepository treatmentRepository;
   final AlertConfigurationRepository alertConfigurationRepository;
+  final FarmRepository farmRepository;
+  final FarmPreferencesRepository farmPreferencesRepository;
 
   const MyApp({
     super.key,
@@ -161,6 +172,8 @@ class MyApp extends StatelessWidget {
     required this.documentRepository,
     required this.treatmentRepository,
     required this.alertConfigurationRepository,
+    required this.farmRepository,
+    required this.farmPreferencesRepository,
   });
 
   @override
@@ -182,6 +195,9 @@ class MyApp extends StatelessWidget {
         Provider<TreatmentRepository>.value(value: treatmentRepository),
         Provider<AlertConfigurationRepository>.value(
             value: alertConfigurationRepository),
+        Provider<FarmRepository>.value(value: farmRepository),
+        Provider<FarmPreferencesRepository>.value(
+            value: farmPreferencesRepository),
 
         // === AuthProvider EN PREMIER ===
         ChangeNotifierProvider(create: (_) => AuthProvider()),
@@ -202,6 +218,36 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProxyProvider<BreedRepository, BreedProvider>(
           create: (context) => BreedProvider(context.read<BreedRepository>()),
           update: (context, repo, previous) => previous ?? BreedProvider(repo),
+        ),
+
+        // === FarmProvider (Phase 1 - Farm Settings) ===
+        ChangeNotifierProxyProvider<AuthProvider, FarmProvider>(
+          create: (context) => FarmProvider(
+              context.read<AuthProvider>(), context.read<FarmRepository>()),
+          update: (context, auth, previous) =>
+              previous ?? FarmProvider(auth, context.read<FarmRepository>()),
+        ),
+
+        // === FarmPreferencesProvider (Phase 1 - Farm Settings) ===
+        ChangeNotifierProxyProvider<AuthProvider, FarmPreferencesProvider>(
+          create: (context) => FarmPreferencesProvider(
+              context.read<AuthProvider>(),
+              context.read<FarmPreferencesRepository>()),
+          update: (context, auth, previous) =>
+              previous ??
+              FarmPreferencesProvider(
+                  auth, context.read<FarmPreferencesRepository>()),
+        ),
+
+        // === AlertConfigurationProvider (Phase 1 - Farm Settings) ===
+        ChangeNotifierProxyProvider<AuthProvider, AlertConfigurationProvider>(
+          create: (context) => AlertConfigurationProvider(
+              context.read<AuthProvider>(),
+              context.read<AlertConfigurationRepository>()),
+          update: (context, auth, previous) =>
+              previous ??
+              AlertConfigurationProvider(
+                  auth, context.read<AlertConfigurationRepository>()),
         ),
 
         // === AnimalProvider (charge depuis DB) ===
