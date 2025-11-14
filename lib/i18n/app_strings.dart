@@ -1015,12 +1015,4 @@ class AppStrings {
   static const String priorityImportant = 'priorityImportant';
   static const String priorityRoutine = 'priorityRoutine';
 
-  // ============ PHASE 1: MEDICAL ACT SCREEN ============
-  static const String scanner = 'scanner';
-  static const String animals = 'animals';
-
-  // ============ PHASE 1: ANIMAL LIST SCREEN ============
-  static const String animalsTitle = 'animalsTitle';
-  static const String noAnimalFound = 'noAnimalFound';
-
 }

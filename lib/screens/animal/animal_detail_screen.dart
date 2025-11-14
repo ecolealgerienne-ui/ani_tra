@@ -488,7 +488,7 @@ class _InfosTab extends StatelessWidget {
                   label: AppLocalizations.of(context)
                       .translate(AppStrings.birthDate),
                   value: _formatDate(currentAnimal.birthDate)),
-              _InfoRow(label: AppLocalizations.of(context).translate(AppStrings.age), value: _getAgeFormatted(context)),
+              _InfoRow(label: AppLocalizations.of(context).translate(AppStrings.age), value: _getAgeFormatted()),
               _InfoRow(
                 label: AppLocalizations.of(context).translate(AppStrings.createdOn),
                 value: _formatDate(currentAnimal.createdAt),
@@ -1391,7 +1391,7 @@ class AlertsSection extends StatelessWidget {
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Text(
-                        _getPriorityLabel(mostUrgent.type),
+                        _getPriorityLabel(context, mostUrgent.type),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -1509,7 +1509,7 @@ class AlertsSection extends StatelessWidget {
     }
   }
 
-  String _getPriorityLabel(AlertType type) {
+  String _getPriorityLabel(BuildContext context, AlertType type) {
     switch (type) {
       case AlertType.urgent:
         return AppLocalizations.of(context).translate(AppStrings.priorityUrgent);

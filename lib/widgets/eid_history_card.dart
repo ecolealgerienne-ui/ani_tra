@@ -141,7 +141,7 @@ class EidHistoryCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    EidChangeReason.getLabel(change.reason),
+                    EidChangeReason.getLabel(change.reason, context),
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: AppConstants.fontSizeBody,
