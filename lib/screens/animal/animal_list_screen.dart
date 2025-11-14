@@ -220,7 +220,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
 
         // 2. Créer le groupe "📋 Brouillons" si NON VIDE
         if (drafts.isNotEmpty) {
-          groups['📋 Brouillons'] = drafts;
+          groups['📋 ${AppLocalizations.of(context).translate(AppStrings.drafts)}'] = drafts;
         }
 
         // 3. Grouper les autres animaux par alerte (URGENT/IMPORTANT/Routine/Aucune alerte)
@@ -267,8 +267,8 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       case GroupByOption.sex:
         for (final animal in animals) {
           final key = animal.sex == AnimalSex.male
-              ? 'ÃƒÂ¢Ã¢â€žÂ¢Ã¢â‚¬Å¡ÃƒÂ¯Ã‚Â¸Ã‚Â MÃƒÆ’Ã‚Â¢les'
-              : 'ÃƒÂ¢Ã¢â€žÂ¢Ã¢â€šÂ¬ÃƒÂ¯Ã‚Â¸Ã‚Â Femelles';
+              ? '♂️ ${AppLocalizations.of(context).translate(AppStrings.males)}'
+              : '♀️ ${AppLocalizations.of(context).translate(AppStrings.females)}';
           groups.putIfAbsent(key, () => []).add(animal);
         }
         break;
@@ -278,13 +278,13 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
           final months = animal.ageInMonths;
           String key;
           if (months < 6) {
-            key = 'ÃƒÂ°Ã…Â¸Ã‚ÂÃ¢â‚¬Ëœ < 6 mois';
+            key = '🐑 ${AppLocalizations.of(context).translate(AppStrings.lessThan6Months)}';
           } else if (months < 12) {
-            key = 'ÃƒÂ°Ã…Â¸Ã‚ÂÃ¢â‚¬Ëœ 6-12 mois';
+            key = '🐑 ${AppLocalizations.of(context).translate(AppStrings.from6To12Months)}';
           } else if (months < 24) {
-            key = 'ÃƒÂ°Ã…Â¸Ã‚ÂÃ‚Â 1-2 ans';
+            key = '🐄 ${AppLocalizations.of(context).translate(AppStrings.from1To2Years)}';
           } else {
-            key = 'ÃƒÂ°Ã…Â¸Ã‚ÂÃ‚Â > 2 ans';
+            key = '🐄 ${AppLocalizations.of(context).translate(AppStrings.moreThan2Years)}';
           }
           groups.putIfAbsent(key, () => []).add(animal);
         }
@@ -295,19 +295,19 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
           String key;
           switch (animal.status) {
             case AnimalStatus.draft:
-              key = '📋 Brouillons';
+              key = '📋 ${AppLocalizations.of(context).translate(AppStrings.drafts)}';
               break;
             case AnimalStatus.alive:
-              key = '🟢 Vivants';
+              key = '🟢 ${AppLocalizations.of(context).translate(AppStrings.statusAlive)}';
               break;
             case AnimalStatus.sold:
-              key = 'ÃƒÂ°Ã…Â¸Ã…Â¸Ã‚Â  Vendus';
+              key = '💰 ${AppLocalizations.of(context).translate(AppStrings.sold)}';
               break;
             case AnimalStatus.dead:
-              key = 'ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â´ Morts';
+              key = '💀 ${AppLocalizations.of(context).translate(AppStrings.dead)}';
               break;
             case AnimalStatus.slaughtered:
-              key = 'ÃƒÂ°Ã…Â¸Ã‚ÂÃ‚Â­ Abattus';
+              key = '🔪 ${AppLocalizations.of(context).translate(AppStrings.slaughtered)}';
               break;
           }
           groups.putIfAbsent(key, () => []).add(animal);
@@ -319,8 +319,8 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
         for (final animal in animals) {
           final hasActive = animalProvider.hasActiveWithdrawal(animal.id);
           final key = hasActive
-              ? 'ÃƒÂ¢Ã…Â¡Ã‚Â ÃƒÂ¯Ã‚Â¸Ã‚Â RÃƒÆ’Ã‚Â©manence Active'
-              : 'ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ RÃƒÆ’Ã‚Â©manence Inactive';
+              ? '⚠️ ${AppLocalizations.of(context).translate(AppStrings.withdrawalActive)}'
+              : '✅ ${AppLocalizations.of(context).translate(AppStrings.withdrawalInactive)}';
           groups.putIfAbsent(key, () => []).add(animal);
         }
         break;
@@ -329,14 +329,14 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
         for (final animal in animals) {
           if (animal.motherId == null) {
             groups
-                .putIfAbsent('ÃƒÂ¢Ã‚ÂÃ¢â‚¬Å“ MÃƒÆ’Ã‚Â¨re inconnue', () => [])
+                .putIfAbsent('❓ ${AppLocalizations.of(context).translate(AppStrings.unknownMother)}', () => [])
                 .add(animal);
           } else {
             final mother =
                 context.read<AnimalProvider>().getAnimalById(animal.motherId!);
             final key = mother != null
-                ? 'ÃƒÂ°Ã…Â¸Ã¢â‚¬ËœÃ‚Â© ${mother.officialNumber ?? mother.eid}'
-                : 'ÃƒÂ¢Ã‚ÂÃ¢â‚¬Å“ MÃƒÆ’Ã‚Â¨re inconnue';
+                ? '🐐 ${mother.officialNumber ?? mother.eid}'
+                : '❓ ${AppLocalizations.of(context).translate(AppStrings.unknownMother)}';
             groups.putIfAbsent(key, () => []).add(animal);
           }
         }
@@ -346,7 +346,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
         for (final animal in animals) {
           if (animal.speciesId == null) {
             groups
-                .putIfAbsent('ÃƒÂ¢Ã‚ÂÃ¢â‚¬Å“ Type non dÃƒÆ’Ã‚Â©fini', () => [])
+                .putIfAbsent('❓ ${AppLocalizations.of(context).translate(AppStrings.undefinedType)}', () => [])
                 .add(animal);
           } else {
             final key = animal.fullDisplayFr.split(' - ').first;
@@ -360,7 +360,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
           if (animal.breedId == null) {
             groups
                 .putIfAbsent(
-                    'ÃƒÂ¢Ã‚ÂÃ¢â‚¬Å“ Race non dÃƒÆ’Ã‚Â©finie', () => [])
+                    '❓ ${AppLocalizations.of(context).translate(AppStrings.undefinedBreed)}', () => [])
                 .add(animal);
           } else {
             final key = animal.breedNameFr;
@@ -407,7 +407,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
 
     // RÃƒÂ©manence
     if (_hasActiveWithdrawal != null) {
-      filters.add('RÃƒÂ©manence');
+      filters.add(AppLocalizations.of(context).translate(AppStrings.withdrawal));
     }
 
     // MÃƒÂ¨re
@@ -433,7 +433,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     if (filters.isEmpty) {
       return '';
     }
-    return 'Filtres: ${filters.join(', ')}';
+    return '${AppLocalizations.of(context).translate(AppStrings.filtersLabel)}: ${filters.join(', ')}';
   }
 
   String _getSectionKey(String groupName) {
@@ -460,33 +460,33 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
         _expandedSections['noalert'] = false;
         break;
       case GroupByOption.sex:
-        _expandedSections['Ã¢â„¢â€šÃ¯Â¸Â MÃƒÂ¢les'] = false;
-        _expandedSections['Ã¢â„¢â‚¬Ã¯Â¸Â Femelles'] = false;
+        _expandedSections['♂️ Mâles'] = false;
+        _expandedSections['♀️ Femelles'] = false;
         break;
       case GroupByOption.age:
-        _expandedSections['Ã°Å¸Ââ€˜ < 6 mois'] = false;
-        _expandedSections['Ã°Å¸Ââ€˜ 6-12 mois'] = false;
-        _expandedSections['Ã°Å¸Ââ€˜ 1-2 ans'] = false;
-        _expandedSections['Ã°Å¸Ââ€˜ > 2 ans'] = false;
+        _expandedSections['🐑 < 6 mois'] = false;
+        _expandedSections['🐑 6-12 mois'] = false;
+        _expandedSections['🐄 1-2 ans'] = false;
+        _expandedSections['🐄 > 2 ans'] = false;
         break;
       case GroupByOption.status:
-        _expandedSections['Ã°Å¸Å¸Â¢ Vivants'] = false;
-        _expandedSections['Ã°Å¸Å¸Â  Vendus'] = false;
-        _expandedSections['Ã°Å¸â€™â‚¬ Morts'] = false;
-        _expandedSections['Ã°Å¸Â¦Â´ Abattus'] = false;
+        _expandedSections['🟢 Vivants'] = false;
+        _expandedSections['💰 Vendus'] = false;
+        _expandedSections['💀 Morts'] = false;
+        _expandedSections['🔪 Abattus'] = false;
         break;
       case GroupByOption.withdrawal:
-        _expandedSections['Ã¢Å¡Â Ã¯Â¸Â RÃƒÂ©manence Active'] = false;
-        _expandedSections['Ã¢Å“â€¦ RÃƒÂ©manence Inactive'] = false;
+        _expandedSections['⚠️ Rémanence Active'] = false;
+        _expandedSections['✅ Rémanence Inactive'] = false;
         break;
       case GroupByOption.mother:
-        _expandedSections['Ã°Å¸Ââ€˜ MÃƒÂ¨re inconnue'] = false;
+        _expandedSections['❓ Mère inconnue'] = false;
         break;
       case GroupByOption.species:
-        _expandedSections['Ã°Å¸Ââ€˜ Type non dÃƒÂ©fini'] = false;
+        _expandedSections['❓ Type non défini'] = false;
         break;
       case GroupByOption.breed:
-        _expandedSections['Ã°Å¸Ââ€˜ Race non dÃƒÂ©finie'] = false;
+        _expandedSections['❓ Race non définie'] = false;
         break;
     }
   }
@@ -573,7 +573,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
 
           if (_groupBy == GroupByOption.alerts) {
             final Map<String, int> priority = {
-              '📋 Brouillons':
+              '📋 ${AppLocalizations.of(context).translate(AppStrings.drafts)}':
                   0, // ✅ PHASE 4 FIX: Brouillons TOUJOURS EN PREMIER
               AppLocalizations.of(context).translate(AppStrings.urgent): 1,
               AppLocalizations.of(context).translate(AppStrings.toMonitor): 2,
@@ -589,11 +589,11 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
             });
           } else if (_groupBy == GroupByOption.status) {
             final Map<String, int> priority = {
-              '📋 Brouillons': 1,
-              '🟢 Vivants': 2,
-              '💰 Vendus': 3,
-              '💀 Morts': 4,
-              '🔪 Abattus': 5,
+              '📋 ${AppLocalizations.of(context).translate(AppStrings.drafts)}': 1,
+              '🟢 ${AppLocalizations.of(context).translate(AppStrings.statusAlive)}': 2,
+              '💰 ${AppLocalizations.of(context).translate(AppStrings.sold)}': 3,
+              '💀 ${AppLocalizations.of(context).translate(AppStrings.dead)}': 4,
+              '🔪 ${AppLocalizations.of(context).translate(AppStrings.slaughtered)}': 5,
             };
 
             sortedKeys.sort((a, b) {
@@ -988,7 +988,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${animal.fullDisplayFr} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ ${animal.ageFormatted}',
+                      '${animal.fullDisplayFr} • ${animal.ageFormatted}',
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.grey.shade600,
@@ -1087,7 +1087,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Aucun animal trouvÃƒÆ’Ã‚Â©',
+            AppLocalizations.of(context).translate(AppStrings.noAnimalFoundMessage),
             style: TextStyle(
               fontSize: 18,
               color: Colors.grey.shade600,
@@ -1343,7 +1343,7 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                         style: const TextStyle(fontWeight: FontWeight.w600)),
                     CheckboxListTile(
                       title: Text(
-                          'ÃƒÂ¢Ã¢â€žÂ¢Ã¢â‚¬Å¡ÃƒÂ¯Ã‚Â¸Ã‚Â ${AppLocalizations.of(context).translate(AppStrings.male)}'),
+                          '♂️ ${AppLocalizations.of(context).translate(AppStrings.male)}'),
                       value: _sexes.contains(AnimalSex.male),
                       onChanged: (checked) {
                         setState(() {
@@ -1357,7 +1357,7 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                     ),
                     CheckboxListTile(
                       title: Text(
-                          'ÃƒÂ¢Ã¢â€žÂ¢Ã¢â€šÂ¬ÃƒÂ¯Ã‚Â¸Ã‚Â ${AppLocalizations.of(context).translate(AppStrings.female)}'),
+                          '♀️ ${AppLocalizations.of(context).translate(AppStrings.female)}'),
                       value: _sexes.contains(AnimalSex.female),
                       onChanged: (checked) {
                         setState(() {

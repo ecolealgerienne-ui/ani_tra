@@ -858,7 +858,7 @@ class _SoinsTab extends StatelessWidget {
                       Icon(Icons.medical_services,
                           size: 64, color: Colors.grey[400]),
                       const SizedBox(height: 16),
-                      Text('Aucun soin enregistré',
+                      Text(AppLocalizations.of(context).translate(AppStrings.noCareRecorded),
                           style: TextStyle(color: Colors.grey[600])),
                     ],
                   ),
@@ -1118,7 +1118,7 @@ class _GenealogieTab extends StatelessWidget {
                   const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           if (children.isEmpty)
-            const Text('Aucun descendant', style: TextStyle(color: Colors.grey))
+            Text(AppLocalizations.of(context).translate(AppStrings.noOffspring), style: const TextStyle(color: Colors.grey))
           else
             ...children.map((child) => Padding(
                   padding: const EdgeInsets.only(bottom: 8),
