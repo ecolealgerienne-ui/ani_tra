@@ -95,7 +95,7 @@ class _ExportRegistryScreenState extends State<ExportRegistryScreen> {
             AppLocalizations.of(context).translate(AppStrings.exportDocuments)),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppConstants.spacingMedium),
         children: [
           _buildDocumentCard(
             context: context,
@@ -108,7 +108,7 @@ class _ExportRegistryScreenState extends State<ExportRegistryScreen> {
                 .translate(AppStrings.herdInventory),
             enabled: true,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppConstants.spacingSmall),
           _buildDocumentCard(
             context: context,
             id: 'inventaire',
@@ -142,9 +142,9 @@ class _ExportRegistryScreenState extends State<ExportRegistryScreen> {
         onTap: enabled && !isGenerating
             ? () => _generateDocument(context, id)
             : null,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppConstants.spacingMedium),
           child: Row(
             children: [
               Container(
@@ -152,15 +152,15 @@ class _ExportRegistryScreenState extends State<ExportRegistryScreen> {
                 height: 56,
                 decoration: BoxDecoration(
                   color: iconColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
                 ),
                 child: Icon(
                   icon,
                   color: iconColor,
-                  size: 28,
+                  size: AppConstants.iconSizeMedium,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: AppConstants.spacingMedium),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -168,15 +168,15 @@ class _ExportRegistryScreenState extends State<ExportRegistryScreen> {
                     Text(
                       title,
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: AppConstants.fontSizeMedium,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppConstants.spacingTiny),
                     Text(
                       subtitle,
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: AppConstants.fontSizeSubtitle,
                         color: Colors.grey[600],
                       ),
                     ),
@@ -185,8 +185,8 @@ class _ExportRegistryScreenState extends State<ExportRegistryScreen> {
               ),
               if (isGenerating)
                 const SizedBox(
-                  width: 24,
-                  height: 24,
+                  width: AppConstants.spacingMediumLarge,
+                  height: AppConstants.spacingMediumLarge,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               else

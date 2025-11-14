@@ -160,20 +160,20 @@ class _DeathScreenState extends State<DeathScreen> {
             AppLocalizations.of(context).translate(AppStrings.recordDeath)),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppConstants.spacingMedium),
         children: [
           // Warning Banner
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppConstants.spacingMedium),
             decoration: BoxDecoration(
               color: Colors.red.shade50,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
               border: Border.all(color: Colors.red.shade300),
             ),
             child: Row(
               children: [
                 Icon(Icons.warning, color: Colors.red.shade700),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppConstants.spacingSmall),
                 Expanded(
                   child: Text(
                     AppLocalizations.of(context)
@@ -184,7 +184,7 @@ class _DeathScreenState extends State<DeathScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppConstants.spacingMediumLarge),
 
           // Scan Animal
           if (_scannedAnimal == null && widget.animal == null)
@@ -201,12 +201,12 @@ class _DeathScreenState extends State<DeathScreen> {
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.nfc, size: 48),
-                          const SizedBox(height: 8),
+                          const Icon(Icons.nfc, size: AppConstants.iconSizeMediumLarge),
+                          const SizedBox(height: AppConstants.spacingExtraSmall),
                           Text(
                               AppLocalizations.of(context)
                                   .translate(AppStrings.scanAnimal),
-                              style: const TextStyle(fontSize: 18)),
+                              style: const TextStyle(fontSize: AppConstants.fontSizeImportant)),
                         ],
                       ),
               ),
@@ -216,14 +216,14 @@ class _DeathScreenState extends State<DeathScreen> {
               final animal = _scannedAnimal ?? widget.animal;
               return Card(
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(AppConstants.spacingMedium),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.pets, size: 32),
-                          const SizedBox(width: 12),
+                          const Icon(Icons.pets, size: AppConstants.iconSizeMedium),
+                          const SizedBox(width: AppConstants.spacingSmall),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -232,7 +232,7 @@ class _DeathScreenState extends State<DeathScreen> {
                                   animal!.officialNumber ??
                                       AppConstants.notAvailable,
                                   style: const TextStyle(
-                                    fontSize: 18,
+                                    fontSize: AppConstants.fontSizeImportant,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -249,7 +249,7 @@ class _DeathScreenState extends State<DeathScreen> {
                             ),
                         ],
                       ),
-                      const Divider(height: 24),
+                      const Divider(height: AppConstants.spacingMediumLarge),
                       Text(
                           '${AppLocalizations.of(context).translate(AppStrings.sex)}: ${animal.sex == AnimalSex.female ? AppLocalizations.of(context).translate(AppStrings.female) : AppLocalizations.of(context).translate(AppStrings.male)}'),
                       Text(
@@ -261,13 +261,13 @@ class _DeathScreenState extends State<DeathScreen> {
                 ),
               );
             }),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppConstants.spacingMediumLarge),
 
             // Death Date
             ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+              contentPadding: const EdgeInsets.symmetric(horizontal: AppConstants.spacingMedium),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
                 side: BorderSide(color: Colors.grey.shade400),
               ),
               tileColor: Colors.white,
@@ -288,7 +288,7 @@ class _DeathScreenState extends State<DeathScreen> {
                 }
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppConstants.spacingMedium),
 
             // Notes/Cause
             TextField(
@@ -302,7 +302,7 @@ class _DeathScreenState extends State<DeathScreen> {
                 alignLabelWithHint: true,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppConstants.spacingMediumLarge),
 
             // Confirm Button
 
@@ -325,7 +325,7 @@ class _DeathScreenState extends State<DeathScreen> {
                 Text(AppLocalizations.of(context).translate(AppStrings.cancel)),
           ),
         ),
-        const SizedBox(width: 16),
+        const SizedBox(width: AppConstants.spacingMedium),
         Expanded(
           child: FilledButton(
             onPressed: _isConfirming ? null : _confirmDeath,
@@ -335,16 +335,16 @@ class _DeathScreenState extends State<DeathScreen> {
               children: [
                 if (_isConfirming)
                   const SizedBox(
-                    width: 16,
-                    height: 16,
+                    width: AppConstants.spacingMedium,
+                    height: AppConstants.spacingMedium,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
                   )
                 else
-                  const Icon(Icons.delete_forever, size: 20),
-                const SizedBox(width: 8),
+                  const Icon(Icons.delete_forever, size: AppConstants.iconSizeRegular),
+                const SizedBox(width: AppConstants.spacingExtraSmall),
                 Flexible(
                   child: Text(
                     AppLocalizations.of(context)

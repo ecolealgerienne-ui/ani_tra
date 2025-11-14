@@ -55,7 +55,7 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
     setState(() => _isScanning = true);
 
     HapticFeedback.mediumImpact();
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const AppConstants.longAnimation);
 
     final animalProvider = context.read<AnimalProvider>();
 
@@ -180,7 +180,7 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
       children: [
         Icon(icon,
             size: AppConstants.iconSizeRegular, color: Colors.deepPurple),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppConstants.spacingExtraSmall),
         Text(
           title,
           style: const TextStyle(
@@ -210,14 +210,14 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppConstants.spacingMedium),
           children: [
             _buildSectionTitle(
               context,
               l10n.translate(AppStrings.stepOneAnimal),
               Icons.pets,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppConstants.spacingSmall),
             if (_selectedAnimal == null)
               SizedBox(
                 height: AppConstants.scanButtonHeight,
@@ -234,7 +234,7 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
                           children: [
                             const Icon(Icons.qr_code_scanner,
                                 size: AppConstants.iconSizeExtraLarge),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: AppConstants.spacingExtraSmall),
                             Text(l10n.translate(AppStrings.scanAnimal),
                                 style: const TextStyle(
                                     fontSize:
@@ -276,7 +276,7 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
                   ),
                 ),
               ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppConstants.spacingMediumLarge),
             _buildSectionTitle(
               context,
               l10n
@@ -284,7 +284,7 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
                   .replaceAll('{weight}', l10n.translate(AppStrings.weight)),
               Icons.monitor_weight,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppConstants.spacingSmall),
             TextFormField(
               controller: _weightController,
               keyboardType:
@@ -313,13 +313,13 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
                 return null;
               },
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppConstants.spacingMediumLarge),
             _buildSectionTitle(
               context,
               l10n.translate(AppStrings.stepThreeSource),
               Icons.source,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppConstants.spacingSmall),
             RadioGroup<WeightSource>(
               groupValue: _selectedSource,
               onChanged: (value) {
@@ -336,7 +336,7 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
                     title: Row(
                       children: [
                         Text(source.icon),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppConstants.spacingExtraSmall),
                         Text(source.getLocalizedName(context)),
                       ],
                     ),
@@ -352,7 +352,7 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
                 }).toList(),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppConstants.spacingMediumLarge),
             _buildSectionTitle(
               context,
               l10n
@@ -360,7 +360,7 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
                   .replaceAll('{date}', l10n.translate(AppStrings.selectDate)),
               Icons.calendar_today,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppConstants.spacingSmall),
             ListTile(
               leading: const Icon(Icons.calendar_today),
               title: Text(l10n.translate(AppStrings.selectDate)),
@@ -374,7 +374,7 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
                 side: BorderSide(color: Colors.grey.shade300),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppConstants.spacingMediumLarge),
             _buildSectionTitle(
               context,
               l10n
@@ -384,7 +384,7 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
                       '{optional}', l10n.translate(AppStrings.optional)),
               Icons.notes,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppConstants.spacingSmall),
             TextFormField(
               controller: _notesController,
               maxLines: 3,
@@ -394,7 +394,7 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
                 prefixIcon: const Icon(Icons.notes),
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: AppConstants.spacingLarge),
             SizedBox(
               height: AppConstants.primaryButtonHeight,
               child: ElevatedButton.icon(
@@ -411,7 +411,7 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppConstants.spacingMedium),
             OutlinedButton(
               onPressed: () => Navigator.pop(context),
               child: Text(l10n.translate(AppStrings.cancel)),

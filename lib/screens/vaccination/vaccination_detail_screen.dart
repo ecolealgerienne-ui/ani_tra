@@ -37,17 +37,17 @@ class VaccinationDetailScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeaderCard(context),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppConstants.spacingExtraSmall),
             _buildInfoCard(context),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppConstants.spacingExtraSmall),
             _buildAnimalCard(context),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppConstants.spacingExtraSmall),
             if (vaccination.nextDueDate != null) _buildReminderCard(context),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppConstants.spacingExtraSmall),
             if (vaccination.notes != null && vaccination.notes!.isNotEmpty)
               _buildNotesCard(context),
             if (vaccination.protocolId != null) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: AppConstants.spacingExtraSmall),
               _buildProtocolCard(context),
             ],
           ],
@@ -60,9 +60,9 @@ class VaccinationDetailScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
 
     return Card(
-      margin: const EdgeInsets.all(16),
+      margin: const EdgeInsets.all(AppConstants.spacingMedium),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppConstants.spacingMedium),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -106,7 +106,7 @@ class VaccinationDetailScreen extends StatelessWidget {
                         const Icon(Icons.group,
                             size: AppConstants.iconSizeTiny,
                             color: Colors.blue),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppConstants.spacingTiny),
                         Text(
                           '${vaccination.animalCount} ${l10n.translate(AppStrings.animalsLowercase)}',
                           style: const TextStyle(
@@ -120,7 +120,7 @@ class VaccinationDetailScreen extends StatelessWidget {
                   ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppConstants.spacingMedium),
             Text(
               vaccination.vaccineName,
               style: const TextStyle(
@@ -128,12 +128,12 @@ class VaccinationDetailScreen extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppConstants.spacingExtraSmall),
             Row(
               children: [
                 const Icon(Icons.medical_services,
                     size: AppConstants.iconSizeSmall, color: Colors.red),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppConstants.spacingExtraSmall),
                 Text(
                   vaccination.disease,
                   style: const TextStyle(
@@ -154,9 +154,9 @@ class VaccinationDetailScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      margin: const EdgeInsets.symmetric(horizontal: AppConstants.spacingMedium),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppConstants.spacingMedium),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -167,21 +167,21 @@ class VaccinationDetailScreen extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppConstants.spacingSmall),
             _buildInfoRow(
               context,
               Icons.calendar_today,
               l10n.translate(AppStrings.vaccinationDate),
               _formatDate(vaccination.vaccinationDate),
             ),
-            const Divider(height: 24),
+            const Divider(height: AppConstants.spacingMediumLarge),
             _buildInfoRow(
               context,
               Icons.science,
               l10n.translate(AppStrings.doseLabel),
               vaccination.dose,
             ),
-            const Divider(height: 24),
+            const Divider(height: AppConstants.spacingMediumLarge),
             _buildInfoRow(
               context,
               Icons.local_hospital,
@@ -189,7 +189,7 @@ class VaccinationDetailScreen extends StatelessWidget {
               vaccination.administrationRoute,
             ),
             if (vaccination.batchNumber != null) ...[
-              const Divider(height: 24),
+              const Divider(height: AppConstants.spacingMediumLarge),
               _buildInfoRow(
                 context,
                 Icons.qr_code,
@@ -198,7 +198,7 @@ class VaccinationDetailScreen extends StatelessWidget {
               ),
             ],
             if (vaccination.expiryDate != null) ...[
-              const Divider(height: 24),
+              const Divider(height: AppConstants.spacingMediumLarge),
               _buildInfoRow(
                 context,
                 Icons.event_busy,
@@ -207,7 +207,7 @@ class VaccinationDetailScreen extends StatelessWidget {
               ),
             ],
             if (vaccination.veterinarianName != null) ...[
-              const Divider(height: 24),
+              const Divider(height: AppConstants.spacingMediumLarge),
               _buildInfoRow(
                 context,
                 Icons.person,
@@ -216,7 +216,7 @@ class VaccinationDetailScreen extends StatelessWidget {
               ),
             ],
             if (vaccination.withdrawalPeriodDays > 0) ...[
-              const Divider(height: 24),
+              const Divider(height: AppConstants.spacingMediumLarge),
               _buildInfoRow(
                 context,
                 Icons.access_time,
@@ -230,7 +230,7 @@ class VaccinationDetailScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(AppConstants.spacingExtraSmall),
                     decoration: BoxDecoration(
                       color: Colors.red
                           .withValues(alpha: AppConstants.opacityLight),
@@ -241,7 +241,7 @@ class VaccinationDetailScreen extends StatelessWidget {
                       children: [
                         const Icon(Icons.warning,
                             size: AppConstants.iconSizeTiny, color: Colors.red),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppConstants.spacingExtraSmall),
                         Text(
                           l10n.translate(AppStrings.daysRemaining).replaceAll(
                               '{days}',
@@ -268,9 +268,9 @@ class VaccinationDetailScreen extends StatelessWidget {
     final animalProvider = context.read<AnimalProvider>();
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      margin: const EdgeInsets.symmetric(horizontal: AppConstants.spacingMedium),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppConstants.spacingMedium),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -281,7 +281,7 @@ class VaccinationDetailScreen extends StatelessWidget {
                   size: AppConstants.iconSizeRegular,
                   color: Colors.teal,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppConstants.spacingExtraSmall),
                 Text(
                   l10n.translate(AppStrings.animal),
                   style: const TextStyle(
@@ -291,7 +291,7 @@ class VaccinationDetailScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppConstants.spacingSmall),
             if (vaccination.isGroupVaccination)
               Text(
                 l10n
@@ -349,9 +349,9 @@ class VaccinationDetailScreen extends StatelessWidget {
     final color = isOverdue ? Colors.red : Colors.orange;
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      margin: const EdgeInsets.symmetric(horizontal: AppConstants.spacingMedium),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppConstants.spacingMedium),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -362,7 +362,7 @@ class VaccinationDetailScreen extends StatelessWidget {
                   color: color,
                   size: AppConstants.iconSizeRegular,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppConstants.spacingExtraSmall),
                 Text(
                   l10n.translate(AppStrings.reminder),
                   style: const TextStyle(
@@ -372,9 +372,9 @@ class VaccinationDetailScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppConstants.spacingSmall),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppConstants.spacingSmall),
               decoration: BoxDecoration(
                 color: color.withValues(alpha: AppConstants.opacityLight),
                 borderRadius:
@@ -399,7 +399,7 @@ class VaccinationDetailScreen extends StatelessWidget {
                       color: color,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppConstants.spacingTiny),
                   Text(
                     l10n.translate(AppStrings.nextReminder).replaceAll(
                         '{date}', _formatDate(vaccination.nextDueDate!)),
@@ -421,9 +421,9 @@ class VaccinationDetailScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      margin: const EdgeInsets.symmetric(horizontal: AppConstants.spacingMedium),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppConstants.spacingMedium),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -431,7 +431,7 @@ class VaccinationDetailScreen extends StatelessWidget {
               children: [
                 const Icon(Icons.note,
                     size: AppConstants.iconSizeRegular, color: Colors.blue),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppConstants.spacingExtraSmall),
                 Text(
                   l10n.translate(AppStrings.notesLabel),
                   style: const TextStyle(
@@ -441,7 +441,7 @@ class VaccinationDetailScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppConstants.spacingSmall),
             Text(
               vaccination.notes!,
               style: TextStyle(
@@ -464,9 +464,9 @@ class VaccinationDetailScreen extends StatelessWidget {
     if (protocol == null) return const SizedBox.shrink();
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      margin: const EdgeInsets.symmetric(horizontal: AppConstants.spacingMedium),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppConstants.spacingMedium),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -474,7 +474,7 @@ class VaccinationDetailScreen extends StatelessWidget {
               children: [
                 const Icon(Icons.assignment,
                     size: AppConstants.iconSizeRegular, color: Colors.purple),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppConstants.spacingExtraSmall),
                 Text(
                   l10n.translate(AppStrings.protocolLabel),
                   style: const TextStyle(
@@ -484,21 +484,21 @@ class VaccinationDetailScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppConstants.spacingSmall),
             _buildInfoRow(
               context,
               Icons.label,
               l10n.translate(AppStrings.name),
               protocol.name,
             ),
-            const Divider(height: 24),
+            const Divider(height: AppConstants.spacingMediumLarge),
             _buildInfoRow(
               context,
               Icons.description,
               l10n.translate(AppStrings.description),
               protocol.description,
             ),
-            const Divider(height: 24),
+            const Divider(height: AppConstants.spacingMediumLarge),
             _buildInfoRow(
               context,
               Icons.repeat,
@@ -506,7 +506,7 @@ class VaccinationDetailScreen extends StatelessWidget {
               '${protocol.reminderIntervalDays} ${l10n.translate(AppStrings.days)}',
             ),
             if (protocol.recommendedPeriod != null) ...[
-              const Divider(height: 24),
+              const Divider(height: AppConstants.spacingMediumLarge),
               _buildInfoRow(
                 context,
                 Icons.event,
@@ -515,7 +515,7 @@ class VaccinationDetailScreen extends StatelessWidget {
               ),
             ],
             if (protocol.notes != null) ...[
-              const Divider(height: 24),
+              const Divider(height: AppConstants.spacingMediumLarge),
               _buildInfoRow(
                 context,
                 Icons.info_outline,
@@ -540,7 +540,7 @@ class VaccinationDetailScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(icon, size: AppConstants.iconSizeSmall, color: Colors.grey[600]),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppConstants.spacingSmall),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -552,7 +552,7 @@ class VaccinationDetailScreen extends StatelessWidget {
                   color: Colors.grey[600],
                 ),
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: AppConstants.spacingMicro),
               Text(
                 value,
                 style: TextStyle(

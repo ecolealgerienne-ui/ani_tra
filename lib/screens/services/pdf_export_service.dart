@@ -10,6 +10,8 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 
 import '../../models/animal.dart';
 
+import '../../utils/constants.dart';
+
 class PdfExportService {
   /// Génère l'inventaire des animaux
   Future<void> generateInventoryPdf({
@@ -60,7 +62,7 @@ class PdfExportService {
       children: [
         pw.Text(
           farmName,
-          style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold),
+          style: pw.TextStyle(fontSize: AppConstants.fontSizeLarge, fontWeight: pw.FontWeight.bold),
         ),
         pw.SizedBox(height: 10),
         pw.Divider(),
@@ -70,11 +72,11 @@ class PdfExportService {
           children: [
             pw.Text(
               title,
-              style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
+              style: pw.TextStyle(fontSize: AppConstants.fontSizeMedium, fontWeight: pw.FontWeight.bold),
             ),
             pw.Text(
               '$dateLabel: $date',
-              style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
+              style: const pw.TextStyle(fontSize: AppConstants.fontSizeMicro, color: PdfColors.grey700),
             ),
           ],
         ),
@@ -98,7 +100,7 @@ class PdfExportService {
       children: [
         pw.Text(
           '${translations['total'] ?? 'Total'}: ${alive.length} ${translations['animalsCount'] ?? 'animaux'}',
-          style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
+          style: pw.TextStyle(fontSize: AppConstants.fontSizeSmall, fontWeight: pw.FontWeight.bold),
         ),
         pw.SizedBox(height: 10),
         pw.Table(
@@ -132,7 +134,7 @@ class PdfExportService {
 
   pw.Widget _buildTableCell(String text, {bool bold = false}) {
     return pw.Padding(
-      padding: const pw.EdgeInsets.all(4),
+      padding: const pw.EdgeInsets.all(AppConstants.spacingTiny),
       child: pw.Text(
         text,
         style: pw.TextStyle(

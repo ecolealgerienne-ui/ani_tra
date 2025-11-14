@@ -37,17 +37,17 @@ class MotherHistoryScreen extends StatelessWidget {
           final offspring = animalProvider.getOffspring(mother.id);
 
           return ListView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppConstants.spacingMedium),
             children: [
               // Informations mère
               _buildMotherCard(context),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: AppConstants.spacingMedium),
 
               // Statistiques
               _buildStatsCard(context, stats),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: AppConstants.spacingMediumLarge),
 
               // Liste descendants
               Text(
@@ -55,18 +55,18 @@ class MotherHistoryScreen extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: AppConstants.spacingExtraSmall),
 
               if (offspring.isEmpty)
                 Card(
                   child: Padding(
-                    padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(AppConstants.spacingMediumLarge),
                     child: Center(
                       child: Column(
                         children: [
                           const Icon(Icons.info_outline,
-                              size: 48, color: Colors.grey),
-                          const SizedBox(height: 8),
+                              size: AppConstants.iconSizeMediumLarge, color: Colors.grey),
+                          const SizedBox(height: AppConstants.spacingExtraSmall),
                           Text(
                             AppLocalizations.of(context)
                                 .translate(AppStrings.noDescendants),
@@ -90,14 +90,14 @@ class MotherHistoryScreen extends StatelessWidget {
   Widget _buildMotherCard(BuildContext context) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppConstants.spacingMedium),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 const Icon(Icons.female, color: Colors.pink),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppConstants.spacingExtraSmall),
                 Text(
                   '${AppLocalizations.of(context).translate(AppStrings.mother)}: ${mother.displayName}',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -106,7 +106,7 @@ class MotherHistoryScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppConstants.spacingExtraSmall),
             Text('${AppLocalizations.of(context).translate(AppStrings.age)}: ${mother.ageInMonths} ${AppLocalizations.of(context).translate(AppStrings.months)} (${mother.ageInDays} ${AppLocalizations.of(context).translate(AppStrings.days)})'),
             if (mother.breedId != null) Text('${AppLocalizations.of(context).translate(AppStrings.breed)}: ${mother.breedId}'),
           ],
@@ -118,7 +118,7 @@ class MotherHistoryScreen extends StatelessWidget {
   Widget _buildStatsCard(BuildContext context, stats) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppConstants.spacingMedium),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -129,7 +129,7 @@ class MotherHistoryScreen extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppConstants.spacingMedium),
             Row(
               children: [
                 Expanded(
@@ -152,7 +152,7 @@ class MotherHistoryScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppConstants.spacingSmall),
             Row(
               children: [
                 Expanded(
@@ -176,10 +176,10 @@ class MotherHistoryScreen extends StatelessWidget {
               ],
             ),
             if (stats.lastBirthDate != null) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: AppConstants.spacingSmall),
               Text(
                 '${AppLocalizations.of(context).translate(AppStrings.lastBirth)}: ${DateFormat('dd/MM/yyyy').format(stats.lastBirthDate!)}',
-                style: const TextStyle(fontSize: 13, color: Colors.grey),
+                style: const TextStyle(fontSize: AppConstants.fontSizeSubtitle, color: Colors.grey),
               ),
             ],
           ],
@@ -195,10 +195,10 @@ class MotherHistoryScreen extends StatelessWidget {
     Color color,
   ) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppConstants.spacingSmall),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
         border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
@@ -207,16 +207,16 @@ class MotherHistoryScreen extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              fontSize: 11,
+              fontSize: AppConstants.fontSizeTiny,
               color: color.withValues(alpha: 0.8),
               fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppConstants.spacingTiny),
           Text(
             value,
             style: TextStyle(
-              fontSize: 18,
+              fontSize: AppConstants.fontSizeImportant,
               fontWeight: FontWeight.bold,
               color: color,
             ),

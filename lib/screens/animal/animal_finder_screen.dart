@@ -401,7 +401,7 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
               Icon(Icons.check_circle,
                   color: Colors.green.shade700,
                   size: AppConstants.iconSizeRegular),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppConstants.spacingExtraSmall),
               Text(
                 '${AppLocalizations.of(context).translate(AppStrings.selected)} (${_selectedAnimals.length})',
                 style: TextStyle(
@@ -411,7 +411,7 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppConstants.spacingExtraSmall),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -456,7 +456,7 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
                 color: Colors.grey.shade600,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppConstants.spacingExtraSmall),
             Text(
               AppLocalizations.of(context)
                   .translate(AppStrings.tryAnotherIdentifier),

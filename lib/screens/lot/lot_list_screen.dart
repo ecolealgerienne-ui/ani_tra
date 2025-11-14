@@ -77,7 +77,7 @@ class _LotListScreenState extends State<LotListScreen> {
                 );
 
                 // ✅ Naviguer vers détail du lot
-                await Future.delayed(const Duration(milliseconds: 300));
+                await Future.delayed(const AppConstants.mediumAnimation);
                 if (!mounted) return;
                 Navigator.push(
                   context,
@@ -179,7 +179,7 @@ class _LotListScreenState extends State<LotListScreen> {
                 );
 
                 // Naviguer vers le nouveau lot
-                await Future.delayed(const Duration(milliseconds: 300));
+                await Future.delayed(const AppConstants.mediumAnimation);
                 if (!mounted) return;
                 Navigator.push(
                   context,
@@ -458,7 +458,7 @@ class _LotListScreenState extends State<LotListScreen> {
           children: [
             Icon(
               Icons.inventory_2,
-              size: 64,
+              size: AppConstants.iconSizeLarge,
               color: Colors.grey.shade300,
             ),
             const SizedBox(height: AppConstants.spacingMedium),

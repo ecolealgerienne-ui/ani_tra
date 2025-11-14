@@ -51,14 +51,14 @@ class SyncScreen extends StatelessWidget {
           }
         },
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppConstants.spacingMedium),
           children: [
             Card(
               color: syncProvider.isOnline
                   ? Colors.green.shade50
                   : Colors.orange.shade50,
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppConstants.spacingMedium),
                 child: Row(
                   children: [
                     Icon(
@@ -70,7 +70,7 @@ class SyncScreen extends StatelessWidget {
                           : Colors.orange.shade700,
                       size: AppConstants.iconSizeMediumLarge,
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: AppConstants.spacingMedium),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -84,7 +84,7 @@ class SyncScreen extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: AppConstants.spacingTiny),
                           Text(
                             syncProvider.isOnline
                                 ? l10n.translate(AppStrings.syncAvailable)
@@ -101,7 +101,7 @@ class SyncScreen extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppConstants.spacingMedium),
             Row(
               children: [
                 Expanded(
@@ -113,7 +113,7 @@ class SyncScreen extends StatelessWidget {
                     color: Colors.orange,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppConstants.spacingSmall),
                 Expanded(
                   child: _StatCard(
                     context: context,
@@ -127,7 +127,7 @@ class SyncScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppConstants.spacingMediumLarge),
             if (syncProvider.pendingDataCount > 0)
               SizedBox(
                 width: double.infinity,
@@ -162,7 +162,7 @@ class SyncScreen extends StatelessWidget {
                           children: [
                             const CircularProgressIndicator(
                                 color: Colors.white),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: AppConstants.spacingSmall),
                             Text(l10n.translate(AppStrings.syncInProgress)),
                           ],
                         )
@@ -171,7 +171,7 @@ class SyncScreen extends StatelessWidget {
                           children: [
                             const Icon(Icons.sync,
                                 size: AppConstants.iconSizeMediumLarge),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: AppConstants.spacingExtraSmall),
                             Text(
                               l10n.translate(AppStrings.syncNow),
                               style: const TextStyle(
@@ -189,10 +189,10 @@ class SyncScreen extends StatelessWidget {
               )
             else
               Container(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(AppConstants.spacingMediumLarge),
                 decoration: BoxDecoration(
                   color: Colors.green.shade50,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
                   border: Border.all(color: Colors.green.shade300),
                 ),
                 child: Column(
@@ -202,7 +202,7 @@ class SyncScreen extends StatelessWidget {
                       color: Colors.green.shade700,
                       size: AppConstants.iconSizeLarge,
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppConstants.spacingSmall),
                     Text(
                       l10n.translate(AppStrings.allDataSynchronized),
                       style: const TextStyle(
@@ -215,18 +215,18 @@ class SyncScreen extends StatelessWidget {
                 ),
               ),
             if (syncProvider.syncError != null) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: AppConstants.spacingMedium),
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppConstants.spacingMedium),
                 decoration: BoxDecoration(
                   color: Colors.red.shade50,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
                   border: Border.all(color: Colors.red.shade300),
                 ),
                 child: Row(
                   children: [
                     Icon(Icons.error, color: Colors.red.shade700),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppConstants.spacingSmall),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -235,7 +235,7 @@ class SyncScreen extends StatelessWidget {
                             l10n.translate(AppStrings.syncError),
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: AppConstants.spacingTiny),
                           Text(
                             syncProvider.syncError!,
                             style: const TextStyle(
@@ -254,14 +254,14 @@ class SyncScreen extends StatelessWidget {
                 ),
               ),
             ],
-            const SizedBox(height: 24),
+            const SizedBox(height: AppConstants.spacingMediumLarge),
             Text(
               l10n.translate(AppStrings.localDataSummary),
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppConstants.spacingSmall),
             _SummaryCard(
               icon: Icons.pets,
               label: l10n.translate(AppStrings.animals),
@@ -326,11 +326,11 @@ class _StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppConstants.spacingMedium),
         child: Column(
           children: [
             Icon(icon, color: color, size: AppConstants.iconSizeMedium),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppConstants.spacingExtraSmall),
             Text(
               value,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -338,7 +338,7 @@ class _StatCard extends StatelessWidget {
                     color: color,
                   ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppConstants.spacingTiny),
             Text(
               label,
               style: Theme.of(context).textTheme.bodySmall,

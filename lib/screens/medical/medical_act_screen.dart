@@ -447,63 +447,63 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
       body: _animal == null && widget.mode == MedicalActMode.singleAnimal
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppConstants.spacingMedium),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Sélection du type d'acte
                   _buildTypeSelector(theme),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppConstants.spacingMediumLarge),
 
                   // Informations animal/lot
                   _buildAnimalInfo(theme),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppConstants.spacingMediumLarge),
 
                   // Vétérinaire prescripteur
                   _buildVeterinarianField(),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppConstants.spacingMediumLarge),
 
                   // Sélection du produit
                   _buildProductSelector(theme),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppConstants.spacingMediumLarge),
 
                   // Informations produit sélectionné
                   if (_selectedProduct != null) ...[
                     _buildProductInfo(theme),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppConstants.spacingMediumLarge),
                   ],
 
                   // Dosage
                   if (_selectedProduct != null) ...[
                     _buildDosageSection(theme),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppConstants.spacingMediumLarge),
                   ],
 
                   // Voie et site d'administration
                   if (_selectedProduct != null) ...[
                     _buildAdministrationSection(theme),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppConstants.spacingMediumLarge),
                   ],
 
                   // Date
                   _buildDateSection(theme),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppConstants.spacingMediumLarge),
 
                   // Rappels (toujours afficher si produit sélectionné)
                   if (_selectedProduct != null) ...[
                     _buildRemindersSection(theme),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppConstants.spacingMediumLarge),
                   ],
 
                   // Délais d'attente
                   if (_selectedProduct != null) ...[
                     _buildWithdrawalPeriods(theme),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppConstants.spacingMediumLarge),
                   ],
 
                   // Notes
                   _buildNotesSection(theme),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: AppConstants.spacingLarge),
 
                   // Boutons d'action
                   _buildActionButtons(theme),
@@ -524,7 +524,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppConstants.spacingSmall),
         SegmentedButton<ProductType>(
           segments: [
             ButtonSegment(
@@ -557,7 +557,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
   Widget _buildAnimalInfo(ThemeData theme) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppConstants.spacingMedium),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -565,8 +565,8 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                 _animal != null) ...[
               Row(
                 children: [
-                  const Icon(Icons.pets, size: 20),
-                  const SizedBox(width: 8),
+                  const Icon(Icons.pets, size: AppConstants.iconSizeRegular),
+                  const SizedBox(width: AppConstants.spacingExtraSmall),
                   Text(
                     '${AppLocalizations.of(context).translate(AppStrings.animal)}: ${_animal!.currentEid ?? _animal!.officialNumber ?? AppLocalizations.of(context).translate(AppStrings.noId)}',
                     style: theme.textTheme.titleSmall,
@@ -574,12 +574,12 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                 ],
               ),
               if (_animalWeight != null) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: AppConstants.spacingExtraSmall),
                 Text(
                     '${AppLocalizations.of(context).translate(AppStrings.weight)}: ${_animalWeight!.toStringAsFixed(1)} kg'),
               ],
               if (_animal!.speciesId != null) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: AppConstants.spacingExtraSmall),
                 Text(
                     '${AppLocalizations.of(context).translate(AppStrings.species)}: ${_animal!.speciesId}'),
               ],
@@ -587,8 +587,8 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                 _batchAnimals != null) ...[
               Row(
                 children: [
-                  const Icon(Icons.group, size: 20),
-                  const SizedBox(width: 8),
+                  const Icon(Icons.group, size: AppConstants.iconSizeRegular),
+                  const SizedBox(width: AppConstants.spacingExtraSmall),
                   Text(
                     '${AppLocalizations.of(context).translate(AppStrings.batch)}: ${_batchAnimals!.length} ${AppLocalizations.of(context).translate(AppStrings.animals)}',
                     style: theme.textTheme.titleSmall,
@@ -596,7 +596,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                 ],
               ),
               if (_averageWeight != null) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: AppConstants.spacingExtraSmall),
                 Text(
                     '${AppLocalizations.of(context).translate(AppStrings.averageWeight)}: ${_averageWeight!.toStringAsFixed(1)} kg'),
               ],
@@ -618,7 +618,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppConstants.spacingSmall),
         DropdownButtonFormField<MedicalProduct>(
           initialValue: _selectedProduct,
           decoration: InputDecoration(
@@ -649,7 +649,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
     return Card(
       color: Colors.blue.shade50,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppConstants.spacingMedium),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -658,14 +658,14 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                 Text(
                     'ℹ️ ${AppLocalizations.of(context).translate(AppStrings.standardCure)}: ${_selectedProduct!.standardCureDays} ${AppLocalizations.of(context).translate(AppStrings.days)}'),
               if (_selectedProduct!.administrationFrequency != null) ...[
-                const SizedBox(height: 4),
+                const SizedBox(height: AppConstants.spacingTiny),
                 Text(
                     'ℹ️ ${AppLocalizations.of(context).translate(AppStrings.administration)}: ${_selectedProduct!.administrationFrequency}'),
               ],
             ] else if (_selectedType == ProductType.vaccine) ...[
               Text(
                   'ℹ️ ${AppLocalizations.of(context).translate(AppStrings.protocol)}: ${_selectedProduct!.vaccinationProtocol ?? AppLocalizations.of(context).translate(AppStrings.single)}'),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppConstants.spacingTiny),
               Text(_selectedProduct!.getProtocolDescription()),
             ],
           ],
@@ -685,7 +685,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppConstants.spacingSmall),
         if (widget.mode == MedicalActMode.singleAnimal) ...[
           TextFormField(
             controller: _dosageController,
@@ -704,24 +704,24 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
           if (_calculatedDosage == null &&
               _selectedProduct?.dosageFormula != null &&
               _animalWeight == null) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: AppConstants.spacingExtraSmall),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppConstants.spacingSmall),
               decoration: BoxDecoration(
                 color: Colors.orange.shade50,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
               ),
               child: Row(
                 children: [
                   Icon(Icons.info_outline,
-                      size: 20, color: Colors.orange.shade700),
-                  const SizedBox(width: 8),
+                      size: AppConstants.iconSizeRegular, color: Colors.orange.shade700),
+                  const SizedBox(width: AppConstants.spacingExtraSmall),
                   Expanded(
                     child: Text(
                       AppLocalizations.of(context)
                           .translate(AppStrings.addWeightToCalculate),
                       style: TextStyle(
-                          fontSize: 12, color: Colors.orange.shade900),
+                          fontSize: AppConstants.fontSizeSmall, color: Colors.orange.shade900),
                     ),
                   ),
                 ],
@@ -732,25 +732,25 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
           Card(
             color: Colors.orange.shade50,
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppConstants.spacingMedium),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (_selectedProduct!.dosageFormula != null)
                     Text(
                         'ℹ️ ${AppLocalizations.of(context).translate(AppStrings.productDosage)}: ${_selectedProduct!.dosageFormula}'),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppConstants.spacingExtraSmall),
                   Text(
                       '💡 ${AppLocalizations.of(context).translate(AppStrings.indicativeCalculation)}:'),
                   if (_averageWeight != null &&
                       _selectedProduct!.dosageFormula != null) ...[
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppConstants.spacingTiny),
                     Text(
                         '   • ${(_averageWeight! * 0.8).toStringAsFixed(0)}kg → ${_selectedProduct!.calculateDosage(_averageWeight! * 0.8)?.toStringAsFixed(1)} ml'),
                     Text(
                         '   • ${_averageWeight!.toStringAsFixed(0)}kg → ${_selectedProduct!.calculateDosage(_averageWeight!)?.toStringAsFixed(1)} ml'),
                   ],
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppConstants.spacingExtraSmall),
                   Text(
                     '⚠️ ${AppLocalizations.of(context).translate(AppStrings.doseIndividually)}',
                     style: const TextStyle(fontWeight: FontWeight.bold),
@@ -776,7 +776,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                 AppLocalizations.of(context).translate(AppStrings.route),
                 style: theme.textTheme.titleSmall,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppConstants.spacingExtraSmall),
               DropdownButtonFormField<String>(
                 initialValue: _selectedRoute,
                 decoration: const InputDecoration(
@@ -802,7 +802,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
             ],
           ),
         ),
-        const SizedBox(width: 16),
+        const SizedBox(width: AppConstants.spacingMedium),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -811,7 +811,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                 AppLocalizations.of(context).translate(AppStrings.site),
                 style: theme.textTheme.titleSmall,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppConstants.spacingExtraSmall),
               DropdownButtonFormField<String>(
                 initialValue: _selectedSite,
                 decoration: const InputDecoration(
@@ -852,7 +852,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppConstants.spacingSmall),
         InkWell(
           onTap: () async {
             final date = await showDatePicker(
@@ -883,14 +883,14 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
   Widget _buildRemindersSection(ThemeData theme) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppConstants.spacingMedium),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                const Icon(Icons.notifications_active, size: 20),
-                const SizedBox(width: 8),
+                const Icon(Icons.notifications_active, size: AppConstants.iconSizeRegular),
+                const SizedBox(width: AppConstants.spacingExtraSmall),
                 Text(
                   AppLocalizations.of(context).translate(AppStrings.reminders),
                   style: theme.textTheme.titleMedium?.copyWith(
@@ -899,7 +899,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppConstants.spacingSmall),
             SwitchListTile(
               title: Text(AppLocalizations.of(context)
                   .translate(AppStrings.sendMeReminders)),
@@ -910,7 +910,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
               },
             ),
             if (_enableReminders) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: AppConstants.spacingSmall),
               ListTile(
                 title: Text(AppLocalizations.of(context)
                     .translate(AppStrings.reminderTime)),
@@ -972,7 +972,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
     return Card(
       color: Colors.orange.shade50,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppConstants.spacingMedium),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -983,7 +983,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppConstants.spacingExtraSmall),
             Text(
                 '${AppLocalizations.of(context).translate(AppStrings.meat)}: ${_selectedProduct!.withdrawalPeriodMeat} ${AppLocalizations.of(context).translate(AppStrings.days)}'),
             Text(
@@ -1005,7 +1005,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppConstants.spacingSmall),
         TextField(
           controller: _notesController,
           maxLines: 3,
@@ -1023,59 +1023,59 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
   Widget _buildVeterinarianField() {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppConstants.spacingMedium),
         child: Column(
           children: [
             Row(
               children: [
                 Icon(Icons.medical_services, color: Colors.blue.shade700),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppConstants.spacingExtraSmall),
                 Text(
                   AppLocalizations.of(context)
                       .translate(AppStrings.prescribingVeterinarian),
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: AppConstants.fontSizeMedium,
                     fontWeight: FontWeight.w600,
                     color: Colors.grey.shade800,
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppConstants.spacingExtraSmall),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
                     color: Colors.grey.shade200,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
                   ),
                   child: Text(
                     AppLocalizations.of(context).translate(AppStrings.optional),
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: AppConstants.fontSizeTiny,
                       color: Colors.grey.shade600,
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppConstants.spacingSmall),
 
             // Si aucun vétérinaire sélectionné
             if (_selectedVetId == null) ...[
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppConstants.spacingMedium),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
                   border: Border.all(color: Colors.grey.shade300),
                 ),
                 child: Column(
                   children: [
                     Icon(
                       Icons.person_search,
-                      size: 48,
+                      size: AppConstants.iconSizeMediumLarge,
                       color: Colors.grey.shade400,
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppConstants.spacingSmall),
                     Text(
                       AppLocalizations.of(context)
                           .translate(AppStrings.noVeterinarianSelected),
@@ -1084,7 +1084,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                         fontStyle: FontStyle.italic,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppConstants.spacingMedium),
                     Row(
                       children: [
                         Expanded(
@@ -1094,11 +1094,11 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                             label: Text(AppLocalizations.of(context)
                                 .translate(AppStrings.search)),
                             style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              padding: const EdgeInsets.symmetric(vertical: AppConstants.spacingSmall),
                             ),
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppConstants.spacingSmall),
                         Expanded(
                           child: OutlinedButton.icon(
                             onPressed: _scanVeterinarianQR,
@@ -1106,7 +1106,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                             label: Text(AppLocalizations.of(context)
                                 .translate(AppStrings.scanQr)),
                             style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              padding: const EdgeInsets.symmetric(vertical: AppConstants.spacingSmall),
                             ),
                           ),
                         ),
@@ -1120,11 +1120,11 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
             // Si vétérinaire sélectionné
             if (_selectedVetId != null) ...[
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppConstants.spacingMedium),
                 decoration: BoxDecoration(
                   color: Colors.green.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.green.shade300, width: 2),
+                  borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
+                  border: Border.all(color: Colors.green.shade300, width: AppConstants.spacingMicro),
                 ),
                 child: Row(
                   children: [
@@ -1134,10 +1134,10 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                       child: Icon(
                         Icons.verified_user,
                         color: Colors.green.shade700,
-                        size: 28,
+                        size: AppConstants.iconSizeMedium,
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: AppConstants.spacingMedium),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1146,14 +1146,14 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                             _selectedVetName ?? '',
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                              fontSize: AppConstants.fontSizeMedium,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: AppConstants.spacingTiny),
                           Text(
                             _selectedVetOrg ?? '',
                             style: TextStyle(
-                              fontSize: 13,
+                              fontSize: AppConstants.fontSizeSubtitle,
                               color: Colors.grey.shade600,
                             ),
                           ),
@@ -1187,7 +1187,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
                 Text(AppLocalizations.of(context).translate(AppStrings.cancel)),
           ),
         ),
-        const SizedBox(width: 16),
+        const SizedBox(width: AppConstants.spacingMedium),
         Expanded(
           child: FilledButton(
             onPressed: _saveAct,
@@ -1266,7 +1266,7 @@ class _VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
               ),
               onChanged: _filterVets,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppConstants.spacingMedium),
             Flexible(
               child: _filtered.isEmpty
                   ? Center(

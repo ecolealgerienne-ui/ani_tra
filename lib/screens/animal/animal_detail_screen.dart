@@ -100,7 +100,7 @@ class _AnimalDetailScreenState extends State<AnimalDetailScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(Icons.qr_code_scanner, size: 100, color: Colors.grey[400]),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppConstants.spacingMediumLarge),
               ElevatedButton.icon(
                 onPressed: _simulateScan,
                 icon: const Icon(Icons.camera_alt),
@@ -199,16 +199,16 @@ class _AnimalHeader extends StatelessWidget {
     final femaleLabel =
         AppLocalizations.of(context).translate(AppStrings.female);
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppConstants.spacingMedium),
       color: Colors.blue[50],
       child: Row(
         children: [
           Icon(
             animal.sex == AnimalSex.male ? Icons.male : Icons.female,
-            size: 32,
+            size: AppConstants.iconSizeMedium,
             color: animal.sex == AnimalSex.male ? Colors.blue : Colors.pink,
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppConstants.spacingSmall),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,7 +216,7 @@ class _AnimalHeader extends StatelessWidget {
                 Text(
                   animal.displayName,
                   style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
+                      fontSize: AppConstants.fontSizeImportant, fontWeight: FontWeight.bold),
                 ),
 
                 Text(
@@ -232,7 +232,7 @@ class _AnimalHeader extends StatelessWidget {
                       style: TextStyle(
                         color: Colors.blue[700],
                         fontWeight: FontWeight.w500,
-                        fontSize: 13,
+                        fontSize: AppConstants.fontSizeSubtitle,
                       ),
                     ),
                   ),
@@ -410,29 +410,29 @@ class _InfosTab extends StatelessWidget {
     final femaleLabel =
         AppLocalizations.of(context).translate(AppStrings.female);
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppConstants.spacingMedium),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 🚨 BANNIÈRE DRAFT
           if (currentAnimal.isDraft) ...[
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppConstants.spacingSmall),
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
                 color: Colors.amber.shade50,
-                border: Border.all(color: Colors.amber, width: 2),
-                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.amber, width: AppConstants.spacingMicro),
+                borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
               ),
               child: Row(
                 children: [
                   Icon(Icons.info, color: Colors.amber.shade700),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppConstants.spacingExtraSmall),
                   Expanded(
                     child: Text(
                       AppLocalizations.of(context).translate(AppStrings.draftModeBanner),
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: AppConstants.fontSizeSmall,
                         color: Colors.amber.shade700,
                         fontWeight: FontWeight.w500,
                       ),
@@ -445,7 +445,7 @@ class _InfosTab extends StatelessWidget {
 
           // 🆕 SECTION ALERTES EN PREMIER
           AlertsSection(animalId: currentAnimal.id),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppConstants.spacingMedium),
           _InfoCard(
             title: AppLocalizations.of(context).translate(AppStrings.basicInformation),
             children: [
@@ -500,7 +500,7 @@ class _InfosTab extends StatelessWidget {
                 ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppConstants.spacingMedium),
 
           // ÉTAPE 7 : Section Type et Race
           if (currentAnimal.hasSpecies)
@@ -532,7 +532,7 @@ class _InfosTab extends StatelessWidget {
               ],
             ),
 
-          if (currentAnimal.hasSpecies) const SizedBox(height: 16),
+          if (currentAnimal.hasSpecies) const SizedBox(height: AppConstants.spacingMedium),
 
           // NOUVEAU : Section Identification RFID
           _InfoCard(
@@ -554,20 +554,20 @@ class _InfosTab extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(AppConstants.spacingExtraSmall),
                     decoration: BoxDecoration(
                       color: Colors.blue.shade50,
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(AppConstants.borderRadiusTiny),
                     ),
                     child: Row(
                       children: [
                         Icon(Icons.history,
-                            size: 16, color: Colors.blue.shade700),
-                        const SizedBox(width: 8),
+                            size: AppConstants.iconSizeXSmall, color: Colors.blue.shade700),
+                        const SizedBox(width: AppConstants.spacingExtraSmall),
                         Text(
                           '${currentAnimal.eidHistory!.length} ${AppLocalizations.of(context).translate(AppStrings.eidChangesRecorded)}',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: AppConstants.fontSizeSmall,
                             color: Colors.blue.shade900,
                           ),
                         ),
@@ -578,13 +578,13 @@ class _InfosTab extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppConstants.spacingMedium),
 
           // Historique des changements d'EID (si existant)
           if (currentAnimal.eidHistory != null &&
               currentAnimal.eidHistory!.isNotEmpty) ...[
             EidHistoryCard(history: currentAnimal.eidHistory!),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppConstants.spacingMedium),
           ],
 
           _InfoCard(
@@ -618,19 +618,19 @@ class _InfosTab extends StatelessWidget {
                         .translate(AppStrings.noWeightRecorded))),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppConstants.spacingMedium),
           _InfoCard(
             title: AppLocalizations.of(context).translate(AppStrings.withdrawal),
             children: [
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(AppConstants.spacingSmall),
                 decoration: BoxDecoration(
                   color:
                       hasActiveWithdrawal ? Colors.red[50] : Colors.green[50],
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
                   border: Border.all(
                     color: hasActiveWithdrawal ? Colors.red : Colors.green,
-                    width: 2,
+                    width: AppConstants.spacingMicro,
                   ),
                 ),
                 child: Row(
@@ -638,16 +638,16 @@ class _InfosTab extends StatelessWidget {
                     Icon(
                       hasActiveWithdrawal ? Icons.warning : Icons.check_circle,
                       color: hasActiveWithdrawal ? Colors.red : Colors.green,
-                      size: 32,
+                      size: AppConstants.iconSizeMedium,
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppConstants.spacingSmall),
                     Expanded(
                       child: Text(
                         hasActiveWithdrawal
                             ? AppLocalizations.of(context).translate(AppStrings.doNotSlaughter)
                             : AppLocalizations.of(context).translate(AppStrings.okForSlaughter),
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: AppConstants.fontSizeMedium,
                           fontWeight: FontWeight.bold,
                           color:
                               hasActiveWithdrawal ? Colors.red : Colors.green,
@@ -659,7 +659,7 @@ class _InfosTab extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppConstants.spacingMedium),
           // ✅ Invisible si DRAFT
           if (!currentAnimal.isDraft)
             OutlinedButton.icon(
@@ -686,7 +686,7 @@ class _InfosTab extends StatelessWidget {
 
           // ✅ BOUTONS DRAFT (Modifier, Valider, Supprimer)
           if (currentAnimal.isDraft) ...[
-            const SizedBox(height: 24),
+            const SizedBox(height: AppConstants.spacingMediumLarge),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               decoration: BoxDecoration(
@@ -715,7 +715,7 @@ class _InfosTab extends StatelessWidget {
                       foregroundColor: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppConstants.spacingExtraSmall),
 
                   // Bouton Valider
                   ElevatedButton.icon(
@@ -757,7 +757,7 @@ class _InfosTab extends StatelessWidget {
                       foregroundColor: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppConstants.spacingExtraSmall),
 
                   // Bouton Supprimer
                   ElevatedButton.icon(
@@ -856,27 +856,27 @@ class _SoinsTab extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.medical_services,
-                          size: 64, color: Colors.grey[400]),
-                      const SizedBox(height: 16),
+                          size: AppConstants.iconSizeLarge, color: Colors.grey[400]),
+                      const SizedBox(height: AppConstants.spacingMedium),
                       Text(AppLocalizations.of(context).translate(AppStrings.noCareRecorded),
                           style: TextStyle(color: Colors.grey[600])),
                     ],
                   ),
                 )
               : ListView(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(AppConstants.spacingMedium),
                   children: [
                     if (vaccinations.isNotEmpty) ...[
                       Row(
                         children: [
                           const Icon(Icons.vaccines,
-                              color: Colors.green, size: 20),
-                          const SizedBox(width: 8),
+                              color: Colors.green, size: AppConstants.iconSizeRegular),
+                          const SizedBox(width: AppConstants.spacingExtraSmall),
                           Text(
                             AppLocalizations.of(context)
                                 .translate(AppStrings.vaccinations),
                             style: const TextStyle(
-                              fontSize: 16,
+                              fontSize: AppConstants.fontSizeMedium,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -884,27 +884,27 @@ class _SoinsTab extends StatelessWidget {
                           Text(
                             '${vaccinations.length}',
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: AppConstants.fontSizeBody,
                               color: Colors.grey[600],
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppConstants.spacingExtraSmall),
                       ...vaccinations
                           .map((v) => _VaccinationCard(vaccination: v)),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppConstants.spacingMediumLarge),
                     ],
                     if (treatments.isNotEmpty) ...[
                       Row(
                         children: [
                           const Icon(Icons.medical_services,
-                              color: Colors.blue, size: 20),
-                          const SizedBox(width: 8),
+                              color: Colors.blue, size: AppConstants.iconSizeRegular),
+                          const SizedBox(width: AppConstants.spacingExtraSmall),
                           Text(
                             AppLocalizations.of(context).translate(AppStrings.treatments),
                             style: const TextStyle(
-                              fontSize: 16,
+                              fontSize: AppConstants.fontSizeMedium,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -912,20 +912,20 @@ class _SoinsTab extends StatelessWidget {
                           Text(
                             '${treatments.length}',
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: AppConstants.fontSizeBody,
                               color: Colors.grey[600],
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppConstants.spacingExtraSmall),
                       ...treatments.map((t) => _TreatmentCard(treatment: t)),
                     ],
                   ],
                 ),
         ),
         Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppConstants.spacingMedium),
           child: ElevatedButton.icon(
             onPressed: animal.canReceiveCare
                 ? () {
@@ -990,47 +990,47 @@ class _TreatmentCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppConstants.spacingMedium),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 const Icon(Icons.medical_services, color: Colors.blue),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppConstants.spacingExtraSmall),
                 Expanded(
                   child: Text(
                     treatment.productName,
                     style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold),
+                        fontSize: AppConstants.fontSizeMedium, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppConstants.spacingExtraSmall),
             Row(
               children: [
-                const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
-                const SizedBox(width: 4),
+                const Icon(Icons.calendar_today, size: AppConstants.iconSizeXSmall, color: Colors.grey),
+                const SizedBox(width: AppConstants.spacingTiny),
                 Text(_formatDate(treatment.treatmentDate)),
               ],
             ),
             if (treatment.veterinarianName != null) ...[
-              const SizedBox(height: 4),
+              const SizedBox(height: AppConstants.spacingTiny),
               Row(
                 children: [
-                  const Icon(Icons.person, size: 16, color: Colors.grey),
-                  const SizedBox(width: 4),
+                  const Icon(Icons.person, size: AppConstants.iconSizeXSmall, color: Colors.grey),
+                  const SizedBox(width: AppConstants.spacingTiny),
                   Text('${AppLocalizations.of(context).translate(AppStrings.drPrefix)}${treatment.veterinarianName}'),
                 ],
               ),
             ],
-            const SizedBox(height: 8),
+            const SizedBox(height: AppConstants.spacingExtraSmall),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 color: withdrawalColor.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(AppConstants.borderRadiusTiny),
                 border: Border.all(color: withdrawalColor),
               ),
               child: Text(
@@ -1083,20 +1083,20 @@ class _GenealogieTab extends StatelessWidget {
         animalProvider.animals.where((a) => a.motherId == animal.id).toList();
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppConstants.spacingMedium),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(AppLocalizations.of(context).translate(AppStrings.mother),
               style:
-                  const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
+                  const TextStyle(fontSize: AppConstants.fontSizeImportant, fontWeight: FontWeight.bold)),
+          const SizedBox(height: AppConstants.spacingExtraSmall),
           if (mother != null)
             ListTile(
               leading: const Icon(Icons.family_restroom, color: Colors.pink),
               title: Text(mother.displayName),
               subtitle: Text(_getAgeFormatted(mother, context)),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              trailing: const Icon(Icons.arrow_forward_ios, size: AppConstants.iconSizeXSmall),
               onTap: () {
                 Navigator.push(
                   context,
@@ -1108,15 +1108,15 @@ class _GenealogieTab extends StatelessWidget {
               },
               tileColor: Colors.pink[50],
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
+                  borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium)),
             )
           else
             const Text('Mère inconnue', style: TextStyle(color: Colors.grey)),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppConstants.spacingMediumLarge),
           Text('Descendants (${children.length})',
               style:
-                  const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
+                  const TextStyle(fontSize: AppConstants.fontSizeImportant, fontWeight: FontWeight.bold)),
+          const SizedBox(height: AppConstants.spacingExtraSmall),
           if (children.isEmpty)
             Text(AppLocalizations.of(context).translate(AppStrings.noOffspring), style: const TextStyle(color: Colors.grey))
           else
@@ -1131,7 +1131,7 @@ class _GenealogieTab extends StatelessWidget {
                     ),
                     title: Text(child.displayName),
                     subtitle: Text(_getAgeFormatted(child, context)),
-                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: AppConstants.iconSizeXSmall),
                     onTap: () {
                       Navigator.push(
                         context,
@@ -1143,7 +1143,7 @@ class _GenealogieTab extends StatelessWidget {
                     },
                     tileColor: Colors.blue[50],
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)),
+                        borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium)),
                   ),
                 )),
         ],
@@ -1168,7 +1168,7 @@ class _InfoCard extends StatelessWidget {
     return Card(
       elevation: 2,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppConstants.spacingMedium),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1177,11 +1177,11 @@ class _InfoCard extends StatelessWidget {
               children: [
                 Text(title,
                     style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold)),
+                        fontSize: AppConstants.fontSizeImportant, fontWeight: FontWeight.bold)),
                 if (trailing != null) trailing!,
               ],
             ),
-            const Divider(height: 24),
+            const Divider(height: AppConstants.spacingMediumLarge),
             ...children,
           ],
         ),
@@ -1220,7 +1220,7 @@ class _InfoRow extends StatelessWidget {
                 if (icon != null) ...[
                   Text(
                     icon!,
-                    style: const TextStyle(fontSize: 18),
+                    style: const TextStyle(fontSize: AppConstants.fontSizeImportant),
                   ),
                   const SizedBox(width: 6),
                 ],
@@ -1299,7 +1299,7 @@ class _VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
               ),
               onChanged: _filterVets,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppConstants.spacingMedium),
             Expanded(
               child: ListView.builder(
                 shrinkWrap: true,
@@ -1350,14 +1350,14 @@ class AlertsSection extends StatelessWidget {
           elevation: 3,
           color: _getBackgroundColor(mostUrgent.type),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
             side: BorderSide(
               color: _getColor(mostUrgent.type),
-              width: 2,
+              width: AppConstants.spacingMicro,
             ),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppConstants.spacingMedium),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -1366,16 +1366,16 @@ class AlertsSection extends StatelessWidget {
                     Icon(
                       _getIcon(mostUrgent.type),
                       color: _getColor(mostUrgent.type),
-                      size: 28,
+                      size: AppConstants.iconSizeMedium,
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppConstants.spacingSmall),
                     Expanded(
                       child: Text(
                         alerts.length == 1
                             ? AppLocalizations.of(context).translate(AppStrings.activeAlert)
                             : '${alerts.length} ${AppLocalizations.of(context).translate(AppStrings.activeAlerts)}',
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: AppConstants.fontSizeImportant,
                           fontWeight: FontWeight.bold,
                           color: _getColor(mostUrgent.type),
                         ),
@@ -1394,14 +1394,14 @@ class AlertsSection extends StatelessWidget {
                         _getPriorityLabel(context, mostUrgent.type),
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 12,
+                          fontSize: AppConstants.fontSizeSmall,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppConstants.spacingMedium),
                 ...alerts.map((alert) => _buildAlertItem(alert, context)),
               ],
             ),
@@ -1414,10 +1414,10 @@ class AlertsSection extends StatelessWidget {
   Widget _buildAlertItem(Alert alert, BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppConstants.spacingSmall),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
         border: Border.all(
           color: _getColor(alert.type).withValues(alpha: 0.3),
         ),
@@ -1430,16 +1430,16 @@ class AlertsSection extends StatelessWidget {
             height: 36,
             decoration: BoxDecoration(
               color: _getColor(alert.type).withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
             ),
             child: Center(
               child: Text(
                 alert.category.icon,
-                style: const TextStyle(fontSize: 18),
+                style: const TextStyle(fontSize: AppConstants.fontSizeImportant),
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppConstants.spacingSmall),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1447,18 +1447,18 @@ class AlertsSection extends StatelessWidget {
                 Text(
                   alert.getTitle(context),
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: AppConstants.fontSizeLabel,
                     fontWeight: FontWeight.w600,
                     color: _getColor(alert.type),
                   ),
                 ),
                 // ✅ PHASE 4 FIX: Afficher le message aussi
                 if (alert.message.isNotEmpty) ...[
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppConstants.spacingTiny),
                   Text(
                     alert.getMessage(context),
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: AppConstants.fontSizeSubtitle,
                       color: Colors.grey[700],
                     ),
                   ),
@@ -1469,7 +1469,7 @@ class AlertsSection extends StatelessWidget {
           Icon(
             _getIcon(alert.type),
             color: _getColor(alert.type),
-            size: 20,
+            size: AppConstants.iconSizeRegular,
           ),
         ],
       ),
@@ -1556,21 +1556,21 @@ class _VaccinationCard extends StatelessWidget {
             ),
           );
         },
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppConstants.spacingMedium),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
                   const Icon(Icons.vaccines, color: Colors.green),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppConstants.spacingExtraSmall),
                   Expanded(
                     child: Text(
                       vaccination.vaccineName,
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: AppConstants.fontSizeMedium,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -1582,12 +1582,12 @@ class _VaccinationCard extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: typeColor.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(AppConstants.borderRadiusTiny),
                     ),
                     child: Text(
                       vaccination.type.label,
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: AppConstants.fontSizeTiny,
                         fontWeight: FontWeight.bold,
                         color: typeColor,
                       ),
@@ -1595,32 +1595,32 @@ class _VaccinationCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppConstants.spacingExtraSmall),
               Row(
                 children: [
                   const Icon(Icons.medical_services,
-                      size: 14, color: Colors.grey),
-                  const SizedBox(width: 4),
+                      size: AppConstants.iconSizeTiny, color: Colors.grey),
+                  const SizedBox(width: AppConstants.spacingTiny),
                   Text(
                     vaccination.disease,
-                    style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                    style: TextStyle(fontSize: AppConstants.fontSizeSubtitle, color: Colors.grey[700]),
                   ),
                 ],
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppConstants.spacingTiny),
               Row(
                 children: [
                   const Icon(Icons.calendar_today,
-                      size: 14, color: Colors.grey),
-                  const SizedBox(width: 4),
+                      size: AppConstants.iconSizeTiny, color: Colors.grey),
+                  const SizedBox(width: AppConstants.spacingTiny),
                   Text(
                     _formatDate(vaccination.vaccinationDate),
-                    style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                    style: TextStyle(fontSize: AppConstants.fontSizeSubtitle, color: Colors.grey[700]),
                   ),
                 ],
               ),
               if (vaccination.nextDueDate != null) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: AppConstants.spacingExtraSmall),
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8,
@@ -1632,7 +1632,7 @@ class _VaccinationCard extends StatelessWidget {
                             ? Colors.red.withValues(alpha: 0.1)
                             : Colors.orange.withValues(alpha: 0.1))
                         : Colors.blue.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(AppConstants.borderRadiusTiny),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -1641,14 +1641,14 @@ class _VaccinationCard extends StatelessWidget {
                         vaccination.daysUntilReminder! < 0
                             ? Icons.error
                             : Icons.notifications,
-                        size: 14,
+                        size: AppConstants.iconSizeTiny,
                         color: vaccination.isReminderDue
                             ? (vaccination.daysUntilReminder! < 0
                                 ? Colors.red
                                 : Colors.orange)
                             : Colors.blue,
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppConstants.spacingTiny),
                       Text(
                         vaccination.daysUntilReminder! < 0
                             ? AppLocalizations.of(context)
@@ -1658,7 +1658,7 @@ class _VaccinationCard extends StatelessWidget {
                                 .replaceAll('{days}',
                                     '${vaccination.daysUntilReminder}'),
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: AppConstants.fontSizeSmall,
                           color: vaccination.isReminderDue
                               ? (vaccination.daysUntilReminder! < 0
                                   ? Colors.red

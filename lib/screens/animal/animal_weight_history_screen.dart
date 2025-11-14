@@ -84,28 +84,28 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
   Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppConstants.spacingLarge),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.monitor_weight, size: 80, color: Colors.grey.shade400),
-            const SizedBox(height: 24),
+            Icon(Icons.monitor_weight, size: AppConstants.iconSizeHuge, color: Colors.grey.shade400),
+            const SizedBox(height: AppConstants.spacingMediumLarge),
             Text(
               AppLocalizations.of(context).translate(AppStrings.noWeights),
               style: TextStyle(
-                fontSize: 20,
+                fontSize: AppConstants.fontSizeLarge,
                 fontWeight: FontWeight.bold,
                 color: Colors.grey.shade700,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppConstants.spacingSmall),
             Text(
               AppLocalizations.of(context)
                   .translate(AppStrings.noWeightsMessage),
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+              style: TextStyle(fontSize: AppConstants.fontSizeBody, color: Colors.grey.shade600),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppConstants.spacingMediumLarge),
             ElevatedButton.icon(
               onPressed: () {
                 Navigator.push(
@@ -133,7 +133,7 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
     final sexIcon = animal.sex == AnimalSex.male ? Icons.male : Icons.female;
 
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppConstants.spacingMediumLarge),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -149,9 +149,9 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
           CircleAvatar(
             radius: 36,
             backgroundColor: sexColor.withValues(alpha: 0.2),
-            child: Icon(sexIcon, size: 40, color: sexColor),
+            child: Icon(sexIcon, size: AppConstants.headerIconSize, color: sexColor),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: AppConstants.spacingMedium),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,23 +161,23 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                       AppLocalizations.of(context)
                           .translate(AppStrings.noNumber),
                   style: const TextStyle(
-                    fontSize: 20,
+                    fontSize: AppConstants.fontSizeLarge,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppConstants.spacingTiny),
                 Text(
                   animal.displayName,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: AppConstants.fontSizeBody,
                     color: Colors.grey.shade700,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppConstants.spacingTiny),
                 Text(
                   _getAnimalAge(),
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: AppConstants.fontSizeSmall,
                     color: Colors.grey.shade600,
                   ),
                 ),
@@ -216,26 +216,26 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
     }
 
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppConstants.spacingMedium),
       child: Card(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppConstants.spacingMedium),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  const Icon(Icons.analytics, size: 20),
-                  const SizedBox(width: 8),
+                  const Icon(Icons.analytics, size: AppConstants.iconSizeRegular),
+                  const SizedBox(width: AppConstants.spacingExtraSmall),
                   Text(
                     AppLocalizations.of(context)
                         .translate(AppStrings.statistics),
                     style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold),
+                        fontSize: AppConstants.fontSizeMedium, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
-              const Divider(height: 24),
+              const Divider(height: AppConstants.spacingMediumLarge),
               Row(
                 children: [
                   Expanded(
@@ -250,7 +250,7 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                       Colors.green,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppConstants.spacingSmall),
                   Expanded(
                     child: _buildStatItem(
                       context,
@@ -263,7 +263,7 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppConstants.spacingSmall),
               Row(
                 children: [
                   Expanded(
@@ -278,7 +278,7 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                       Colors.orange,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppConstants.spacingSmall),
                   Expanded(
                     child: _buildStatItem(
                       context,
@@ -291,7 +291,7 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppConstants.spacingSmall),
               _buildStatItem(
                 context,
                 AppLocalizations.of(context).translate(AppStrings.gmq),
@@ -317,15 +317,15 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
     Color color,
   ) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppConstants.spacingSmall),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: color),
-          const SizedBox(width: 8),
+          Icon(icon, size: AppConstants.iconSizeRegular, color: color),
+          const SizedBox(width: AppConstants.spacingExtraSmall),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -333,15 +333,15 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                 Text(
                   label,
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: AppConstants.fontSizeTiny,
                     color: Colors.grey.shade600,
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: AppConstants.spacingMicro),
                 Text(
                   value,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: AppConstants.fontSizeBody,
                     fontWeight: FontWeight.bold,
                     color: color,
                   ),
@@ -357,26 +357,26 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
   /// Widget: Section graphique
   Widget _buildChartSection(BuildContext context, List<WeightRecord> weights) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppConstants.spacingMedium),
       child: Card(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppConstants.spacingMedium),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  const Icon(Icons.show_chart, size: 20),
-                  const SizedBox(width: 8),
+                  const Icon(Icons.show_chart, size: AppConstants.iconSizeRegular),
+                  const SizedBox(width: AppConstants.spacingExtraSmall),
                   Text(
                     AppLocalizations.of(context)
                         .translate(AppStrings.weightEvolution),
                     style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold),
+                        fontSize: AppConstants.fontSizeMedium, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppConstants.spacingMedium),
               SizedBox(
                 height: 180,
                 child: CustomPaint(
@@ -384,11 +384,11 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                   child: Container(),
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppConstants.spacingExtraSmall),
               Center(
                 child: Text(
                   'Évolution sur ${weights.length} pesées',
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                  style: TextStyle(fontSize: AppConstants.fontSizeSmall, color: Colors.grey.shade600),
                 ),
               ),
             ],
@@ -401,22 +401,22 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
   /// Widget: Liste des pesées
   Widget _buildWeightsList(BuildContext context, List<WeightRecord> weights) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppConstants.spacingMedium),
       child: Card(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppConstants.spacingMedium),
               child: Row(
                 children: [
-                  const Icon(Icons.history, size: 20),
-                  const SizedBox(width: 8),
+                  const Icon(Icons.history, size: AppConstants.iconSizeRegular),
+                  const SizedBox(width: AppConstants.spacingExtraSmall),
                   Text(
                     AppLocalizations.of(context)
                         .translate(AppStrings.fullHistory),
                     style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold),
+                        fontSize: AppConstants.fontSizeMedium, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -446,8 +446,8 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
 
                 return ListTile(
                   leading: Container(
-                    width: 48,
-                    height: 48,
+                    width: AppConstants.spacingXLarge,
+                    height: AppConstants.spacingXLarge,
                     decoration: BoxDecoration(
                       color: isLatest
                           ? Colors.green.shade100
@@ -457,7 +457,7 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                     child: Center(
                       child: Text(
                         weight.sourceIcon,
-                        style: const TextStyle(fontSize: 20),
+                        style: const TextStyle(fontSize: AppConstants.fontSizeLarge),
                       ),
                     ),
                   ),
@@ -466,13 +466,13 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                       Text(
                         weight.formattedWeight,
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: AppConstants.fontSizeMedium,
                           fontWeight:
                               isLatest ? FontWeight.bold : FontWeight.normal,
                         ),
                       ),
                       if (isLatest) ...[
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppConstants.spacingExtraSmall),
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 6,
@@ -480,7 +480,7 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: AppConstants.successGreen,
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: BorderRadius.circular(AppConstants.borderRadiusTiny),
                           ),
                           child: Text(
                             AppLocalizations.of(context)
@@ -503,7 +503,7 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                         Text(
                           diffText,
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: AppConstants.fontSizeSmall,
                             color: diffColor,
                             fontWeight: FontWeight.w500,
                           ),
@@ -512,7 +512,7 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                         Text(
                           weight.notes!,
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: AppConstants.fontSizeTiny,
                             fontStyle: FontStyle.italic,
                             color: Colors.grey.shade600,
                           ),
@@ -526,12 +526,12 @@ class AnimalWeightHistoryScreen extends StatelessWidget {
                     children: [
                       Text(
                         weight.sourceLabel,
-                        style: const TextStyle(fontSize: 11),
+                        style: const TextStyle(fontSize: AppConstants.fontSizeTiny),
                       ),
                       if (!weight.synced)
                         Icon(
                           Icons.sync_disabled,
-                          size: 14,
+                          size: AppConstants.iconSizeTiny,
                           color: Colors.orange.shade700,
                         ),
                     ],

@@ -194,11 +194,14 @@ class AppConstants {
 
   // ========== SETTINGS SCREEN ==========
   // ============ SPACING ============
+  static const double spacingMicro = 2.0;
   static const double spacingTiny = 4.0;
   static const double spacingExtraSmall = 8.0;
   static const double spacingSmall = 12.0;
   static const double spacingMedium = 16.0;
+  static const double spacingMediumLarge = 24.0;
   static const double spacingLarge = 32.0;
+  static const double spacingXLarge = 48.0;
 
   // ============ AVATAR SIZES ============
   static const double avatarRadiusMedium = 24.0;

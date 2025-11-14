@@ -212,10 +212,10 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
             ),
           if (_isSaving)
             const Padding(
-              padding: EdgeInsets.all(16),
+              padding: EdgeInsets.all(AppConstants.spacingMedium),
               child: SizedBox(
-                width: 24,
-                height: 24,
+                width: AppConstants.spacingMediumLarge,
+                height: AppConstants.spacingMediumLarge,
                 child: CircularProgressIndicator(
                   color: Colors.white,
                   strokeWidth: 2,
@@ -227,20 +227,20 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppConstants.spacingMedium),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildContextBanner(context),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppConstants.spacingMediumLarge),
               _buildProductField(context, products),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppConstants.spacingMedium),
               _buildDoseField(context),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppConstants.spacingMedium),
               _buildDateField(context, dateFormat),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppConstants.spacingMediumLarge),
               _buildVeterinarianSection(context),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppConstants.spacingMediumLarge),
               _buildNotesField(context),
             ],
           ),
@@ -251,10 +251,10 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
 
   Widget _buildContextBanner(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppConstants.spacingMedium),
       decoration: BoxDecoration(
         color: Colors.blue.shade50,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
         border: Border.all(color: Colors.blue.shade200),
       ),
       child: Row(
@@ -264,7 +264,7 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
             color: Colors.blue.shade700,
             size: AppConstants.iconSizeMedium,
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: AppConstants.spacingMedium),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -281,7 +281,7 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                     color: Colors.blue.shade900,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppConstants.spacingTiny),
                 Text(
                   _animalCount == 1
                       ? AppLocalizations.of(context)
@@ -416,7 +416,7 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
         Row(
           children: [
             Icon(Icons.medical_services, color: Colors.blue.shade700),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppConstants.spacingExtraSmall),
             Text(
               AppLocalizations.of(context).translate(AppStrings.veterinarian),
               style: TextStyle(
@@ -425,12 +425,12 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                 color: Colors.grey.shade800,
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppConstants.spacingExtraSmall),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
                 color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
               ),
               child: Text(
                 AppLocalizations.of(context).translate(AppStrings.optional),
@@ -442,13 +442,13 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppConstants.spacingSmall),
         if (_selectedVetId == null) ...[
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppConstants.spacingMedium),
             decoration: BoxDecoration(
               color: Colors.grey.shade100,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
               border: Border.all(color: Colors.grey.shade300),
             ),
             child: Column(
@@ -458,7 +458,7 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                   size: AppConstants.iconSizeMediumLarge,
                   color: Colors.grey.shade400,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppConstants.spacingSmall),
                 Text(
                   AppLocalizations.of(context)
                       .translate(AppStrings.noVeterinarianSelected),
@@ -467,7 +467,7 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                     fontStyle: FontStyle.italic,
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppConstants.spacingMedium),
                 Row(
                   children: [
                     Expanded(
@@ -477,11 +477,11 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                         label: Text(AppLocalizations.of(context)
                             .translate(AppStrings.search)),
                         style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          padding: const EdgeInsets.symmetric(vertical: AppConstants.spacingSmall),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppConstants.spacingSmall),
                     Expanded(
                       child: OutlinedButton.icon(
                         onPressed: _scanVeterinarianQR,
@@ -489,7 +489,7 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                         label: Text(AppLocalizations.of(context)
                             .translate(AppStrings.scanQr)),
                         style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          padding: const EdgeInsets.symmetric(vertical: AppConstants.spacingSmall),
                         ),
                       ),
                     ),
@@ -501,11 +501,11 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
         ],
         if (_selectedVetId != null) ...[
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppConstants.spacingMedium),
             decoration: BoxDecoration(
               color: Colors.green.shade50,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.green.shade300, width: 2),
+              borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
+              border: Border.all(color: Colors.green.shade300, width: AppConstants.spacingMicro),
             ),
             child: Row(
               children: [
@@ -518,7 +518,7 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                     size: AppConstants.iconSizeMedium,
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: AppConstants.spacingMedium),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -530,7 +530,7 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                           fontSize: AppConstants.fontSizeSectionTitle,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppConstants.spacingTiny),
                       Text(
                         _selectedVetOrg ?? '',
                         style: TextStyle(
@@ -642,7 +642,7 @@ class _VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
               ),
               onChanged: _filterVets,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppConstants.spacingMedium),
             Flexible(
               child: _filtered.isEmpty
                   ? Center(

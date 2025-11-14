@@ -268,7 +268,7 @@ class LotDetailScreen extends StatelessWidget {
                         fontSize: AppConstants.fontSizeSmall,
                         color: Colors.grey.shade700),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: AppConstants.spacingMicro),
                   Text(
                     statusText,
                     style: TextStyle(

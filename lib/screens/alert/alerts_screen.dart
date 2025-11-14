@@ -51,7 +51,7 @@ class AlertsScreen extends StatelessWidget {
                       '$count',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: AppConstants.fontSizeMedium,
                       ),
                     ),
                   ),
@@ -74,11 +74,11 @@ class AlertsScreen extends StatelessWidget {
               await Future.delayed(AppConstants.longAnimation);
             },
             child: ListView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppConstants.spacingMedium),
               children: [
                 // Résumé en haut
                 _buildSummaryCard(context, alertProvider),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppConstants.spacingMediumLarge),
 
                 // Alertes URGENTES
                 if (alertProvider.urgentAlerts.isNotEmpty) ...[
@@ -90,12 +90,12 @@ class AlertsScreen extends StatelessWidget {
                     count: alertProvider.urgentAlertCount,
                     color: Colors.red.shade700,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppConstants.spacingSmall),
                   ...alertProvider.urgentAlerts.map(
                     (alert) =>
                         _buildAlertCard(context, alert, Colors.red.shade700),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppConstants.spacingMediumLarge),
                 ],
 
                 // Alertes IMPORTANTES
@@ -108,12 +108,12 @@ class AlertsScreen extends StatelessWidget {
                     count: alertProvider.importantAlertCount,
                     color: Colors.orange.shade700,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppConstants.spacingSmall),
                   ...alertProvider.importantAlerts.map(
                     (alert) =>
                         _buildAlertCard(context, alert, Colors.orange.shade700),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppConstants.spacingMediumLarge),
                 ],
 
                 // Alertes ROUTINE
@@ -126,7 +126,7 @@ class AlertsScreen extends StatelessWidget {
                     count: alertProvider.routineAlerts.length,
                     color: Colors.blue.shade700,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppConstants.spacingSmall),
                   ...alertProvider.routineAlerts.map(
                     (alert) =>
                         _buildAlertCard(context, alert, Colors.blue.shade700),
@@ -146,34 +146,34 @@ class AlertsScreen extends StatelessWidget {
       builder: (context, alertProvider, child) {
         return Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(AppConstants.spacingMediumLarge),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
                   Icons.check_circle_outline,
-                  size: 80,
+                  size: AppConstants.iconSizeHuge,
                   color: Colors.green.shade300,
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppConstants.spacingMediumLarge),
                 Text(
                   AppLocalizations.of(context)
                       .translate(AppStrings.noAlertsTitle),
                   style: const TextStyle(
-                    fontSize: 24,
+                    fontSize: AppConstants.fontSizeExtraLarge,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppConstants.spacingExtraSmall),
                 Text(
                   AppLocalizations.of(context)
                       .translate(AppStrings.allGoodWithHerd),
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: AppConstants.fontSizeMedium,
                     color: Colors.grey.shade600,
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: AppConstants.spacingLarge),
                 // Bouton pour forcer le recalcul
                 ElevatedButton.icon(
                   onPressed: () {
@@ -190,13 +190,13 @@ class AlertsScreen extends StatelessWidget {
                   label: Text(AppLocalizations.of(context)
                       .translate(AppStrings.recalculateAlerts)),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppConstants.spacingMedium),
                 // Debug info
                 Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(AppConstants.spacingMedium),
                   decoration: BoxDecoration(
                     color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -209,26 +209,26 @@ class AlertsScreen extends StatelessWidget {
                           color: Colors.grey.shade700,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppConstants.spacingExtraSmall),
                       Text(
                         'Alertes urgentes: ${alertProvider.urgentAlertCount}',
                         style: TextStyle(
-                            fontSize: 12, color: Colors.grey.shade600),
+                            fontSize: AppConstants.fontSizeSmall, color: Colors.grey.shade600),
                       ),
                       Text(
                         'Alertes importantes: ${alertProvider.importantAlertCount}',
                         style: TextStyle(
-                            fontSize: 12, color: Colors.grey.shade600),
+                            fontSize: AppConstants.fontSizeSmall, color: Colors.grey.shade600),
                       ),
                       Text(
                         'Alertes routine: ${alertProvider.routineAlerts.length}',
                         style: TextStyle(
-                            fontSize: 12, color: Colors.grey.shade600),
+                            fontSize: AppConstants.fontSizeSmall, color: Colors.grey.shade600),
                       ),
                       Text(
                         'Total: ${alertProvider.alertCount}',
                         style: TextStyle(
-                            fontSize: 12, color: Colors.grey.shade600),
+                            fontSize: AppConstants.fontSizeSmall, color: Colors.grey.shade600),
                       ),
                     ],
                   ),
@@ -266,27 +266,27 @@ class AlertsScreen extends StatelessWidget {
           Row(
             children: [
               const Icon(Icons.notifications_active,
-                  color: Colors.white, size: 28),
-              const SizedBox(width: 12),
+                  color: Colors.white, size: AppConstants.iconSizeMedium),
+              const SizedBox(width: AppConstants.spacingSmall),
               Text(
                 AppLocalizations.of(context).translate(AppStrings.overview),
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 20,
+                  fontSize: AppConstants.fontSizeLarge,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppConstants.spacingMedium),
           Text(
             alertProvider.getSummary(context),
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 16,
+              fontSize: AppConstants.fontSizeMedium,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppConstants.spacingMedium),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -337,17 +337,17 @@ class AlertsScreen extends StatelessWidget {
             '$value',
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 20,
+              fontSize: AppConstants.fontSizeLarge,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppConstants.spacingTiny),
         Text(
           label,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 12,
+            fontSize: AppConstants.fontSizeSmall,
           ),
         ),
       ],
@@ -365,34 +365,34 @@ class AlertsScreen extends StatelessWidget {
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(AppConstants.spacingExtraSmall),
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
           ),
-          child: Icon(icon, color: color, size: 24),
+          child: Icon(icon, color: color, size: AppConstants.iconSizeMedium),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppConstants.spacingSmall),
         Text(
           title,
           style: TextStyle(
-            fontSize: 18,
+            fontSize: AppConstants.fontSizeImportant,
             fontWeight: FontWeight.bold,
             color: color,
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppConstants.spacingExtraSmall),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
           ),
           child: Text(
             '$count',
             style: TextStyle(
               color: color,
-              fontSize: 14,
+              fontSize: AppConstants.fontSizeBody,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -407,14 +407,14 @@ class AlertsScreen extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
         side: BorderSide(color: color.withValues(alpha: 0.3), width: 1),
       ),
       child: InkWell(
         onTap: () => _handleAlertTap(context, alert),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppConstants.spacingMedium),
           child: Row(
             children: [
               // Icône de catégorie
@@ -427,10 +427,10 @@ class AlertsScreen extends StatelessWidget {
                 child: Icon(
                   _getAlertIcon(alert.category),
                   color: color,
-                  size: 24,
+                  size: AppConstants.iconSizeMedium,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: AppConstants.spacingMedium),
 
               // Contenu
               Expanded(
@@ -440,24 +440,24 @@ class AlertsScreen extends StatelessWidget {
                     Text(
                       alert.getTitle(context),
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: AppConstants.fontSizeMedium,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppConstants.spacingTiny),
                     Text(
                       alert.getMessage(context),
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: AppConstants.fontSizeBody,
                         color: Colors.grey.shade600,
                       ),
                     ),
                     if (alert.actionLabel != null) ...[
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppConstants.spacingExtraSmall),
                       Text(
                         alert.actionLabel!,
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: AppConstants.fontSizeSmall,
                           color: color,
                           fontWeight: FontWeight.w500,
                         ),
@@ -471,7 +471,7 @@ class AlertsScreen extends StatelessWidget {
               Icon(
                 Icons.chevron_right,
                 color: Colors.grey.shade400,
-                size: 24,
+                size: AppConstants.iconSizeMedium,
               ),
             ],
           ),

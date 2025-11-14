@@ -44,7 +44,7 @@ class _SaleScreenState extends State<SaleScreen> {
 
     try {
       // Simulate processing
-      await Future.delayed(const Duration(milliseconds: 500));
+      await Future.delayed(const AppConstants.longAnimation);
 
       if (!mounted) return;
 
@@ -212,7 +212,7 @@ class _SaleScreenState extends State<SaleScreen> {
                 Text(AppLocalizations.of(context).translate(AppStrings.cancel)),
           ),
         ),
-        const SizedBox(width: 16),
+        const SizedBox(width: AppConstants.spacingMedium),
         Expanded(
           child: FilledButton(
             onPressed: _isConfirming ? null : _confirmSale,
@@ -222,16 +222,16 @@ class _SaleScreenState extends State<SaleScreen> {
               children: [
                 if (_isConfirming)
                   const SizedBox(
-                    width: 16,
-                    height: 16,
+                    width: AppConstants.spacingMedium,
+                    height: AppConstants.spacingMedium,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
                   )
                 else
-                  const Icon(Icons.check, size: 20),
-                const SizedBox(width: 8),
+                  const Icon(Icons.check, size: AppConstants.iconSizeRegular),
+                const SizedBox(width: AppConstants.spacingExtraSmall),
                 Flexible(
                   child: Text(
                     AppLocalizations.of(context)

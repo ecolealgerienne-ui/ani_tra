@@ -94,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Text(
                     '👤 ${auth.currentUserName} | 🏗️ ${auth.currentFarmName}',
                     style: const TextStyle(
-                      fontSize: 12,
+                      fontSize: AppConstants.fontSizeSmall,
                       fontWeight: FontWeight.normal,
                     ),
                   ),
@@ -127,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       right: 8,
                       top: 8,
                       child: Container(
-                        padding: const EdgeInsets.all(4),
+                        padding: const EdgeInsets.all(AppConstants.spacingTiny),
                         decoration: const BoxDecoration(
                           color: Colors.red,
                           shape: BoxShape.circle,
@@ -140,7 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           alertCount > 9 ? '9+' : '$alertCount',
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 10,
+                            fontSize: AppConstants.fontSizeMicro,
                             fontWeight: FontWeight.bold,
                           ),
                           textAlign: TextAlign.center,
@@ -181,31 +181,31 @@ class _HomeScreenState extends State<HomeScreen> {
               },
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppConstants.spacingMedium),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Barre de recherche
                     _buildSearchBar(context),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppConstants.spacingMediumLarge),
 
                     // Statistiques (3 cartes compactes)
                     _buildStatsCards(context),
 
-                    const SizedBox(height: 32),
+                    const SizedBox(height: AppConstants.spacingLarge),
 
                     // Titre section
                     Text(
                       AppLocalizations.of(context)
                           .translate(AppStrings.quickActions),
                       style: const TextStyle(
-                        fontSize: 20,
+                        fontSize: AppConstants.fontSizeLarge,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppConstants.spacingMedium),
 
                     // 🆕 CARTE 1 : ANIMAUX (grosse carte)
                     _buildMainActionCard(
@@ -226,7 +226,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppConstants.spacingMedium),
 
                     // 🆕 CARTE 2 : LOTS (grosse carte)
                     _buildMainActionCard(
@@ -247,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppConstants.spacingMedium),
 
                     // 🆕 PART3 : CARTE 3 : EXPORT PDF
                     _buildMainActionCard(
@@ -268,7 +268,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppConstants.spacingMediumLarge),
                   ],
                 ),
               ),
@@ -349,9 +349,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 Icon(
                   Icons.error,
                   color: Colors.red.shade700,
-                  size: 24,
+                  size: AppConstants.iconSizeMedium,
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppConstants.spacingSmall),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -359,16 +359,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       Text(
                         firstAlert.getTitle(context),
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: AppConstants.fontSizeBody,
                           fontWeight: FontWeight.bold,
                           color: Colors.red.shade900,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: AppConstants.spacingMicro),
                       Text(
                         firstAlert.getMessage(context),
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: AppConstants.fontSizeSmall,
                           color: Colors.red.shade700,
                         ),
                         maxLines: 1,
@@ -377,7 +377,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppConstants.spacingExtraSmall),
                 if (urgentAlerts.length > 1)
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -386,20 +386,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     decoration: BoxDecoration(
                       color: Colors.red.shade700,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
                     ),
                     child: Text(
                       '+${urgentAlerts.length - 1}',
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 12,
+                        fontSize: AppConstants.fontSizeSmall,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 Icon(
                   Icons.arrow_forward_ios,
-                  size: 16,
+                  size: AppConstants.iconSizeXSmall,
                   color: Colors.red.shade700,
                 ),
               ],
@@ -415,7 +415,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -441,7 +441,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 )
               : null,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
             borderSide: BorderSide.none,
           ),
           filled: true,
@@ -490,7 +490,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Colors.blue,
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppConstants.spacingSmall),
 
             // Stat 2 : Lots actifs
             Expanded(
@@ -503,7 +503,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Colors.orange,
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppConstants.spacingSmall),
 
             // Stat 3 : Alertes urgentes (depuis AlertProvider)
             Expanded(
@@ -556,11 +556,11 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 60,
               decoration: BoxDecoration(
                 color: iconColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
               ),
               child: Icon(
                 icon,
-                size: 32,
+                size: AppConstants.iconSizeMedium,
                 color: iconColor,
               ),
             ),
@@ -575,15 +575,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   Text(
                     title,
                     style: const TextStyle(
-                      fontSize: 20,
+                      fontSize: AppConstants.fontSizeLarge,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppConstants.spacingTiny),
                   Text(
                     subtitle,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: AppConstants.fontSizeBody,
                       color: Colors.grey[600],
                     ),
                   ),
@@ -594,7 +594,7 @@ class _HomeScreenState extends State<HomeScreen> {
             // Flèche
             Icon(
               Icons.arrow_forward_ios,
-              size: 20,
+              size: AppConstants.iconSizeRegular,
               color: Colors.grey[400],
             ),
           ],
@@ -623,10 +623,10 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppConstants.spacingMedium),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -637,21 +637,21 @@ class _StatCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Icon(icon, color: color, size: 28),
-          const SizedBox(height: 8),
+          Icon(icon, color: color, size: AppConstants.iconSizeMedium),
+          const SizedBox(height: AppConstants.spacingExtraSmall),
           Text(
             value,
             style: TextStyle(
-              fontSize: 24,
+              fontSize: AppConstants.fontSizeExtraLarge,
               fontWeight: FontWeight.bold,
               color: color,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppConstants.spacingTiny),
           Text(
             label,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: AppConstants.fontSizeSmall,
               color: Colors.grey[700],
               fontWeight: FontWeight.w500,
             ),
@@ -660,7 +660,7 @@ class _StatCard extends StatelessWidget {
             Text(
               subtitle!,
               style: TextStyle(
-                fontSize: 10,
+                fontSize: AppConstants.fontSizeMicro,
                 color: Colors.grey[500],
               ),
             ),

@@ -453,27 +453,27 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppConstants.spacingMedium),
           children: [
             // 📋 BANNIÈRE DRAFT
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppConstants.spacingSmall),
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
                 color: Colors.amber.shade50,
-                border: Border.all(color: Colors.amber, width: 2),
-                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.amber, width: AppConstants.spacingMicro),
+                borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
               ),
               child: Row(
                 children: [
                   Icon(Icons.info, color: Colors.amber.shade700),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppConstants.spacingExtraSmall),
                   Expanded(
                     child: Text(
                       AppLocalizations.of(context)
                           .translate(AppStrings.draftModeBanner),
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: AppConstants.fontSizeSmall,
                         color: Colors.amber.shade700,
                         fontWeight: FontWeight.w500,
                       ),
@@ -485,7 +485,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
 
             _buildSectionHeader(AppLocalizations.of(context)
                 .translate(AppStrings.identification)),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppConstants.spacingMedium),
 
             // 1ï¸âƒ£ NUMÃ‰RO OFFICIEL EN PREMIER (avec scan)
             TextFormField(
@@ -504,7 +504,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: AppConstants.spacingMedium),
 
             // 2ï¸âƒ£ EID (avec scan)
             TextFormField(
@@ -525,7 +525,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: AppConstants.spacingMedium),
 
             // 3ï¸âƒ£ ID VISUEL (SANS scan)
             TextFormField(
@@ -541,13 +541,13 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
               ),
             ),
 
-            const SizedBox(height: 24),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppConstants.spacingMediumLarge),
+            const SizedBox(height: AppConstants.spacingMediumLarge),
 
             // === Ãƒâ€°TAPE 5 : Section Type et Race ===
             _buildSectionHeader(AppLocalizations.of(context)
                 .translate(AppStrings.typeAndBreed)),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppConstants.spacingMedium),
 
             // Dropdown Type d'animal
             DropdownButtonFormField<String>(
@@ -591,7 +591,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
               },
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: AppConstants.spacingMedium),
 
             // Dropdown Race
             // Origine
@@ -630,7 +630,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
               },
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: AppConstants.spacingMedium),
 
             // Date de naissance
             ListTile(
@@ -653,27 +653,27 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                 onPressed: _selectBirthDate,
               ),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
                 side: BorderSide(color: Colors.grey.shade300),
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: AppConstants.spacingMediumLarge),
 
             // === Section : CaractÃƒÂ©ristiques ===
             _buildSectionHeader(AppLocalizations.of(context)
                 .translate(AppStrings.characteristics)),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppConstants.spacingMedium),
 
             // Sexe
             Text(
               AppLocalizations.of(context).translate(AppStrings.sexRequired),
               style: const TextStyle(
-                fontSize: 16,
+                fontSize: AppConstants.fontSizeMedium,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppConstants.spacingExtraSmall),
             RadioGroup<AnimalSex>(
               groupValue: _selectedSex,
               onChanged: (value) {
@@ -689,7 +689,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                           .translate(AppStrings.male)),
                       value: AnimalSex.male,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
                         side: BorderSide(
                           color: _selectedSex == AnimalSex.male
                               ? Colors.blue
@@ -698,14 +698,14 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppConstants.spacingSmall),
                   Expanded(
                     child: RadioListTile<AnimalSex>(
                       title: Text(AppLocalizations.of(context)
                           .translate(AppStrings.female)),
                       value: AnimalSex.female,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
                         side: BorderSide(
                           color: _selectedSex == AnimalSex.female
                               ? Colors.pink
@@ -718,7 +718,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: AppConstants.spacingMedium),
 
             // Origine
             DropdownButtonFormField<String>(
@@ -760,7 +760,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
               },
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: AppConstants.spacingMedium),
 
             // Champs conditionnels selon l'origine
             if (_selectedOrigin ==
@@ -805,7 +805,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                   ],
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
                   side: BorderSide(color: Colors.grey.shade300),
                 ),
               ),
@@ -826,7 +826,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: AppConstants.spacingMedium),
 
               // Prix d'achat
               TextFormField(
@@ -846,7 +846,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
               ),
             ],
 
-            const SizedBox(height: 24),
+            const SizedBox(height: AppConstants.spacingMediumLarge),
 
             // Notes
             TextFormField(
@@ -862,7 +862,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
               maxLength: 500,
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: AppConstants.spacingLarge),
 
             // Boutons d'action
             Row(
@@ -874,7 +874,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                         .translate(AppStrings.cancel)),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: AppConstants.spacingMedium),
                 Expanded(
                   flex: 2,
                   child: ElevatedButton(
@@ -895,8 +895,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                         : Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(Icons.save, size: 20),
-                              const SizedBox(width: 8),
+                              const Icon(Icons.save, size: AppConstants.iconSizeRegular),
+                              const SizedBox(width: AppConstants.spacingExtraSmall),
                               Text(AppLocalizations.of(context)
                                   .translate(AppStrings.save)),
                             ],
@@ -906,7 +906,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
               ],
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: AppConstants.spacingLarge),
           ],
         ),
       ),
@@ -918,7 +918,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
     return Text(
       title,
       style: const TextStyle(
-        fontSize: 18,
+        fontSize: AppConstants.fontSizeImportant,
         fontWeight: FontWeight.bold,
         color: AppConstants.successGreen,
       ),
@@ -966,7 +966,7 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
     });
 
     // Simulation d'un dÃƒÂ©lai de scan
-    Future.delayed(const Duration(milliseconds: 500), () {
+    Future.delayed(const AppConstants.longAnimation, () {
       final animalProvider = context.read<AnimalProvider>();
 
       // Chercher une femelle dans le troupeau
@@ -1001,7 +1001,7 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
       title: Row(
         children: [
           const Icon(Icons.qr_code_scanner, color: AppConstants.successGreen),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppConstants.spacingExtraSmall),
           Text(AppLocalizations.of(context).translate(AppStrings.scanMother)),
         ],
       ),
@@ -1025,7 +1025,7 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
               readOnly: true,
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: AppConstants.spacingMedium),
 
             // Bouton Scanner
             ElevatedButton.icon(
@@ -1047,31 +1047,31 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppConstants.successGreen,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                padding: const EdgeInsets.symmetric(vertical: AppConstants.spacingSmall),
               ),
             ),
 
             // Message d'erreur
             if (_errorMessage != null) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: AppConstants.spacingSmall),
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(AppConstants.spacingSmall),
                 decoration: BoxDecoration(
                   color: Colors.orange.shade50,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
                   border: Border.all(color: Colors.orange.shade200),
                 ),
                 child: Row(
                   children: [
                     Icon(Icons.warning,
-                        color: Colors.orange.shade700, size: 20),
-                    const SizedBox(width: 8),
+                        color: Colors.orange.shade700, size: AppConstants.iconSizeRegular),
+                    const SizedBox(width: AppConstants.spacingExtraSmall),
                     Expanded(
                       child: Text(
                         _errorMessage!,
                         style: TextStyle(
                           color: Colors.orange.shade900,
-                          fontSize: 13,
+                          fontSize: AppConstants.fontSizeSubtitle,
                         ),
                       ),
                     ),
@@ -1082,12 +1082,12 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
 
             // Informations de la mÃƒÂ¨re scannÃƒÂ©e
             if (_scannedMother != null) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: AppConstants.spacingMedium),
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(AppConstants.spacingSmall),
                 decoration: BoxDecoration(
                   color: Colors.green.shade50,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
                   border: Border.all(color: Colors.green.shade200),
                 ),
                 child: Column(
@@ -1096,37 +1096,37 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
                     Row(
                       children: [
                         Icon(Icons.check_circle,
-                            color: Colors.green.shade700, size: 20),
-                        const SizedBox(width: 8),
+                            color: Colors.green.shade700, size: AppConstants.iconSizeRegular),
+                        const SizedBox(width: AppConstants.spacingExtraSmall),
                         Text(
                           AppLocalizations.of(context)
                               .translate(AppStrings.motherDetected),
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                            fontSize: AppConstants.fontSizeBody,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppConstants.spacingExtraSmall),
                     if (_scannedMother!.eid != null)
                       Text(
                         'EID: ${_scannedMother!.eid}',
-                        style: const TextStyle(fontSize: 13),
+                        style: const TextStyle(fontSize: AppConstants.fontSizeSubtitle),
                       ),
                     if (_scannedMother!.officialNumber != null)
                       Text(
                         '${AppLocalizations.of(context).translate(AppStrings.officialNumber)}: ${_scannedMother!.officialNumber}',
-                        style: const TextStyle(fontSize: 13),
+                        style: const TextStyle(fontSize: AppConstants.fontSizeSubtitle),
                       ),
                     if (_scannedMother!.visualId != null)
                       Text(
                         '${AppLocalizations.of(context).translate(AppStrings.visualId)}: ${_scannedMother!.visualId}',
-                        style: const TextStyle(fontSize: 13),
+                        style: const TextStyle(fontSize: AppConstants.fontSizeSubtitle),
                       ),
                     Text(
                       '${AppLocalizations.of(context).translate(AppStrings.age)}: ${_scannedMother!.ageInMonths} ${AppLocalizations.of(context).translate(AppStrings.months)}',
-                      style: const TextStyle(fontSize: 13),
+                      style: const TextStyle(fontSize: AppConstants.fontSizeSubtitle),
                     ),
                   ],
                 ),
@@ -1231,7 +1231,7 @@ class _ScanEIDDialogState extends State<_ScanEIDDialog> {
       title: Row(
         children: [
           const Icon(Icons.qr_code_scanner, color: Colors.blue),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppConstants.spacingExtraSmall),
           Text(AppLocalizations.of(context).translate(AppStrings.scanAnimal)),
         ],
       ),
@@ -1244,12 +1244,12 @@ class _ScanEIDDialogState extends State<_ScanEIDDialog> {
             Text(
               AppLocalizations.of(context).translate(AppStrings.placeRfidNear),
               style: const TextStyle(
-                fontSize: 13,
+                fontSize: AppConstants.fontSizeSubtitle,
                 color: Colors.grey,
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: AppConstants.spacingMedium),
 
             // Champ EID
             TextField(
@@ -1265,7 +1265,7 @@ class _ScanEIDDialogState extends State<_ScanEIDDialog> {
               readOnly: true,
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: AppConstants.spacingMedium),
 
             // Bouton Scanner
             ElevatedButton.icon(
@@ -1287,18 +1287,18 @@ class _ScanEIDDialogState extends State<_ScanEIDDialog> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                padding: const EdgeInsets.symmetric(vertical: AppConstants.spacingSmall),
               ),
             ),
 
             // RÃƒÂ©sultat du scan
             if (_scannedEID != null) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: AppConstants.spacingMedium),
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(AppConstants.spacingSmall),
                 decoration: BoxDecoration(
                   color: Colors.green.shade50,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
                   border: Border.all(color: Colors.green.shade200),
                 ),
                 child: Column(
@@ -1307,33 +1307,33 @@ class _ScanEIDDialogState extends State<_ScanEIDDialog> {
                     Row(
                       children: [
                         Icon(Icons.check_circle,
-                            color: Colors.green.shade700, size: 20),
-                        const SizedBox(width: 8),
+                            color: Colors.green.shade700, size: AppConstants.iconSizeRegular),
+                        const SizedBox(width: AppConstants.spacingExtraSmall),
                         Text(
                           AppLocalizations.of(context)
                               .translate(AppStrings.eidDetectedSuccess),
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                            fontSize: AppConstants.fontSizeBody,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppConstants.spacingExtraSmall),
                     Text(
                       _scannedEID!,
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: AppConstants.fontSizeMedium,
                         fontWeight: FontWeight.w600,
                         fontFamily: 'monospace',
                         color: Colors.black87,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppConstants.spacingTiny),
                     Text(
                       _formatEID(_scannedEID!),
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: AppConstants.fontSizeSubtitle,
                         color: Colors.grey.shade700,
                       ),
                     ),

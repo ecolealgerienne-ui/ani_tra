@@ -215,7 +215,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       borderRadius: BorderRadius.circular(
                           AppConstants.borderRadiusMedium),
                       border:
-                          Border.all(color: Colors.green.shade300, width: 2),
+                          Border.all(color: Colors.green.shade300, width: AppConstants.spacingMicro),
                     ),
                     child: Row(
                       children: [
