@@ -113,11 +113,8 @@ class AuthProvider extends ChangeNotifier {
   /// Persiste le choix via SharedPreferences
   /// Notifie tous les listeners (providers dépendants)
   Future<void> switchFarm(String farmId) async {
-    // Vérifier que la ferme existe
-    final farmExists = _farms.any((f) => f.id == farmId);
-    if (!farmExists) {
-      throw Exception('Farm with ID $farmId not found');
-    }
+    // Note: We don't verify farm existence here because farms are managed
+    // by FarmProvider (from DB), not AuthProvider (mock data)
 
     // Mettre à jour l'état
     _selectedFarmId = farmId;

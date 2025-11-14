@@ -101,10 +101,11 @@ class _FarmSettingsScreenState extends State<FarmSettingsScreen> {
 
                 // ========================================
                 // SECTION 4 : Paramètres d'alertes
+                // TODO: Implement alert settings in Phase 1B
                 // ========================================
-                _AlertSettingsSection(
-                  onManageAlerts: () => _navigateToAlertSettings(),
-                ),
+                // _AlertSettingsSection(
+                //   onManageAlerts: () => _navigateToAlertSettings(),
+                // ),
 
                 const SizedBox(height: AppConstants.spacingLarge),
               ],
@@ -258,14 +259,15 @@ class _FarmSettingsScreenState extends State<FarmSettingsScreen> {
     }
   }
 
-  void _navigateToAlertSettings() {
-    // TODO: Navigate to alert configuration screen when implemented
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Gestion des alertes - À implémenter en Phase 1B'),
-      ),
-    );
-  }
+  // TODO Phase 1B: Implement alert settings navigation
+  // void _navigateToAlertSettings() {
+  //   // Navigate to alert configuration screen when implemented
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     const SnackBar(
+  //       content: Text('Gestion des alertes - À implémenter en Phase 1B'),
+  //     ),
+  //   );
+  // }
 }
 
 // ==========================================
