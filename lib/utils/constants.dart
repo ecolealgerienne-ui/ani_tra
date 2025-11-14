@@ -423,6 +423,37 @@ class AppConstants {
   static const int alertVaccinationDaysDue = 7; // ≤ 7j avant due = ALERT
   static const int alertVaccinationDaysOverdue =
       0; // ≤ 0j (passé) = IMPORTANT/URGENT
+
+  // ==================== FARM SETTINGS SCREEN ====================
+  /// Espèce par défaut si aucune préférence configurée
+  static const String defaultSpeciesId = 'sheep';
+
+  /// Race par défaut pour ovins
+  static const String defaultSheepBreedId = 'merinos';
+
+  /// Hauteur de la section de sélection de ferme
+  static const double farmSelectionSectionHeight = 80.0;
+
+  /// Padding horizontal de la section Farm Settings
+  static const double farmSettingsSectionPaddingH = 16.0;
+
+  /// Spacing entre les sections Farm Settings
+  static const double farmSettingsSectionSpacing = 24.0;
+
+  /// Radius des cards Farm Settings
+  static const double farmSettingsCardRadius = 12.0;
+
+  /// Padding des cards Farm Settings
+  static const double farmSettingsCardPadding = 16.0;
+
+  /// Taille de l'icône dans les sections Farm Settings
+  static const double farmSettingsIconSize = 24.0;
+
+  /// Taille du titre de section Farm Settings
+  static const double farmSettingsSectionTitleSize = 16.0;
+
+  /// Taille du sous-titre de section Farm Settings
+  static const double farmSettingsSectionSubtitleSize = 13.0;
 }
 
 // ==================== DATABASE ====================

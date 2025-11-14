@@ -186,6 +186,29 @@ class AppStrings {
   static const String noBreedAvailable = 'noBreedAvailable';
   static const String noneChooseEachTime = 'noneChooseEachTime';
 
+  // ============ FARM SETTINGS SCREEN ============
+  static const String farmSettings = 'farmSettings';
+  static const String farmSettingsTitle = 'farmSettingsTitle';
+  static const String farmSettingsSubtitle = 'farmSettingsSubtitle';
+  static const String farmSelection = 'farmSelection';
+  static const String farmSelectionSubtitle = 'farmSelectionSubtitle';
+  static const String selectFarm = 'selectFarm';
+  static const String breedingPreferences = 'breedingPreferences';
+  static const String breedingPreferencesSubtitle = 'breedingPreferencesSubtitle';
+  static const String defaultSpecies = 'defaultSpecies';
+  static const String selectDefaultSpecies = 'selectDefaultSpecies';
+  static const String selectDefaultBreed = 'selectDefaultBreed';
+  static const String veterinarianSettings = 'veterinarianSettings';
+  static const String veterinarianSettingsSubtitle = 'veterinarianSettingsSubtitle';
+  static const String selectDefaultVeterinarian = 'selectDefaultVeterinarian';
+  static const String alertSettings = 'alertSettings';
+  static const String alertSettingsSubtitle = 'alertSettingsSubtitle';
+  static const String manageAlertPreferences = 'manageAlertPreferences';
+  static const String preferencesUpdated = 'preferencesUpdated';
+  static const String errorUpdatingPreferences = 'errorUpdatingPreferences';
+  static const String noFarmSelected = 'noFarmSelected';
+  static const String pleaseSelectFarm = 'pleaseSelectFarm';
+
   // ============ ALERTS (24) ============
   static const String alerts = 'alerts';
   static const String noAlertsTitle = 'noAlertsTitle';

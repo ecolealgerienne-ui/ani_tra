@@ -11,6 +11,7 @@ import 'package:path/path.dart' as p;
 // ═══════════════════════════════════════════════════════════
 // Standalone Tables (no FK dependencies)
 import 'tables/farms_table.dart';
+import 'tables/farm_preferences_table.dart';
 
 // Main Entity Tables
 import 'tables/animals_table.dart';
@@ -46,6 +47,7 @@ import 'tables/alert_configurations_table.dart';
 // ═══════════════════════════════════════════════════════════
 // Standalone DAOs
 import 'daos/farm_dao.dart';
+import 'daos/farm_preferences_dao.dart';
 
 // Main Entity DAOs
 import 'daos/animal_dao.dart';
@@ -89,6 +91,7 @@ part 'database.g.dart';
     // STANDALONE TABLES (no FK dependencies)
     // ────────────────────────────────────────────────────────
     FarmsTable,
+    FarmPreferencesTable,
 
     // ────────────────────────────────────────────────────────
     // MAIN ENTITY TABLES
@@ -134,6 +137,7 @@ part 'database.g.dart';
     // STANDALONE DAOs
     // ────────────────────────────────────────────────────────
     FarmDao,
+    FarmPreferencesDao,
 
     // ────────────────────────────────────────────────────────
     // MAIN ENTITY DAOs
@@ -197,6 +201,7 @@ class AppDatabase extends _$AppDatabase {
           // INDEXES - STANDALONE TABLES
           // ───────────────────────────────────────────────────
           await _createFarmsIndexes();
+          await _createFarmPreferencesIndexes();
 
           // ───────────────────────────────────────────────────
           // INDEXES - MAIN ENTITY TABLES
@@ -261,6 +266,36 @@ class AppDatabase extends _$AppDatabase {
     );
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_farms_group_id ON farms(group_id)',
+    );
+  }
+
+  // ───────────────────────────────────────────────────────────
+  // FARM PREFERENCES INDEXES
+  // ───────────────────────────────────────────────────────────
+  Future<void> _createFarmPreferencesIndexes() async {
+    // Index principal: farmId (queries fréquentes par ferme)
+    // Unique constraint déjà défini dans la table (une préférence par ferme)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_farm_preferences_farm_id '
+      'ON farm_preferences(farm_id);',
+    );
+
+    // Index: deletedAt (soft-delete)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_farm_preferences_deleted_at '
+      'ON farm_preferences(deleted_at);',
+    );
+
+    // Index composite: farmId + synced (Phase 2 sync queries)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_farm_preferences_synced '
+      'ON farm_preferences(farm_id, synced);',
+    );
+
+    // Index: createdAt (tri chronologique)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_farm_preferences_created '
+      'ON farm_preferences(created_at);',
     );
   }
 
@@ -1067,6 +1102,8 @@ class AppDatabase extends _$AppDatabase {
   // ───────────────────────────────────────────────────────────
   @override
   FarmDao get farmDao => FarmDao(this);
+  @override
+  FarmPreferencesDao get farmPreferencesDao => FarmPreferencesDao(this);
 
   // ───────────────────────────────────────────────────────────
   // MAIN ENTITY DAOs
