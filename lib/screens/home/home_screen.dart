@@ -19,7 +19,9 @@ import '../animal/animal_list_screen.dart';
 import '../animal/animal_detail_screen.dart';
 //import '../animal/animal_finder_screen.dart';
 import '../lot/lot_list_screen.dart';
-import '../settings/settings_screen.dart';
+import '../settings/account_settings_screen.dart';
+import '../settings/farm_settings_screen.dart';
+import '../settings/app_settings_screen.dart';
 import '../alert/alerts_screen.dart';
 import '../services/export_registry_screen.dart'; // 🆕 PART3
 
@@ -80,24 +82,65 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Consumer<AuthProvider>(
           builder: (context, auth, child) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(AppLocalizations.of(context)
-                    .translate(AppStrings.dashboard)),
-                if (auth.currentUserName != null &&
-                    auth.currentFarmName != null)
+            return PopupMenuButton<String>(
+              onSelected: (value) {
+                if (value == 'account') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AccountSettingsScreen(),
+                    ),
+                  );
+                } else if (value == 'farm') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const FarmSettingsScreen(),
+                    ),
+                  );
+                }
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
                   Text(
-                    '👤 ${auth.currentUserName} | 🏗️ ${auth.currentFarmName}',
+                    auth.currentUserName ?? 'Utilisateur',
                     style: const TextStyle(
-                      fontSize: AppConstants.fontSizeSmall,
-                      fontWeight: FontWeight.normal,
+                      fontSize: AppConstants.fontSizeBody,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
+                  const SizedBox(width: AppConstants.spacingTiny),
+                  const Icon(Icons.arrow_drop_down, size: AppConstants.iconSizeRegular),
+                ],
+              ),
+              itemBuilder: (context) => [
+                PopupMenuItem<String>(
+                  value: 'account',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.person),
+                      const SizedBox(width: AppConstants.spacingSmall),
+                      Text(l10n.translate(AppStrings.myAccount)),
+                    ],
+                  ),
+                ),
+                PopupMenuItem<String>(
+                  value: 'farm',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.agriculture),
+                      const SizedBox(width: AppConstants.spacingSmall),
+                      Text(l10n.translate(AppStrings.farmSettings)),
+                    ],
+                  ),
+                ),
               ],
             );
           },
@@ -153,19 +196,40 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.settings),
-            tooltip:
-                AppLocalizations.of(context).translate(AppStrings.settings),
+            tooltip: l10n.translate(AppStrings.settings),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
-              );
+              AppSettingsScreen.show(context);
             },
           ),
         ],
       ),
       body: Column(
         children: [
+          // Header "Tableau de Bord" centré
+          Container(
+            padding: const EdgeInsets.symmetric(
+              vertical: AppConstants.spacingSmall,
+            ),
+            decoration: BoxDecoration(
+              color: Theme.of(context).primaryColor.withValues(alpha: 0.05),
+              border: Border(
+                bottom: BorderSide(
+                  color: Theme.of(context).dividerColor,
+                  width: 1,
+                ),
+              ),
+            ),
+            child: Center(
+              child: Text(
+                l10n.translate(AppStrings.dashboard),
+                style: const TextStyle(
+                  fontSize: AppConstants.fontSizeImportant,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+
           // 🆕 Bannière d'alerte urgente (si présente)
           _buildUrgentAlertBanner(context),
 

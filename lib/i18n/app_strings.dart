@@ -1055,4 +1055,13 @@ class AppStrings {
   static const String noAnimalFoundMessage = 'noAnimalFoundMessage';
   static const String officialNumberNone = 'officialNumberNone';
 
+  // ============ ACCOUNT SETTINGS SCREEN ============
+  static const String myAccount = 'myAccount';
+  static const String profile = 'profile';
+  static const String password = 'password';
+  static const String editProfile = 'editProfile';
+  static const String fillAllFields = 'fillAllFields';
+  static const String passwordsDoNotMatch = 'passwordsDoNotMatch';
+  static const String passwordRequirements = 'passwordRequirements';
+
 }

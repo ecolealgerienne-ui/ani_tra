@@ -1058,4 +1058,13 @@ const Map<String, String> stringsFr = {
   'filtersLabel': 'Filtres',
   'noAnimalFoundMessage': 'Aucun animal trouvé',
   'officialNumberNone': 'Sans numéro officiel',
+
+  // ============ ACCOUNT SETTINGS SCREEN ============
+  'myAccount': 'Mon Compte',
+  'profile': 'Profil',
+  'password': 'Mot de passe',
+  'editProfile': 'Modifier le profil',
+  'fillAllFields': 'Veuillez remplir tous les champs',
+  'passwordsDoNotMatch': 'Les mots de passe ne correspondent pas',
+  'passwordRequirements': 'Le mot de passe doit contenir au moins 8 caractères',
 };
