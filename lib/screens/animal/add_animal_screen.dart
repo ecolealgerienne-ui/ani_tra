@@ -470,7 +470,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      '📋 Mode brouillon - Modifie à volonté. Une fois validé, données immuables.',
+                      AppLocalizations.of(context)
+                          .translate(AppStrings.draftModeBanner),
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.amber.shade700,
@@ -1115,16 +1116,16 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
                       ),
                     if (_scannedMother!.officialNumber != null)
                       Text(
-                        'NÂ° officiel: ${_scannedMother!.officialNumber}',
+                        '${AppLocalizations.of(context).translate(AppStrings.officialNumber)}: ${_scannedMother!.officialNumber}',
                         style: const TextStyle(fontSize: 13),
                       ),
                     if (_scannedMother!.visualId != null)
                       Text(
-                        'ID visuel: ${_scannedMother!.visualId}',
+                        '${AppLocalizations.of(context).translate(AppStrings.visualId)}: ${_scannedMother!.visualId}',
                         style: const TextStyle(fontSize: 13),
                       ),
                     Text(
-                      'Age: ${_scannedMother!.ageInMonths} mois',
+                      '${AppLocalizations.of(context).translate(AppStrings.age)}: ${_scannedMother!.ageInMonths} ${AppLocalizations.of(context).translate(AppStrings.months)}',
                       style: const TextStyle(fontSize: 13),
                     ),
                   ],
@@ -1155,7 +1156,14 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        'MÃ¨re ajoutÃ©e: ${_scannedMother!.officialNumber ?? _scannedMother!.eid ?? _scannedMother!.visualId ?? 'Animal ${_scannedMother!.id.substring(0, 8)}'}',
+                        AppLocalizations.of(context)
+                            .translate(AppStrings.motherAdded)
+                            .replaceAll(
+                                '{name}',
+                                _scannedMother!.officialNumber ??
+                                    _scannedMother!.eid ??
+                                    _scannedMother!.visualId ??
+                                    'Animal ${_scannedMother!.id.substring(0, 8)}'),
                       ),
                       backgroundColor: AppConstants.successGreen,
                       duration: const Duration(seconds: 2),
