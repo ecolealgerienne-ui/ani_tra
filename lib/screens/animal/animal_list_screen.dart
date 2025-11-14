@@ -495,7 +495,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.customTitle ?? 'Animaux'),
+        title: Text(widget.customTitle ?? AppLocalizations.of(context).translate(AppStrings.animals)),
         actions: [
           // ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã¢â‚¬Â¢ Badge d'alertes
           Consumer<AlertProvider>(
@@ -700,9 +700,9 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     final animal = await Navigator.push<Animal>(
       context,
       MaterialPageRoute(
-        builder: (context) => const AnimalFinderScreen(
+        builder: (context) => AnimalFinderScreen(
           mode: AnimalFinderMode.single,
-          title: 'Scanner un animal',
+          title: AppLocalizations.of(context).translate(AppStrings.scanAnimal),
         ),
       ),
     );
@@ -737,7 +737,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                   children: [
                     const Icon(Icons.warning_amber, size: 16),
                     const SizedBox(width: 4),
-                    Text('Alertes (${alertProvider.alertCount})'),
+                    Text('${AppLocalizations.of(context).translate(AppStrings.alerts)} (${alertProvider.alertCount})'),
                   ],
                 ),
                 selected: _showOnlyWithAlerts,

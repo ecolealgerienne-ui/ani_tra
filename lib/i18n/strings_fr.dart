@@ -980,4 +980,37 @@ const Map<String, String> stringsFr = {
   // ========== LOT/MOVEMENT NOTES ==========
   'buyerNoteLabel': 'Acheteur:',
   'slaughterhouseNoteLabel': 'Abattoir:',
+
+  // ========== PHASE 1: ANIMAL DETAIL SCREEN ==========
+  'weightAddedMessage': 'Pesée ajoutée',
+  'draftModeBanner': '📋 Mode brouillon - Modifie à volonté. Une fois validé, données immuables.',
+  'basicInformation': 'Informations de base',
+  'createdOn': 'Créé le',
+  'validatedOn': 'Validé le',
+  'typeAndBreedSection': '🐑 Type et Race',
+  'rfidIdentification': '🏷️ Identification RFID',
+  'eidChangesRecorded': 'changement(s) enregistré(s)',
+  'on': 'Le',
+  'doNotSlaughter': '⚠️ Ne pas abattre',
+  'okForSlaughter': '✅ OK pour abattage',
+  'validateAnimalTitle': 'Valider l\'animal',
+  'validateAnimalConfirm': 'Êtes-vous sûr? L\'animal deviendra immuable (sauf nom).',
+  'animalValidatedSuccess': '✅ Animal validé',
+  'deleteAnimalTitle': 'Supprimer l\'animal',
+  'deleteAnimalConfirm': 'Êtes-vous sûr? Cette action est irréversible.',
+  'animalDeletedSuccess': '🗑️ Animal supprimé',
+  'noCareRecorded': 'Aucun soin enregistré',
+  'drPrefix': 'Dr. ',
+  'withdrawalLabel': 'Rémanence : ',
+  'noWithdrawal': '✅ Pas de rémanence',
+  'activeAlert': 'Alerte active',
+  'activeAlerts': 'alertes actives',
+  'priorityUrgent': 'URGENT',
+  'priorityImportant': 'IMPORTANT',
+  'priorityRoutine': 'ROUTINE',
+
+  // ========== PHASE 1: MEDICAL ACT SCREEN ==========
+
+  // ========== PHASE 1: ANIMAL LIST SCREEN ==========
+  'animalsTitle': 'Animaux',
 };

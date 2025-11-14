@@ -977,4 +977,40 @@ class AppStrings {
   static const String buyerNoteLabel = 'buyerNoteLabel';
   static const String slaughterhouseNoteLabel = 'slaughterhouseNoteLabel';
 
+  // ============ PHASE 1: ANIMAL DETAIL SCREEN ============
+  static const String weightAddedMessage = 'weightAddedMessage';
+  static const String draftModeBanner = 'draftModeBanner';
+  static const String basicInformation = 'basicInformation';
+  static const String createdOn = 'createdOn';
+  static const String validatedOn = 'validatedOn';
+  static const String typeAndBreedSection = 'typeAndBreedSection';
+  static const String rfidIdentification = 'rfidIdentification';
+  static const String eidChangesRecorded = 'eidChangesRecorded';
+  static const String on = 'on';
+  static const String doNotSlaughter = 'doNotSlaughter';
+  static const String okForSlaughter = 'okForSlaughter';
+  static const String validateAnimalTitle = 'validateAnimalTitle';
+  static const String validateAnimalConfirm = 'validateAnimalConfirm';
+  static const String animalValidatedSuccess = 'animalValidatedSuccess';
+  static const String deleteAnimalTitle = 'deleteAnimalTitle';
+  static const String deleteAnimalConfirm = 'deleteAnimalConfirm';
+  static const String animalDeletedSuccess = 'animalDeletedSuccess';
+  static const String noCareRecorded = 'noCareRecorded';
+  static const String drPrefix = 'drPrefix';
+  static const String withdrawalLabel = 'withdrawalLabel';
+  static const String noWithdrawal = 'noWithdrawal';
+  static const String activeAlert = 'activeAlert';
+  static const String activeAlerts = 'activeAlerts';
+  static const String priorityUrgent = 'priorityUrgent';
+  static const String priorityImportant = 'priorityImportant';
+  static const String priorityRoutine = 'priorityRoutine';
+
+  // ============ PHASE 1: MEDICAL ACT SCREEN ============
+  static const String scanner = 'scanner';
+  static const String animals = 'animals';
+
+  // ============ PHASE 1: ANIMAL LIST SCREEN ============
+  static const String animalsTitle = 'animalsTitle';
+  static const String noAnimalFound = 'noAnimalFound';
+
 }
