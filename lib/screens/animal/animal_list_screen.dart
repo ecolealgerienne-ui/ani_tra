@@ -301,13 +301,13 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
               key = '🟢 ${AppLocalizations.of(context).translate(AppStrings.statusAlive)}';
               break;
             case AnimalStatus.sold:
-              key = '💰 ${AppLocalizations.of(context).translate(AppStrings.sold)}';
+              key = '💰 ${AppLocalizations.of(context).translate(AppStrings.soldGroup)}';
               break;
             case AnimalStatus.dead:
-              key = '💀 ${AppLocalizations.of(context).translate(AppStrings.dead)}';
+              key = '💀 ${AppLocalizations.of(context).translate(AppStrings.deadGroup)}';
               break;
             case AnimalStatus.slaughtered:
-              key = '🔪 ${AppLocalizations.of(context).translate(AppStrings.slaughtered)}';
+              key = '🔪 ${AppLocalizations.of(context).translate(AppStrings.slaughteredGroup)}';
               break;
           }
           groups.putIfAbsent(key, () => []).add(animal);
@@ -591,9 +591,9 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
             final Map<String, int> priority = {
               '📋 ${AppLocalizations.of(context).translate(AppStrings.drafts)}': 1,
               '🟢 ${AppLocalizations.of(context).translate(AppStrings.statusAlive)}': 2,
-              '💰 ${AppLocalizations.of(context).translate(AppStrings.sold)}': 3,
-              '💀 ${AppLocalizations.of(context).translate(AppStrings.dead)}': 4,
-              '🔪 ${AppLocalizations.of(context).translate(AppStrings.slaughtered)}': 5,
+              '💰 ${AppLocalizations.of(context).translate(AppStrings.soldGroup)}': 3,
+              '💀 ${AppLocalizations.of(context).translate(AppStrings.deadGroup)}': 4,
+              '🔪 ${AppLocalizations.of(context).translate(AppStrings.slaughteredGroup)}': 5,
             };
 
             sortedKeys.sort((a, b) {

@@ -1017,15 +1017,13 @@ class AppStrings {
 
   // ============ PHASE 5: ANIMAL LIST SCREEN ============
   static const String drafts = 'drafts';
-  static const String males = 'males';
-  static const String females = 'females';
   static const String lessThan6Months = 'lessThan6Months';
   static const String from6To12Months = 'from6To12Months';
   static const String from1To2Years = 'from1To2Years';
   static const String moreThan2Years = 'moreThan2Years';
-  static const String sold = 'sold';
-  static const String dead = 'dead';
-  static const String slaughtered = 'slaughtered';
+  static const String soldGroup = 'soldGroup';
+  static const String deadGroup = 'deadGroup';
+  static const String slaughteredGroup = 'slaughteredGroup';
   static const String withdrawalActive = 'withdrawalActive';
   static const String withdrawalInactive = 'withdrawalInactive';
   static const String unknownMother = 'unknownMother';

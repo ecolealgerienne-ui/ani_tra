@@ -1021,15 +1021,13 @@ const Map<String, String> stringsFr = {
 
   // ========== PHASE 5: ANIMAL LIST SCREEN ==========
   'drafts': 'Brouillons',
-  'males': 'Mâles',
-  'females': 'Femelles',
   'lessThan6Months': '< 6 mois',
   'from6To12Months': '6-12 mois',
   'from1To2Years': '1-2 ans',
   'moreThan2Years': '> 2 ans',
-  'sold': 'Vendus',
-  'dead': 'Morts',
-  'slaughtered': 'Abattus',
+  'soldGroup': 'Vendus',
+  'deadGroup': 'Morts',
+  'slaughteredGroup': 'Abattus',
   'withdrawalActive': 'Rémanence Active',
   'withdrawalInactive': 'Rémanence Inactive',
   'unknownMother': 'Mère inconnue',
