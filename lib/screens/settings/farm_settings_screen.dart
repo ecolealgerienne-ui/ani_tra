@@ -294,21 +294,21 @@ class _FarmSelectionSection extends StatelessWidget {
             subtitle: l10n.translate(AppStrings.farmSelectionSubtitle),
             icon: Icons.business,
           ),
-          Padding(
-            padding: const EdgeInsets.all(AppConstants.farmSettingsSectionPaddingH),
+          const Padding(
+            padding: EdgeInsets.all(AppConstants.farmSettingsSectionPaddingH),
             child: Card(
               elevation: AppConstants.mainCardElevation,
               child: Padding(
-                padding: const EdgeInsets.all(AppConstants.spacingMedium),
+                padding: EdgeInsets.all(AppConstants.spacingMedium),
                 child: Column(
                   children: [
                     Icon(Icons.warning, color: Colors.orange, size: 48),
-                    const SizedBox(height: AppConstants.spacingSmall),
+                    SizedBox(height: AppConstants.spacingSmall),
                     Text(
                       'Aucune ferme disponible',
                       style: TextStyle(fontSize: AppConstants.fontSizeImportant),
                     ),
-                    const SizedBox(height: AppConstants.spacingTiny),
+                    SizedBox(height: AppConstants.spacingTiny),
                     Text(
                       'Veuillez créer une ferme pour continuer',
                       style: TextStyle(fontSize: AppConstants.fontSizeSmall, color: Colors.grey),
