@@ -967,6 +967,14 @@ class AppStrings {
 
   static const String alertBatchTitle = 'alertBatchTitle';
   static const String alertBatchMsg = 'alertBatchMsg';
-  
+
+  // ============ BREEDING NOTES ============
+  static const String breedingFailedNote = 'breedingFailedNote';
+  static const String breedingAbortedNote = 'breedingAbortedNote';
+  static const String reasonNotSpecified = 'reasonNotSpecified';
+
+  // ============ LOT/MOVEMENT NOTES ============
+  static const String buyerNoteLabel = 'buyerNoteLabel';
+  static const String slaughterhouseNoteLabel = 'slaughterhouseNoteLabel';
 
 }

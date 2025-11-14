@@ -971,4 +971,13 @@ const Map<String, String> stringsFr = {
 
   'alertBatchTitle': 'Lot à finaliser',
   'alertBatchMsg': '{batchName}: {animalCount} animal(aux)',
+
+  // ========== BREEDING NOTES ==========
+  'breedingFailedNote': 'Échec:',
+  'breedingAbortedNote': 'Avortement:',
+  'reasonNotSpecified': 'Non précisé',
+
+  // ========== LOT/MOVEMENT NOTES ==========
+  'buyerNoteLabel': 'Acheteur:',
+  'slaughterhouseNoteLabel': 'Abattoir:',
 };

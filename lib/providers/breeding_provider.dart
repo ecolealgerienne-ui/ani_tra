@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import '../models/breeding.dart';
 import '../repositories/breeding_repository.dart';
 import 'auth_provider.dart';
+import '../i18n/app_strings.dart';
 
 /// BreedingProvider - Phase 1C
 /// CHANGEMENT: Utilise Repository pour Breedings (SQLite)
@@ -11,6 +12,18 @@ class BreedingProvider extends ChangeNotifier {
   final AuthProvider _authProvider;
   final BreedingRepository _repository;
   String _currentFarmId;
+
+  // ==================== I18N Notes (stored in DB) ====================
+  // NOTE: Ces constantes correspondent aux clés i18n mais sont en français par défaut
+  // car les providers n'ont pas accès au BuildContext pour la traduction.
+  // Les notes sont stockées dans la langue active au moment de la création.
+  // Pour une vraie i18n, il faudrait soit:
+  // 1. Passer BuildContext aux méthodes (refactoring majeur)
+  // 2. Stocker en JSON {"type": "failed", "reason": "..."} (meilleure approche)
+  // Références: AppStrings.breedingFailedNote, AppStrings.breedingAbortedNote
+  static const String _failedNotePrefix = 'Échec:'; // breedingFailedNote
+  static const String _abortedNotePrefix = 'Avortement:'; // breedingAbortedNote
+  static const String _notSpecified = 'Non précisé'; // reasonNotSpecified
 
   // Données principales (cache local)
   final List<Breeding> _allBreedings = [];
@@ -225,7 +238,7 @@ class BreedingProvider extends ChangeNotifier {
 
     final updated = breeding.copyWith(
       status: BreedingStatus.failed,
-      notes: '${breeding.notes ?? ''}\n❌ Échec: $reason'.trim(),
+      notes: '${breeding.notes ?? ''}\n❌ $_failedNotePrefix $reason'.trim(),
     );
 
     await update(updated);
@@ -243,7 +256,7 @@ class BreedingProvider extends ChangeNotifier {
       status: BreedingStatus.aborted,
       actualBirthDate: abortionDate,
       notes:
-          '${breeding.notes ?? ''}\n⚠️ Avortement: ${reason ?? "Non précisé"}'
+          '${breeding.notes ?? ''}\n⚠️ $_abortedNotePrefix ${reason ?? _notSpecified}'
               .trim(),
     );
 

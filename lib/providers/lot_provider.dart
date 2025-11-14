@@ -8,6 +8,7 @@ import '../models/treatment.dart';
 import '../models/movement.dart';
 import '../repositories/lot_repository.dart';
 import '../utils/constants.dart';
+import '../i18n/app_strings.dart';
 import 'auth_provider.dart';
 
 const uuid = Uuid();
@@ -18,6 +19,14 @@ class LotProvider extends ChangeNotifier {
   final AuthProvider _authProvider;
   final LotRepository _repository;
   String _currentFarmId;
+
+  // ==================== I18N Notes (stored in DB) ====================
+  // NOTE: Ces constantes correspondent aux clés i18n mais sont en français par défaut
+  // car les providers n'ont pas accès au BuildContext pour la traduction.
+  // Les notes des movements sont stockées dans la langue active au moment de la création.
+  // Références: AppStrings.buyerNoteLabel, AppStrings.slaughterhouseNoteLabel
+  static const String _buyerLabel = 'Acheteur:'; // buyerNoteLabel
+  static const String _slaughterhouseLabel = 'Abattoir:'; // slaughterhouseNoteLabel
 
   // Données principales (cache local)
   final List<Lot> _allLots = [];
@@ -501,7 +510,7 @@ class LotProvider extends ChangeNotifier {
         movementDate: lot.saleDate ?? DateTime.now(),
         toFarmId: lot.buyerFarmId,
         price: lot.pricePerAnimal,
-        notes: 'Acheteur: ${lot.buyerName ?? AppConstants.notAvailable}',
+        notes: '$_buyerLabel ${lot.buyerName ?? AppConstants.notAvailable}',
         synced: false,
         createdAt: DateTime.now(),
         farmId: lot.farmId,
@@ -519,7 +528,7 @@ class LotProvider extends ChangeNotifier {
         type: MovementType.slaughter,
         movementDate: lot.slaughterDate ?? DateTime.now(),
         notes:
-            'Abattoir: ${lot.slaughterhouseName ?? AppConstants.notAvailable}',
+            '$_slaughterhouseLabel ${lot.slaughterhouseName ?? AppConstants.notAvailable}',
         synced: false,
         createdAt: DateTime.now(),
         farmId: lot.farmId,
