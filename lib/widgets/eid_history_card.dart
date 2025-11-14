@@ -26,11 +26,11 @@ class EidHistoryCard extends StatelessWidget {
     if (history.isEmpty) {
       return Card(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppConstants.spacingMedium),
           child: Row(
             children: [
               Icon(Icons.info_outline, color: Colors.grey.shade400),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppConstants.spacingSmall),
               Text(
                 l10n.translate(AppStrings.noEidChanges),
                 style: TextStyle(
@@ -46,7 +46,7 @@ class EidHistoryCard extends StatelessWidget {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppConstants.spacingMedium),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -57,7 +57,7 @@ class EidHistoryCard extends StatelessWidget {
                   color: Theme.of(context).primaryColor,
                   size: AppConstants.iconSizeRegular,
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppConstants.spacingSmall),
                 Expanded(
                   child: Text(
                     l10n.translate(AppStrings.eidHistory),
@@ -90,9 +90,9 @@ class EidHistoryCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppConstants.spacingMedium),
             const Divider(),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppConstants.spacingExtraSmall),
             ...history.reversed
                 .map((change) => _buildHistoryItem(context, change)),
           ],
@@ -127,10 +127,10 @@ class EidHistoryCard extends StatelessWidget {
                 ),
             ],
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppConstants.spacingSmall),
           Expanded(
             child: Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppConstants.spacingSmall),
               decoration: BoxDecoration(
                 color: Colors.grey.shade50,
                 borderRadius:
@@ -147,7 +147,7 @@ class EidHistoryCard extends StatelessWidget {
                       fontSize: AppConstants.fontSizeBody,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppConstants.spacingExtraSmall),
                   Row(
                     children: [
                       Expanded(
@@ -198,7 +198,7 @@ class EidHistoryCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppConstants.spacingExtraSmall),
                   Row(
                     children: [
                       Icon(
@@ -206,7 +206,7 @@ class EidHistoryCard extends StatelessWidget {
                         size: AppConstants.iconSizeTiny,
                         color: Colors.grey.shade600,
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppConstants.spacingTiny),
                       Text(
                         _formatDate(change.changedAt),
                         style: TextStyle(
@@ -217,9 +217,9 @@ class EidHistoryCard extends StatelessWidget {
                     ],
                   ),
                   if (change.notes != null && change.notes!.isNotEmpty) ...[
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppConstants.spacingExtraSmall),
                     Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(AppConstants.spacingExtraSmall),
                       decoration: BoxDecoration(
                         color: Colors.blue.shade50,
                         borderRadius: BorderRadius.circular(

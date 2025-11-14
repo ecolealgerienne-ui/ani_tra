@@ -28,9 +28,9 @@ class FarmPreferencesSection extends StatelessWidget {
             : null;
 
         return Card(
-          margin: const EdgeInsets.all(16),
+          margin: const EdgeInsets.all(AppConstants.spacingMedium),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppConstants.spacingMedium),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -41,7 +41,7 @@ class FarmPreferencesSection extends StatelessWidget {
                       color: Theme.of(context).primaryColor,
                       size: AppConstants.iconSizeMediumLarge,
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppConstants.spacingSmall),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,7 +53,7 @@ class FarmPreferencesSection extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: AppConstants.spacingTiny),
                           Text(
                             l10n.translate(AppStrings.farmPreferencesSubtitle),
                             style: const TextStyle(
@@ -66,7 +66,7 @@ class FarmPreferencesSection extends StatelessWidget {
                     ),
                   ],
                 ),
-                const Divider(height: 32),
+                const Divider(height: AppConstants.spacingLarge),
                 _buildSettingTile(
                   context: context,
                   icon: Icons.category,
@@ -76,7 +76,7 @@ class FarmPreferencesSection extends StatelessWidget {
                       : l10n.translate(AppStrings.notDefined),
                   onTap: () => _showSpeciesSelector(context, settingsProvider),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppConstants.spacingSmall),
                 _buildSettingTile(
                   context: context,
                   icon: Icons.pets,
@@ -87,9 +87,9 @@ class FarmPreferencesSection extends StatelessWidget {
                   onTap: () => _showBreedSelector(context, settingsProvider),
                   enabled: settingsProvider.defaultSpeciesId.isNotEmpty,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppConstants.spacingMedium),
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(AppConstants.spacingSmall),
                   decoration: BoxDecoration(
                     color: Colors.blue.shade50,
                     borderRadius:
@@ -101,7 +101,7 @@ class FarmPreferencesSection extends StatelessWidget {
                       Icon(Icons.info_outline,
                           color: Colors.blue.shade700,
                           size: AppConstants.iconSizeRegular),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: AppConstants.spacingSmall),
                       Expanded(
                         child: Text(
                           l10n.translate(AppStrings.farmPreferencesInfo),
@@ -132,7 +132,7 @@ class FarmPreferencesSection extends StatelessWidget {
       onTap: enabled ? onTap : null,
       borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(AppConstants.spacingSmall),
         decoration: BoxDecoration(
           color: enabled ? Colors.grey.shade50 : Colors.grey.shade200,
           borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
@@ -145,7 +145,7 @@ class FarmPreferencesSection extends StatelessWidget {
               color: enabled ? Theme.of(context).primaryColor : Colors.grey,
               size: AppConstants.iconSizeRegular,
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppConstants.spacingSmall),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -158,7 +158,7 @@ class FarmPreferencesSection extends StatelessWidget {
                       color: enabled ? Colors.black87 : Colors.grey,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppConstants.spacingTiny),
                   Text(
                     value,
                     style: TextStyle(

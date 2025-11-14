@@ -6,6 +6,8 @@ import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
 
+import '../utils/constants.dart';
+
 /// Section gestion de ferme pour Settings
 ///
 /// Phase 0-1: Affiche ferme actuelle (1 seule ferme)
@@ -18,9 +20,9 @@ class FarmManagementSection extends StatelessWidget {
     return Consumer<AuthProvider>(
       builder: (context, auth, child) {
         return Card(
-          margin: const EdgeInsets.all(16),
+          margin: const EdgeInsets.all(AppConstants.spacingMedium),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppConstants.spacingMedium),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -29,7 +31,7 @@ class FarmManagementSection extends StatelessWidget {
                       .translate(AppStrings.farmManagement),
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppConstants.spacingMedium),
 
                 // Ferme actuelle
                 ListTile(

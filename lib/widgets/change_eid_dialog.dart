@@ -103,7 +103,7 @@ class _ChangeEidDialogState extends State<ChangeEidDialog> {
       title: Row(
         children: [
           Icon(Icons.qr_code, color: Theme.of(context).primaryColor),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppConstants.spacingSmall),
           Expanded(
             child: Text(l10n.translate(AppStrings.changeEidTitle)),
           ),
@@ -117,7 +117,7 @@ class _ChangeEidDialogState extends State<ChangeEidDialog> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(AppConstants.spacingSmall),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade100,
                   borderRadius:
@@ -134,7 +134,7 @@ class _ChangeEidDialogState extends State<ChangeEidDialog> {
                         color: Colors.grey.shade600,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppConstants.spacingTiny),
                     Text(
                       widget.animal.displayName,
                       style: const TextStyle(
@@ -167,7 +167,7 @@ class _ChangeEidDialogState extends State<ChangeEidDialog> {
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppConstants.spacingMedium),
               Text(
                 l10n.translate(AppStrings.changeReason),
                 style: const TextStyle(
@@ -175,7 +175,7 @@ class _ChangeEidDialogState extends State<ChangeEidDialog> {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppConstants.spacingExtraSmall),
               RadioGroup<String>(
                 groupValue: _selectedReason,
                 onChanged: (value) {
@@ -196,7 +196,7 @@ class _ChangeEidDialogState extends State<ChangeEidDialog> {
                   }).toList(),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppConstants.spacingMedium),
               TextFormField(
                 controller: _notesController,
                 decoration: InputDecoration(
