@@ -1,6 +1,9 @@
 // lib/models/weight_record.dart
 
+import 'package:flutter/material.dart';
 import 'syncable_entity.dart';
+import '../i18n/app_localizations.dart';
+import '../i18n/app_strings.dart';
 
 /// Enregistrement de pesée d'un animal
 ///
@@ -290,17 +293,17 @@ enum WeightSource {
 
 /// Extensions pour WeightSource
 extension WeightSourceExtension on WeightSource {
-  /// Nom en français
-  String get frenchName {
+  /// Nom localisé (i18n)
+  String getLocalizedName(BuildContext context) {
     switch (this) {
       case WeightSource.scale:
-        return 'Balance';
+        return AppLocalizations.of(context).translate(AppStrings.weightSourceScale);
       case WeightSource.manual:
-        return 'Manuel';
+        return AppLocalizations.of(context).translate(AppStrings.weightSourceManual);
       case WeightSource.estimated:
-        return 'Estimé';
+        return AppLocalizations.of(context).translate(AppStrings.weightSourceEstimated);
       case WeightSource.veterinary:
-        return 'Vétérinaire';
+        return AppLocalizations.of(context).translate(AppStrings.weightSourceVeterinary);
     }
   }
 

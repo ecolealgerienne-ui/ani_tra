@@ -41,6 +41,10 @@ const Map<String, String> stringsFr = {
   'selectDate': 'Sélectionner la date',
   'selectAnimal': 'Sélectionner l\'animal',
   'weightSource': 'Source de mesure',
+  'weightSourceScale': 'Balance',
+  'weightSourceManual': 'Manuel',
+  'weightSourceEstimated': 'Estimé',
+  'weightSourceVeterinary': 'Vétérinaire',
   'notes': 'Notes',
 
   // ============ SETTINGS SCREEN ============

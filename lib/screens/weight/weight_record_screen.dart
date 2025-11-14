@@ -337,7 +337,7 @@ class _WeightRecordScreenState extends State<WeightRecordScreen> {
                       children: [
                         Text(source.icon),
                         const SizedBox(width: 8),
-                        Text(source.frenchName),
+                        Text(source.getLocalizedName(context)),
                       ],
                     ),
                     subtitle: Text(

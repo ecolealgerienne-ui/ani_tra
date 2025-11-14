@@ -144,7 +144,7 @@ class _SaleScreenState extends State<SaleScreen> {
               decoration: InputDecoration(
                 labelText: AppLocalizations.of(context)
                     .translate(AppStrings.pricePerAnimal),
-                hintText: '(optionnel)',
+                hintText: '(${AppLocalizations.of(context).translate(AppStrings.optional).toLowerCase()})',
                 border: const OutlineInputBorder(),
                 prefixIcon: const Icon(Icons.euro),
               ),

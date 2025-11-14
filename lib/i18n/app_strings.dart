@@ -44,6 +44,10 @@ class AppStrings {
   static const String selectDate = 'selectDate';
   static const String selectAnimal = 'selectAnimal';
   static const String weightSource = 'weightSource';
+  static const String weightSourceScale = 'weightSourceScale';
+  static const String weightSourceManual = 'weightSourceManual';
+  static const String weightSourceEstimated = 'weightSourceEstimated';
+  static const String weightSourceVeterinary = 'weightSourceVeterinary';
   static const String notes = 'notes';
 
   // ============ SETTINGS SCREEN ============
