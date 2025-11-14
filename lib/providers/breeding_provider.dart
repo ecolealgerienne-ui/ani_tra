@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import '../models/breeding.dart';
 import '../repositories/breeding_repository.dart';
 import 'auth_provider.dart';
-import '../i18n/app_strings.dart';
 
 /// BreedingProvider - Phase 1C
 /// CHANGEMENT: Utilise Repository pour Breedings (SQLite)

@@ -8,7 +8,6 @@ import '../models/treatment.dart';
 import '../models/movement.dart';
 import '../repositories/lot_repository.dart';
 import '../utils/constants.dart';
-import '../i18n/app_strings.dart';
 import 'auth_provider.dart';
 
 const uuid = Uuid();

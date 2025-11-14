@@ -356,7 +356,7 @@ class AlertProvider extends ChangeNotifier {
           entityType: 'animal',
           entityName: _getAnimalDisplayName(animal),
           dueDate: animal.createdAt
-              .add(Duration(hours: AppConstants.draftAlertLimitHours)),
+              .add(const Duration(hours: AppConstants.draftAlertLimitHours)),
           actionLabel: 'Valider',
           animalIds: [animal.id],
           titleKey: config?.titleKey,
@@ -384,7 +384,7 @@ class AlertProvider extends ChangeNotifier {
           entityType: 'animal',
           entityName: _getAnimalDisplayName(animal),
           dueDate: animal.createdAt
-              .add(Duration(hours: AppConstants.draftAlertHours)),
+              .add(const Duration(hours: AppConstants.draftAlertHours)),
           actionLabel: 'Valider',
           animalIds: [animal.id],
           titleKey: config?.titleKey,
