@@ -106,7 +106,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(AppConstants.borderRadiusLarge),
+          top: Radius.circular(20.0),
         ),
       ),
       child: DraggableScrollableSheet(
@@ -211,7 +211,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
         ),
         const SizedBox(height: AppConstants.spacingSmall),
         SwitchListTile(
-          title: Text(l10n.translate(AppStrings.enableNotifications)),
+          title: Text(l10n.translate(AppStrings.notifications)),
           value: _notificationsEnabled,
           onChanged: (value) {
             setState(() => _notificationsEnabled = value);
@@ -221,47 +221,42 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
         SwitchListTile(
           title: Text(l10n.translate(AppStrings.treatmentReminders)),
           value: _treatmentReminders,
-          enabled: _notificationsEnabled,
-          onChanged: (value) {
+          onChanged: _notificationsEnabled ? (value) {
             setState(() => _treatmentReminders = value);
             _savePreference('treatment_reminders', value);
-          },
+          } : null,
         ),
         SwitchListTile(
           title: Text(l10n.translate(AppStrings.withdrawalAlerts)),
           value: _withdrawalAlerts,
-          enabled: _notificationsEnabled,
-          onChanged: (value) {
+          onChanged: _notificationsEnabled ? (value) {
             setState(() => _withdrawalAlerts = value);
             _savePreference('withdrawal_alerts', value);
-          },
+          } : null,
         ),
         SwitchListTile(
           title: Text(l10n.translate(AppStrings.campaignNotifications)),
           value: _campaignNotifications,
-          enabled: _notificationsEnabled,
-          onChanged: (value) {
+          onChanged: _notificationsEnabled ? (value) {
             setState(() => _campaignNotifications = value);
             _savePreference('campaign_notifications', value);
-          },
+          } : null,
         ),
         SwitchListTile(
           title: Text(l10n.translate(AppStrings.sound)),
           value: _soundEnabled,
-          enabled: _notificationsEnabled,
-          onChanged: (value) {
+          onChanged: _notificationsEnabled ? (value) {
             setState(() => _soundEnabled = value);
             _savePreference('sound_enabled', value);
-          },
+          } : null,
         ),
         SwitchListTile(
           title: Text(l10n.translate(AppStrings.vibration)),
           value: _vibrationEnabled,
-          enabled: _notificationsEnabled,
-          onChanged: (value) {
+          onChanged: _notificationsEnabled ? (value) {
             setState(() => _vibrationEnabled = value);
             _savePreference('vibration_enabled', value);
-          },
+          } : null,
         ),
       ],
     );
@@ -318,17 +313,23 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
           title: l10n.translate(AppStrings.languageSection),
         ),
         const SizedBox(height: AppConstants.spacingSmall),
-        RadioListTile<String>(
+        ListTile(
           title: const Text('Français'),
-          value: 'fr',
-          groupValue: localeProvider.locale.languageCode,
-          onChanged: (value) => localeProvider.setLocale(const Locale('fr')),
+          leading: Radio<String>(
+            value: 'fr',
+            groupValue: localeProvider.locale.languageCode,
+            onChanged: (value) => localeProvider.setLocale(const Locale('fr')),
+          ),
+          onTap: () => localeProvider.setLocale(const Locale('fr')),
         ),
-        RadioListTile<String>(
+        ListTile(
           title: const Text('العربية'),
-          value: 'ar',
-          groupValue: localeProvider.locale.languageCode,
-          onChanged: (value) => localeProvider.setLocale(const Locale('ar')),
+          leading: Radio<String>(
+            value: 'ar',
+            groupValue: localeProvider.locale.languageCode,
+            onChanged: (value) => localeProvider.setLocale(const Locale('ar')),
+          ),
+          onTap: () => localeProvider.setLocale(const Locale('ar')),
         ),
       ],
     );
@@ -521,7 +522,16 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
             _ColorOption('purple', l10n.translate(AppStrings.colorPurple), Colors.purple),
             _ColorOption('orange', l10n.translate(AppStrings.colorOrange), Colors.orange),
           ].map((option) {
-            return RadioListTile<String>(
+            return ListTile(
+              leading: Radio<String>(
+                value: option.value,
+                groupValue: _themeColor,
+                onChanged: (value) {
+                  setState(() => _themeColor = value!);
+                  _savePreference('theme_color', value!);
+                  Navigator.pop(context);
+                },
+              ),
               title: Row(
                 children: [
                   Container(
@@ -536,11 +546,9 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                   Text(option.name),
                 ],
               ),
-              value: option.value,
-              groupValue: _themeColor,
-              onChanged: (value) {
-                setState(() => _themeColor = value!);
-                _savePreference('theme_color', value!);
+              onTap: () {
+                setState(() => _themeColor = option.value);
+                _savePreference('theme_color', option.value);
                 Navigator.pop(context);
               },
             );
@@ -559,13 +567,20 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [1, 5, 15, 30].map((minutes) {
-            return RadioListTile<int>(
+            return ListTile(
+              leading: Radio<int>(
+                value: minutes,
+                groupValue: _autoLockMinutes,
+                onChanged: (value) {
+                  setState(() => _autoLockMinutes = value!);
+                  _savePreference('auto_lock_minutes', value!);
+                  Navigator.pop(context);
+                },
+              ),
               title: Text(_getAutoLockTimeLabel(l10n, minutes)),
-              value: minutes,
-              groupValue: _autoLockMinutes,
-              onChanged: (value) {
-                setState(() => _autoLockMinutes = value!);
-                _savePreference('auto_lock_minutes', value!);
+              onTap: () {
+                setState(() => _autoLockMinutes = minutes);
+                _savePreference('auto_lock_minutes', minutes);
                 Navigator.pop(context);
               },
             );

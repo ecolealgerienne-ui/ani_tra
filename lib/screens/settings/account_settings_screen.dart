@@ -86,7 +86,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                   _ProfileField(
                     icon: Icons.email_outlined,
                     label: l10n.translate(AppStrings.email),
-                    value: authProvider.currentUserEmail ?? l10n.translate(AppStrings.adminEmail),
+                    value: l10n.translate(AppStrings.adminEmail),
                   ),
                   const SizedBox(height: AppConstants.spacingMedium),
 

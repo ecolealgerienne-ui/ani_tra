@@ -1064,4 +1064,14 @@ class AppStrings {
   static const String passwordsDoNotMatch = 'passwordsDoNotMatch';
   static const String passwordRequirements = 'passwordRequirements';
 
+  // ============ APP SETTINGS SCREEN ============
+  static const String enableDarkMode = 'enableDarkMode';
+  static const String biometricAuth = 'biometricAuth';
+  static const String useFingerprintFaceId = 'useFingerprintFaceId';
+  static const String lockAppInactivity = 'lockAppInactivity';
+  static const String autoLockTime = 'autoLockTime';
+  static const String syncOnDemand = 'syncOnDemand';
+  static const String automaticBackup = 'automaticBackup';
+  static const String backupDailyCloud = 'backupDailyCloud';
+
 }
