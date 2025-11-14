@@ -321,7 +321,7 @@ class _FarmSelectionSection extends StatelessWidget {
                         AppConstants.spacingSmall,
                       ),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor.withOpacity(0.1),
+                        color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(
                           AppConstants.borderRadiusMedium,
                         ),
@@ -463,10 +463,10 @@ class _BreedingPreferencesSection extends StatelessWidget {
       orElse: () => speciesOptions.first,
     );
 
-    final selectedBreed = defaultBreedId != null
+    final Map<String, String?>? selectedBreed = defaultBreedId != null
         ? breedOptions.firstWhere(
             (b) => b['id'] == defaultBreedId,
-            orElse: () => {'id': null, 'name': 'Aucune'},
+            orElse: () => <String, String?>{'id': null, 'name': 'Aucune'},
           )
         : null;
 
@@ -564,8 +564,8 @@ class _BreedingPreferencesSection extends StatelessWidget {
   void _showBreedDialog(
       BuildContext context, List<Map<String, String>> breedOptions) {
     final l10n = AppLocalizations.of(context);
-    final optionsWithNone = [
-      {'id': null, 'name': l10n.translate(AppStrings.noneChooseEachTime)},
+    final List<Map<String, String?>> optionsWithNone = [
+      <String, String?>{'id': null, 'name': l10n.translate(AppStrings.noneChooseEachTime)},
       ...breedOptions,
     ];
 
@@ -896,7 +896,7 @@ class _SettingsCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(AppConstants.spacingSmall),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor.withOpacity(0.1),
+                  color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
                   borderRadius:
                       BorderRadius.circular(AppConstants.borderRadiusMedium),
                 ),
