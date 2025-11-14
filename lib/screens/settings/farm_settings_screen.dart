@@ -5,8 +5,10 @@ import '../../providers/auth_provider.dart';
 import '../../providers/farm_provider.dart';
 import '../../providers/farm_preferences_provider.dart';
 import '../../providers/veterinarian_provider.dart';
+import '../../providers/breed_provider.dart';
 import '../../models/farm.dart';
 import '../../models/veterinarian.dart';
+import '../../data/animal_config.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
@@ -482,20 +484,27 @@ class _BreedingPreferencesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final breedProvider = context.watch<BreedProvider>();
 
-    // TODO: Replace with actual species/breed data from providers
-    // For now, using hardcoded values for Phase 1
-    final speciesOptions = [
-      {'id': 'sheep', 'name': 'Ovin'},
-      {'id': 'goat', 'name': 'Caprin'},
-      {'id': 'cattle', 'name': 'Bovin'},
-    ];
+    // ✅ Use real species data from AnimalConfig
+    final speciesOptions = AnimalConfig.availableSpecies
+        .map((species) => {
+              'id': species.id,
+              'name': species.nameFr,
+            })
+        .toList();
 
-    final breedOptions = [
-      {'id': 'merinos', 'name': 'Mérinos'},
-      {'id': 'suffolk', 'name': 'Suffolk'},
-      {'id': 'texel', 'name': 'Texel'},
-    ];
+    // ✅ Use real breed data from BreedProvider (filtered by selected species)
+    final availableBreeds = breedProvider.activeBreeds
+        .where((breed) => breed.speciesId == defaultSpeciesId)
+        .toList();
+
+    final breedOptions = availableBreeds
+        .map((breed) => {
+              'id': breed.id,
+              'name': breed.nameFr,
+            })
+        .toList();
 
     final selectedSpecies = speciesOptions.firstWhere(
       (s) => s['id'] == defaultSpeciesId,
