@@ -188,7 +188,7 @@ class _ChangeEidDialogState extends State<ChangeEidDialog> {
                 child: Column(
                   children: EidChangeReason.all.map((reason) {
                     return RadioListTile<String>(
-                      title: Text(EidChangeReason.getLabel(reason)),
+                      title: Text(EidChangeReason.getLabel(reason, context)),
                       value: reason,
                       dense: true,
                       contentPadding: EdgeInsets.zero,

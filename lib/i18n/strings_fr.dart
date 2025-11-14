@@ -165,6 +165,12 @@ const Map<String, String> stringsFr = {
   'eidRequired': 'EID obligatoire',
   'eidMustBeDifferent': 'Le nouvel EID doit être différent',
   'eidTooShort': 'EID trop court',
+  'chipLost': '🔴 Puce perdue',
+  'chipBroken': '💥 Puce cassée',
+  'chipDefective': '⚠️ Puce défectueuse',
+  'entryError': '✏️ Erreur de saisie',
+  'replacement': '🔄 Remplacement',
+  'otherReason': '📝 Autre raison',
 
   // ============ FARM PREFERENCES ============
   'farmPreferencesTitle': 'Préférences d\'élevage',

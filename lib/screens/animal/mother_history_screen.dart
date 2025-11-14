@@ -51,7 +51,7 @@ class MotherHistoryScreen extends StatelessWidget {
 
               // Liste descendants
               Text(
-                'Descendants (${offspring.length})',
+                '${AppLocalizations.of(context).translate(AppStrings.descendants)} (${offspring.length})',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
 
@@ -99,7 +99,7 @@ class MotherHistoryScreen extends StatelessWidget {
                 const Icon(Icons.female, color: Colors.pink),
                 const SizedBox(width: 8),
                 Text(
-                  'Mère: ${mother.displayName}',
+                  '${AppLocalizations.of(context).translate(AppStrings.mother)}: ${mother.displayName}',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -107,8 +107,8 @@ class MotherHistoryScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-            Text('Âge: ${mother.ageInMonths} mois (${mother.ageInDays} jours)'),
-            if (mother.breedId != null) Text('Race: ${mother.breedId}'),
+            Text('${AppLocalizations.of(context).translate(AppStrings.age)}: ${mother.ageInMonths} ${AppLocalizations.of(context).translate(AppStrings.months)} (${mother.ageInDays} ${AppLocalizations.of(context).translate(AppStrings.days)})'),
+            if (mother.breedId != null) Text('${AppLocalizations.of(context).translate(AppStrings.breed)}: ${mother.breedId}'),
           ],
         ),
       ),
@@ -178,7 +178,7 @@ class MotherHistoryScreen extends StatelessWidget {
             if (stats.lastBirthDate != null) ...[
               const SizedBox(height: 12),
               Text(
-                'Dernière naissance: ${DateFormat('dd/MM/yyyy').format(stats.lastBirthDate!)}',
+                '${AppLocalizations.of(context).translate(AppStrings.lastBirth)}: ${DateFormat('dd/MM/yyyy').format(stats.lastBirthDate!)}',
                 style: const TextStyle(fontSize: 13, color: Colors.grey),
               ),
             ],
@@ -251,8 +251,8 @@ class MotherHistoryScreen extends StatelessWidget {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Né le ${DateFormat('dd/MM/yyyy').format(child.birthDate)}'),
-            Text('$age mois • ${_getStatusLabel(context, child.status)}'),
+            Text('${AppLocalizations.of(context).translate(AppStrings.bornOn)} ${DateFormat('dd/MM/yyyy').format(child.birthDate)}'),
+            Text('$age ${AppLocalizations.of(context).translate(AppStrings.months)} • ${_getStatusLabel(context, child.status)}'),
           ],
         ),
         trailing: const Icon(Icons.chevron_right),

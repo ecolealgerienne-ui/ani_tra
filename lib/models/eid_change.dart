@@ -1,5 +1,9 @@
 // lib/models/eid_change.dart
 
+import 'package:flutter/material.dart';
+import '../i18n/app_localizations.dart';
+import '../i18n/app_strings.dart';
+
 /// Historique d'un changement d'EID (Electronic IDentification)
 ///
 /// Enregistre chaque fois qu'une puce RFID est remplacée sur un animal.
@@ -112,20 +116,20 @@ class EidChangeReason {
     autre,
   ];
 
-  static String getLabel(String reason) {
+  static String getLabel(String reason, BuildContext context) {
     switch (reason) {
       case pucePerdue:
-        return '🔴 Puce perdue';
+        return AppLocalizations.of(context).translate(AppStrings.chipLost);
       case puceCassee:
-        return '💥 Puce cassée';
+        return AppLocalizations.of(context).translate(AppStrings.chipBroken);
       case puceDefectueuse:
-        return '⚠️ Puce défectueuse';
+        return AppLocalizations.of(context).translate(AppStrings.chipDefective);
       case erreurSaisie:
-        return '✏️ Erreur de saisie';
+        return AppLocalizations.of(context).translate(AppStrings.entryError);
       case remplacement:
-        return '🔄 Remplacement';
+        return AppLocalizations.of(context).translate(AppStrings.replacement);
       case autre:
-        return '📝 Autre raison';
+        return AppLocalizations.of(context).translate(AppStrings.otherReason);
       default:
         return reason;
     }

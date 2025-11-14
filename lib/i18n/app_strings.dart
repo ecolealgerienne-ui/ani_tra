@@ -169,6 +169,12 @@ class AppStrings {
   static const String eidRequired = 'eidRequired';
   static const String eidMustBeDifferent = 'eidMustBeDifferent';
   static const String eidTooShort = 'eidTooShort';
+  static const String chipLost = 'chipLost';
+  static const String chipBroken = 'chipBroken';
+  static const String chipDefective = 'chipDefective';
+  static const String entryError = 'entryError';
+  static const String replacement = 'replacement';
+  static const String otherReason = 'otherReason';
 
   // ============ FARM PREFERENCES ============
   static const String farmPreferencesTitle = 'farmPreferencesTitle';
