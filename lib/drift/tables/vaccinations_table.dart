@@ -78,8 +78,5 @@ class VaccinationsTable extends Table {
   @override
   List<String> get customConstraints => [
         'FOREIGN KEY (farm_id) REFERENCES farms(id) ON DELETE CASCADE',
-        'CREATE INDEX IF NOT EXISTS idx_vaccinations_farm_id ON vaccinations(farm_id)',
-        'CREATE INDEX IF NOT EXISTS idx_vaccinations_farm_created ON vaccinations(farm_id, created_at DESC)',
-        'CREATE INDEX IF NOT EXISTS idx_vaccinations_deleted_at ON vaccinations(deleted_at)',
       ];
 }

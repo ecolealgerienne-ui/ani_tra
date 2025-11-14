@@ -35,6 +35,9 @@ import 'tables/batches_table.dart';
 import 'tables/lots_table.dart';
 import 'tables/campaigns_table.dart';
 
+// Alert Configuration Table (Phase 1B)
+import 'tables/alert_configurations_table.dart';
+
 // Sync Table (Phase 2)
 // import 'tables/sync_queue_table.dart';
 
@@ -66,6 +69,8 @@ import 'daos/veterinarian_dao.dart';
 import 'daos/batch_dao.dart';
 import 'daos/lot_dao.dart';
 import 'daos/campaign_dao.dart';
+// Alert Configuration DAO (Phase 1B)
+import 'daos/alert_configuration_dao.dart';
 
 // Sync DAO (Phase 2)
 // import 'daos/sync_queue_dao.dart';
@@ -116,6 +121,9 @@ part 'database.g.dart';
     LotsTable,
     CampaignsTable,
 
+    // Alert Configuration (Phase 1B)
+    AlertConfigurationsTable,
+
     // ────────────────────────────────────────────────────────
     // SYNC TABLE (Phase 2)
     // ────────────────────────────────────────────────────────
@@ -157,6 +165,9 @@ part 'database.g.dart';
     BatchDao,
     LotDao,
     CampaignDao,
+
+    // Alert Configuration (Phase 1B)
+    AlertConfigurationDao,
 
     // ────────────────────────────────────────────────────────
     // SYNC DAO (Phase 2)
@@ -219,6 +230,11 @@ class AppDatabase extends _$AppDatabase {
           await _createCampaignsIndexes();
 
           // ───────────────────────────────────────────────────
+          // INDEXES - ALERT CONFIGURATION (Phase 1B)
+          // ───────────────────────────────────────────────────
+          await _createAlertConfigurationsIndexes();
+
+          // ───────────────────────────────────────────────────
           // INDEXES - SYNC TABLE (Phase 2)
           // ───────────────────────────────────────────────────
           // await _createSyncQueueIndexes();
@@ -252,26 +268,60 @@ class AppDatabase extends _$AppDatabase {
   // ANIMALS INDEXES
   // ───────────────────────────────────────────────────────────
   Future<void> _createAnimalsIndexes() async {
+    // Index 1: Recherches par ferme (TRÈS FRÉQUENT)
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_animals_farm_id ON animals(farm_id)',
     );
+
+    // Index 2: Recherches par EID
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_animals_current_eid ON animals(current_eid)',
     );
+
+    // Index 3: Filtrage par espèce
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_animals_species_id ON animals(species_id)',
     );
+
+    // Index 4: Filtrage par statut
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_animals_status ON animals(status)',
     );
+
+    // Index 5: Filtrage par race
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_animals_breed_id ON animals(breed_id)',
     );
+
+    // Index 6: Recherches par mère
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_animals_mother_id ON animals(mother_id)',
     );
+
+    // Index 7: Soft-delete check
     await customStatement(
-        'CREATE INDEX IF NOT EXISTS idx_animals_deleted_at ON animals(deleted_at);');
+      'CREATE INDEX IF NOT EXISTS idx_animals_deleted_at ON animals(deleted_at)',
+    );
+
+    // Index composite 1: farm + status (filtrage courant)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_animals_farm_status ON animals(farm_id, status)',
+    );
+
+    // Index composite 2: farm + created_at DESC (pagination/listing)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_animals_farm_created_desc ON animals(farm_id, created_at DESC)',
+    );
+
+    // Index composite 3: farm + EID (recherche courante)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_animals_farm_eid ON animals(farm_id, current_eid)',
+    );
+
+    // Index composite 4: farm + status + validated_at (DRAFT system)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_animals_draft_alerts ON animals(farm_id, status, validated_at)',
+    );
   }
 
   // ───────────────────────────────────────────────────────
@@ -967,6 +1017,47 @@ class AppDatabase extends _$AppDatabase {
         'CREATE INDEX IF NOT EXISTS idx_documents_deleted_at ON documents(deleted_at);');
   }
 
+  // ───────────────────────────────────────────────────────────
+  // ALERT CONFIGURATIONS INDEXES
+  // ───────────────────────────────────────────────────────────
+  Future<void> _createAlertConfigurationsIndexes() async {
+    // Index principal: farmId (queries fréquentes par ferme)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_alert_config_farmid '
+      'ON alert_configurations_table(farm_id);',
+    );
+
+    // Index: enabled (configurations actives uniquement)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_alert_config_enabled '
+      'ON alert_configurations_table(enabled);',
+    );
+
+    // Index composite: farmId + evaluationType (lookup principal)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_alert_config_evaluation '
+      'ON alert_configurations_table(farm_id, evaluation_type);',
+    );
+
+    // Index: createdAt (tri chronologique)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_alert_config_created '
+      'ON alert_configurations_table(created_at);',
+    );
+
+    // Index composite: farmId + synced (Phase 2 sync queries)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_alert_config_synced '
+      'ON alert_configurations_table(farm_id, synced);',
+    );
+
+    // Index: deletedAt (soft-delete)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_alert_config_deleted_at '
+      'ON alert_configurations_table(deleted_at);',
+    );
+  }
+
   // ═══════════════════════════════════════════════════════════
   // DAO GETTERS
   // ═══════════════════════════════════════════════════════════
@@ -1022,6 +1113,13 @@ class AppDatabase extends _$AppDatabase {
   LotDao get lotDao => LotDao(this);
   @override
   CampaignDao get campaignDao => CampaignDao(this);
+
+  // ───────────────────────────────────────────────────────────
+  // ALERT CONFIGURATION DAO (Phase 1B)
+  // ───────────────────────────────────────────────────────────
+  @override
+  AlertConfigurationDao get alertConfigurationDao =>
+      AlertConfigurationDao(this);
 
   // ───────────────────────────────────────────────────────────
   // SYNC DAO (Phase 2)

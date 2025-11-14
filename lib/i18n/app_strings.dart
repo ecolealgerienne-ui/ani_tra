@@ -943,5 +943,30 @@ class AppStrings {
   static const String draftModifiableUntilValidation = 'draftModifiableUntilValidation';
   static const String draftSinceHours = 'draftSinceHours';
   static const String animalsInAlert = 'animalsInAlert';
+  static const String notAvailableDraft = 'notAvailableDraft';
+  static const String animalUpdatedSuccess = 'animalUpdatedSuccess';
+
+    // ============ ALERT CONFIGURATION KEYS ============
+  static const String alertRemanenceTitle = 'alertRemanenceTitle';
+  static const String alertRemanenceMsg = 'alertRemanenceMsg';
+
+  static const String alertWeighingTitle = 'alertWeighingTitle';
+  static const String alertWeighingMsg = 'alertWeighingMsg';
+
+  static const String alertVaccinationTitle = 'alertVaccinationTitle';
+  static const String alertVaccinationMsg = 'alertVaccinationMsg';
+
+  static const String alertIdentificationTitle = 'alertIdentificationTitle';
+  static const String alertIdentificationMsg = 'alertIdentificationMsg';
+
+  static const String alertSyncTitle = 'alertSyncTitle';
+  static const String alertSyncMsg = 'alertSyncMsg';
+
+  static const String alertTreatmentTitle = 'alertTreatmentTitle';
+  static const String alertTreatmentMsg = 'alertTreatmentMsg';
+
+  static const String alertBatchTitle = 'alertBatchTitle';
+  static const String alertBatchMsg = 'alertBatchMsg';
+  
 
 }

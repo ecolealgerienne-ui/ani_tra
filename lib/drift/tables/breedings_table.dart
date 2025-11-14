@@ -19,20 +19,26 @@ class BreedingsTable extends Table {
   // Breeding details
   TextColumn get method => text()(); // 'natural' or 'artificialInsemination'
   DateTimeColumn get breedingDate => dateTime().named('breeding_date')();
-  DateTimeColumn get expectedBirthDate => dateTime().named('expected_birth_date')();
-  DateTimeColumn get actualBirthDate => dateTime().nullable().named('actual_birth_date')();
+  DateTimeColumn get expectedBirthDate =>
+      dateTime().named('expected_birth_date')();
+  DateTimeColumn get actualBirthDate =>
+      dateTime().nullable().named('actual_birth_date')();
 
   // Offspring
-  IntColumn get expectedOffspringCount => integer().nullable().named('expected_offspring_count')();
-  TextColumn get offspringIds => text().nullable().named('offspring_ids')(); // JSON array of IDs
+  IntColumn get expectedOffspringCount =>
+      integer().nullable().named('expected_offspring_count')();
+  TextColumn get offspringIds =>
+      text().nullable().named('offspring_ids')(); // JSON array of IDs
 
   // Veterinarian (if AI)
   TextColumn get veterinarianId => text().nullable().named('veterinarian_id')();
-  TextColumn get veterinarianName => text().nullable().named('veterinarian_name')();
+  TextColumn get veterinarianName =>
+      text().nullable().named('veterinarian_name')();
 
   // Additional info
   TextColumn get notes => text().nullable()();
-  TextColumn get status => text()(); // 'pending', 'completed', 'failed', 'aborted'
+  TextColumn get status =>
+      text()(); // 'pending', 'completed', 'failed', 'aborted'
 
   // Sync fields (Phase 2 ready)
   BoolColumn get synced => boolean().withDefault(const Constant(false))();
@@ -52,8 +58,8 @@ class BreedingsTable extends Table {
 
   @override
   List<String> get customConstraints => [
-    'FOREIGN KEY (farm_id) REFERENCES farms(id)',
-    'FOREIGN KEY (mother_id) REFERENCES animals(id)',
-    'FOREIGN KEY (father_id) REFERENCES animals(id)',
-  ];
+        'FOREIGN KEY (farm_id) REFERENCES farms(id)',
+        'FOREIGN KEY (mother_id) REFERENCES animals(id)',
+        'FOREIGN KEY (father_id) REFERENCES animals(id)',
+      ];
 }

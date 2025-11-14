@@ -357,7 +357,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        firstAlert.title,
+                        firstAlert.getTitle(context),
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
@@ -366,7 +366,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        firstAlert.message,
+                        firstAlert.getMessage(context),
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.red.shade700,

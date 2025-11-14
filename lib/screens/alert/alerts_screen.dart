@@ -438,7 +438,7 @@ class AlertsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      alert.title,
+                      alert.getTitle(context),
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -446,7 +446,7 @@ class AlertsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      alert.message,
+                      alert.getMessage(context),
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey.shade600,
@@ -559,20 +559,47 @@ class AlertsScreen extends StatelessWidget {
         break;
 
       case AlertCategory.weighing:
-        // Alerte de pesée (multiple animaux)
+        // ✅ PHASE 4 FIX: Si 1 seul animal → Aller au détail, sinon → Liste
         if (alert.animalIds != null && alert.animalIds!.isNotEmpty) {
-          // Naviguer vers AnimalListScreen avec filtre
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => AnimalListScreen(
-                filterAnimalIds: alert.animalIds!,
-                customTitle: AppLocalizations.of(context)
-                    .translate(AppStrings.animalsToWeigh)
-                    .replaceAll('{count}', '${alert.count}'),
+          if (alert.animalIds!.length == 1) {
+            // 1 seul animal → Naviguer directement vers AnimalDetailScreen
+            final animal = animalProvider.getAnimalById(alert.animalIds!.first);
+            if (animal != null) {
+              animalProvider.setCurrentAnimal(animal);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      AnimalDetailScreen(preloadedAnimal: animal),
+                ),
+              );
+            } else {
+              // Animal introuvable
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    AppLocalizations.of(context)
+                        .translate(AppStrings.animalNotFoundAlert)
+                        .replaceAll('{name}', alert.entityName ?? ''),
+                  ),
+                  duration: AppConstants.snackBarDurationMedium,
+                ),
+              );
+            }
+          } else {
+            // Plusieurs animaux → Naviguer vers AnimalListScreen avec filtre
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => AnimalListScreen(
+                  filterAnimalIds: alert.animalIds!,
+                  customTitle: AppLocalizations.of(context)
+                      .translate(AppStrings.animalsToWeigh)
+                      .replaceAll('{count}', '${alert.count}'),
+                ),
               ),
-            ),
-          );
+            );
+          }
         } else {
           // Pas d'IDs → Afficher message
           ScaffoldMessenger.of(context).showSnackBar(
@@ -595,23 +622,51 @@ class AlertsScreen extends StatelessWidget {
         break;
 
       case AlertCategory.registre:
-        // Événements incomplets
-        if (alert.entityId != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                AppLocalizations.of(context)
-                    .translate(AppStrings.incompleteEvent)
-                    .replaceAll('{message}', alert.message),
+        // ✅ PHASE 4 FIX: Distinguer les alertes DRAFT des autres événements incomplets
+        if (alert.entityType == 'animal' && alert.entityId != null) {
+          // Alerte DRAFT → Naviguer vers l'animal
+          final animal = animalProvider.getAnimalById(alert.entityId!);
+          if (animal != null) {
+            animalProvider.setCurrentAnimal(animal);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    AnimalDetailScreen(preloadedAnimal: animal),
               ),
-              action: SnackBarAction(
-                label:
-                    AppLocalizations.of(context).translate(AppStrings.complete),
-                onPressed: () {},
+            );
+          } else {
+            // Animal introuvable
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  AppLocalizations.of(context)
+                      .translate(AppStrings.animalNotFoundAlert)
+                      .replaceAll('{name}', alert.entityName ?? ''),
+                ),
+                duration: AppConstants.snackBarDurationMedium,
               ),
-              duration: AppConstants.snackBarDurationLong,
-            ),
-          );
+            );
+          }
+        } else {
+          // Autres événements incomplets → Afficher message seulement
+          if (alert.entityId != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  AppLocalizations.of(context)
+                      .translate(AppStrings.incompleteEvent)
+                      .replaceAll('{message}', alert.message),
+                ),
+                action: SnackBarAction(
+                  label: AppLocalizations.of(context)
+                      .translate(AppStrings.complete),
+                  onPressed: () {},
+                ),
+                duration: AppConstants.snackBarDurationLong,
+              ),
+            );
+          }
         }
         break;
 

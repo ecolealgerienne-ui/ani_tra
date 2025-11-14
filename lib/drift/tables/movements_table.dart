@@ -3,7 +3,7 @@
 import 'package:drift/drift.dart';
 
 /// Table pour les mouvements d'animaux
-/// 
+///
 /// Stocke les mouvements avec:
 /// - Lien vers l'animal (FK → animals)
 /// - Type de mouvement (birth, purchase, sale, death, slaughter)
@@ -25,28 +25,30 @@ class MovementsTable extends Table {
   // === Données métier ===
   /// Type: "birth", "purchase", "sale", "death", "slaughter" (MovementType enum)
   TextColumn get type => text()();
-  
+
   /// Date du mouvement
   DateTimeColumn get movementDate => dateTime().named('movement_date')();
-  
+
   /// ID de la ferme d'origine (pour purchase)
   TextColumn get fromFarmId => text().nullable().named('from_farm_id')();
-  
+
   /// ID de la ferme de destination (pour sale)
   TextColumn get toFarmId => text().nullable().named('to_farm_id')();
-  
+
   /// Prix (pour purchase/sale)
   RealColumn get price => real().nullable()();
-  
+
   /// Notes optionnelles
   TextColumn get notes => text().nullable()();
-  
+
   /// Signature QR de l'acheteur (pour sale)
-  TextColumn get buyerQrSignature => text().nullable().named('buyer_qr_signature')();
+  TextColumn get buyerQrSignature =>
+      text().nullable().named('buyer_qr_signature')();
 
   // === Sync fields (Phase 2 ready) ===
   BoolColumn get synced => boolean().withDefault(const Constant(false))();
-  DateTimeColumn get lastSyncedAt => dateTime().nullable().named('last_synced_at')();
+  DateTimeColumn get lastSyncedAt =>
+      dateTime().nullable().named('last_synced_at')();
   IntColumn get serverVersion => integer().nullable().named('server_version')();
 
   // === Soft-delete ===
@@ -61,10 +63,7 @@ class MovementsTable extends Table {
 
   @override
   List<String> get customConstraints => [
-    'FOREIGN KEY (farm_id) REFERENCES farms(id) ON DELETE CASCADE',
-    'FOREIGN KEY (animal_id) REFERENCES animals(id) ON DELETE CASCADE',
-    'CREATE INDEX IF NOT EXISTS idx_movements_farm_id ON movements(farm_id)',
-    'CREATE INDEX IF NOT EXISTS idx_movements_farm_moved ON movements(farm_id, movement_date DESC)',
-    'CREATE INDEX IF NOT EXISTS idx_movements_deleted_at ON movements(deleted_at)',
-  ];
+        'FOREIGN KEY (farm_id) REFERENCES farms(id) ON DELETE CASCADE',
+        'FOREIGN KEY (animal_id) REFERENCES animals(id)',
+      ];
 }

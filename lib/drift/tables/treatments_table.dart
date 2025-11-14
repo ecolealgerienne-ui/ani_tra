@@ -57,9 +57,6 @@ class TreatmentsTable extends Table {
   List<String> get customConstraints => [
         'FOREIGN KEY (farm_id) REFERENCES farms(id) ON DELETE CASCADE',
         'FOREIGN KEY (animal_id) REFERENCES animals(id)',
-        'FOREIGN KEY (product_id) REFERENCES medical_products(id)',
-        'CREATE INDEX IF NOT EXISTS idx_treatments_farm_id ON treatments(farm_id)',
-        'CREATE INDEX IF NOT EXISTS idx_treatments_farm_created ON treatments(farm_id, created_at DESC)',
-        'CREATE INDEX IF NOT EXISTS idx_treatments_deleted_at ON treatments(deleted_at)',
+        'FOREIGN KEY (veterinarian_id) REFERENCES veterinarians(id)',
       ];
 }

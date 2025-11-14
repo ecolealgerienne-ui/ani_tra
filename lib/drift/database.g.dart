@@ -14687,6 +14687,853 @@ class CampaignsTableCompanion extends UpdateCompanion<CampaignsTableData> {
   }
 }
 
+class $AlertConfigurationsTableTable extends AlertConfigurationsTable
+    with TableInfo<$AlertConfigurationsTableTable, AlertConfigurationData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AlertConfigurationsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _farmIdMeta = const VerificationMeta('farmId');
+  @override
+  late final GeneratedColumn<String> farmId = GeneratedColumn<String>(
+      'farm_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _evaluationTypeMeta =
+      const VerificationMeta('evaluationType');
+  @override
+  late final GeneratedColumn<String> evaluationType = GeneratedColumn<String>(
+      'evaluation_type', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _typeMeta = const VerificationMeta('type');
+  @override
+  late final GeneratedColumn<String> type = GeneratedColumn<String>(
+      'type', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _categoryMeta =
+      const VerificationMeta('category');
+  @override
+  late final GeneratedColumn<String> category = GeneratedColumn<String>(
+      'category', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _titleKeyMeta =
+      const VerificationMeta('titleKey');
+  @override
+  late final GeneratedColumn<String> titleKey = GeneratedColumn<String>(
+      'title_key', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _messageKeyMeta =
+      const VerificationMeta('messageKey');
+  @override
+  late final GeneratedColumn<String> messageKey = GeneratedColumn<String>(
+      'message_key', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _severityMeta =
+      const VerificationMeta('severity');
+  @override
+  late final GeneratedColumn<int> severity = GeneratedColumn<int>(
+      'severity', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _iconNameMeta =
+      const VerificationMeta('iconName');
+  @override
+  late final GeneratedColumn<String> iconName = GeneratedColumn<String>(
+      'icon_name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _colorHexMeta =
+      const VerificationMeta('colorHex');
+  @override
+  late final GeneratedColumn<String> colorHex = GeneratedColumn<String>(
+      'color_hex', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _enabledMeta =
+      const VerificationMeta('enabled');
+  @override
+  late final GeneratedColumn<bool> enabled = GeneratedColumn<bool>(
+      'enabled', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("enabled" IN (0, 1))'),
+      defaultValue: const Constant(true));
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+      'synced', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("synced" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _lastSyncedAtMeta =
+      const VerificationMeta('lastSyncedAt');
+  @override
+  late final GeneratedColumn<DateTime> lastSyncedAt = GeneratedColumn<DateTime>(
+      'last_synced_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _serverVersionMeta =
+      const VerificationMeta('serverVersion');
+  @override
+  late final GeneratedColumn<String> serverVersion = GeneratedColumn<String>(
+      'server_version', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _deletedAtMeta =
+      const VerificationMeta('deletedAt');
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+      'deleted_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        farmId,
+        evaluationType,
+        type,
+        category,
+        titleKey,
+        messageKey,
+        severity,
+        iconName,
+        colorHex,
+        enabled,
+        synced,
+        lastSyncedAt,
+        serverVersion,
+        deletedAt,
+        createdAt,
+        updatedAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'alert_configurations_table';
+  @override
+  VerificationContext validateIntegrity(
+      Insertable<AlertConfigurationData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('farm_id')) {
+      context.handle(_farmIdMeta,
+          farmId.isAcceptableOrUnknown(data['farm_id']!, _farmIdMeta));
+    } else if (isInserting) {
+      context.missing(_farmIdMeta);
+    }
+    if (data.containsKey('evaluation_type')) {
+      context.handle(
+          _evaluationTypeMeta,
+          evaluationType.isAcceptableOrUnknown(
+              data['evaluation_type']!, _evaluationTypeMeta));
+    } else if (isInserting) {
+      context.missing(_evaluationTypeMeta);
+    }
+    if (data.containsKey('type')) {
+      context.handle(
+          _typeMeta, type.isAcceptableOrUnknown(data['type']!, _typeMeta));
+    } else if (isInserting) {
+      context.missing(_typeMeta);
+    }
+    if (data.containsKey('category')) {
+      context.handle(_categoryMeta,
+          category.isAcceptableOrUnknown(data['category']!, _categoryMeta));
+    } else if (isInserting) {
+      context.missing(_categoryMeta);
+    }
+    if (data.containsKey('title_key')) {
+      context.handle(_titleKeyMeta,
+          titleKey.isAcceptableOrUnknown(data['title_key']!, _titleKeyMeta));
+    } else if (isInserting) {
+      context.missing(_titleKeyMeta);
+    }
+    if (data.containsKey('message_key')) {
+      context.handle(
+          _messageKeyMeta,
+          messageKey.isAcceptableOrUnknown(
+              data['message_key']!, _messageKeyMeta));
+    } else if (isInserting) {
+      context.missing(_messageKeyMeta);
+    }
+    if (data.containsKey('severity')) {
+      context.handle(_severityMeta,
+          severity.isAcceptableOrUnknown(data['severity']!, _severityMeta));
+    } else if (isInserting) {
+      context.missing(_severityMeta);
+    }
+    if (data.containsKey('icon_name')) {
+      context.handle(_iconNameMeta,
+          iconName.isAcceptableOrUnknown(data['icon_name']!, _iconNameMeta));
+    } else if (isInserting) {
+      context.missing(_iconNameMeta);
+    }
+    if (data.containsKey('color_hex')) {
+      context.handle(_colorHexMeta,
+          colorHex.isAcceptableOrUnknown(data['color_hex']!, _colorHexMeta));
+    } else if (isInserting) {
+      context.missing(_colorHexMeta);
+    }
+    if (data.containsKey('enabled')) {
+      context.handle(_enabledMeta,
+          enabled.isAcceptableOrUnknown(data['enabled']!, _enabledMeta));
+    }
+    if (data.containsKey('synced')) {
+      context.handle(_syncedMeta,
+          synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta));
+    }
+    if (data.containsKey('last_synced_at')) {
+      context.handle(
+          _lastSyncedAtMeta,
+          lastSyncedAt.isAcceptableOrUnknown(
+              data['last_synced_at']!, _lastSyncedAtMeta));
+    }
+    if (data.containsKey('server_version')) {
+      context.handle(
+          _serverVersionMeta,
+          serverVersion.isAcceptableOrUnknown(
+              data['server_version']!, _serverVersionMeta));
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(_deletedAtMeta,
+          deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+        {farmId, evaluationType},
+      ];
+  @override
+  AlertConfigurationData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AlertConfigurationData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      farmId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}farm_id'])!,
+      evaluationType: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}evaluation_type'])!,
+      type: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}type'])!,
+      category: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}category'])!,
+      titleKey: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}title_key'])!,
+      messageKey: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}message_key'])!,
+      severity: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}severity'])!,
+      iconName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}icon_name'])!,
+      colorHex: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}color_hex'])!,
+      enabled: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}enabled'])!,
+      synced: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}synced'])!,
+      lastSyncedAt: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}last_synced_at']),
+      serverVersion: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}server_version']),
+      deletedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}deleted_at']),
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+    );
+  }
+
+  @override
+  $AlertConfigurationsTableTable createAlias(String alias) {
+    return $AlertConfigurationsTableTable(attachedDatabase, alias);
+  }
+}
+
+class AlertConfigurationData extends DataClass
+    implements Insertable<AlertConfigurationData> {
+  /// Identifiant unique (UUID)
+  final String id;
+
+  /// Ferme propriétaire (multi-tenancy)
+  final String farmId;
+
+  /// Type d'évaluation (remanence, weighing, vaccination, etc.)
+  final String evaluationType;
+
+  /// Type d'alerte (urgent, important, routine)
+  final String type;
+
+  /// Catégorie d'alerte (remanence, identification, registre, etc.)
+  final String category;
+
+  /// Clé de traduction pour le titre (ex: alertRemanenceTitle)
+  final String titleKey;
+
+  /// Clé de traduction pour le message (ex: alertRemanenceMsg)
+  final String messageKey;
+
+  /// Niveau de sévérité (1 = faible, 2 = moyen, 3 = critique)
+  final int severity;
+
+  /// Emoji ou nom d'icône pour affichage
+  final String iconName;
+
+  /// Couleur en hexadécimal (#D32F2F)
+  final String colorHex;
+
+  /// Activation/désactivation de cette configuration par l'éleveur
+  final bool enabled;
+
+  /// Flag de synchronisation serveur
+  final bool synced;
+
+  /// Timestamp de la dernière synchronisation
+  final DateTime? lastSyncedAt;
+
+  /// Version serveur pour résolution de conflits
+  final String? serverVersion;
+
+  /// Timestamp de suppression (soft-delete)
+  final DateTime? deletedAt;
+
+  /// Timestamp de création
+  final DateTime createdAt;
+
+  /// Timestamp de dernière modification
+  final DateTime updatedAt;
+  const AlertConfigurationData(
+      {required this.id,
+      required this.farmId,
+      required this.evaluationType,
+      required this.type,
+      required this.category,
+      required this.titleKey,
+      required this.messageKey,
+      required this.severity,
+      required this.iconName,
+      required this.colorHex,
+      required this.enabled,
+      required this.synced,
+      this.lastSyncedAt,
+      this.serverVersion,
+      this.deletedAt,
+      required this.createdAt,
+      required this.updatedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['farm_id'] = Variable<String>(farmId);
+    map['evaluation_type'] = Variable<String>(evaluationType);
+    map['type'] = Variable<String>(type);
+    map['category'] = Variable<String>(category);
+    map['title_key'] = Variable<String>(titleKey);
+    map['message_key'] = Variable<String>(messageKey);
+    map['severity'] = Variable<int>(severity);
+    map['icon_name'] = Variable<String>(iconName);
+    map['color_hex'] = Variable<String>(colorHex);
+    map['enabled'] = Variable<bool>(enabled);
+    map['synced'] = Variable<bool>(synced);
+    if (!nullToAbsent || lastSyncedAt != null) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt);
+    }
+    if (!nullToAbsent || serverVersion != null) {
+      map['server_version'] = Variable<String>(serverVersion);
+    }
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  AlertConfigurationsTableCompanion toCompanion(bool nullToAbsent) {
+    return AlertConfigurationsTableCompanion(
+      id: Value(id),
+      farmId: Value(farmId),
+      evaluationType: Value(evaluationType),
+      type: Value(type),
+      category: Value(category),
+      titleKey: Value(titleKey),
+      messageKey: Value(messageKey),
+      severity: Value(severity),
+      iconName: Value(iconName),
+      colorHex: Value(colorHex),
+      enabled: Value(enabled),
+      synced: Value(synced),
+      lastSyncedAt: lastSyncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSyncedAt),
+      serverVersion: serverVersion == null && nullToAbsent
+          ? const Value.absent()
+          : Value(serverVersion),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory AlertConfigurationData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AlertConfigurationData(
+      id: serializer.fromJson<String>(json['id']),
+      farmId: serializer.fromJson<String>(json['farmId']),
+      evaluationType: serializer.fromJson<String>(json['evaluationType']),
+      type: serializer.fromJson<String>(json['type']),
+      category: serializer.fromJson<String>(json['category']),
+      titleKey: serializer.fromJson<String>(json['titleKey']),
+      messageKey: serializer.fromJson<String>(json['messageKey']),
+      severity: serializer.fromJson<int>(json['severity']),
+      iconName: serializer.fromJson<String>(json['iconName']),
+      colorHex: serializer.fromJson<String>(json['colorHex']),
+      enabled: serializer.fromJson<bool>(json['enabled']),
+      synced: serializer.fromJson<bool>(json['synced']),
+      lastSyncedAt: serializer.fromJson<DateTime?>(json['lastSyncedAt']),
+      serverVersion: serializer.fromJson<String?>(json['serverVersion']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'farmId': serializer.toJson<String>(farmId),
+      'evaluationType': serializer.toJson<String>(evaluationType),
+      'type': serializer.toJson<String>(type),
+      'category': serializer.toJson<String>(category),
+      'titleKey': serializer.toJson<String>(titleKey),
+      'messageKey': serializer.toJson<String>(messageKey),
+      'severity': serializer.toJson<int>(severity),
+      'iconName': serializer.toJson<String>(iconName),
+      'colorHex': serializer.toJson<String>(colorHex),
+      'enabled': serializer.toJson<bool>(enabled),
+      'synced': serializer.toJson<bool>(synced),
+      'lastSyncedAt': serializer.toJson<DateTime?>(lastSyncedAt),
+      'serverVersion': serializer.toJson<String?>(serverVersion),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  AlertConfigurationData copyWith(
+          {String? id,
+          String? farmId,
+          String? evaluationType,
+          String? type,
+          String? category,
+          String? titleKey,
+          String? messageKey,
+          int? severity,
+          String? iconName,
+          String? colorHex,
+          bool? enabled,
+          bool? synced,
+          Value<DateTime?> lastSyncedAt = const Value.absent(),
+          Value<String?> serverVersion = const Value.absent(),
+          Value<DateTime?> deletedAt = const Value.absent(),
+          DateTime? createdAt,
+          DateTime? updatedAt}) =>
+      AlertConfigurationData(
+        id: id ?? this.id,
+        farmId: farmId ?? this.farmId,
+        evaluationType: evaluationType ?? this.evaluationType,
+        type: type ?? this.type,
+        category: category ?? this.category,
+        titleKey: titleKey ?? this.titleKey,
+        messageKey: messageKey ?? this.messageKey,
+        severity: severity ?? this.severity,
+        iconName: iconName ?? this.iconName,
+        colorHex: colorHex ?? this.colorHex,
+        enabled: enabled ?? this.enabled,
+        synced: synced ?? this.synced,
+        lastSyncedAt:
+            lastSyncedAt.present ? lastSyncedAt.value : this.lastSyncedAt,
+        serverVersion:
+            serverVersion.present ? serverVersion.value : this.serverVersion,
+        deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+  AlertConfigurationData copyWithCompanion(
+      AlertConfigurationsTableCompanion data) {
+    return AlertConfigurationData(
+      id: data.id.present ? data.id.value : this.id,
+      farmId: data.farmId.present ? data.farmId.value : this.farmId,
+      evaluationType: data.evaluationType.present
+          ? data.evaluationType.value
+          : this.evaluationType,
+      type: data.type.present ? data.type.value : this.type,
+      category: data.category.present ? data.category.value : this.category,
+      titleKey: data.titleKey.present ? data.titleKey.value : this.titleKey,
+      messageKey:
+          data.messageKey.present ? data.messageKey.value : this.messageKey,
+      severity: data.severity.present ? data.severity.value : this.severity,
+      iconName: data.iconName.present ? data.iconName.value : this.iconName,
+      colorHex: data.colorHex.present ? data.colorHex.value : this.colorHex,
+      enabled: data.enabled.present ? data.enabled.value : this.enabled,
+      synced: data.synced.present ? data.synced.value : this.synced,
+      lastSyncedAt: data.lastSyncedAt.present
+          ? data.lastSyncedAt.value
+          : this.lastSyncedAt,
+      serverVersion: data.serverVersion.present
+          ? data.serverVersion.value
+          : this.serverVersion,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AlertConfigurationData(')
+          ..write('id: $id, ')
+          ..write('farmId: $farmId, ')
+          ..write('evaluationType: $evaluationType, ')
+          ..write('type: $type, ')
+          ..write('category: $category, ')
+          ..write('titleKey: $titleKey, ')
+          ..write('messageKey: $messageKey, ')
+          ..write('severity: $severity, ')
+          ..write('iconName: $iconName, ')
+          ..write('colorHex: $colorHex, ')
+          ..write('enabled: $enabled, ')
+          ..write('synced: $synced, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('serverVersion: $serverVersion, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id,
+      farmId,
+      evaluationType,
+      type,
+      category,
+      titleKey,
+      messageKey,
+      severity,
+      iconName,
+      colorHex,
+      enabled,
+      synced,
+      lastSyncedAt,
+      serverVersion,
+      deletedAt,
+      createdAt,
+      updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AlertConfigurationData &&
+          other.id == this.id &&
+          other.farmId == this.farmId &&
+          other.evaluationType == this.evaluationType &&
+          other.type == this.type &&
+          other.category == this.category &&
+          other.titleKey == this.titleKey &&
+          other.messageKey == this.messageKey &&
+          other.severity == this.severity &&
+          other.iconName == this.iconName &&
+          other.colorHex == this.colorHex &&
+          other.enabled == this.enabled &&
+          other.synced == this.synced &&
+          other.lastSyncedAt == this.lastSyncedAt &&
+          other.serverVersion == this.serverVersion &&
+          other.deletedAt == this.deletedAt &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class AlertConfigurationsTableCompanion
+    extends UpdateCompanion<AlertConfigurationData> {
+  final Value<String> id;
+  final Value<String> farmId;
+  final Value<String> evaluationType;
+  final Value<String> type;
+  final Value<String> category;
+  final Value<String> titleKey;
+  final Value<String> messageKey;
+  final Value<int> severity;
+  final Value<String> iconName;
+  final Value<String> colorHex;
+  final Value<bool> enabled;
+  final Value<bool> synced;
+  final Value<DateTime?> lastSyncedAt;
+  final Value<String?> serverVersion;
+  final Value<DateTime?> deletedAt;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const AlertConfigurationsTableCompanion({
+    this.id = const Value.absent(),
+    this.farmId = const Value.absent(),
+    this.evaluationType = const Value.absent(),
+    this.type = const Value.absent(),
+    this.category = const Value.absent(),
+    this.titleKey = const Value.absent(),
+    this.messageKey = const Value.absent(),
+    this.severity = const Value.absent(),
+    this.iconName = const Value.absent(),
+    this.colorHex = const Value.absent(),
+    this.enabled = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.serverVersion = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AlertConfigurationsTableCompanion.insert({
+    required String id,
+    required String farmId,
+    required String evaluationType,
+    required String type,
+    required String category,
+    required String titleKey,
+    required String messageKey,
+    required int severity,
+    required String iconName,
+    required String colorHex,
+    this.enabled = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.serverVersion = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        farmId = Value(farmId),
+        evaluationType = Value(evaluationType),
+        type = Value(type),
+        category = Value(category),
+        titleKey = Value(titleKey),
+        messageKey = Value(messageKey),
+        severity = Value(severity),
+        iconName = Value(iconName),
+        colorHex = Value(colorHex),
+        createdAt = Value(createdAt),
+        updatedAt = Value(updatedAt);
+  static Insertable<AlertConfigurationData> custom({
+    Expression<String>? id,
+    Expression<String>? farmId,
+    Expression<String>? evaluationType,
+    Expression<String>? type,
+    Expression<String>? category,
+    Expression<String>? titleKey,
+    Expression<String>? messageKey,
+    Expression<int>? severity,
+    Expression<String>? iconName,
+    Expression<String>? colorHex,
+    Expression<bool>? enabled,
+    Expression<bool>? synced,
+    Expression<DateTime>? lastSyncedAt,
+    Expression<String>? serverVersion,
+    Expression<DateTime>? deletedAt,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (farmId != null) 'farm_id': farmId,
+      if (evaluationType != null) 'evaluation_type': evaluationType,
+      if (type != null) 'type': type,
+      if (category != null) 'category': category,
+      if (titleKey != null) 'title_key': titleKey,
+      if (messageKey != null) 'message_key': messageKey,
+      if (severity != null) 'severity': severity,
+      if (iconName != null) 'icon_name': iconName,
+      if (colorHex != null) 'color_hex': colorHex,
+      if (enabled != null) 'enabled': enabled,
+      if (synced != null) 'synced': synced,
+      if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
+      if (serverVersion != null) 'server_version': serverVersion,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AlertConfigurationsTableCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? farmId,
+      Value<String>? evaluationType,
+      Value<String>? type,
+      Value<String>? category,
+      Value<String>? titleKey,
+      Value<String>? messageKey,
+      Value<int>? severity,
+      Value<String>? iconName,
+      Value<String>? colorHex,
+      Value<bool>? enabled,
+      Value<bool>? synced,
+      Value<DateTime?>? lastSyncedAt,
+      Value<String?>? serverVersion,
+      Value<DateTime?>? deletedAt,
+      Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt,
+      Value<int>? rowid}) {
+    return AlertConfigurationsTableCompanion(
+      id: id ?? this.id,
+      farmId: farmId ?? this.farmId,
+      evaluationType: evaluationType ?? this.evaluationType,
+      type: type ?? this.type,
+      category: category ?? this.category,
+      titleKey: titleKey ?? this.titleKey,
+      messageKey: messageKey ?? this.messageKey,
+      severity: severity ?? this.severity,
+      iconName: iconName ?? this.iconName,
+      colorHex: colorHex ?? this.colorHex,
+      enabled: enabled ?? this.enabled,
+      synced: synced ?? this.synced,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      serverVersion: serverVersion ?? this.serverVersion,
+      deletedAt: deletedAt ?? this.deletedAt,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (farmId.present) {
+      map['farm_id'] = Variable<String>(farmId.value);
+    }
+    if (evaluationType.present) {
+      map['evaluation_type'] = Variable<String>(evaluationType.value);
+    }
+    if (type.present) {
+      map['type'] = Variable<String>(type.value);
+    }
+    if (category.present) {
+      map['category'] = Variable<String>(category.value);
+    }
+    if (titleKey.present) {
+      map['title_key'] = Variable<String>(titleKey.value);
+    }
+    if (messageKey.present) {
+      map['message_key'] = Variable<String>(messageKey.value);
+    }
+    if (severity.present) {
+      map['severity'] = Variable<int>(severity.value);
+    }
+    if (iconName.present) {
+      map['icon_name'] = Variable<String>(iconName.value);
+    }
+    if (colorHex.present) {
+      map['color_hex'] = Variable<String>(colorHex.value);
+    }
+    if (enabled.present) {
+      map['enabled'] = Variable<bool>(enabled.value);
+    }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
+    if (lastSyncedAt.present) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt.value);
+    }
+    if (serverVersion.present) {
+      map['server_version'] = Variable<String>(serverVersion.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AlertConfigurationsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('farmId: $farmId, ')
+          ..write('evaluationType: $evaluationType, ')
+          ..write('type: $type, ')
+          ..write('category: $category, ')
+          ..write('titleKey: $titleKey, ')
+          ..write('messageKey: $messageKey, ')
+          ..write('severity: $severity, ')
+          ..write('iconName: $iconName, ')
+          ..write('colorHex: $colorHex, ')
+          ..write('enabled: $enabled, ')
+          ..write('synced: $synced, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('serverVersion: $serverVersion, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -14710,6 +15557,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $BatchesTableTable batchesTable = $BatchesTableTable(this);
   late final $LotsTableTable lotsTable = $LotsTableTable(this);
   late final $CampaignsTableTable campaignsTable = $CampaignsTableTable(this);
+  late final $AlertConfigurationsTableTable alertConfigurationsTable =
+      $AlertConfigurationsTableTable(this);
   late final FarmDao farmDao = FarmDao(this as AppDatabase);
   late final AnimalDao animalDao = AnimalDao(this as AppDatabase);
   late final BreedingDao breedingDao = BreedingDao(this as AppDatabase);
@@ -14729,6 +15578,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final BatchDao batchDao = BatchDao(this as AppDatabase);
   late final LotDao lotDao = LotDao(this as AppDatabase);
   late final CampaignDao campaignDao = CampaignDao(this as AppDatabase);
+  late final AlertConfigurationDao alertConfigurationDao =
+      AlertConfigurationDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -14749,7 +15600,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         veterinariansTable,
         batchesTable,
         lotsTable,
-        campaignsTable
+        campaignsTable,
+        alertConfigurationsTable
       ];
 }
 
@@ -21081,6 +21933,370 @@ typedef $$CampaignsTableTableProcessedTableManager = ProcessedTableManager<
     ),
     CampaignsTableData,
     PrefetchHooks Function()>;
+typedef $$AlertConfigurationsTableTableCreateCompanionBuilder
+    = AlertConfigurationsTableCompanion Function({
+  required String id,
+  required String farmId,
+  required String evaluationType,
+  required String type,
+  required String category,
+  required String titleKey,
+  required String messageKey,
+  required int severity,
+  required String iconName,
+  required String colorHex,
+  Value<bool> enabled,
+  Value<bool> synced,
+  Value<DateTime?> lastSyncedAt,
+  Value<String?> serverVersion,
+  Value<DateTime?> deletedAt,
+  required DateTime createdAt,
+  required DateTime updatedAt,
+  Value<int> rowid,
+});
+typedef $$AlertConfigurationsTableTableUpdateCompanionBuilder
+    = AlertConfigurationsTableCompanion Function({
+  Value<String> id,
+  Value<String> farmId,
+  Value<String> evaluationType,
+  Value<String> type,
+  Value<String> category,
+  Value<String> titleKey,
+  Value<String> messageKey,
+  Value<int> severity,
+  Value<String> iconName,
+  Value<String> colorHex,
+  Value<bool> enabled,
+  Value<bool> synced,
+  Value<DateTime?> lastSyncedAt,
+  Value<String?> serverVersion,
+  Value<DateTime?> deletedAt,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<int> rowid,
+});
+
+class $$AlertConfigurationsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $AlertConfigurationsTableTable> {
+  $$AlertConfigurationsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get farmId => $composableBuilder(
+      column: $table.farmId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get evaluationType => $composableBuilder(
+      column: $table.evaluationType,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get type => $composableBuilder(
+      column: $table.type, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get category => $composableBuilder(
+      column: $table.category, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get titleKey => $composableBuilder(
+      column: $table.titleKey, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get messageKey => $composableBuilder(
+      column: $table.messageKey, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get severity => $composableBuilder(
+      column: $table.severity, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get iconName => $composableBuilder(
+      column: $table.iconName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get colorHex => $composableBuilder(
+      column: $table.colorHex, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get enabled => $composableBuilder(
+      column: $table.enabled, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+      column: $table.synced, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get serverVersion => $composableBuilder(
+      column: $table.serverVersion, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+      column: $table.deletedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$AlertConfigurationsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $AlertConfigurationsTableTable> {
+  $$AlertConfigurationsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get farmId => $composableBuilder(
+      column: $table.farmId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get evaluationType => $composableBuilder(
+      column: $table.evaluationType,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get type => $composableBuilder(
+      column: $table.type, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get category => $composableBuilder(
+      column: $table.category, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get titleKey => $composableBuilder(
+      column: $table.titleKey, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get messageKey => $composableBuilder(
+      column: $table.messageKey, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get severity => $composableBuilder(
+      column: $table.severity, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get iconName => $composableBuilder(
+      column: $table.iconName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get colorHex => $composableBuilder(
+      column: $table.colorHex, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get enabled => $composableBuilder(
+      column: $table.enabled, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+      column: $table.synced, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get serverVersion => $composableBuilder(
+      column: $table.serverVersion,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+      column: $table.deletedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$AlertConfigurationsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AlertConfigurationsTableTable> {
+  $$AlertConfigurationsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get farmId =>
+      $composableBuilder(column: $table.farmId, builder: (column) => column);
+
+  GeneratedColumn<String> get evaluationType => $composableBuilder(
+      column: $table.evaluationType, builder: (column) => column);
+
+  GeneratedColumn<String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+
+  GeneratedColumn<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => column);
+
+  GeneratedColumn<String> get titleKey =>
+      $composableBuilder(column: $table.titleKey, builder: (column) => column);
+
+  GeneratedColumn<String> get messageKey => $composableBuilder(
+      column: $table.messageKey, builder: (column) => column);
+
+  GeneratedColumn<int> get severity =>
+      $composableBuilder(column: $table.severity, builder: (column) => column);
+
+  GeneratedColumn<String> get iconName =>
+      $composableBuilder(column: $table.iconName, builder: (column) => column);
+
+  GeneratedColumn<String> get colorHex =>
+      $composableBuilder(column: $table.colorHex, builder: (column) => column);
+
+  GeneratedColumn<bool> get enabled =>
+      $composableBuilder(column: $table.enabled, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get serverVersion => $composableBuilder(
+      column: $table.serverVersion, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$AlertConfigurationsTableTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $AlertConfigurationsTableTable,
+    AlertConfigurationData,
+    $$AlertConfigurationsTableTableFilterComposer,
+    $$AlertConfigurationsTableTableOrderingComposer,
+    $$AlertConfigurationsTableTableAnnotationComposer,
+    $$AlertConfigurationsTableTableCreateCompanionBuilder,
+    $$AlertConfigurationsTableTableUpdateCompanionBuilder,
+    (
+      AlertConfigurationData,
+      BaseReferences<_$AppDatabase, $AlertConfigurationsTableTable,
+          AlertConfigurationData>
+    ),
+    AlertConfigurationData,
+    PrefetchHooks Function()> {
+  $$AlertConfigurationsTableTableTableManager(
+      _$AppDatabase db, $AlertConfigurationsTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AlertConfigurationsTableTableFilterComposer(
+                  $db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AlertConfigurationsTableTableOrderingComposer(
+                  $db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AlertConfigurationsTableTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> farmId = const Value.absent(),
+            Value<String> evaluationType = const Value.absent(),
+            Value<String> type = const Value.absent(),
+            Value<String> category = const Value.absent(),
+            Value<String> titleKey = const Value.absent(),
+            Value<String> messageKey = const Value.absent(),
+            Value<int> severity = const Value.absent(),
+            Value<String> iconName = const Value.absent(),
+            Value<String> colorHex = const Value.absent(),
+            Value<bool> enabled = const Value.absent(),
+            Value<bool> synced = const Value.absent(),
+            Value<DateTime?> lastSyncedAt = const Value.absent(),
+            Value<String?> serverVersion = const Value.absent(),
+            Value<DateTime?> deletedAt = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              AlertConfigurationsTableCompanion(
+            id: id,
+            farmId: farmId,
+            evaluationType: evaluationType,
+            type: type,
+            category: category,
+            titleKey: titleKey,
+            messageKey: messageKey,
+            severity: severity,
+            iconName: iconName,
+            colorHex: colorHex,
+            enabled: enabled,
+            synced: synced,
+            lastSyncedAt: lastSyncedAt,
+            serverVersion: serverVersion,
+            deletedAt: deletedAt,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String farmId,
+            required String evaluationType,
+            required String type,
+            required String category,
+            required String titleKey,
+            required String messageKey,
+            required int severity,
+            required String iconName,
+            required String colorHex,
+            Value<bool> enabled = const Value.absent(),
+            Value<bool> synced = const Value.absent(),
+            Value<DateTime?> lastSyncedAt = const Value.absent(),
+            Value<String?> serverVersion = const Value.absent(),
+            Value<DateTime?> deletedAt = const Value.absent(),
+            required DateTime createdAt,
+            required DateTime updatedAt,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              AlertConfigurationsTableCompanion.insert(
+            id: id,
+            farmId: farmId,
+            evaluationType: evaluationType,
+            type: type,
+            category: category,
+            titleKey: titleKey,
+            messageKey: messageKey,
+            severity: severity,
+            iconName: iconName,
+            colorHex: colorHex,
+            enabled: enabled,
+            synced: synced,
+            lastSyncedAt: lastSyncedAt,
+            serverVersion: serverVersion,
+            deletedAt: deletedAt,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$AlertConfigurationsTableTableProcessedTableManager
+    = ProcessedTableManager<
+        _$AppDatabase,
+        $AlertConfigurationsTableTable,
+        AlertConfigurationData,
+        $$AlertConfigurationsTableTableFilterComposer,
+        $$AlertConfigurationsTableTableOrderingComposer,
+        $$AlertConfigurationsTableTableAnnotationComposer,
+        $$AlertConfigurationsTableTableCreateCompanionBuilder,
+        $$AlertConfigurationsTableTableUpdateCompanionBuilder,
+        (
+          AlertConfigurationData,
+          BaseReferences<_$AppDatabase, $AlertConfigurationsTableTable,
+              AlertConfigurationData>
+        ),
+        AlertConfigurationData,
+        PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -21117,4 +22333,7 @@ class $AppDatabaseManager {
       $$LotsTableTableTableManager(_db, _db.lotsTable);
   $$CampaignsTableTableTableManager get campaignsTable =>
       $$CampaignsTableTableTableManager(_db, _db.campaignsTable);
+  $$AlertConfigurationsTableTableTableManager get alertConfigurationsTable =>
+      $$AlertConfigurationsTableTableTableManager(
+          _db, _db.alertConfigurationsTable);
 }

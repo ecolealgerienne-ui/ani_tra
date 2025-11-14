@@ -25,6 +25,7 @@ import '../movement/death_screen.dart';
 //import '../treatment/0_treatment_screen.dart';
 import '../vaccination/vaccination_detail_screen.dart';
 import '../medical/medical_act_screen.dart';
+import 'add_animal_screen.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
@@ -121,21 +122,38 @@ class _AnimalDetailScreenState extends State<AnimalDetailScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(_scannedAnimal!.displayName),
-          bottom: TabBar(
-            tabs: [
-              Tab(
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(48),
+            child: TabBar(
+              onTap: (index) {
+                // ✅ Empêcher de cliquer sur Tab "Soins" si DRAFT
+                if (index == 1 && _scannedAnimal!.isDraft) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(AppLocalizations.of(context)
+                          .translate(AppStrings.notAvailableDraft)),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                }
+              },
+              tabs: [
+                Tab(
                   icon: const Icon(Icons.info),
                   text:
-                      AppLocalizations.of(context).translate(AppStrings.infos)),
-              Tab(
+                      AppLocalizations.of(context).translate(AppStrings.infos),
+                ),
+                Tab(
                   icon: const Icon(Icons.medical_services),
-                  text:
-                      AppLocalizations.of(context).translate(AppStrings.care)),
-              Tab(
+                  text: AppLocalizations.of(context).translate(AppStrings.care),
+                ),
+                Tab(
                   icon: const Icon(Icons.family_restroom),
                   text: AppLocalizations.of(context)
-                      .translate(AppStrings.genealogy)),
-            ],
+                      .translate(AppStrings.genealogy),
+                ),
+              ],
+            ),
           ),
         ),
         body: Column(
@@ -396,6 +414,35 @@ class _InfosTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // 🚨 BANNIÈRE DRAFT
+          if (currentAnimal.isDraft) ...[
+            Container(
+              padding: const EdgeInsets.all(12),
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: Colors.amber.shade50,
+                border: Border.all(color: Colors.amber, width: 2),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info, color: Colors.amber.shade700),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      '📋 Mode brouillon - Modifie à volonté. Une fois validé, données immuables.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.amber.shade700,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
           // 🆕 SECTION ALERTES EN PREMIER
           AlertsSection(animalId: currentAnimal.id),
           const SizedBox(height: 16),
@@ -403,6 +450,9 @@ class _InfosTab extends StatelessWidget {
             title: 'Informations de base',
             children: [
               _InfoRow(label: 'EID', value: _formatEID(currentAnimal.safeEid)),
+              if (currentAnimal.visualId != null &&
+                  currentAnimal.visualId!.isNotEmpty)
+                _InfoRow(label: 'ID Visuel', value: currentAnimal.visualId!),
               if (currentAnimal.officialNumber != null)
                 _InfoRow(
                     label: 'N° Officiel', value: currentAnimal.officialNumber!),
@@ -439,6 +489,15 @@ class _InfosTab extends StatelessWidget {
                       .translate(AppStrings.birthDate),
                   value: _formatDate(currentAnimal.birthDate)),
               _InfoRow(label: 'Âge', value: _getAgeFormatted()),
+              _InfoRow(
+                label: 'Créé le',
+                value: _formatDate(currentAnimal.createdAt),
+              ),
+              if (currentAnimal.validatedAt != null)
+                _InfoRow(
+                  label: 'Validé le',
+                  value: _formatDate(currentAnimal.validatedAt!),
+                ),
             ],
           ),
           const SizedBox(height: 16),
@@ -601,27 +660,152 @@ class _InfosTab extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          OutlinedButton.icon(
-            onPressed: currentAnimal.status == AnimalStatus.dead
-                ? null
-                : () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              DeathScreen(animal: currentAnimal)),
-                    );
-                  },
-            icon: const Icon(Icons.dangerous),
-            label: Text(AppLocalizations.of(context)
-                .translate(AppStrings.declareDeath)),
-            style: OutlinedButton.styleFrom(
-              minimumSize: const Size.fromHeight(48),
-              foregroundColor: currentAnimal.status == AnimalStatus.dead
-                  ? Colors.grey
-                  : Colors.red,
+          // ✅ Invisible si DRAFT
+          if (!currentAnimal.isDraft)
+            OutlinedButton.icon(
+              onPressed: currentAnimal.status == AnimalStatus.dead
+                  ? null
+                  : () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                DeathScreen(animal: currentAnimal)),
+                      );
+                    },
+              icon: const Icon(Icons.dangerous),
+              label: Text(AppLocalizations.of(context)
+                  .translate(AppStrings.declareDeath)),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size.fromHeight(48),
+                foregroundColor: currentAnimal.status == AnimalStatus.dead
+                    ? Colors.grey
+                    : Colors.red,
+              ),
             ),
-          ),
+
+          // ✅ BOUTONS DRAFT (Modifier, Valider, Supprimer)
+          if (currentAnimal.isDraft) ...[
+            const SizedBox(height: 24),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              decoration: BoxDecoration(
+                color: Colors.amber.shade50,
+                border: const Border(
+                    top: BorderSide(color: Colors.amber, width: 1)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Bouton Modifier → Naviguer vers AddAnimalScreen en mode édition
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              AddAnimalScreen(editingAnimal: currentAnimal),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.edit),
+                    label: const Text('✏️ Modifier'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Bouton Valider
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Valider l\'animal'),
+                          content: const Text(
+                              'Êtes-vous sûr? L\'animal deviendra immuable (sauf nom).'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Annuler'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                context
+                                    .read<AnimalProvider>()
+                                    .validateAnimal(currentAnimal.id);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text('✅ Animal validé')),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                              ),
+                              child: const Text('Valider'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.check_circle),
+                    label: const Text('✅ Valider'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Bouton Supprimer
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Supprimer l\'animal'),
+                          content: const Text(
+                              'Êtes-vous sûr? Cette action est irréversible.'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Annuler'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                context
+                                    .read<AnimalProvider>()
+                                    .deleteAnimal(currentAnimal.id);
+                                Navigator.pop(context);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text('🗑️ Animal supprimé')),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                              ),
+                              child: const Text('Supprimer'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.delete),
+                    label: const Text('🗑️ Supprimer'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -745,22 +929,27 @@ class _SoinsTab extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(16),
           child: ElevatedButton.icon(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MedicalActScreen(
-                      mode: MedicalActMode.singleAnimal, animalId: animal.id),
-                ),
-              ).then((_) {
-                onDeathScreenReturn?.call();
-              });
-            },
+            onPressed: animal.canReceiveCare
+                ? () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MedicalActScreen(
+                            mode: MedicalActMode.singleAnimal,
+                            animalId: animal.id),
+                      ),
+                    ).then((_) {
+                      onDeathScreenReturn?.call();
+                    });
+                  }
+                : null,
             icon: const Icon(Icons.medical_services),
             label: const Text('Traiter'),
             style: ElevatedButton.styleFrom(
               minimumSize: const Size.fromHeight(48),
-              backgroundColor: Theme.of(context).colorScheme.primary,
+              backgroundColor: animal.canReceiveCare
+                  ? Theme.of(context).colorScheme.primary
+                  : Colors.grey.shade400,
               foregroundColor: Colors.white,
             ),
           ),
@@ -1149,7 +1338,7 @@ class AlertsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AlertProvider>(
       builder: (context, alertProvider, child) {
-        final alerts = alertProvider.getAlertsForAnimal(animalId);
+        final alerts = alertProvider.getSpecificAlertsForAnimal(animalId);
 
         if (alerts.isEmpty) {
           return const SizedBox.shrink();
@@ -1256,21 +1445,24 @@ class AlertsSection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  alert.title,
+                  alert.getTitle(context),
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                     color: _getColor(alert.type),
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  alert.message,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: Colors.black87,
+                // ✅ PHASE 4 FIX: Afficher le message aussi
+                if (alert.message.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    alert.getMessage(context),
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey[700],
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           ),

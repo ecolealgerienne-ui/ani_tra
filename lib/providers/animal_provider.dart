@@ -8,6 +8,7 @@ import '../models/product.dart';
 import '../models/mother_stats.dart';
 import 'auth_provider.dart';
 import '../repositories/animal_repository.dart';
+import '../../utils/constants.dart';
 
 // lib/providers/animal_provider.dart
 // (Garder le début identique jusqu'à la ligne ~30)
@@ -599,6 +600,73 @@ class AnimalProvider extends ChangeNotifier {
   /// Invalide complètement le cache
   void invalidateCache() {
     _lastRefreshTime = null;
+  }
+
+  // ==================== DRAFT SYSTEM ====================
+  /// Valider un animal (DRAFT → ALIVE)
+  Future<void> validateAnimal(String animalId) async {
+    try {
+      final animal = _allAnimals.firstWhere((a) => a.id == animalId);
+      final updated = animal.copyWith(
+        status: AnimalStatus.alive,
+        validatedAt: DateTime.now(),
+      );
+      await updateAnimal(updated);
+      debugPrint('✅ Animal validé: $animalId');
+    } catch (e) {
+      debugPrint('❌ Error validating animal: $e');
+      rethrow;
+    }
+  }
+
+  /// Supprimer un animal (hard delete pour DRAFT)
+  Future<void> deleteAnimal(String animalId) async {
+    try {
+      await removeAnimal(animalId);
+      debugPrint('✅ Animal supprimé: $animalId');
+    } catch (e) {
+      debugPrint('❌ Error deleting animal: $e');
+      rethrow;
+    }
+  }
+
+  // ==================== DRAFT ALERTES ====================
+
+  /// Getter: Tous les animaux DRAFT en alerte (> 48h)
+  List<Animal> get alertableDrafts {
+    return animals.where((animal) {
+      if (animal.status != AnimalStatus.draft) return false;
+      return isDraftAlerting(animal);
+    }).toList();
+  }
+
+  /// Getter: Tous les animaux groupés par statut
+  Map<AnimalStatus, List<Animal>> get groupedByStatus {
+    final grouped = <AnimalStatus, List<Animal>>{};
+
+    for (final status in AnimalStatus.values) {
+      grouped[status] = animals.where((a) => a.status == status).toList();
+    }
+
+    return grouped;
+  }
+
+  /// Vérifier si un animal DRAFT est en alerte (> 48h)
+  bool isDraftAlerting(Animal animal) {
+    if (animal.status != AnimalStatus.draft) return false;
+
+    final hoursSinceCreation =
+        DateTime.now().difference(animal.createdAt).inHours;
+    return hoursSinceCreation >= AppConstants.draftAlertHours;
+  }
+
+  /// Vérifier si un animal DRAFT est en alerte CRITIQUE (> 7j)
+  bool isDraftCritical(Animal animal) {
+    if (animal.status != AnimalStatus.draft) return false;
+
+    final hoursSinceCreation =
+        DateTime.now().difference(animal.createdAt).inHours;
+    return hoursSinceCreation >= AppConstants.draftAlertLimitHours;
   }
 
   @override

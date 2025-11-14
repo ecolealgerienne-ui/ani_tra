@@ -28,8 +28,9 @@ import '../../utils/constants.dart';
 /// CrÃƒÂ©e automatiquement l'animal + le mouvement correspondant
 class AddAnimalScreen extends StatefulWidget {
   final String? scannedEID;
+  final Animal? editingAnimal;
 
-  const AddAnimalScreen({super.key, this.scannedEID});
+  const AddAnimalScreen({super.key, this.scannedEID, this.editingAnimal});
 
   @override
   State<AddAnimalScreen> createState() => _AddAnimalScreenState();
@@ -47,36 +48,72 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
   final _priceController = TextEditingController();
   final _notesController = TextEditingController();
 
-  // Ãƒâ€°tat du formulaire
+  // État du formulaire
   DateTime? _selectedBirthDate;
   AnimalSex? _selectedSex;
   String _selectedOrigin = 'Naissance';
   String? _selectedMotherId;
   String? _selectedMotherDisplay;
 
-  // Ãƒâ€°TAPE 5 : Type et Race
+  // ÉTAPE 5 : Type et Race
   String? _selectedSpeciesId;
   String? _selectedBreedId;
 
   bool _isLoading = false;
+  late bool _isEditMode;
 
   @override
   void initState() {
     super.initState();
-    // Date par dÃƒÂ©faut : aujourd'hui
-    _selectedBirthDate = DateTime.now();
-    // PrÃƒÂ©-remplir EID si fourni
-    if (widget.scannedEID != null) {
-      _primaryIdController.text = widget.scannedEID!;
+
+    // Déterminer si on est en mode édition
+    _isEditMode = widget.editingAnimal != null;
+
+    // Si on édite un animal, pré-remplir TOUS les champs
+    if (_isEditMode && widget.editingAnimal != null) {
+      final animal = widget.editingAnimal!;
+      _primaryIdController.text = animal.currentEid ?? '';
+      _officialNumberController.text = animal.officialNumber ?? '';
+      _visualIdController.text = animal.visualId ?? '';
+      _selectedBirthDate = animal.birthDate;
+      _selectedSex = animal.sex;
+      _selectedSpeciesId = animal.speciesId;
+      _selectedBreedId = animal.breedId;
+      _selectedMotherId = animal.motherId;
+      if (animal.motherId != null) {
+        final provider = context.read<AnimalProvider>();
+        final mother = provider.getAnimalById(animal.motherId!);
+        _selectedMotherDisplay = mother?.displayName;
+      }
+    } else {
+      // Mode création : date par défaut = aujourd'hui
+      _selectedBirthDate = DateTime.now();
+      // Pré-remplir EID si fourni par scan
+      if (widget.scannedEID != null) {
+        _primaryIdController.text = widget.scannedEID!;
+      }
     }
 
-    // Ãƒâ€°TAPE 5 : Charger les valeurs par dÃƒÂ©faut du SettingsProvider
+    // ÉTAPE 5 : Charger les valeurs par défaut du SettingsProvider
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final settings = context.read<SettingsProvider>();
-      setState(() {
-        _selectedSpeciesId = settings.defaultSpeciesId;
-        _selectedBreedId = settings.defaultBreedId;
-      });
+      if (!_isEditMode) {
+        setState(() {
+          _selectedSpeciesId = settings.defaultSpeciesId;
+          _selectedBreedId = settings.defaultBreedId;
+        });
+      } else {
+        if (_selectedSpeciesId == null) {
+          setState(() {
+            _selectedSpeciesId = settings.defaultSpeciesId;
+          });
+        }
+        if (_selectedBreedId == null) {
+          setState(() {
+            _selectedBreedId = settings.defaultBreedId;
+          });
+        }
+      }
     });
   }
 
@@ -250,30 +287,64 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
       final animalProvider = context.read<AnimalProvider>();
       final syncProvider = context.read<SyncProvider>();
 
-      // 1. CrÃƒÂ©er l'animal
-      final animal = Animal(
-        id: _generateId(),
-        currentEid: _primaryIdController.text.trim().isNotEmpty
-            ? _primaryIdController.text.trim()
-            : null,
-        sex: _selectedSex!,
-        status: AnimalStatus.draft,
-        validatedAt: null,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-        officialNumber: _officialNumberController.text.trim().isNotEmpty
-            ? _officialNumberController.text.trim()
-            : null,
-        birthDate: _selectedBirthDate ?? DateTime.now(),
-        motherId: _selectedMotherId,
-        // Ãƒâ€°TAPE 5 : Ajouter type et race
-        speciesId: _selectedSpeciesId,
-        breedId: _selectedBreedId,
-        visualId: _visualIdController.text.trim().isNotEmpty
-            ? _visualIdController.text.trim()
-            : null,
-      );
+      // 1. CrÃƒÂ©er ou éditer l'animal
+      final animal = _isEditMode
+          ? widget.editingAnimal!.copyWith(
+              currentEid: _primaryIdController.text.trim().isNotEmpty
+                  ? _primaryIdController.text.trim()
+                  : null,
+              officialNumber: _officialNumberController.text.trim().isNotEmpty
+                  ? _officialNumberController.text.trim()
+                  : null,
+              visualId: _visualIdController.text.trim().isNotEmpty
+                  ? _visualIdController.text.trim()
+                  : null,
+              sex: _selectedSex!,
+              birthDate: _selectedBirthDate ?? DateTime.now(),
+              motherId: _selectedMotherId,
+              speciesId: _selectedSpeciesId,
+              breedId: _selectedBreedId,
+              updatedAt: DateTime.now(),
+            )
+          : Animal(
+              id: _generateId(),
+              currentEid: _primaryIdController.text.trim().isNotEmpty
+                  ? _primaryIdController.text.trim()
+                  : null,
+              sex: _selectedSex!,
+              status: AnimalStatus.draft,
+              validatedAt: null,
+              createdAt: DateTime.now(),
+              updatedAt: DateTime.now(),
+              officialNumber: _officialNumberController.text.trim().isNotEmpty
+                  ? _officialNumberController.text.trim()
+                  : null,
+              birthDate: _selectedBirthDate ?? DateTime.now(),
+              motherId: _selectedMotherId,
+              speciesId: _selectedSpeciesId,
+              breedId: _selectedBreedId,
+              visualId: _visualIdController.text.trim().isNotEmpty
+                  ? _visualIdController.text.trim()
+                  : null,
+            );
 
+      // Mode édition : mettre à jour l'animal
+      if (_isEditMode) {
+        await animalProvider.updateAnimal(animal);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(AppLocalizations.of(context)
+                  .translate(AppStrings.animalUpdatedSuccess)),
+              backgroundColor: AppConstants.successGreen,
+            ),
+          );
+          Navigator.pop(context);
+        }
+        return; // Ne pas créer de mouvement en édition
+      }
+
+      // Mode création : ajouter l'animal
       animalProvider.addAnimal(animal);
 
       // 2. CrÃƒÂ©er le mouvement correspondant

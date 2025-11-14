@@ -43,7 +43,11 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
   final _searchController = TextEditingController();
 
   // Filtres
-  Set<AnimalStatus> _selectedStatuses = {AnimalStatus.alive};
+  // ✅ PHASE 4 FIX: Inclure les DRAFT par défaut pour afficher les alertes de brouillon
+  Set<AnimalStatus> _selectedStatuses = {
+    AnimalStatus.alive,
+    AnimalStatus.draft
+  };
   Set<AnimalSex> _selectedSexes = {};
   Set<String> _selectedAgeRanges = {};
   bool? _hasActiveWithdrawal;
@@ -199,10 +203,28 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
         return {'all': animals};
 
       // ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã¢â‚¬Â¢ NOUVEAU : Grouper par niveau d'alerte
+      // ✅ PHASE 4 FIX: NOUVEAU - Grouper par alertes AVEC groupe Brouillons EN PREMIER
       case GroupByOption.alerts:
         final alertProvider = context.read<AlertProvider>();
+        final drafts = <Animal>[];
+        final nonDrafts = <Animal>[];
 
+        // 1. Séparer les brouillons des autres
         for (final animal in animals) {
+          if (animal.status == AnimalStatus.draft) {
+            drafts.add(animal);
+          } else {
+            nonDrafts.add(animal);
+          }
+        }
+
+        // 2. Créer le groupe "📋 Brouillons" si NON VIDE
+        if (drafts.isNotEmpty) {
+          groups['📋 Brouillons'] = drafts;
+        }
+
+        // 3. Grouper les autres animaux par alerte (URGENT/IMPORTANT/Routine/Aucune alerte)
+        for (final animal in nonDrafts) {
           final animalAlerts = alertProvider.getAlertsForAnimal(animal.id);
 
           if (animalAlerts.isEmpty) {
@@ -276,7 +298,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
               key = '📋 Brouillons';
               break;
             case AnimalStatus.alive:
-              key = 'ÃƒÂ°Ã…Â¸Ã…Â¸Ã‚Â¢ Vivants';
+              key = '🟢 Vivants';
               break;
             case AnimalStatus.sold:
               key = 'ÃƒÂ°Ã…Â¸Ã…Â¸Ã‚Â  Vendus';
@@ -551,6 +573,8 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
 
           if (_groupBy == GroupByOption.alerts) {
             final Map<String, int> priority = {
+              '📋 Brouillons':
+                  0, // ✅ PHASE 4 FIX: Brouillons TOUJOURS EN PREMIER
               AppLocalizations.of(context).translate(AppStrings.urgent): 1,
               AppLocalizations.of(context).translate(AppStrings.toMonitor): 2,
               AppLocalizations.of(context).translate(AppStrings.routine): 3,
@@ -559,6 +583,21 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
 
             sortedKeys.sort((a, b) {
               // "Sans numÃƒÂ©ro officiel" reste EN PREMIER
+              if (a == officialNumberKey) return -1;
+              if (b == officialNumberKey) return 1;
+              return (priority[a] ?? 99).compareTo(priority[b] ?? 99);
+            });
+          } else if (_groupBy == GroupByOption.status) {
+            final Map<String, int> priority = {
+              '📋 Brouillons': 1,
+              '🟢 Vivants': 2,
+              '💰 Vendus': 3,
+              '💀 Morts': 4,
+              '🔪 Abattus': 5,
+            };
+
+            sortedKeys.sort((a, b) {
+              // "Sans numéro officiel" reste EN PREMIER
               if (a == officialNumberKey) return -1;
               if (b == officialNumberKey) return 1;
               return (priority[a] ?? 99).compareTo(priority[b] ?? 99);
@@ -809,12 +848,16 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
             ),
             child: Row(
               children: [
-                Text(
-                  groupName,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: getSectionColor(),
+                // ✅ PHASE 4 FIX: Expanded pour éviter overflow quand groupName est long
+                Expanded(
+                  child: Text(
+                    groupName,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: getSectionColor(),
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -907,12 +950,41 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      animal.officialNumber ?? animal.displayName,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            animal.officialNumber ?? animal.displayName,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        if (animal.isDraft)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.orange.shade100,
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: Colors.orange.shade700,
+                                width: 1,
+                              ),
+                            ),
+                            child: Text(
+                              '🟡 ${AppLocalizations.of(context).translate(AppStrings.draftStatus)}',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.orange.shade700,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -944,7 +1016,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                               ),
                             ),
                             child: Text(
-                              '${alert.category.icon} ${alert.title}',
+                              '${alert.category.icon} ${alert.getTitle(context)}',
                               style: TextStyle(
                                 fontSize: 11,
                                 color: _getAlertColor(alert.type),

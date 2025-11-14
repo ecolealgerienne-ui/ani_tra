@@ -14,11 +14,11 @@ class BatchesTable extends Table {
   // Batch data
   TextColumn get name => text()();
   TextColumn get purpose => text()(); // sale, slaughter, treatment, other
-  
+
   // ⚠️ IMPORTANT: animal_ids stocké en JSON
   // Exemple: '["animal-1", "animal-2", "animal-3"]'
   TextColumn get animalIdsJson => text().named('animal_ids_json')();
-  
+
   DateTimeColumn get usedAt => dateTime().nullable().named('used_at')();
   BoolColumn get completed => boolean().withDefault(const Constant(false))();
   TextColumn get notes => text().nullable()();
@@ -27,9 +27,10 @@ class BatchesTable extends Table {
   BoolColumn get synced => boolean().withDefault(const Constant(false))();
   DateTimeColumn get createdAt => dateTime().named('created_at')();
   DateTimeColumn get updatedAt => dateTime().named('updated_at')();
-  DateTimeColumn get lastSyncedAt => dateTime().nullable().named('last_synced_at')();
+  DateTimeColumn get lastSyncedAt =>
+      dateTime().nullable().named('last_synced_at')();
   TextColumn get serverVersion => text().nullable().named('server_version')();
-  
+
   // Soft-delete (audit trail)
   DateTimeColumn get deletedAt => dateTime().nullable().named('deleted_at')();
 
@@ -38,17 +39,11 @@ class BatchesTable extends Table {
 
   @override
   List<Set<Column>> get uniqueKeys => [
-    {farmId, name}, // Unique batch name par farm
-  ];
+        {farmId, name}, // Unique batch name par farm
+      ];
 
   @override
   List<String> get customConstraints => [
-    // FK vers farms (multi-tenancy)
-    'FOREIGN KEY (farm_id) REFERENCES farms(id) ON DELETE CASCADE',
-    
-    // Indexes pour performance
-    'CREATE INDEX IF NOT EXISTS idx_batches_farm_id ON batches(farm_id)',
-    'CREATE INDEX IF NOT EXISTS idx_batches_purpose ON batches(farm_id, purpose)',
-    'CREATE INDEX IF NOT EXISTS idx_batches_created_at ON batches(farm_id, created_at DESC)',
-  ];
+        'FOREIGN KEY (farm_id) REFERENCES farms(id) ON DELETE CASCADE',
+      ];
 }

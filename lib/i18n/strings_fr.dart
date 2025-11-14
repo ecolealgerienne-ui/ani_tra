@@ -945,4 +945,30 @@ const Map<String, String> stringsFr = {
       'Mode brouillon - Modifie à volonté. Une fois validé, données immuables.',
   'draftSinceHours': 'Brouillon depuis {hours} heures',
   'animalsInAlert': '{count} animaux en brouillon depuis > 48h',
+  'notAvailableDraft': 'Non disponible en mode brouillon',
+  'animalUpdatedSuccess': 'Modification enregistré avec succès',
+
+  // ========== ALERT CONFIGURATION MESSAGES ==========
+  'alertRemanenceTitle': 'Rémanence',
+  'alertRemanenceMsg':
+      '{animalName}: {daysRemaining}j avant abattage ({treatmentName})',
+
+  'alertWeighingTitle': 'Pesée requise',
+  'alertWeighingMsg': '{animalName}: {daysSinceWeight}j sans pesée',
+
+  'alertVaccinationTitle': 'Vaccination requise',
+  'alertVaccinationMsg': '{animalName}: vaccination {daysOverdue}j en retard',
+
+  'alertIdentificationTitle': 'Identification manquante',
+  'alertIdentificationMsg': '{animalName} ({ageInDays}j): EID obligatoire',
+
+  'alertSyncTitle': 'Synchronisation critique',
+  'alertSyncMsg':
+      'Dernière sync il y a {daysSince}j • {pending} élément(s) en attente',
+
+  'alertTreatmentTitle': 'Traitement à renouveler',
+  'alertTreatmentMsg': '{animalName}: {treatmentName} (dans {daysRemaining}j)',
+
+  'alertBatchTitle': 'Lot à finaliser',
+  'alertBatchMsg': '{batchName}: {animalCount} animal(aux)',
 };

@@ -25,7 +25,8 @@ class AnimalsTable extends Table {
   TextColumn get motherId => text().nullable().named('mother_id')();
 
   // Status
-  TextColumn get status => text()(); // 'alive', 'sold', 'dead', 'slaughtered'
+  TextColumn get status =>
+      text()(); // 'alive', 'sold', 'dead', 'slaughtered', 'draft'
 
   // DRAFT System
   DateTimeColumn get validatedAt =>
@@ -57,28 +58,12 @@ class AnimalsTable extends Table {
   @override
   Set<Column> get primaryKey => {id};
 
-  // ==================== B2: Foreign Key Constraints + Indexes ====================
-  // Combine les FK et les indexes pour l'intÃ©gritÃ© et la performance
+  // ==================== B2: Foreign Key Constraint ====================
+  /// ⚡ IMPORTANT: customConstraints MUST return String (singular), not List!
+  /// Only include FOREIGN KEY here, NOT CREATE INDEX statements
+  /// Indexes are defined in database.dart within _createAnimalsIndexes()
   @override
   List<String> get customConstraints => [
-        // FK pour intÃ©gritÃ© rÃ©fÃ©rentielle
         'FOREIGN KEY (farm_id) REFERENCES farms(id) ON DELETE CASCADE',
-
-        // Index 1: Recherches par ferme (TRÃˆS FRÃ‰QUENT)
-        'CREATE INDEX IF NOT EXISTS idx_animals_farm_id ON animals(farm_id)',
-
-        // Index 2: Recherches multi-colonnes farm + statut (filtrage courant)
-        'CREATE INDEX IF NOT EXISTS idx_animals_farm_status ON animals(farm_id, status)',
-
-        // Index 3: Tri descendant par date de crÃ©ation (pagination/listing)
-        'CREATE INDEX IF NOT EXISTS idx_animals_created_desc ON animals(created_at DESC)',
-
-        // Index 4: Soft-delete check (toutes les queries excluent deleted_at)
-        'CREATE INDEX IF NOT EXISTS idx_animals_deleted_at ON animals(deleted_at)',
-
-        // Index 5: Recherches par EID (identification courante)
-        'CREATE INDEX IF NOT EXISTS idx_animals_farm_eid ON animals(farm_id, current_eid)',
-        // Index 6: Recherche DRAFT + alertes (farm + status + validated_at)
-        'CREATE INDEX IF NOT EXISTS idx_animals_draft_alerts ON animals(farm_id, status, validated_at)',
       ];
 }

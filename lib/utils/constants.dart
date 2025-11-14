@@ -383,10 +383,20 @@ class AppConstants {
   static const double mainInputRadius = 8.0;
 
   /// Délai avant alerte DRAFT (heures)
-  static const int draftAlertHours = 48;
+  static const int draftAlertHours = 0;
 
   /// Délai avant HARD LIMIT (supprimer ou valider obligatoire)
   static const int draftAlertLimitHours = 168; // 7 jours
+
+  // ALERT CONFIGURATION - Seuils (jours)
+  static const int alertRemanenceDaysUrgent = 0; // ≤ 0j = URGENT
+  static const int alertRemanenceDaysImportant = 3; // ≤ 3j = IMPORTANT
+  static const int alertWeighingToleranceDays = 7; // > 7j sans pesée = ALERT
+  static const int alertIdentificationAgeDays = 7; // Âge > 7j = ALERT
+  static const int alertIdentificationAgeDaysUrgent = 180; // > 180j = URGENT
+  static const int alertVaccinationDaysDue = 7; // ≤ 7j avant due = ALERT
+  static const int alertVaccinationDaysOverdue =
+      0; // ≤ 0j (passé) = IMPORTANT/URGENT
 }
 
 // ==================== DATABASE ====================

@@ -3,7 +3,7 @@
 import 'package:drift/drift.dart';
 
 /// Table pour les vétérinaires
-/// 
+///
 /// Stocke les informations sur les vétérinaires avec:
 /// - Informations personnelles et professionnelles
 /// - Coordonnées complètes
@@ -27,10 +27,10 @@ class VeterinariansTable extends Table {
 
   // === Informations professionnelles ===
   TextColumn get licenseNumber => text().named('license_number')();
-  
+
   /// Liste des spécialités (JSON array): ["Ovins", "Bovins"]
   TextColumn get specialties => text()();
-  
+
   TextColumn get clinic => text().nullable()();
 
   // === Coordonnées ===
@@ -43,31 +43,40 @@ class VeterinariansTable extends Table {
   TextColumn get country => text().nullable()();
 
   // === Disponibilité ===
-  BoolColumn get isAvailable => boolean().withDefault(const Constant(true)).named('is_available')();
-  BoolColumn get emergencyService => boolean().withDefault(const Constant(false)).named('emergency_service')();
+  BoolColumn get isAvailable =>
+      boolean().withDefault(const Constant(true)).named('is_available')();
+  BoolColumn get emergencyService =>
+      boolean().withDefault(const Constant(false)).named('emergency_service')();
   TextColumn get workingHours => text().nullable().named('working_hours')();
 
   // === Tarifs ===
-  RealColumn get consultationFee => real().nullable().named('consultation_fee')();
+  RealColumn get consultationFee =>
+      real().nullable().named('consultation_fee')();
   RealColumn get emergencyFee => real().nullable().named('emergency_fee')();
   TextColumn get currency => text().nullable()();
 
   // === Notes et préférences ===
   TextColumn get notes => text().nullable()();
-  BoolColumn get isPreferred => boolean().withDefault(const Constant(false)).named('is_preferred')();
-  BoolColumn get isDefault => boolean().withDefault(const Constant(false)).named('is_default')();
+  BoolColumn get isPreferred =>
+      boolean().withDefault(const Constant(false)).named('is_preferred')();
+  BoolColumn get isDefault =>
+      boolean().withDefault(const Constant(false)).named('is_default')();
   IntColumn get rating => integer().withDefault(const Constant(5))();
 
   // === Statistiques ===
-  IntColumn get totalInterventions => integer().withDefault(const Constant(0)).named('total_interventions')();
-  DateTimeColumn get lastInterventionDate => dateTime().nullable().named('last_intervention_date')();
+  IntColumn get totalInterventions =>
+      integer().withDefault(const Constant(0)).named('total_interventions')();
+  DateTimeColumn get lastInterventionDate =>
+      dateTime().nullable().named('last_intervention_date')();
 
   // === État ===
-  BoolColumn get isActive => boolean().withDefault(const Constant(true)).named('is_active')();
+  BoolColumn get isActive =>
+      boolean().withDefault(const Constant(true)).named('is_active')();
 
   // === Sync fields (Phase 2 ready) ===
   BoolColumn get synced => boolean().withDefault(const Constant(false))();
-  DateTimeColumn get lastSyncedAt => dateTime().nullable().named('last_synced_at')();
+  DateTimeColumn get lastSyncedAt =>
+      dateTime().nullable().named('last_synced_at')();
   IntColumn get serverVersion => integer().nullable().named('server_version')();
 
   // === Soft-delete ===
@@ -82,6 +91,6 @@ class VeterinariansTable extends Table {
 
   @override
   List<String> get customConstraints => [
-    'FOREIGN KEY (farm_id) REFERENCES farms(id)',
-  ];
+        'FOREIGN KEY (farm_id) REFERENCES farms(id)',
+      ];
 }

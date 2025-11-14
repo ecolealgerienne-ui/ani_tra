@@ -9,14 +9,11 @@ import 'package:timezone/timezone.dart' as tz;
 //import 'models/animal.dart';
 import 'providers/animal_provider.dart';
 import 'providers/sync_provider.dart';
-import 'providers/qr_provider.dart';
-import 'providers/rfid_scanner_provider.dart';
 import 'providers/locale_provider.dart';
 import 'providers/batch_provider.dart';
 import 'providers/campaign_provider.dart';
 import 'providers/lot_provider.dart';
 import 'providers/weight_provider.dart';
-import 'providers/settings_provider.dart';
 import 'providers/alert_provider.dart';
 import 'providers/vaccination_provider.dart';
 import 'providers/treatment_provider.dart';
@@ -34,7 +31,7 @@ import 'screens/home/home_screen.dart';
 //import 'screens/animal/animal_detail_screen.dart';
 //import 'screens/animal/animal_list_screen.dart';
 //import 'screens/animal/animal_finder_screen.dart';
-import 'screens/animal/universal_scanner_screen.dart';
+//import 'screens/animal/universal_scanner_screen.dart';
 //import 'screens/sync/sync_screen.dart';
 import 'drift/database.dart';
 import 'repositories/animal_repository.dart';
@@ -48,6 +45,7 @@ import 'repositories/lot_repository.dart';
 import 'repositories/campaign_repository.dart';
 import 'repositories/breeding_repository.dart';
 import 'repositories/document_repository.dart';
+import 'repositories/alert_configuration_repository.dart';
 import 'database_initializer.dart';
 
 AppDatabase? _appDatabase;
@@ -114,6 +112,7 @@ void main() async {
   final breedingRepository = BreedingRepository(database);
   final documentRepository = DocumentRepository(database);
   final treatmentRepository = TreatmentRepository(database);
+  final alertConfigurationRepository = AlertConfigurationRepository(database);
 
   runApp(MyApp(
     database: database,
@@ -128,6 +127,7 @@ void main() async {
     breedingRepository: breedingRepository,
     documentRepository: documentRepository,
     treatmentRepository: treatmentRepository,
+    alertConfigurationRepository: alertConfigurationRepository,
   ));
 }
 
@@ -144,6 +144,7 @@ class MyApp extends StatelessWidget {
   final BreedingRepository breedingRepository;
   final DocumentRepository documentRepository;
   final TreatmentRepository treatmentRepository;
+  final AlertConfigurationRepository alertConfigurationRepository;
 
   const MyApp({
     super.key,
@@ -159,6 +160,7 @@ class MyApp extends StatelessWidget {
     required this.breedingRepository,
     required this.documentRepository,
     required this.treatmentRepository,
+    required this.alertConfigurationRepository,
   });
 
   @override
@@ -178,21 +180,18 @@ class MyApp extends StatelessWidget {
         Provider<BreedingRepository>.value(value: breedingRepository),
         Provider<DocumentRepository>.value(value: documentRepository),
         Provider<TreatmentRepository>.value(value: treatmentRepository),
+        Provider<AlertConfigurationRepository>.value(
+            value: alertConfigurationRepository),
 
         // === AuthProvider EN PREMIER ===
         ChangeNotifierProvider(create: (_) => AuthProvider()),
 
-        // === Providers sans dépendance ===
+        // === LocaleProvider (gestion langue) ===
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
-        ChangeNotifierProvider(create: (_) => QRProvider()),
-        ChangeNotifierProvider(create: (_) => SyncProvider()),
-        ChangeNotifierProvider(create: (_) => RFIDScannerProvider()),
+
+        // === SyncProvider (standalone) ===
         ChangeNotifierProvider(
-          create: (_) {
-            final provider = SettingsProvider();
-            provider.initializeWithDefaults();
-            return provider;
-          },
+          create: (_) => SyncProvider(),
         ),
         ChangeNotifierProvider(
           create: (_) => ReminderProvider(flutterLocalNotificationsPlugin),
@@ -303,22 +302,39 @@ class MyApp extends StatelessWidget {
               TreatmentProvider(auth, context.read<TreatmentRepository>()),
         ),
 
-        // === AlertProvider (dépend de plusieurs providers) ===
-        ChangeNotifierProxyProvider4<AnimalProvider, WeightProvider,
-            SyncProvider, VaccinationProvider, AlertProvider>(
+        // ═══════════════════════════════════════════════════════════
+        // === AlertProvider - ✅ CORRIGÉ: Injection AuthProvider ===
+        // ═══════════════════════════════════════════════════════════
+        // AVANT: ChangeNotifierProxyProvider5 (❌ MANQUAIT AuthProvider)
+        // APRÈS: ChangeNotifierProxyProvider6 (✅ INCLUT AuthProvider)
+        ChangeNotifierProxyProvider6<
+            AuthProvider,
+            AnimalProvider,
+            WeightProvider,
+            SyncProvider,
+            VaccinationProvider,
+            AlertConfigurationRepository,
+            AlertProvider>(
           create: (context) => AlertProvider(
+            authProvider: context.read<AuthProvider>(),
             animalProvider: context.read<AnimalProvider>(),
             weightProvider: context.read<WeightProvider>(),
             syncProvider: context.read<SyncProvider>(),
             vaccinationProvider: context.read<VaccinationProvider>(),
+            treatmentProvider: context.read<TreatmentProvider>(),
+            alertConfigRepository: context.read<AlertConfigurationRepository>(),
           ),
-          update: (context, animal, weight, sync, vaccination, previous) =>
+          update: (context, auth, animal, weight, sync, vaccination,
+                  alertConfig, previous) =>
               previous ??
               AlertProvider(
+                authProvider: auth,
                 animalProvider: animal,
                 weightProvider: weight,
                 syncProvider: sync,
                 vaccinationProvider: vaccination,
+                treatmentProvider: context.read<TreatmentProvider>(),
+                alertConfigRepository: alertConfig,
               ),
         ),
       ],
@@ -349,43 +365,28 @@ class MyApp extends StatelessWidget {
                 ),
                 filled: true,
                 fillColor: Colors.white,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 12.0,
+                ),
               ),
             ),
             locale: localeProvider.locale,
+            supportedLocales: const [
+              Locale('fr', 'FR'),
+              Locale('en', 'US'),
+              Locale('ar', 'SA'),
+            ],
             localizationsDelegates: const [
               AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
             ],
-            supportedLocales: const [
-              Locale('fr', ''),
-              Locale('en', ''),
-              Locale('ar', ''),
-            ],
-            routes: {
-              '/scanner': (context) => const UniversalScannerScreen(),
-            },
-            home: const MainNavigation(),
+            home: const HomeScreen(),
           );
         },
       ),
-    );
-  }
-}
-
-class MainNavigation extends StatefulWidget {
-  const MainNavigation({super.key});
-
-  @override
-  State<MainNavigation> createState() => _MainNavigationState();
-}
-
-class _MainNavigationState extends State<MainNavigation> {
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: HomeScreen(),
     );
   }
 }

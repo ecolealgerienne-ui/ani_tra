@@ -20,16 +20,18 @@ class BreedsTable extends Table {
   TextColumn get description => text().nullable()();
 
   // Display order
-  IntColumn get displayOrder => integer().withDefault(const Constant(0)).named('display_order')();
+  IntColumn get displayOrder =>
+      integer().withDefault(const Constant(0)).named('display_order')();
 
   // Active flag
-  BoolColumn get isActive => boolean().withDefault(const Constant(true)).named('is_active')();
+  BoolColumn get isActive =>
+      boolean().withDefault(const Constant(true)).named('is_active')();
 
   @override
   Set<Column> get primaryKey => {id};
 
   @override
   List<String> get customConstraints => [
-    'FOREIGN KEY (species_id) REFERENCES species(id) ON DELETE CASCADE',
-  ];
+        'FOREIGN KEY (species_id) REFERENCES species(id) ON DELETE CASCADE',
+      ];
 }

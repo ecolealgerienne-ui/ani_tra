@@ -43,9 +43,9 @@ class DatabaseInitializer {
 
       final now = DateTime.now();
 
-      // ═══════════════════════════════════════════════════════════
+      // ════════════════════════════════════════════════════════════
       // DONNÉES DE BASE
-      // ═══════════════════════════════════════════════════════════
+      // ════════════════════════════════════════════════════════════
 
       // Farms
       try {
@@ -126,11 +126,11 @@ class DatabaseInitializer {
         final breeds = [
           ('merinos', 'sheep', 'Mérinos', 'Merino', 'ميرينوس', 1),
           ('suffolk', 'sheep', 'Suffolk', 'Suffolk', 'سوفولك', 2),
-          ('lacaune', 'sheep', 'Lacaune', 'Lacaune', 'لاكون', 3),
+          ('lacaune', 'sheep', 'Lacaune', 'Lacaune', 'لاكاون', 3),
           ('holstein', 'cattle', 'Holstein', 'Holstein', 'هولشتاين', 1),
           ('charolais', 'cattle', 'Charolaise', 'Charolais', 'شارولي', 2),
           ('limousin', 'cattle', 'Limousine', 'Limousin', 'ليموزين', 3),
-          ('alpine', 'goat', 'Alpine', 'Alpine', 'ألبين', 1),
+          ('alpine', 'goat', 'Alpine', 'Alpine', 'ألبيني', 1),
           ('saanen', 'goat', 'Saanen', 'Saanen', 'سانين', 2),
           ('angora', 'goat', 'Angora', 'Angora', 'أنجورا', 3),
         ];
@@ -150,9 +150,9 @@ class DatabaseInitializer {
         debugPrint('$_tag:   ⚠️ Breeds: $e');
       }
 
-      // ═══════════════════════════════════════════════════════════
+      // ════════════════════════════════════════════════════════════
       // DONNÉES SIMPLIFIÉES (champs réels uniquement)
-      // ═══════════════════════════════════════════════════════════
+      // ════════════════════════════════════════════════════════════
 
       // Veterinarians (utilise firstName, lastName)
       try {
@@ -326,9 +326,152 @@ class DatabaseInitializer {
         debugPrint('$_tag:   ⚠️ Lot: $e');
       }
 
-      // ═══════════════════════════════════════════════════════════
+      // ════════════════════════════════════════════════════════════
+      // ALERT CONFIGURATIONS (Phase 1B) ✅ NEW
+      // ════════════════════════════════════════════════════════════
+
+      try {
+        // Remanence Alert Config
+        await db.alertConfigurationDao
+            .insertItem(AlertConfigurationsTableCompanion.insert(
+          id: 'config_remanence_1',
+          farmId: 'farm_default',
+          evaluationType: 'remanence',
+          type: 'important',
+          category: 'remanence',
+          titleKey: 'alertRemanenceTitle',
+          messageKey: 'alertRemanenceMsg',
+          severity: 2,
+          iconName: 'pill',
+          colorHex: '#F57C00',
+          enabled: const Value(true),
+          synced: const Value(false),
+          createdAt: now,
+          updatedAt: now,
+        ));
+
+        // Weighing Alert Config
+        await db.alertConfigurationDao
+            .insertItem(AlertConfigurationsTableCompanion.insert(
+          id: 'config_weighing_1',
+          farmId: 'farm_default',
+          evaluationType: 'weighing',
+          type: 'routine',
+          category: 'weighing',
+          titleKey: 'alertWeighingTitle',
+          messageKey: 'alertWeighingMsg',
+          severity: 1,
+          iconName: 'scale',
+          colorHex: '#1976D2',
+          enabled: const Value(true),
+          synced: const Value(false),
+          createdAt: now,
+          updatedAt: now,
+        ));
+
+        // Vaccination Alert Config
+        await db.alertConfigurationDao
+            .insertItem(AlertConfigurationsTableCompanion.insert(
+          id: 'config_vaccination_1',
+          farmId: 'farm_default',
+          evaluationType: 'vaccination',
+          type: 'important',
+          category: 'treatment',
+          titleKey: 'alertVaccinationTitle',
+          messageKey: 'alertVaccinationMsg',
+          severity: 2,
+          iconName: 'syringe',
+          colorHex: '#D32F2F',
+          enabled: const Value(true),
+          synced: const Value(false),
+          createdAt: now,
+          updatedAt: now,
+        ));
+
+        // Identification Alert Config
+        await db.alertConfigurationDao
+            .insertItem(AlertConfigurationsTableCompanion.insert(
+          id: 'config_identification_1',
+          farmId: 'farm_default',
+          evaluationType: 'identification',
+          type: 'urgent',
+          category: 'identification',
+          titleKey: 'alertIdentificationTitle',
+          messageKey: 'alertIdentificationMsg',
+          severity: 3,
+          iconName: 'tag',
+          colorHex: '#E53935',
+          enabled: const Value(true),
+          synced: const Value(false),
+          createdAt: now,
+          updatedAt: now,
+        ));
+
+        // Sync Required Alert Config
+        await db.alertConfigurationDao
+            .insertItem(AlertConfigurationsTableCompanion.insert(
+          id: 'config_sync_1',
+          farmId: 'farm_default',
+          evaluationType: 'syncRequired',
+          type: 'routine',
+          category: 'sync',
+          titleKey: 'alertSyncTitle',
+          messageKey: 'alertSyncMsg',
+          severity: 1,
+          iconName: 'cloud_upload',
+          colorHex: '#0288D1',
+          enabled: const Value(true),
+          synced: const Value(false),
+          createdAt: now,
+          updatedAt: now,
+        ));
+
+        // Treatment Renewal Alert Config
+        await db.alertConfigurationDao
+            .insertItem(AlertConfigurationsTableCompanion.insert(
+          id: 'config_treatment_renewal_1',
+          farmId: 'farm_default',
+          evaluationType: 'treatmentRenewal',
+          type: 'routine',
+          category: 'treatment',
+          titleKey: 'alertTreatmentRenewalTitle',
+          messageKey: 'alertTreatmentRenewalMsg',
+          severity: 1,
+          iconName: 'medication',
+          colorHex: '#0097A7',
+          enabled: const Value(true),
+          synced: const Value(false),
+          createdAt: now,
+          updatedAt: now,
+        ));
+
+        // Batch to Finalize Alert Config
+        await db.alertConfigurationDao
+            .insertItem(AlertConfigurationsTableCompanion.insert(
+          id: 'config_batch_finalize_1',
+          farmId: 'farm_default',
+          evaluationType: 'batchToFinalize',
+          type: 'routine',
+          category: 'batch',
+          titleKey: 'alertBatchFinalizeTitle',
+          messageKey: 'alertBatchFinalizeMsg',
+          severity: 1,
+          iconName: 'check_circle',
+          colorHex: '#388E3C',
+          enabled: const Value(true),
+          synced: const Value(false),
+          createdAt: now,
+          updatedAt: now,
+        ));
+
+        debugPrint('$_tag:   ✅ Alert Configurations (8)');
+      } catch (e) {
+        debugPrint('$_tag:   ⚠️ Alert Configurations: $e');
+      }
+
+      // ════════════════════════════════════════════════════════════
       // DONNÉES GÉNÉRÉES (30 animaux supplémentaires)
-      // ═══════════════════════════════════════════════════════════
+      // ════════════════════════════════════════════════════════════
 
       try {
         final farms = ['farm_default', 'farm_002', 'farm_003'];

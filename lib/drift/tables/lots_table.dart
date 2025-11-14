@@ -72,12 +72,6 @@ class LotsTable extends Table {
 
   @override
   List<String> get customConstraints => [
-        // FK vers farms (multi-tenancy)
         'FOREIGN KEY (farm_id) REFERENCES farms(id) ON DELETE CASCADE',
-
-        // Indexes pour performance
-        'CREATE INDEX IF NOT EXISTS idx_lots_farm_id ON lots(farm_id)',
-        'CREATE INDEX IF NOT EXISTS idx_lots_status ON lots(farm_id, status)',
-        'CREATE INDEX IF NOT EXISTS idx_lots_created_at ON lots(farm_id, created_at DESC)',
       ];
 }
