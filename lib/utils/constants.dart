@@ -105,6 +105,15 @@ class AppConstants {
   /// Taille de police très petite pour labels secondaires
   static const double fontSizeTiny = 11.0;
 
+  /// Taille de police micro pour badges/compteurs
+  static const double fontSizeMicro = 10.0;
+
+  /// Taille de police grande pour sous-titres importants
+  static const double fontSizeLarge = 20.0;
+
+  /// Taille de police extra large pour titres/emojis
+  static const double fontSizeExtraLarge = 24.0;
+
   // ============ OPACITY VALUES ============
   /// Opacité légère pour les badges et backgrounds subtils
   static const double opacityLight = 0.1;
@@ -113,6 +122,9 @@ class AppConstants {
   static const double opacityMedium = 0.2;
 
   // ============ ICON SIZES (si absentes) ============
+  /// Taille extra petite pour petites icônes inline
+  static const double iconSizeXSmall = 16.0;
+
   /// Taille très petite pour petites icônes inline
   static const double iconSizeTiny = 14.0;
 
@@ -132,6 +144,9 @@ class AppConstants {
   static const double fontSizeMedium = 16.0;
 
   // ============ BORDER RADIUS (si absentes) ============
+  /// Très petit border radius pour petits éléments
+  static const double borderRadiusTiny = 4.0;
+
   /// Petit border radius pour badges
   static const double borderRadiusSmall = 6.0;
 
@@ -151,6 +166,13 @@ class AppConstants {
   // ============ ICON SIZES (si absentes) ============
   /// Taille pour grandes icônes de boutons/actions principales
   static const double iconSizeExtraLarge = 36.0;
+
+  /// Taille pour très grandes icônes (états vides, illustrations)
+  static const double iconSizeHuge = 80.0;
+
+  // ============ CONTAINER SIZES ============
+  /// Taille standard des containers d'icônes carrés
+  static const double iconContainerSize = 48.0;
 
   // ============ EID HISTORY TIMELINE ============
   /// Taille du cercle de la timeline
@@ -173,6 +195,7 @@ class AppConstants {
   // ========== SETTINGS SCREEN ==========
   // ============ SPACING ============
   static const double spacingTiny = 4.0;
+  static const double spacingExtraSmall = 8.0;
   static const double spacingSmall = 12.0;
   static const double spacingMedium = 16.0;
   static const double spacingLarge = 32.0;

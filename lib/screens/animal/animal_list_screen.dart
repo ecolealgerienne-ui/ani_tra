@@ -21,6 +21,7 @@ import 'add_animal_screen.dart';
 import 'animal_finder_screen.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
+import '../../utils/constants.dart';
 
 class AnimalListScreen extends StatefulWidget {
   /// Liste d'IDs ÃƒÆ’Ã‚Â  afficher uniquement (pour filtrer depuis une alerte)
@@ -504,7 +505,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
               if (alertCount == 0) return const SizedBox.shrink();
 
               return Padding(
-                padding: const EdgeInsets.only(right: 8),
+                padding: const EdgeInsets.only(right: AppConstants.spacingExtraSmall),
                 child: Stack(
                   children: [
                     IconButton(
@@ -517,7 +518,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                       right: 8,
                       top: 8,
                       child: Container(
-                        padding: const EdgeInsets.all(4),
+                        padding: const EdgeInsets.all(AppConstants.spacingTiny),
                         decoration: const BoxDecoration(
                           color: Colors.red,
                           shape: BoxShape.circle,
@@ -530,7 +531,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                           alertCount > 9 ? '9+' : '$alertCount',
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 10,
+                            fontSize: AppConstants.fontSizeMicro,
                             fontWeight: FontWeight.bold,
                           ),
                           textAlign: TextAlign.center,
@@ -617,12 +618,12 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                 child: RefreshIndicator(
                   onRefresh: () async {
                     alertProvider.refresh();
-                    await Future.delayed(const Duration(milliseconds: 500));
+                    await Future.delayed(const AppConstants.longAnimation);
                   },
                   child: filtered.isEmpty
                       ? _buildEmptyState()
                       : ListView.builder(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(AppConstants.spacingMedium),
                           itemCount: sortedKeys.length,
                           itemBuilder: (context, index) {
                             final groupName = sortedKeys[index];
@@ -657,7 +658,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
   /// Widget : Barre de recherche
   Widget _buildSearchBar() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppConstants.spacingMedium),
       child: TextField(
         controller: _searchController,
         decoration: InputDecoration(
@@ -687,7 +688,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
             ],
           ),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
           ),
         ),
         onChanged: (value) => setState(() {}),
@@ -722,7 +723,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     final hasFilters = _getAppliedFiltersLabel().isNotEmpty;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppConstants.spacingMedium),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -735,8 +736,8 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                 label: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.warning_amber, size: 16),
-                    const SizedBox(width: 4),
+                    const Icon(Icons.warning_amber, size: AppConstants.iconSizeXSmall),
+                    const SizedBox(width: AppConstants.spacingTiny),
                     Text('${AppLocalizations.of(context).translate(AppStrings.alerts)} (${alertProvider.alertCount})'),
                   ],
                 ),
@@ -747,7 +748,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                   });
                 },
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppConstants.spacingSmall),
 
               // Dropdown Group By
               Expanded(
@@ -760,7 +761,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                       vertical: 8,
                     ),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
                     ),
                   ),
                   items: GroupByOption.values.map((option) {
@@ -768,7 +769,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                       value: option,
                       child: Text(
                         option.label(context),
-                        style: const TextStyle(fontSize: 14),
+                        style: const TextStyle(fontSize: AppConstants.fontSizeBody),
                       ),
                     );
                   }).toList(),
@@ -783,12 +784,12 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                 ),
               ),
 
-              const SizedBox(width: 12),
+              const SizedBox(width: AppConstants.spacingSmall),
               Text(
                 '$totalCount',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 16,
+                  fontSize: AppConstants.fontSizeSectionTitle,
                 ),
               ),
             ],
@@ -796,11 +797,11 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
 
           // Ligne affichage Filtres (si filtres appliquÃƒÂ©s)
           if (hasFilters) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: AppConstants.spacingExtraSmall),
             Text(
               _getAppliedFiltersLabel(),
               style: TextStyle(
-                fontSize: 13,
+                fontSize: AppConstants.fontSizeSubtitle,
                 color: Colors.grey.shade600,
                 fontStyle: FontStyle.italic,
               ),
@@ -840,11 +841,11 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
             });
           },
           child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            margin: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.symmetric(vertical: AppConstants.spacingSmall, horizontal: AppConstants.spacingMedium),
+            margin: const EdgeInsets.only(bottom: AppConstants.spacingExtraSmall),
             decoration: BoxDecoration(
               color: getSectionColor().withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
             ),
             child: Row(
               children: [
@@ -853,14 +854,14 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                   child: Text(
                     groupName,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: AppConstants.fontSizeSectionTitle,
                       fontWeight: FontWeight.bold,
                       color: getSectionColor(),
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppConstants.spacingExtraSmall),
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8,
@@ -868,12 +869,12 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                   ),
                   decoration: BoxDecoration(
                     color: getSectionColor().withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
                   ),
                   child: Text(
                     '${animals.length}',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: AppConstants.fontSizeSmall,
                       fontWeight: FontWeight.bold,
                       color: getSectionColor(),
                     ),
@@ -901,7 +902,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
             );
           }),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: AppConstants.spacingMedium),
       ],
     );
   }
@@ -913,7 +914,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     AnimalProvider animalProvider,
   ) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: AppConstants.spacingExtraSmall),
       child: InkWell(
         onTap: () {
           animalProvider.setCurrentAnimal(animal);
@@ -925,25 +926,25 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
           );
         },
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(AppConstants.spacingSmall),
           child: Row(
             children: [
               // IcÃƒÆ’Ã‚Â´ne espÃƒÆ’Ã‚Â¨ce
               Container(
-                width: 48,
-                height: 48,
+                width: AppConstants.iconContainerSize,
+                height: AppConstants.iconContainerSize,
                 decoration: BoxDecoration(
                   color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
                 ),
                 child: Center(
                   child: Text(
                     animal.speciesIcon,
-                    style: const TextStyle(fontSize: 24),
+                    style: const TextStyle(fontSize: AppConstants.fontSizeExtraLarge),
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppConstants.spacingSmall),
 
               // Infos animal
               Expanded(
@@ -956,7 +957,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                           child: Text(
                             animal.officialNumber ?? animal.displayName,
                             style: const TextStyle(
-                              fontSize: 16,
+                              fontSize: AppConstants.fontSizeSectionTitle,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -969,16 +970,16 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                             ),
                             decoration: BoxDecoration(
                               color: Colors.orange.shade100,
-                              borderRadius: BorderRadius.circular(4),
+                              borderRadius: BorderRadius.circular(AppConstants.borderRadiusTiny),
                               border: Border.all(
                                 color: Colors.orange.shade700,
-                                width: 1,
+                                width: 1.0,
                               ),
                             ),
                             child: Text(
                               '🟡 ${AppLocalizations.of(context).translate(AppStrings.draftStatus)}',
                               style: TextStyle(
-                                fontSize: 10,
+                                fontSize: AppConstants.fontSizeMicro,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.orange.shade700,
                               ),
@@ -986,17 +987,17 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                           ),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppConstants.spacingTiny),
                     Text(
                       '${animal.fullDisplayFr} • ${animal.ageFormatted}',
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: AppConstants.fontSizeSubtitle,
                         color: Colors.grey.shade600,
                       ),
                     ),
                     // ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã¢â‚¬Â¢ Badges d'alertes
                     if (alerts.isNotEmpty) ...[
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppConstants.spacingExtraSmall),
                       Wrap(
                         spacing: 4,
                         runSpacing: 4,
@@ -1009,16 +1010,16 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                             decoration: BoxDecoration(
                               color: _getAlertColor(alert.type)
                                   .withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(4),
+                              borderRadius: BorderRadius.circular(AppConstants.borderRadiusTiny),
                               border: Border.all(
                                 color: _getAlertColor(alert.type),
-                                width: 1,
+                                width: 1.0,
                               ),
                             ),
                             child: Text(
                               '${alert.category.icon} ${alert.getTitle(context)}',
                               style: TextStyle(
-                                fontSize: 11,
+                                fontSize: AppConstants.fontSizeTiny,
                                 color: _getAlertColor(alert.type),
                                 fontWeight: FontWeight.w600,
                               ),
@@ -1034,7 +1035,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
               // Badge nombre d'alertes
               if (alerts.isNotEmpty)
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(AppConstants.spacingExtraSmall),
                   decoration: BoxDecoration(
                     color: _getAlertColor(alerts.first.type)
                         .withValues(alpha: 0.1),
@@ -1043,14 +1044,14 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                   child: Text(
                     '${alerts.length}',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: AppConstants.fontSizeBody,
                       fontWeight: FontWeight.bold,
                       color: _getAlertColor(alerts.first.type),
                     ),
                   ),
                 ),
 
-              const SizedBox(width: 8),
+              const SizedBox(width: AppConstants.spacingExtraSmall),
               Icon(
                 Icons.chevron_right,
                 color: Colors.grey.shade400,
@@ -1082,14 +1083,14 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
         children: [
           Icon(
             Icons.search_off,
-            size: 80,
+            size: AppConstants.iconSizeHuge,
             color: Colors.grey.shade300,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppConstants.spacingMedium),
           Text(
             AppLocalizations.of(context).translate(AppStrings.noAnimalFoundMessage),
             style: TextStyle(
-              fontSize: 18,
+              fontSize: AppConstants.fontSizeImportant,
               color: Colors.grey.shade600,
             ),
           ),
@@ -1191,16 +1192,16 @@ class _GroupBySheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppConstants.spacingMedium),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             AppLocalizations.of(context).translate(AppStrings.groupBy),
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: AppConstants.fontSizeLarge, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppConstants.spacingMedium),
           RadioGroup<GroupByOption>(
             groupValue: currentValue,
             onChanged: (value) {
@@ -1285,7 +1286,7 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
       maxChildSize: 0.9,
       builder: (context, scrollController) {
         return Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppConstants.spacingMedium),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -1296,7 +1297,7 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                   Text(
                     AppLocalizations.of(context).translate(AppStrings.filters),
                     style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold),
+                        fontSize: AppConstants.fontSizeExtraLarge, fontWeight: FontWeight.bold),
                   ),
                   TextButton(
                     onPressed: () {
@@ -1308,7 +1309,7 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppConstants.spacingMedium),
 
               Expanded(
                 child: ListView(
@@ -1429,7 +1430,7 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                         style: const TextStyle(fontWeight: FontWeight.w600)),
                     if (_species.isEmpty)
                       Padding(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(AppConstants.spacingMedium),
                         child: Text(
                           AppLocalizations.of(context)
                               .translate(AppStrings.selectTypeFirst),
@@ -1453,7 +1454,7 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                             subtitle: breed.description != null
                                 ? Text(
                                     breed.description!,
-                                    style: const TextStyle(fontSize: 11),
+                                    style: const TextStyle(fontSize: AppConstants.fontSizeTiny),
                                   )
                                 : null,
                             value: _breeds.contains(breed.id),
@@ -1534,7 +1535,7 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                           .translate(AppStrings.cancel)),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppConstants.spacingSmall),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
