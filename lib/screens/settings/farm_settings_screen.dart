@@ -463,7 +463,6 @@ class _FarmSelectionSection extends StatelessWidget {
               );
             },
           ),
-        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -623,7 +622,6 @@ class _BreedingPreferencesSection extends StatelessWidget {
               );
             },
           ),
-        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -693,7 +691,6 @@ class _BreedingPreferencesSection extends StatelessWidget {
               );
             },
           ),
-        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -851,7 +848,6 @@ class _VeterinarianSettingsSection extends StatelessWidget {
               );
             },
           ),
-        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
