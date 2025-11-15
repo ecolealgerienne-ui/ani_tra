@@ -22,6 +22,13 @@ class TreatmentDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
+    // ✅ Récupérer le traitement à jour depuis le provider
+    final treatmentProvider = context.watch<TreatmentProvider>();
+    final currentTreatment = treatmentProvider.treatments.firstWhere(
+      (t) => t.id == treatment.id,
+      orElse: () => treatment,
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.translate(AppStrings.treatmentDetail)),
@@ -36,22 +43,22 @@ class TreatmentDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeaderCard(context),
+            _buildHeaderCard(context, currentTreatment),
             const SizedBox(height: AppConstants.spacingExtraSmall),
-            _buildInfoCard(context),
+            _buildInfoCard(context, currentTreatment),
             const SizedBox(height: AppConstants.spacingExtraSmall),
-            _buildWithdrawalCard(context),
+            _buildWithdrawalCard(context, currentTreatment),
             const SizedBox(height: AppConstants.spacingExtraSmall),
-            _buildAnimalCard(context),
+            _buildAnimalCard(context, currentTreatment),
             const SizedBox(height: AppConstants.spacingExtraSmall),
-            _buildNotesCard(context),
+            _buildNotesCard(context, currentTreatment),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeaderCard(BuildContext context) {
+  Widget _buildHeaderCard(BuildContext context, Treatment currentTreatment) {
     final l10n = AppLocalizations.of(context);
 
     return Card(
@@ -71,7 +78,7 @@ class TreatmentDetailScreen extends StatelessWidget {
                 const SizedBox(width: AppConstants.spacingSmall),
                 Expanded(
                   child: Text(
-                    treatment.productName,
+                    currentTreatment.productName,
                     style: const TextStyle(
                       fontSize: AppConstants.fontSizeImportant,
                       fontWeight: FontWeight.bold,
@@ -86,7 +93,7 @@ class TreatmentDetailScreen extends StatelessWidget {
                 Icon(Icons.science, size: AppConstants.iconSizeXSmall, color: Colors.grey[600]),
                 const SizedBox(width: AppConstants.spacingTiny),
                 Text(
-                  '${l10n.translate(AppStrings.dosage)}: ${treatment.dose.toStringAsFixed(1)} ml',
+                  '${l10n.translate(AppStrings.dosage)}: ${currentTreatment.dose.toStringAsFixed(1)} ml',
                   style: TextStyle(
                     fontSize: AppConstants.fontSizeMedium,
                     color: Colors.grey[700],
@@ -100,7 +107,7 @@ class TreatmentDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoCard(BuildContext context) {
+  Widget _buildInfoCard(BuildContext context, Treatment currentTreatment) {
     final l10n = AppLocalizations.of(context);
 
     return Card(
@@ -122,23 +129,23 @@ class TreatmentDetailScreen extends StatelessWidget {
               context,
               Icons.calendar_today,
               l10n.translate(AppStrings.date),
-              _formatDate(treatment.treatmentDate),
+              _formatDate(currentTreatment.treatmentDate),
             ),
             const SizedBox(height: AppConstants.spacingSmall),
-            if (treatment.veterinarianName != null)
+            if (currentTreatment.veterinarianName != null)
               _buildInfoRow(
                 context,
                 Icons.person,
                 l10n.translate(AppStrings.veterinarian),
-                '${l10n.translate(AppStrings.drPrefix)}${treatment.veterinarianName}',
+                '${l10n.translate(AppStrings.drPrefix)}${currentTreatment.veterinarianName}',
               ),
-            if (treatment.veterinarianName != null)
+            if (currentTreatment.veterinarianName != null)
               const SizedBox(height: AppConstants.spacingSmall),
             _buildInfoRow(
               context,
               Icons.access_time,
               l10n.translate(AppStrings.recordedOn),
-              _formatDateTime(treatment.createdAt),
+              _formatDateTime(currentTreatment.createdAt),
             ),
           ],
         ),
@@ -146,10 +153,10 @@ class TreatmentDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildWithdrawalCard(BuildContext context) {
+  Widget _buildWithdrawalCard(BuildContext context, Treatment currentTreatment) {
     final l10n = AppLocalizations.of(context);
-    final isActive = treatment.isWithdrawalActive;
-    final daysRemaining = treatment.daysUntilWithdrawalEnd;
+    final isActive = currentTreatment.isWithdrawalActive;
+    final daysRemaining = currentTreatment.daysUntilWithdrawalEnd;
 
     Color color;
     IconData icon;
@@ -168,7 +175,7 @@ class TreatmentDetailScreen extends StatelessWidget {
       }
       message = l10n
           .translate(AppStrings.withdrawalActiveUntil)
-          .replaceAll('{date}', _formatDate(treatment.withdrawalEndDate))
+          .replaceAll('{date}', _formatDate(currentTreatment.withdrawalEndDate))
           .replaceAll('{days}', daysRemaining.toString());
     } else {
       color = Colors.green;
@@ -212,7 +219,7 @@ class TreatmentDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAnimalCard(BuildContext context) {
+  Widget _buildAnimalCard(BuildContext context, Treatment currentTreatment) {
     final l10n = AppLocalizations.of(context);
 
     return Card(
@@ -221,7 +228,7 @@ class TreatmentDetailScreen extends StatelessWidget {
         padding: const EdgeInsets.all(AppConstants.spacingMedium),
         child: Consumer<AnimalProvider>(
           builder: (context, animalProvider, child) {
-            final animal = animalProvider.getAnimalById(treatment.animalId);
+            final animal = animalProvider.getAnimalById(currentTreatment.animalId);
 
             if (animal == null) {
               return Row(
@@ -291,9 +298,9 @@ class TreatmentDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNotesCard(BuildContext context) {
+  Widget _buildNotesCard(BuildContext context, Treatment currentTreatment) {
     final l10n = AppLocalizations.of(context);
-    final hasNotes = treatment.notes != null && treatment.notes!.isNotEmpty;
+    final hasNotes = currentTreatment.notes != null && currentTreatment.notes!.isNotEmpty;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: AppConstants.spacingMedium),
@@ -314,7 +321,7 @@ class TreatmentDetailScreen extends StatelessWidget {
                 ),
                 IconButton(
                   icon: const Icon(Icons.edit, size: AppConstants.iconSizeRegular),
-                  onPressed: () => _showEditNotesDialog(context),
+                  onPressed: () => _showEditNotesDialog(context, currentTreatment),
                   tooltip: l10n.translate(AppStrings.editNotes),
                 ),
               ],
@@ -322,7 +329,7 @@ class TreatmentDetailScreen extends StatelessWidget {
             const Divider(height: AppConstants.spacingMediumLarge),
             Text(
               hasNotes
-                  ? treatment.notes!
+                  ? currentTreatment.notes!
                   : l10n.translate(AppStrings.noNotes),
               style: TextStyle(
                 fontSize: AppConstants.fontSizeBody,
@@ -362,13 +369,13 @@ class TreatmentDetailScreen extends StatelessWidget {
     );
   }
 
-  void _showEditNotesDialog(BuildContext context) {
-    final notesController = TextEditingController(text: treatment.notes ?? '');
+  void _showEditNotesDialog(BuildContext context, Treatment currentTreatment) {
+    final notesController = TextEditingController(text: currentTreatment.notes ?? '');
 
     showDialog(
       context: context,
       builder: (context) => _EditNotesDialog(
-        treatment: treatment,
+        treatment: currentTreatment,
         notesController: notesController,
       ),
     );

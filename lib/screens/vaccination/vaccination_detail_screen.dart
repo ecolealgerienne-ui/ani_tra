@@ -22,6 +22,13 @@ class VaccinationDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
+    // ✅ Récupérer la vaccination à jour depuis le provider
+    final vaccinationProvider = context.watch<VaccinationProvider>();
+    final currentVaccination = vaccinationProvider.vaccinations.firstWhere(
+      (v) => v.id == vaccination.id,
+      orElse: () => vaccination,
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.translate(AppStrings.vaccinationDetail)),
@@ -36,19 +43,19 @@ class VaccinationDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeaderCard(context),
+            _buildHeaderCard(context, currentVaccination),
             const SizedBox(height: AppConstants.spacingExtraSmall),
-            _buildInfoCard(context),
+            _buildInfoCard(context, currentVaccination),
             const SizedBox(height: AppConstants.spacingExtraSmall),
-            _buildAnimalCard(context),
+            _buildAnimalCard(context, currentVaccination),
             const SizedBox(height: AppConstants.spacingExtraSmall),
-            if (vaccination.nextDueDate != null) _buildReminderCard(context),
+            if (currentVaccination.nextDueDate != null) _buildReminderCard(context, currentVaccination),
             const SizedBox(height: AppConstants.spacingExtraSmall),
-            _buildNotesCard(context),
+            _buildNotesCard(context, currentVaccination),
             const SizedBox(height: AppConstants.spacingExtraSmall),
-            if (vaccination.protocolId != null) ...[
+            if (currentVaccination.protocolId != null) ...[
               const SizedBox(height: AppConstants.spacingExtraSmall),
-              _buildProtocolCard(context),
+              _buildProtocolCard(context, currentVaccination),
             ],
           ],
         ),
@@ -56,7 +63,7 @@ class VaccinationDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeaderCard(BuildContext context) {
+  Widget _buildHeaderCard(BuildContext context, Vaccination currentVaccination) {
     final l10n = AppLocalizations.of(context);
 
     return Card(
@@ -74,22 +81,22 @@ class VaccinationDetailScreen extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: _getTypeColor(vaccination.type)
+                    color: _getTypeColor(currentVaccination.type)
                         .withValues(alpha: AppConstants.opacityMedium),
                     borderRadius:
                         BorderRadius.circular(AppConstants.borderRadiusSmall),
                   ),
                   child: Text(
-                    vaccination.type.label,
+                    currentVaccination.type.label,
                     style: TextStyle(
                       fontSize: AppConstants.fontSizeSmall,
                       fontWeight: FontWeight.bold,
-                      color: _getTypeColor(vaccination.type),
+                      color: _getTypeColor(currentVaccination.type),
                     ),
                   ),
                 ),
                 const Spacer(),
-                if (vaccination.isGroupVaccination)
+                if (currentVaccination.isGroupVaccination)
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
@@ -108,7 +115,7 @@ class VaccinationDetailScreen extends StatelessWidget {
                             color: Colors.blue),
                         const SizedBox(width: AppConstants.spacingTiny),
                         Text(
-                          '${vaccination.animalCount} ${l10n.translate(AppStrings.animalsLowercase)}',
+                          '${currentVaccination.animalCount} ${l10n.translate(AppStrings.animalsLowercase)}',
                           style: const TextStyle(
                             fontSize: AppConstants.fontSizeSmall,
                             fontWeight: FontWeight.bold,
@@ -122,7 +129,7 @@ class VaccinationDetailScreen extends StatelessWidget {
             ),
             const SizedBox(height: AppConstants.spacingMedium),
             Text(
-              vaccination.vaccineName,
+              currentVaccination.vaccineName,
               style: const TextStyle(
                 fontSize: AppConstants.fontSizeLargeTitle,
                 fontWeight: FontWeight.bold,
@@ -135,7 +142,7 @@ class VaccinationDetailScreen extends StatelessWidget {
                     size: AppConstants.iconSizeSmall, color: Colors.red),
                 const SizedBox(width: AppConstants.spacingExtraSmall),
                 Text(
-                  vaccination.disease,
+                  currentVaccination.disease,
                   style: const TextStyle(
                     fontSize: AppConstants.fontSizeSectionTitle,
                     color: Colors.red,
@@ -150,7 +157,7 @@ class VaccinationDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoCard(BuildContext context) {
+  Widget _buildInfoCard(BuildContext context, Vaccination currentVaccination) {
     final l10n = AppLocalizations.of(context);
 
     return Card(
@@ -172,61 +179,61 @@ class VaccinationDetailScreen extends StatelessWidget {
               context,
               Icons.calendar_today,
               l10n.translate(AppStrings.vaccinationDate),
-              _formatDate(vaccination.vaccinationDate),
+              _formatDate(currentVaccination.vaccinationDate),
             ),
             const Divider(height: AppConstants.spacingMediumLarge),
             _buildInfoRow(
               context,
               Icons.science,
               l10n.translate(AppStrings.doseLabel),
-              vaccination.dose,
+              currentVaccination.dose,
             ),
             const Divider(height: AppConstants.spacingMediumLarge),
             _buildInfoRow(
               context,
               Icons.local_hospital,
               l10n.translate(AppStrings.administrationRoute),
-              vaccination.administrationRoute,
+              currentVaccination.administrationRoute,
             ),
-            if (vaccination.batchNumber != null) ...[
+            if (currentVaccination.batchNumber != null) ...[
               const Divider(height: AppConstants.spacingMediumLarge),
               _buildInfoRow(
                 context,
                 Icons.qr_code,
                 l10n.translate(AppStrings.lotNumber),
-                vaccination.batchNumber!,
+                currentVaccination.batchNumber!,
               ),
             ],
-            if (vaccination.expiryDate != null) ...[
+            if (currentVaccination.expiryDate != null) ...[
               const Divider(height: AppConstants.spacingMediumLarge),
               _buildInfoRow(
                 context,
                 Icons.event_busy,
                 l10n.translate(AppStrings.expirationDate),
-                _formatDate(vaccination.expiryDate!),
+                _formatDate(currentVaccination.expiryDate!),
               ),
             ],
-            if (vaccination.veterinarianName != null) ...[
+            if (currentVaccination.veterinarianName != null) ...[
               const Divider(height: AppConstants.spacingMediumLarge),
               _buildInfoRow(
                 context,
                 Icons.person,
                 l10n.translate(AppStrings.veterinarianLabel),
-                vaccination.veterinarianName!,
+                currentVaccination.veterinarianName!,
               ),
             ],
-            if (vaccination.withdrawalPeriodDays > 0) ...[
+            if (currentVaccination.withdrawalPeriodDays > 0) ...[
               const Divider(height: AppConstants.spacingMediumLarge),
               _buildInfoRow(
                 context,
                 Icons.access_time,
                 l10n.translate(AppStrings.withdrawalPeriodLabel),
-                '${vaccination.withdrawalPeriodDays} ${l10n.translate(AppStrings.days)}',
-                valueColor: vaccination.isInWithdrawalPeriod
+                '${currentVaccination.withdrawalPeriodDays} ${l10n.translate(AppStrings.days)}',
+                valueColor: currentVaccination.isInWithdrawalPeriod
                     ? Colors.red
                     : Colors.grey[700],
               ),
-              if (vaccination.isInWithdrawalPeriod)
+              if (currentVaccination.isInWithdrawalPeriod)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: Container(
@@ -245,7 +252,7 @@ class VaccinationDetailScreen extends StatelessWidget {
                         Text(
                           l10n.translate(AppStrings.daysRemaining).replaceAll(
                               '{days}',
-                              vaccination.daysRemainingInWithdrawal.toString()),
+                              currentVaccination.daysRemainingInWithdrawal.toString()),
                           style: const TextStyle(
                             fontSize: AppConstants.fontSizeSmall,
                             color: Colors.red,
@@ -263,7 +270,7 @@ class VaccinationDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAnimalCard(BuildContext context) {
+  Widget _buildAnimalCard(BuildContext context, Vaccination currentVaccination) {
     final l10n = AppLocalizations.of(context);
     final animalProvider = context.read<AnimalProvider>();
 
@@ -292,27 +299,27 @@ class VaccinationDetailScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: AppConstants.spacingSmall),
-            if (vaccination.isGroupVaccination)
+            if (currentVaccination.isGroupVaccination)
               Text(
                 l10n
                     .translate(AppStrings.groupVaccination)
-                    .replaceAll('{count}', vaccination.animalCount.toString()),
+                    .replaceAll('{count}', currentVaccination.animalCount.toString()),
                 style: TextStyle(
                   fontSize: AppConstants.fontSizeBody,
                   color: Colors.grey[700],
                 ),
               )
-            else if (vaccination.animalId != null &&
-                vaccination.animalId!.isNotEmpty)
+            else if (currentVaccination.animalId != null &&
+                currentVaccination.animalId!.isNotEmpty)
               FutureBuilder(
                 future: Future.value(
-                    animalProvider.getAnimalById(vaccination.animalId!)),
+                    animalProvider.getAnimalById(currentVaccination.animalId!)),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return Text(
                       l10n
                           .translate(AppStrings.animalPrefix)
-                          .replaceAll('{id}', vaccination.animalId!),
+                          .replaceAll('{id}', currentVaccination.animalId!),
                       style: TextStyle(
                           fontSize: AppConstants.fontSizeBody,
                           color: Colors.grey[700]),
@@ -342,9 +349,9 @@ class VaccinationDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildReminderCard(BuildContext context) {
+  Widget _buildReminderCard(BuildContext context, Vaccination currentVaccination) {
     final l10n = AppLocalizations.of(context);
-    final days = vaccination.nextDueDate?.difference(DateTime.now()).inDays;
+    final days = currentVaccination.nextDueDate?.difference(DateTime.now()).inDays;
     final isOverdue = days! < 0;
     final color = isOverdue ? Colors.red : Colors.orange;
 
@@ -402,7 +409,7 @@ class VaccinationDetailScreen extends StatelessWidget {
                   const SizedBox(height: AppConstants.spacingTiny),
                   Text(
                     l10n.translate(AppStrings.nextReminder).replaceAll(
-                        '{date}', _formatDate(vaccination.nextDueDate!)),
+                        '{date}', _formatDate(currentVaccination.nextDueDate!)),
                     style: TextStyle(
                       fontSize: AppConstants.fontSizeBody,
                       color: Colors.grey[700],
@@ -417,9 +424,9 @@ class VaccinationDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNotesCard(BuildContext context) {
+  Widget _buildNotesCard(BuildContext context, Vaccination currentVaccination) {
     final l10n = AppLocalizations.of(context);
-    final hasNotes = vaccination.notes != null && vaccination.notes!.isNotEmpty;
+    final hasNotes = currentVaccination.notes != null && currentVaccination.notes!.isNotEmpty;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: AppConstants.spacingMedium),
@@ -447,14 +454,14 @@ class VaccinationDetailScreen extends StatelessWidget {
                 ),
                 IconButton(
                   icon: const Icon(Icons.edit, size: AppConstants.iconSizeRegular),
-                  onPressed: () => _showEditNotesDialog(context),
+                  onPressed: () => _showEditNotesDialog(context, currentVaccination),
                   tooltip: l10n.translate(AppStrings.editNotes),
                 ),
               ],
             ),
             const SizedBox(height: AppConstants.spacingSmall),
             Text(
-              hasNotes ? vaccination.notes! : l10n.translate(AppStrings.noNotes),
+              hasNotes ? currentVaccination.notes! : l10n.translate(AppStrings.noNotes),
               style: TextStyle(
                 fontSize: AppConstants.fontSizeBody,
                 color: hasNotes ? Colors.grey[700] : Colors.grey,
@@ -467,22 +474,22 @@ class VaccinationDetailScreen extends StatelessWidget {
     );
   }
 
-  void _showEditNotesDialog(BuildContext context) {
-    final notesController = TextEditingController(text: vaccination.notes ?? '');
+  void _showEditNotesDialog(BuildContext context, Vaccination currentVaccination) {
+    final notesController = TextEditingController(text: currentVaccination.notes ?? '');
 
     showDialog(
       context: context,
       builder: (context) => _EditNotesDialog(
-        vaccination: vaccination,
+        vaccination: currentVaccination,
         notesController: notesController,
       ),
     );
   }
 
-  Widget _buildProtocolCard(BuildContext context) {
+  Widget _buildProtocolCard(BuildContext context, Vaccination currentVaccination) {
     final l10n = AppLocalizations.of(context);
     final protocol = VaccinationProtocols.getProtocolById(
-      vaccination.protocolId!,
+      currentVaccination.protocolId!,
     );
 
     if (protocol == null) return const SizedBox.shrink();
