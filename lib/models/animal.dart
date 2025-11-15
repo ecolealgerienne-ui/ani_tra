@@ -152,12 +152,6 @@ class Animal implements SyncableEntity {
   /// ❌ DRAFT, DEAD, SOLD, SLAUGHTERED: non
   bool get canReceiveCare => status == AnimalStatus.alive;
 
-  /// Les enregistrements de l'animal peuvent-ils être modifiés?
-  /// (notes, EID, poids, etc.)
-  /// ✅ ALIVE (vivant): oui
-  /// ❌ DRAFT, DEAD, SOLD, SLAUGHTERED: non
-  bool get canEditRecords => status == AnimalStatus.alive;
-
   /// L'animal peut-il avoir des enregistrements modifiés (pesées, traitements, etc.)?
   /// ✅ ALIVE validé
   /// ❌ DRAFT, DEAD, SOLD, SLAUGHTERED: non
