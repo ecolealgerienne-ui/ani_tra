@@ -434,13 +434,13 @@ class _FarmSelectionSection extends StatelessWidget {
                         isSelected ? FontWeight.bold : FontWeight.normal,
                     color: isSelected
                         ? Theme.of(context).primaryColor
-                        : Theme.of(context).textTheme.bodyLarge?.color,
+                        : Colors.black87,
                   ),
                 ),
                 subtitle: Text(
                   farm.location,
-                  style: TextStyle(
-                    color: Theme.of(context).textTheme.bodyMedium?.color,
+                  style: const TextStyle(
+                    color: Colors.black54,
                   ),
                 ),
                 trailing: isSelected
@@ -592,7 +592,7 @@ class _BreedingPreferencesSection extends StatelessWidget {
                         isSelected ? FontWeight.bold : FontWeight.normal,
                     color: isSelected
                         ? Theme.of(context).primaryColor
-                        : Theme.of(context).textTheme.bodyLarge?.color,
+                        : Colors.black87,
                   ),
                 ),
                 trailing: isSelected
@@ -654,7 +654,7 @@ class _BreedingPreferencesSection extends StatelessWidget {
                         isSelected ? FontWeight.bold : FontWeight.normal,
                     color: isSelected
                         ? Theme.of(context).primaryColor
-                        : Theme.of(context).textTheme.bodyLarge?.color,
+                        : Colors.black87,
                   ),
                 ),
                 trailing: isSelected
@@ -768,7 +768,7 @@ class _VeterinarianSettingsSection extends StatelessWidget {
                           : FontWeight.normal,
                       color: defaultVeterinarianId == null
                           ? Theme.of(context).primaryColor
-                          : Theme.of(context).textTheme.bodyLarge?.color,
+                          : Colors.black87,
                     ),
                   ),
                   trailing: defaultVeterinarianId == null
@@ -798,13 +798,13 @@ class _VeterinarianSettingsSection extends StatelessWidget {
                         isSelected ? FontWeight.bold : FontWeight.normal,
                     color: isSelected
                         ? Theme.of(context).primaryColor
-                        : Theme.of(context).textTheme.bodyLarge?.color,
+                        : Colors.black87,
                   ),
                 ),
                 subtitle: Text(
                   vet.clinic ?? '',
-                  style: TextStyle(
-                    color: Theme.of(context).textTheme.bodyMedium?.color,
+                  style: const TextStyle(
+                    color: Colors.black54,
                   ),
                 ),
                 trailing: isSelected
