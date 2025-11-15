@@ -370,6 +370,19 @@ class _InfosTab extends StatelessWidget {
     // automatiquement les changements et rebuild les widgets
   }
 
+  /// Afficher le dialog d'édition des notes
+  void _showEditNotesDialog(BuildContext context, Animal animal) {
+    final notesController = TextEditingController(text: animal.notes ?? '');
+
+    showDialog(
+      context: context,
+      builder: (context) => _EditNotesDialog(
+        animal: animal,
+        notesController: notesController,
+      ),
+    );
+  }
+
   String _getAgeFormatted() {
     final ageMonths = animal.ageInMonths;
     if (ageMonths < 12) {
@@ -586,6 +599,32 @@ class _InfosTab extends StatelessWidget {
             EidHistoryCard(history: currentAnimal.eidHistory!),
             const SizedBox(height: AppConstants.spacingMedium),
           ],
+
+          // Section Notes
+          _InfoCard(
+            title: AppLocalizations.of(context).translate(AppStrings.notes),
+            trailing: (currentAnimal.isDraft || currentAnimal.status == AnimalStatus.alive)
+                ? IconButton(
+                    icon: const Icon(Icons.edit),
+                    tooltip: AppLocalizations.of(context).translate(AppStrings.editNotes),
+                    onPressed: () => _showEditNotesDialog(context, currentAnimal),
+                  )
+                : null,
+            children: [
+              _InfoRow(
+                label: '',
+                value: currentAnimal.hasNotes
+                    ? currentAnimal.notes!
+                    : AppLocalizations.of(context).translate(AppStrings.noNotes),
+                valueStyle: TextStyle(
+                  color: currentAnimal.hasNotes ? Colors.black87 : Colors.grey,
+                  fontStyle: currentAnimal.hasNotes ? FontStyle.normal : FontStyle.italic,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: AppConstants.spacingMedium),
 
           _InfoCard(
             title: AppLocalizations.of(context).translate(AppStrings.weight),
@@ -1675,6 +1714,135 @@ class _VaccinationCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+// ==================== EDIT NOTES DIALOG ====================
+
+class _EditNotesDialog extends StatefulWidget {
+  final Animal animal;
+  final TextEditingController notesController;
+
+  const _EditNotesDialog({
+    required this.animal,
+    required this.notesController,
+  });
+
+  @override
+  State<_EditNotesDialog> createState() => _EditNotesDialogState();
+}
+
+class _EditNotesDialogState extends State<_EditNotesDialog> {
+  static const int maxLength = 1000;
+  bool _isSaving = false;
+
+  @override
+  void dispose() {
+    widget.notesController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _saveNotes() async {
+    setState(() => _isSaving = true);
+
+    try {
+      final animalProvider = context.read<AnimalProvider>();
+      final updatedAnimal = widget.animal.copyWith(
+        notes: widget.notesController.text.trim().isEmpty
+            ? null
+            : widget.notesController.text.trim(),
+      );
+
+      await animalProvider.updateAnimal(updatedAnimal);
+
+      if (mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context).translate(AppStrings.notesSaved),
+            ),
+            backgroundColor: AppConstants.successGreen,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)
+                  .translate(AppStrings.errorOccurred)
+                  .replaceAll('{error}', e.toString()),
+            ),
+            backgroundColor: AppConstants.statusDanger,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(AppLocalizations.of(context).translate(AppStrings.editNotes)),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisStart,
+          children: [
+            TextField(
+              controller: widget.notesController,
+              maxLength: maxLength,
+              maxLines: 8,
+              decoration: InputDecoration(
+                hintText: AppLocalizations.of(context)
+                    .translate(AppStrings.notesPlaceholder),
+                border: const OutlineInputBorder(),
+                helperText: AppLocalizations.of(context)
+                    .translate(AppStrings.notesMaxLength),
+              ),
+              enabled: !_isSaving,
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _isSaving ? null : () => Navigator.pop(context),
+          child: Text(AppLocalizations.of(context).translate(AppStrings.cancel)),
+        ),
+        ElevatedButton(
+          onPressed: _isSaving ? null : _saveNotes,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppConstants.successGreen,
+            foregroundColor: Colors.white,
+          ),
+          child: _isSaving
+              ? const SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.save, size: 18),
+                    const SizedBox(width: 4),
+                    Text(AppLocalizations.of(context).translate(AppStrings.save)),
+                  ],
+                ),
+        ),
+      ],
     );
   }
 }

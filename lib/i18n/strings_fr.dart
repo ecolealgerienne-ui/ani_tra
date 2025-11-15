@@ -483,6 +483,7 @@ const Map<String, String> stringsFr = {
   'noNotes': 'Aucune note',
   'notesPlaceholder': 'Saisissez vos observations sur cet animal...',
   'notesMaxLength': 'Maximum 1000 caractères',
+  'notesSaved': 'Notes enregistrées',
   'treatmentWillApplyToAnimals': 'Le traitement sera appliqué aux animaux',
   'typeNotDefined': 'Type non défini',
   'allGoodWithHerd': 'Tout va bien avec votre troupeau',

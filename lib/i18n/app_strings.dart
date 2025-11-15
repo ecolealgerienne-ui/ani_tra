@@ -521,6 +521,7 @@ class AppStrings {
   static const String noNotes = 'noNotes';
   static const String notesPlaceholder = 'notesPlaceholder';
   static const String notesMaxLength = 'notesMaxLength';
+  static const String notesSaved = 'notesSaved';
 
   // Ajouter dans la section MEDICAL & EVENTS
   static const String causeNotSpecified = 'causeNotSpecified';

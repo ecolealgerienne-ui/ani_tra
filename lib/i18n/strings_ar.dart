@@ -439,6 +439,7 @@ const Map<String, String> stringsAr = {
   'noNotes': 'لا توجد ملاحظات',
   'notesPlaceholder': 'أدخل ملاحظاتك حول هذا الحيوان...',
   'notesMaxLength': 'الحد الأقصى 1000 حرف',
+  'notesSaved': 'تم حفظ الملاحظات',
   'treatmentWillApplyToAnimals': 'سيتم تطبيق العلاج على الحيوانات',
   'typeNotDefined': 'النوع غير محدد',
   'allGoodWithHerd': 'كل شيء على ما يرام مع قطيعك',
