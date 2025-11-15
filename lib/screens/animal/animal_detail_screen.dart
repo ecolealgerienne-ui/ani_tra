@@ -882,6 +882,10 @@ class _SoinsTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final animalProvider = context.watch<AnimalProvider>();
     final vaccinationProvider = context.watch<VaccinationProvider>();
+
+    // ✅ Récupérer l'animal à jour depuis le provider
+    final currentAnimal = animalProvider.getAnimalById(animal.id) ?? animal;
+
     final treatments = animalProvider.getAnimalTreatments(animal.id);
     final vaccinations =
         vaccinationProvider.getVaccinationsForAnimal(animal.id);
@@ -966,14 +970,14 @@ class _SoinsTab extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(AppConstants.spacingMedium),
           child: ElevatedButton.icon(
-            onPressed: animal.canReceiveCare
+            onPressed: currentAnimal.canReceiveCare
                 ? () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => MedicalActScreen(
                             mode: MedicalActMode.singleAnimal,
-                            animalId: animal.id),
+                            animalId: currentAnimal.id),
                       ),
                     ).then((_) {
                       onDeathScreenReturn?.call();
@@ -984,7 +988,7 @@ class _SoinsTab extends StatelessWidget {
             label: Text(AppLocalizations.of(context).translate(AppStrings.treat)),
             style: ElevatedButton.styleFrom(
               minimumSize: const Size.fromHeight(48),
-              backgroundColor: animal.canReceiveCare
+              backgroundColor: currentAnimal.canReceiveCare
                   ? Theme.of(context).colorScheme.primary
                   : Colors.grey.shade400,
               foregroundColor: Colors.white,
