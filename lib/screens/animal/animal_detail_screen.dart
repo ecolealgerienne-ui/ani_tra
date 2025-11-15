@@ -14,6 +14,7 @@ import '../../providers/weight_provider.dart';
 import '../../providers/sync_provider.dart';
 import '../../providers/alert_provider.dart';
 import '../../providers/vaccination_provider.dart';
+import '../../providers/treatment_provider.dart';
 import '../../models/alert.dart';
 import '../../models/alert_type.dart';
 import '../../models/alert_category.dart';
@@ -397,6 +398,7 @@ class _InfosTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final animalProvider = context.watch<AnimalProvider>();
     final weightProvider = context.watch<WeightProvider>();
+    final treatmentProvider = context.watch<TreatmentProvider>();
 
     // Récupérer l'animal à jour depuis le Provider (au cas où il a changé)
     //final currentAnimal = animalProvider.getAnimalById(animal.id) ?? animal;
@@ -410,7 +412,8 @@ class _InfosTab extends StatelessWidget {
     allWeights.sort((a, b) => b.recordedAt.compareTo(a.recordedAt));
     final latestWeight = allWeights.isNotEmpty ? allWeights.first : null;
 
-    final treatments = animalProvider.getAnimalTreatments(currentAnimal.id);
+    // ✅ Utiliser TreatmentProvider au lieu de AnimalProvider
+    final treatments = treatmentProvider.getTreatmentsForAnimal(currentAnimal.id);
 
     bool hasActiveWithdrawal = false;
     for (final treatment in treatments) {
@@ -882,6 +885,7 @@ class _SoinsTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final animalProvider = context.watch<AnimalProvider>();
     final vaccinationProvider = context.watch<VaccinationProvider>();
+    final treatmentProvider = context.watch<TreatmentProvider>();
 
     // ✅ Récupérer l'animal à jour depuis le provider
     final currentAnimal = animalProvider.getAnimalById(animal.id) ?? animal;
@@ -893,7 +897,8 @@ class _SoinsTab extends StatelessWidget {
     debugPrint('🔍 SOINS TAB - IsValidated: ${currentAnimal.isValidated}');
     debugPrint('🔍 SOINS TAB - CanReceiveCare: ${currentAnimal.canReceiveCare}');
 
-    final treatments = animalProvider.getAnimalTreatments(animal.id);
+    // ✅ Utiliser TreatmentProvider au lieu de AnimalProvider
+    final treatments = treatmentProvider.getTreatmentsForAnimal(animal.id);
     final vaccinations =
         vaccinationProvider.getVaccinationsForAnimal(animal.id);
 
