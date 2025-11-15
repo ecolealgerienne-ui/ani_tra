@@ -928,9 +928,8 @@ class _AlertConfigItem extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final alertProvider = context.read<AlertConfigurationProvider>();
 
-    // Get title and message from i18n
+    // Get title from i18n
     final title = l10n.translate(config.titleKey);
-    final message = l10n.translate(config.messageKey);
 
     // Parse color from hex
     final color = Color(int.parse(config.colorHex.replaceFirst('#', '0xFF')));
@@ -961,47 +960,19 @@ class _AlertConfigItem extends StatelessWidget {
               style: const TextStyle(fontSize: 24),
             ),
           ),
-          title: Text(
-            title,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: AppConstants.fontSizeImportant,
-            ),
-          ),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          title: Row(
             children: [
-              const SizedBox(height: 4),
-              Text(
-                message,
-                style: TextStyle(
-                  fontSize: AppConstants.fontSizeSmall,
-                  color: Colors.grey[600],
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: AppConstants.fontSizeImportant,
+                  ),
                 ),
               ),
-              const SizedBox(height: 4),
-              Wrap(
-                spacing: 8,
-                runSpacing: 4,
-                children: [
-                  _SeverityBadge(severity: config.severity),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      config.type.toUpperCase(),
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[700],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              const SizedBox(width: 8),
+              _SeverityBadge(severity: config.severity, color: color),
             ],
           ),
           trailing: Switch(
@@ -1044,21 +1015,22 @@ class _AlertConfigItem extends StatelessWidget {
 /// Severity Badge Widget
 class _SeverityBadge extends StatelessWidget {
   final int severity;
+  final Color color;
 
-  const _SeverityBadge({required this.severity});
+  const _SeverityBadge({required this.severity, required this.color});
 
   @override
   Widget build(BuildContext context) {
-    final severityConfig = _getSeverityConfig(severity);
+    final label = _getSeverityLabel(severity);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: severityConfig['color'],
+        color: color,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
-        severityConfig['label'],
+        label,
         style: const TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.bold,
@@ -1068,15 +1040,15 @@ class _SeverityBadge extends StatelessWidget {
     );
   }
 
-  Map<String, dynamic> _getSeverityConfig(int severity) {
+  String _getSeverityLabel(int severity) {
     switch (severity) {
       case 3:
-        return {'label': 'CRITIQUE', 'color': AppConstants.statusDanger};
+        return 'CRITIQUE';
       case 2:
-        return {'label': 'IMPORTANT', 'color': AppConstants.statusWarning};
+        return 'IMPORTANT';
       case 1:
       default:
-        return {'label': 'ROUTINE', 'color': Colors.blue};
+        return 'ROUTINE';
     }
   }
 }

@@ -275,7 +275,7 @@ class AlertConfigurationProvider with ChangeNotifier {
         messageKey: AppStrings.alertVaccinationMsg,
         severity: 2, // Important
         iconName: '💉',
-        colorHex: '#4CAF50', // Vert
+        colorHex: '#FF9800', // Orange (unifié selon sévérité)
         enabled: true,
         createdAt: now,
         updatedAt: now,
@@ -343,7 +343,7 @@ class AlertConfigurationProvider with ChangeNotifier {
         messageKey: AppStrings.alertBatchMsg,
         severity: 1, // Routine
         iconName: '📦',
-        colorHex: '#9E9E9E', // Gris
+        colorHex: '#2196F3', // Bleu (unifié selon sévérité)
         enabled: true,
         createdAt: now,
         updatedAt: now,
