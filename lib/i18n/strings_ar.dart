@@ -469,6 +469,7 @@ const Map<String, String> stringsAr = {
   'recordSale': 'تسجيل بيع',
   'confirmSale': 'تأكيد البيع',
   'saleRecorded': 'تم تسجيل البيع',
+  'slaughterRecorded': 'تم تسجيل الذبح',
   'recordDeath': 'تسجيل نفوق',
   'confirmDeath': 'تأكيد النفوق',
   'deathRecorded': 'تم تسجيل النفوق',

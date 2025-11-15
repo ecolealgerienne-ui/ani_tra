@@ -1,20 +1,27 @@
 // lib/screens/movement/slaughter_screen.dart
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
+import '../../models/animal.dart';
+import '../../models/movement.dart';
+import '../../providers/animal_provider.dart';
+import '../../providers/sync_provider.dart';
 
 class SlaughterScreen extends StatefulWidget {
   final String? lotId;
   final List<String>? animalIds;
   final int animalCount;
+  final Animal? animal;
 
   const SlaughterScreen({
     super.key,
     this.lotId,
     this.animalIds,
     required this.animalCount,
+    this.animal,
   });
 
   @override
@@ -38,17 +45,56 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
   Future<void> _confirmSlaughter() async {
     if (!_formKey.currentState!.validate()) return;
 
+    final animal = widget.animal;
+    if (animal == null) return;
+
     setState(() => _isConfirming = true);
 
+    final animalProvider = context.read<AnimalProvider>();
+    final syncProvider = context.read<SyncProvider>();
+
     try {
-      // Simulate processing
-      await Future.delayed(AppConstants.longAnimation);
+      // Build notes with slaughterhouse info
+      final notesText = 'Abattoir: ${_slaughterhouseNameController.text}' +
+          (_slaughterhouseIdController.text.isNotEmpty
+              ? ' (N°${_slaughterhouseIdController.text})'
+              : '');
+
+      // Create slaughter movement
+      final movement = Movement(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        animalId: animal.id,
+        type: MovementType.slaughter,
+        movementDate: _slaughterDate,
+        notes: notesText,
+        createdAt: DateTime.now(),
+      );
+
+      animalProvider.addMovement(movement);
+
+      // Update animal status to slaughtered
+      final updatedAnimal = animal.copyWith(status: AnimalStatus.slaughtered);
+      await animalProvider.updateAnimal(updatedAnimal);
+
+      debugPrint('✅ Animal ${animal.id} marked as slaughtered in DB and provider');
+
+      syncProvider.incrementPendingData();
 
       if (!mounted) return;
 
-      // Return data as true to indicate successful confirmation
-      Navigator.pop(context, true);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              AppLocalizations.of(context).translate(AppStrings.slaughterRecorded)),
+          backgroundColor: Colors.orange,
+        ),
+      );
+
+      // Return after update is complete
+      Navigator.pop(context);
     } catch (e) {
+      debugPrint('❌ Error marking animal as slaughtered: $e');
+
       if (!mounted) return;
 
       setState(() => _isConfirming = false);
