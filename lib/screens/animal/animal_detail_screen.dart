@@ -1734,7 +1734,6 @@ class _EditNotesDialog extends StatefulWidget {
 }
 
 class _EditNotesDialogState extends State<_EditNotesDialog> {
-  static const int maxLength = 1000;
   bool _isSaving = false;
 
   @override
@@ -1795,11 +1794,11 @@ class _EditNotesDialogState extends State<_EditNotesDialog> {
         width: double.maxFinite,
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisStart,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
               controller: widget.notesController,
-              maxLength: maxLength,
+              maxLength: AppConstants.maxNotesLength,
               maxLines: 8,
               decoration: InputDecoration(
                 hintText: AppLocalizations.of(context)

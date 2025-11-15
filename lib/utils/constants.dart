@@ -49,7 +49,7 @@ class AppConstants {
   static const Duration snackBarDurationLong = Duration(seconds: 3);
 
   // Text limits
-  static const int maxNotesLength = 500;
+  static const int maxNotesLength = 1000;  // Animal notes max length
   static const int maxNameLength = 100;
   static const int maxCampaignNameLength = 50;
 
