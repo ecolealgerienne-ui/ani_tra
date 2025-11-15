@@ -299,12 +299,12 @@ class _FarmSelectionSection extends StatelessWidget {
                     Icon(Icons.warning, color: Colors.orange, size: 48),
                     SizedBox(height: AppConstants.spacingSmall),
                     Text(
-                      'Aucune ferme disponible',
+                      l10n.translate(AppStrings.noFarmAvailable),
                       style: TextStyle(fontSize: AppConstants.fontSizeImportant),
                     ),
                     SizedBox(height: AppConstants.spacingTiny),
                     Text(
-                      'Veuillez créer une ferme pour continuer',
+                      l10n.translate(AppStrings.pleaseCreateFarm),
                       style: TextStyle(fontSize: AppConstants.fontSizeSmall, color: Colors.grey),
                     ),
                   ],
@@ -949,7 +949,7 @@ class _AlertSettingsSection extends StatelessWidget {
                     const Icon(Icons.info_outline, size: 48, color: Colors.blue),
                     const SizedBox(height: AppConstants.spacingSmall),
                     Text(
-                      'Initialisation des alertes...',
+                      l10n.translate(AppStrings.initializingAlerts),
                       style: TextStyle(
                         color: Colors.grey[600],
                         fontSize: AppConstants.fontSizeImportant,
@@ -957,7 +957,7 @@ class _AlertSettingsSection extends StatelessWidget {
                     ),
                     const SizedBox(height: AppConstants.spacingTiny),
                     Text(
-                      'Les configurations par défaut sont en cours de création',
+                      l10n.translate(AppStrings.creatingDefaultConfigs),
                       style: TextStyle(
                         color: Colors.grey[500],
                         fontSize: AppConstants.fontSizeSmall,
@@ -1045,8 +1045,8 @@ class _AlertConfigItem extends StatelessWidget {
                     SnackBar(
                       content: Text(
                         value
-                            ? 'Alerte activée : $title'
-                            : 'Alerte désactivée : $title',
+                            ? l10n.translate(AppStrings.alertEnabled).replaceFirst('{title}', title)
+                            : l10n.translate(AppStrings.alertDisabled).replaceFirst('{title}', title),
                       ),
                       backgroundColor: value ? AppConstants.successGreen : Colors.grey,
                       duration: const Duration(seconds: 2),

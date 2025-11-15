@@ -3,7 +3,7 @@
 /// Clés de traduction pour les chaînes de caractères
 /// Utilisé avec AppLocalizations.of(context).translate(AppStrings.xxx)
 class AppStrings {
-  // FARM MANAGEMENT (7 clés)
+  // FARM MANAGEMENT (9 clés)
   static const String userName = 'userName';
   static const String farmManagement = 'farmManagement';
   static const String currentFarm = 'currentFarm';
@@ -11,6 +11,8 @@ class AppStrings {
   static const String switchFarm = 'switchFarm';
   static const String availableFarms = 'availableFarms';
   static const String farmPhase4Note = 'farmPhase4Note';
+  static const String noFarmAvailable = 'noFarmAvailable';
+  static const String pleaseCreateFarm = 'pleaseCreateFarm';
 
   // ============ GENERAL ====================
   static const String ok = 'ok';
@@ -1088,5 +1090,9 @@ class AppStrings {
   static const String disabled = 'disabled';
   static const String draftUrgentAlert = 'draftUrgentAlert';
   static const String draftWarningAlert = 'draftWarningAlert';
+  static const String initializingAlerts = 'initializingAlerts';
+  static const String creatingDefaultConfigs = 'creatingDefaultConfigs';
+  static const String alertEnabled = 'alertEnabled';
+  static const String alertDisabled = 'alertDisabled';
 
 }

@@ -1,7 +1,7 @@
 // lib/i18n/strings_fr.dart
 
 const Map<String, String> stringsFr = {
-  // FARM MANAGEMENT (7 traductions)
+  // FARM MANAGEMENT (9 traductions)
   'userName': 'Nom utilisateur',
   'farmManagement': 'Gestion de ferme',
   'currentFarm': 'Ferme actuelle',
@@ -9,6 +9,8 @@ const Map<String, String> stringsFr = {
   'switchFarm': 'Changer de ferme',
   'availableFarms': 'Fermes disponibles',
   'farmPhase4Note': 'Phase 4: Sélection de ferme disponible ici',
+  'noFarmAvailable': 'Aucune ferme disponible',
+  'pleaseCreateFarm': 'Veuillez créer une ferme pour continuer',
 
   // ==================== GÉNÉRAL ====================
   'ok': 'OK',
@@ -1090,4 +1092,8 @@ const Map<String, String> stringsFr = {
   'disabled': 'Désactivées',
   'draftUrgentAlert': '🚨 URGENT: Brouillon depuis {days}j',
   'draftWarningAlert': '⚠️ Brouillon depuis {hours}h',
+  'initializingAlerts': 'Initialisation des alertes...',
+  'creatingDefaultConfigs': 'Les configurations par défaut sont en cours de création',
+  'alertEnabled': 'Alerte activée : {title}',
+  'alertDisabled': 'Alerte désactivée : {title}',
 };
