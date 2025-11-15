@@ -516,6 +516,12 @@ class AppStrings {
   // Ajouter suite à des erreurs d'ajout de clés
   static const String notesOptional = 'notesOptional';
 
+  // Notes feature
+  static const String editNotes = 'editNotes';
+  static const String noNotes = 'noNotes';
+  static const String notesPlaceholder = 'notesPlaceholder';
+  static const String notesMaxLength = 'notesMaxLength';
+
   // Ajouter dans la section MEDICAL & EVENTS
   static const String causeNotSpecified = 'causeNotSpecified';
   static const String deathCauseHint = 'deathCauseHint';

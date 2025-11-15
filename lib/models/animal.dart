@@ -68,6 +68,10 @@ class Animal implements SyncableEntity {
   /// Photo optionnelle de l'animal
   final String? photoUrl;
 
+  /// Notes libres sur l'animal (observations, comportement, etc.)
+  /// Max 1000 caractères - Modifiable même si l'animal est validé (ALIVE)
+  final String? notes;
+
   /// Champ de compatibilitÃ© pour mock_data.dart
   final int? days;
 
@@ -110,6 +114,7 @@ class Animal implements SyncableEntity {
     this.breedId,
     this.visualId,
     this.photoUrl,
+    this.notes,
     this.days,
     this.synced = false,
     DateTime? createdAt,
@@ -162,6 +167,9 @@ class Animal implements SyncableEntity {
 
   /// Nombre de changements d'EID
   int get eidChangeCount => eidHistory?.length ?? 0;
+
+  /// L'animal a-t-il des notes ?
+  bool get hasNotes => notes != null && notes!.isNotEmpty;
 
   /// ðŸ†• PART3 - VALIDATION MÃˆRE
   /// Peut-elle Ãªtre mÃ¨re ?
@@ -281,6 +289,7 @@ class Animal implements SyncableEntity {
     String? breedId,
     String? visualId,
     String? photoUrl,
+    String? notes,
     int? days,
     bool? synced,
     DateTime? createdAt,
@@ -303,6 +312,7 @@ class Animal implements SyncableEntity {
       breedId: breedId ?? this.breedId,
       visualId: visualId ?? this.visualId,
       photoUrl: photoUrl ?? this.photoUrl,
+      notes: notes ?? this.notes,
       days: days ?? this.days,
       synced: synced ?? this.synced,
       createdAt: createdAt ?? this.createdAt,
@@ -348,6 +358,7 @@ class Animal implements SyncableEntity {
       'breed_id': breedId,
       'visual_id': visualId,
       'photo_url': photoUrl,
+      'notes': notes,
       'days': days,
       'synced': synced,
       'created_at': createdAt.toIso8601String(),
@@ -381,6 +392,7 @@ class Animal implements SyncableEntity {
       breedId: json['breed_id'] ?? json['breedId'],
       visualId: json['visual_id'] ?? json['visualId'],
       photoUrl: json['photo_url'] ?? json['photoUrl'],
+      notes: json['notes'] as String?,
       days: json['days'] as int?,
       synced: json['synced'] as bool? ?? false,
       createdAt: DateTime.parse(json['created_at'] ?? json['createdAt']),

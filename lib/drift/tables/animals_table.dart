@@ -39,6 +39,9 @@ class AnimalsTable extends Table {
   // Photo
   TextColumn get photoUrl => text().nullable().named('photo_url')();
 
+  // Notes libres sur l'animal (max 1000 caractères)
+  TextColumn get notes => text().nullable()();
+
   // Deprecated field (kept for compatibility)
   IntColumn get days => integer().nullable()();
 
