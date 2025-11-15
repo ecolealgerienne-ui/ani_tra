@@ -347,7 +347,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
       }
 
       // Mode création : ajouter l'animal
-      animalProvider.addAnimal(animal);
+      await animalProvider.addAnimal(animal);
 
       // 2. CrÃƒÂ©er le mouvement correspondant
       Movement? movement;
@@ -412,11 +412,27 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
     } catch (e) {
       if (!mounted) return;
 
-      _showError(
+      // Détecter les violations de contraintes UNIQUE
+      final errorMessage = e.toString().toLowerCase();
+
+      if (errorMessage.contains('unique') && errorMessage.contains('current_eid')) {
+        _showError(
+          AppLocalizations.of(context).translate(AppStrings.eidAlreadyExists),
+          isError: true,
+        );
+      } else if (errorMessage.contains('unique') && errorMessage.contains('official_number')) {
+        _showError(
+          AppLocalizations.of(context).translate(AppStrings.officialNumberAlreadyExists),
+          isError: true,
+        );
+      } else {
+        _showError(
           AppLocalizations.of(context)
               .translate(AppStrings.errorOccurred)
               .replaceAll('{error}', e.toString()),
-          isError: true);
+          isError: true,
+        );
+      }
     } finally {
       if (mounted) {
         setState(() {

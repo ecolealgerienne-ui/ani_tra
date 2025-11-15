@@ -836,6 +836,8 @@ const Map<String, String> stringsFr = {
   'motherNotFound': '⚠️ Mère introuvable',
   'animalSavedSuccess': '✅ Animal enregistré avec succès',
   'errorOccurred': '❌ Erreur: {error}',
+  'eidAlreadyExists': '⚠️ Cet EID existe déjà dans la base de données. Veuillez en saisir un autre.',
+  'officialNumberAlreadyExists': '⚠️ Ce numéro officiel existe déjà dans la base de données. Veuillez en saisir un autre.',
   'eidOfMother': 'EID de la mère',
   'scanningInProgress': 'Scan en cours...',
   'noFemaleAvailable': 'Aucune femelle disponible dans le troupeau',
