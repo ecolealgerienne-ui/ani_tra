@@ -44,8 +44,8 @@ class VaccinationDetailScreen extends StatelessWidget {
             const SizedBox(height: AppConstants.spacingExtraSmall),
             if (vaccination.nextDueDate != null) _buildReminderCard(context),
             const SizedBox(height: AppConstants.spacingExtraSmall),
-            if (vaccination.notes != null && vaccination.notes!.isNotEmpty)
-              _buildNotesCard(context),
+            _buildNotesCard(context),
+            const SizedBox(height: AppConstants.spacingExtraSmall),
             if (vaccination.protocolId != null) ...[
               const SizedBox(height: AppConstants.spacingExtraSmall),
               _buildProtocolCard(context),
@@ -419,6 +419,7 @@ class VaccinationDetailScreen extends StatelessWidget {
 
   Widget _buildNotesCard(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final hasNotes = vaccination.notes != null && vaccination.notes!.isNotEmpty;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: AppConstants.spacingMedium),
@@ -428,29 +429,52 @@ class VaccinationDetailScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Icon(Icons.note,
-                    size: AppConstants.iconSizeRegular, color: Colors.blue),
-                const SizedBox(width: AppConstants.spacingExtraSmall),
-                Text(
-                  l10n.translate(AppStrings.notesLabel),
-                  style: const TextStyle(
-                    fontSize: AppConstants.fontSizeSectionTitle,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  children: [
+                    const Icon(Icons.note,
+                        size: AppConstants.iconSizeRegular, color: Colors.blue),
+                    const SizedBox(width: AppConstants.spacingExtraSmall),
+                    Text(
+                      l10n.translate(AppStrings.notesLabel),
+                      style: const TextStyle(
+                        fontSize: AppConstants.fontSizeSectionTitle,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                IconButton(
+                  icon: const Icon(Icons.edit, size: AppConstants.iconSizeRegular),
+                  onPressed: () => _showEditNotesDialog(context),
+                  tooltip: l10n.translate(AppStrings.editNotes),
                 ),
               ],
             ),
             const SizedBox(height: AppConstants.spacingSmall),
             Text(
-              vaccination.notes!,
+              hasNotes ? vaccination.notes! : l10n.translate(AppStrings.noNotes),
               style: TextStyle(
                 fontSize: AppConstants.fontSizeBody,
-                color: Colors.grey[700],
+                color: hasNotes ? Colors.grey[700] : Colors.grey,
+                fontStyle: hasNotes ? FontStyle.normal : FontStyle.italic,
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showEditNotesDialog(BuildContext context) {
+    final notesController = TextEditingController(text: vaccination.notes ?? '');
+
+    showDialog(
+      context: context,
+      builder: (context) => _EditNotesDialog(
+        vaccination: vaccination,
+        notesController: notesController,
       ),
     );
   }
@@ -617,6 +641,134 @@ class VaccinationDetailScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+// ==================== EDIT NOTES DIALOG ====================
+
+class _EditNotesDialog extends StatefulWidget {
+  final Vaccination vaccination;
+  final TextEditingController notesController;
+
+  const _EditNotesDialog({
+    required this.vaccination,
+    required this.notesController,
+  });
+
+  @override
+  State<_EditNotesDialog> createState() => _EditNotesDialogState();
+}
+
+class _EditNotesDialogState extends State<_EditNotesDialog> {
+  bool _isSaving = false;
+
+  @override
+  void dispose() {
+    widget.notesController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _saveNotes() async {
+    setState(() => _isSaving = true);
+
+    try {
+      final vaccinationProvider = context.read<VaccinationProvider>();
+      final updatedVaccination = widget.vaccination.copyWith(
+        notes: widget.notesController.text.trim().isEmpty
+            ? null
+            : widget.notesController.text.trim(),
+      );
+
+      vaccinationProvider.updateVaccination(updatedVaccination);
+
+      if (mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context).translate(AppStrings.notesSaved),
+            ),
+            backgroundColor: AppConstants.successGreen,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)
+                  .translate(AppStrings.errorOccurred)
+                  .replaceAll('{error}', e.toString()),
+            ),
+            backgroundColor: AppConstants.statusDanger,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return AlertDialog(
+      title: Text(l10n.translate(AppStrings.editNotes)),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              controller: widget.notesController,
+              maxLength: AppConstants.maxNotesLength,
+              maxLines: 8,
+              decoration: InputDecoration(
+                hintText: l10n.translate(AppStrings.notesPlaceholder),
+                border: const OutlineInputBorder(),
+                helperText: l10n.translate(AppStrings.notesMaxLength),
+              ),
+              enabled: !_isSaving,
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _isSaving ? null : () => Navigator.pop(context),
+          child: Text(l10n.translate(AppStrings.cancel)),
+        ),
+        ElevatedButton(
+          onPressed: _isSaving ? null : _saveNotes,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppConstants.successGreen,
+            foregroundColor: Colors.white,
+          ),
+          child: _isSaving
+              ? const SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.save, size: 18),
+                    const SizedBox(width: 4),
+                    Text(l10n.translate(AppStrings.save)),
+                  ],
+                ),
+        ),
+      ],
     );
   }
 }

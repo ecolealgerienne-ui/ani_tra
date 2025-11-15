@@ -147,6 +147,20 @@ class AppStrings {
   static const String dose = 'dose';
   static const String veterinarian = 'veterinarian';
   static const String added = 'added';
+  static const String treatmentDetail = 'treatmentDetail';
+  static const String treatmentInformation = 'treatmentInformation';
+  static const String recordedOn = 'recordedOn';
+  static const String withdrawalPeriod = 'withdrawalPeriod';
+  static const String withdrawalActiveUntil = 'withdrawalActiveUntil';
+  static const String withdrawalCompleted = 'withdrawalCompleted';
+  static const String deleteTreatment = 'deleteTreatment';
+  static const String deleteTreatmentConfirm = 'deleteTreatmentConfirm';
+  static const String treatmentDeleted = 'treatmentDeleted';
+  static const String editNotes = 'editNotes';
+  static const String noNotes = 'noNotes';
+  static const String notesSaved = 'notesSaved';
+  static const String notesPlaceholder = 'notesPlaceholder';
+  static const String notesMaxLength = 'notesMaxLength';
 
   // ============ VACCINATION SCREEN ============
   static const String vaccinationDetail = 'vaccinationDetail';
