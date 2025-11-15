@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../providers/treatment_provider.dart';
 import '../../providers/animal_provider.dart';
 import '../../models/treatment.dart';
+import '../../models/animal.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';

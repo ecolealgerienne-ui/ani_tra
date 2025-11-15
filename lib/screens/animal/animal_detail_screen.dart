@@ -397,12 +397,10 @@ class _InfosTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final animalProvider = context.watch<AnimalProvider>();
     final weightProvider = context.watch<WeightProvider>();
     final treatmentProvider = context.watch<TreatmentProvider>();
 
     // Récupérer l'animal à jour depuis le Provider (au cas où il a changé)
-    //final currentAnimal = animalProvider.getAnimalById(animal.id) ?? animal;
     final currentAnimal =
         context.watch<AnimalProvider>().getAnimalById(animal.id) ?? animal;
 
