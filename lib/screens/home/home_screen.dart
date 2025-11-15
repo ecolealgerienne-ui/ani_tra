@@ -121,15 +121,18 @@ class _HomeScreenState extends State<HomeScreen> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: AppConstants.spacingMicro),
-                      Text(
-                        farmProvider.currentFarm?.name ?? '',
-                        style: TextStyle(
-                          fontSize: AppConstants.fontSizeSmall,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.white.withValues(alpha: AppConstants.opacitySubtle),
+                      if (farmProvider.currentFarm != null || farmProvider.farms.isNotEmpty) ...[
+                        const SizedBox(height: AppConstants.spacingMicro),
+                        Text(
+                          farmProvider.currentFarm?.name ??
+                            (farmProvider.farms.isNotEmpty ? farmProvider.farms.first.name : ''),
+                          style: TextStyle(
+                            fontSize: AppConstants.fontSizeSmall,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.white.withValues(alpha: AppConstants.opacitySubtle),
+                          ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                   const SizedBox(width: AppConstants.spacingTiny),
