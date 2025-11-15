@@ -33,7 +33,7 @@ class BatchProvider with ChangeNotifier {
   static const String kLogBatchActivated = 'log.batch.activated';
   static const String kLogBatchLoading = 'log.batch.loading';
   static const String kLogBatchSaving = 'log.batch.saving';
-  static const String kLogBatchMockLoaded = 'log.batch.mock_loaded';
+  static const String kLogBatchInitialLoaded = 'log.batch.initial_loaded';
   static const String kLogBatchReset = 'log.batch.reset';
 
   static const String kErrBatchNotFound = 'err.batch.not_found';
@@ -84,15 +84,14 @@ class BatchProvider with ChangeNotifier {
       _allBatches.removeWhere((b) => b.farmId == _currentFarmId);
       _allBatches.addAll(farmBatches);
     } catch (e) {
-      debugPrint('❌ Error loading batches from repository: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  void initializeWithMockData(List<Batch> mockBatches) {
-    _migrateBatchesToRepository(mockBatches);
+  void initializeWithInitialData(List<Batch> batches) {
+    _migrateBatchesToRepository(batches);
   }
 
   Future<void> _migrateBatchesToRepository(List<Batch> batches) async {
@@ -100,7 +99,6 @@ class BatchProvider with ChangeNotifier {
       try {
         await _repository.create(batch, batch.farmId);
       } catch (e) {
-        debugPrint('⚠️ Batch ${batch.id} already exists or error: $e');
       }
     }
     await _loadBatchesFromRepository();
@@ -127,7 +125,6 @@ class BatchProvider with ChangeNotifier {
       notifyListeners();
       return batch;
     } catch (e) {
-      debugPrint('❌ Error creating batch: $e');
       rethrow;
     }
   }
@@ -159,7 +156,6 @@ class BatchProvider with ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      debugPrint('❌ Error adding animal to batch: $e');
       return false;
     }
   }
@@ -194,7 +190,6 @@ class BatchProvider with ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      debugPrint('❌ Error removing animal from batch: $e');
       return false;
     }
   }
@@ -230,7 +225,6 @@ class BatchProvider with ChangeNotifier {
       }
       notifyListeners();
     } catch (e) {
-      debugPrint('❌ Error completing batch: $e');
       rethrow;
     }
   }
@@ -245,7 +239,6 @@ class BatchProvider with ChangeNotifier {
       }
       notifyListeners();
     } catch (e) {
-      debugPrint('❌ Error deleting batch: $e');
       rethrow;
     }
   }

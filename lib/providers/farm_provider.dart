@@ -65,7 +65,6 @@ class FarmProvider with ChangeNotifier {
       _allFarms.clear();
       _allFarms.addAll(allFarms);
     } catch (e) {
-      debugPrint('❌ Error loading farms from repository: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -82,7 +81,6 @@ class FarmProvider with ChangeNotifier {
       _allFarms.clear();
       _allFarms.addAll(ownerFarms);
     } catch (e) {
-      debugPrint('❌ Error loading farms for owner: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -97,7 +95,6 @@ class FarmProvider with ChangeNotifier {
       _allFarms.add(farm);
       notifyListeners();
     } catch (e) {
-      debugPrint('❌ Error adding farm: $e');
       rethrow;
     }
   }
@@ -113,7 +110,6 @@ class FarmProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('❌ Error updating farm: $e');
       rethrow;
     }
   }
@@ -124,7 +120,6 @@ class FarmProvider with ChangeNotifier {
       _allFarms.removeWhere((f) => f.id == id);
       notifyListeners();
     } catch (e) {
-      debugPrint('❌ Error deleting farm: $e');
       rethrow;
     }
   }
@@ -143,7 +138,6 @@ class FarmProvider with ChangeNotifier {
     try {
       return await _repository.getByCheptelNumber(cheptelNumber);
     } catch (e) {
-      debugPrint('❌ Error getting farm by cheptel number: $e');
       return null;
     }
   }
@@ -165,7 +159,6 @@ class FarmProvider with ChangeNotifier {
     try {
       await _authProvider.switchFarm(farmId);
     } catch (e) {
-      debugPrint('❌ Error switching farm: $e');
       rethrow;
     }
   }

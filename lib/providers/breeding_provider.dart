@@ -91,15 +91,14 @@ class BreedingProvider extends ChangeNotifier {
       _allBreedings.removeWhere((b) => b.farmId == _currentFarmId);
       _allBreedings.addAll(farmBreedings);
     } catch (e) {
-      debugPrint('❌ Error loading breedings from repository: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  Future<void> loadMockData(List<Breeding> mockBreedings) async {
-    await _migrateBreedingsToRepository(mockBreedings);
+  Future<void> loadInitialData(List<Breeding> breedings) async {
+    await _migrateBreedingsToRepository(breedings);
   }
 
   Future<void> _migrateBreedingsToRepository(List<Breeding> breedings) async {
@@ -107,7 +106,6 @@ class BreedingProvider extends ChangeNotifier {
       try {
         await _repository.create(breeding, breeding.farmId);
       } catch (e) {
-        debugPrint('⚠️ Breeding ${breeding.id} already exists or error: $e');
       }
     }
     await _loadBreedingsFromRepository();
@@ -146,7 +144,6 @@ class BreedingProvider extends ChangeNotifier {
       _allBreedings.add(breeding);
       notifyListeners();
     } catch (e) {
-      debugPrint('❌ Error adding breeding: $e');
       rethrow;
     }
   }
@@ -162,7 +159,6 @@ class BreedingProvider extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('❌ Error updating breeding: $e');
       rethrow;
     }
   }
@@ -174,7 +170,6 @@ class BreedingProvider extends ChangeNotifier {
       _allBreedings.removeWhere((b) => b.id == id);
       notifyListeners();
     } catch (e) {
-      debugPrint('❌ Error deleting breeding: $e');
       rethrow;
     }
   }

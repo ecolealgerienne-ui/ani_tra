@@ -76,8 +76,6 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
       final updatedAnimal = animal.copyWith(status: AnimalStatus.slaughtered);
       await animalProvider.updateAnimal(updatedAnimal);
 
-      debugPrint('✅ Animal ${animal.id} marked as slaughtered in DB and provider');
-
       syncProvider.incrementPendingData();
 
       if (!mounted) return;
@@ -93,8 +91,6 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
       // Return after update is complete
       Navigator.pop(context);
     } catch (e) {
-      debugPrint('❌ Error marking animal as slaughtered: $e');
-
       if (!mounted) return;
 
       setState(() => _isConfirming = false);

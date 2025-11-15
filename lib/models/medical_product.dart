@@ -163,7 +163,7 @@ class MedicalProduct implements SyncableEntity {
 
   MedicalProduct({
     required this.id,
-    this.farmId = 'mock-farm-001', // Valeur par défaut pour compatibilité mock
+    this.farmId = 'farm_default', // Valeur par défaut pour compatibilité mock
     required this.name,
     this.commercialName,
     required this.category,
@@ -449,7 +449,7 @@ class MedicalProduct implements SyncableEntity {
       id: json['id'] as String,
       farmId: json['farmId'] as String? ??
           json['farm_id'] as String? ??
-          'mock-farm-001',
+          'farm_default',
       name: json['name'] as String,
       commercialName: json['commercialName'] as String? ??
           json['commercial_name'] as String?,

@@ -117,15 +117,14 @@ class AnimalProvider extends ChangeNotifier {
       _allAnimals.addAll(farmAnimals);
       _lastRefreshTime = DateTime.now(); // A5: Marquer le refresh
     } catch (e) {
-      debugPrint('❌ Error loading animals from repository: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  /// Initialise avec mock data
-  void initializeWithMockData(
+  /// Initialise avec données initiales
+  void initializeWithInitialData(
     List<Animal> animals,
     List<Product> products,
     List<Treatment> treatments,
@@ -144,19 +143,18 @@ class AnimalProvider extends ChangeNotifier {
     _migrateAnimalsToRepository(animals);
   }
 
-  /// Migre les animaux mock vers SQLite
+  /// Migre les animaux initiaux vers SQLite
   Future<void> _migrateAnimalsToRepository(List<Animal> animals) async {
     for (final animal in animals) {
       try {
         await _repository.create(animal, animal.farmId);
       } catch (e) {
-        debugPrint('⚠️ Animal ${animal.id} already exists or error: $e');
       }
     }
     await _loadAnimalsFromRepository();
   }
 
-  void _loadMockData() {
+  void _loadInitialData() {
     // no-op
   }
 
@@ -232,7 +230,6 @@ class AnimalProvider extends ChangeNotifier {
       _lastRefreshTime = DateTime.now(); // A5: Invalider cache
       notifyListeners();
     } catch (e) {
-      debugPrint('❌ Error adding animal: $e');
       rethrow;
     }
   }
@@ -251,7 +248,6 @@ class AnimalProvider extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('❌ Error updating animal: $e');
       rethrow;
     }
   }
@@ -270,7 +266,6 @@ class AnimalProvider extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('❌ Error removing animal: $e');
       rethrow;
     }
   }
@@ -591,7 +586,6 @@ class AnimalProvider extends ChangeNotifier {
   /// Si cache valide (<5 min), ne recharge pas
   Future<void> refresh({bool forceRefresh = false}) async {
     if (!forceRefresh && _isCacheValid) {
-      debugPrint('📦 Cache valid, skip refresh');
       return;
     }
     await _loadAnimalsFromRepository();
@@ -612,9 +606,7 @@ class AnimalProvider extends ChangeNotifier {
         validatedAt: DateTime.now(),
       );
       await updateAnimal(updated);
-      debugPrint('✅ Animal validé: $animalId');
     } catch (e) {
-      debugPrint('❌ Error validating animal: $e');
       rethrow;
     }
   }
@@ -623,9 +615,7 @@ class AnimalProvider extends ChangeNotifier {
   Future<void> deleteAnimal(String animalId) async {
     try {
       await removeAnimal(animalId);
-      debugPrint('✅ Animal supprimé: $animalId');
     } catch (e) {
-      debugPrint('❌ Error deleting animal: $e');
       rethrow;
     }
   }

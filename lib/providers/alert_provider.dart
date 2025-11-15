@@ -107,8 +107,6 @@ class AlertProvider extends ChangeNotifier {
   /// Pattern copié de AnimalProvider
   void _onFarmChanged() {
     if (_currentFarmId != _authProvider.currentFarmId) {
-      debugPrint(
-          '🔄 [ALERT] Farm changée: $_currentFarmId → ${_authProvider.currentFarmId}');
       _currentFarmId = _authProvider.currentFarmId;
       _alerts = [];
       _incompleteEvents = [];
@@ -123,7 +121,6 @@ class AlertProvider extends ChangeNotifier {
   /// Garder pour backward compatibility et appels explicites
   Future<void> setCurrentFarm(String farmId) async {
     if (_currentFarmId == farmId) return;
-    debugPrint('🔄 [ALERT] setCurrentFarm: $farmId');
     _currentFarmId = farmId;
     await _recalculateAlerts();
   }
@@ -184,7 +181,6 @@ class AlertProvider extends ChangeNotifier {
   /// Phase 2: Charge configurations depuis BD via AlertConfigurationRepository
   Future<void> _recalculateAlerts() async {
     if (_currentFarmId.isEmpty) {
-      debugPrint('⚠️ [ALERT] _recalculateAlerts: farmId VIDE, skip');
       _alerts = [];
       notifyListeners();
       return;
@@ -193,7 +189,6 @@ class AlertProvider extends ChangeNotifier {
     try {
       await generateAlerts(_currentFarmId);
     } catch (e) {
-      debugPrint('❌ Erreur calcul alertes: $e');
       _alerts = [];
       notifyListeners();
     }
@@ -201,101 +196,67 @@ class AlertProvider extends ChangeNotifier {
 
   /// Générer toutes les alertes pour une ferme (Phase 2 - Config-driven + DEBUG)
   Future<void> generateAlerts(String farmId) async {
-    debugPrint('🔍 [ALERT DEBUG] generateAlerts START - farmId: $farmId');
     final newAlerts = <Alert>[];
 
     try {
       // Vérification 0: farmId vide?
       if (farmId.isEmpty) {
-        debugPrint('⚠️ [ALERT] farmId est VIDE! Arrêt.');
         _alerts = [];
         notifyListeners();
         return;
       }
 
       // 1. Charger configurations activées depuis BD
-      debugPrint('📦 [ALERT] Chargement configurations...');
       final configs = await _alertConfigRepository.getEnabled(farmId);
-      debugPrint('✅ [ALERT] Configs trouvées: ${configs.length}');
-      for (final c in configs) {
-        debugPrint(
-            '   - ${c.evaluationType}: ${c.titleKey} (enabled: ${c.enabled})');
-      }
-
-      if (configs.isEmpty) {
-        debugPrint(
-            '⚠️ [ALERT] AUCUNE configuration trouvée pour farmId: $farmId');
-        debugPrint(
-            '   → Vérifier si AlertConfigurationSeeds.seedDatabase() a été appelé');
-      }
 
       // 2. Pour chaque configuration, évaluer le type
       for (final config in configs) {
         try {
-          debugPrint('🔄 [ALERT] Évaluation: ${config.evaluationType}');
-
           switch (config.evaluationType) {
             case AlertEvaluationType.remanence:
               final remanenceAlerts = await _checkAndBuildRemanence(config);
-              debugPrint('   ↳ Remanence: ${remanenceAlerts.length} alertes');
               newAlerts.addAll(remanenceAlerts);
               break;
             case AlertEvaluationType.weighing:
               final weighingAlerts = await _checkAndBuildWeighing(config);
-              debugPrint('   ↳ Weighing: ${weighingAlerts.length} alertes');
               newAlerts.addAll(weighingAlerts);
               break;
             case AlertEvaluationType.vaccination:
               final vacAlerts = await _checkAndBuildVaccination(config);
-              debugPrint('   ↳ Vaccination: ${vacAlerts.length} alertes');
               newAlerts.addAll(vacAlerts);
               break;
             case AlertEvaluationType.identification:
               final idAlerts = await _checkAndBuildIdentification(config);
-              debugPrint('   ↳ Identification: ${idAlerts.length} alertes');
               newAlerts.addAll(idAlerts);
               break;
             case AlertEvaluationType.syncRequired:
               final syncAlert = await _checkAndBuildSyncRequired(config);
               if (syncAlert != null) {
-                debugPrint('   ↳ Sync: 1 alerte');
                 newAlerts.add(syncAlert);
-              } else {
-                debugPrint('   ↳ Sync: 0 alertes');
               }
               break;
             case AlertEvaluationType.treatmentRenewal:
               final treatAlerts = await _checkAndBuildTreatmentRenewal(config);
-              debugPrint(
-                  '   ↳ Treatment: ${treatAlerts.length} alertes (TODO)');
               newAlerts.addAll(treatAlerts);
               break;
             case AlertEvaluationType.batchToFinalize:
               final batchAlerts = await _checkAndBuildBatchToFinalize(config);
-              debugPrint('   ↳ Batch: ${batchAlerts.length} alertes (TODO)');
               newAlerts.addAll(batchAlerts);
               break;
             case AlertEvaluationType.draftAnimals:
               // SKIP: draftAnimals handled by legacy _checkAndBuildDraftAlerts below
-              debugPrint('   ↳ Draft Animals: skipped (using individual alerts)');
               break;
           }
         } catch (e) {
-          debugPrint(
-              '❌ [ALERT] Erreur évaluation ${config.evaluationType}: $e');
         }
       }
 
       // 3. ✅ PHASE 4 FIX: Alertes DRAFT individuelles par animal
-      debugPrint('🔄 [ALERT] Calcul alertes brouillons individuelles (DRAFT)...');
       final draftAlerts = await _checkAndBuildDraftAlerts(null);
-      debugPrint('   ↳ Brouillons individuels: ${draftAlerts.length} alertes');
       newAlerts.addAll(draftAlerts);
 
       // 4. Événements incomplets (legacy support - brouillons)
-      debugPrint('🔄 [ALERT] Calcul événements incomplets...');
       _incompleteEvents = _calculateIncompleteEvents();
-      debugPrint('   ↳ Brouillons: ${_incompleteEvents.length}');
       newAlerts.addAll(_incompleteEvents
           .where((e) => e.needsAlert)
           .map((e) => Alert.incompleteEvent(
@@ -308,17 +269,9 @@ class AlertProvider extends ChangeNotifier {
       // 5. Trier par priorité
       newAlerts.sort((a, b) => a.type.priority.compareTo(b.type.priority));
 
-      debugPrint('✅ [ALERT] TOTAL alertes générées: ${newAlerts.length}');
-      for (final alert in newAlerts) {
-        debugPrint(
-            '   - ${alert.type.labelFr}: ${alert.title} (${alert.category.labelFr})');
-      }
-
       _alerts = newAlerts;
       notifyListeners();
     } catch (e) {
-      debugPrint('❌ [ALERT] ERREUR CRITIQUE generateAlerts: $e');
-      debugPrint('   Stack: ${StackTrace.current}');
       rethrow;
     }
   }
@@ -335,19 +288,12 @@ class AlertProvider extends ChangeNotifier {
         .where((a) => a.status == AnimalStatus.draft)
         .toList();
 
-    debugPrint('🔍 [DRAFT] Analyse ${drafts.length} brouillons');
-
     for (final animal in drafts) {
       final hoursSinceCreation =
           DateTime.now().difference(animal.createdAt).inHours;
 
-      debugPrint(
-          '   - ${animal.displayName}: $hoursSinceCreation heures en brouillon');
-
       // ✅ URGENT si > 7 jours (HARD LIMIT)
       if (hoursSinceCreation >= AppConstants.draftAlertLimitHours) {
-        debugPrint(
-            '     ⚠️ URGENT: Dépasse ${AppConstants.draftAlertLimitHours}h!');
 
         final daysOld = hoursSinceCreation ~/ 24;
         final alert = Alert(
@@ -375,8 +321,6 @@ class AlertProvider extends ChangeNotifier {
       }
       // ✅ IMPORTANT si > 48h
       else if (hoursSinceCreation >= AppConstants.draftAlertHours) {
-        debugPrint(
-            '     ⚠️ IMPORTANT: Dépasse ${AppConstants.draftAlertHours}h');
 
         final alert = Alert(
           id: 'draft_warning_${animal.id}',
@@ -440,8 +384,6 @@ class AlertProvider extends ChangeNotifier {
 
       // ✅ PHASE 4 FIX: SKIP si DRAFT
       if (animal.status == AnimalStatus.draft) {
-        debugPrint(
-            '   ↳ SKIP remanence alerte for DRAFT animal: ${animal.displayName}');
         continue;
       }
 
@@ -576,14 +518,10 @@ class AlertProvider extends ChangeNotifier {
 
           // SKIP si animal DRAFT
           if (animal.status == AnimalStatus.draft) {
-            debugPrint(
-                '   ↳ SKIP vaccination alerte for DRAFT animal: ${animal.displayName}');
             continue;
           }
         } catch (e) {
           // Animal non trouvé, on continue
-          debugPrint(
-              '   ↳ Animal not found for vaccination: ${vaccination.animalId}');
           continue;
         }
       }
@@ -748,7 +686,6 @@ class AlertProvider extends ChangeNotifier {
     AlertConfiguration config,
   ) async {
     final alerts = <Alert>[];
-    // TODO: Implémenter la logique quand treatments ont renewal date
     return alerts;
   }
 
@@ -757,7 +694,6 @@ class AlertProvider extends ChangeNotifier {
     AlertConfiguration config,
   ) async {
     final alerts = <Alert>[];
-    // TODO: Implémenter quand Batch model est prêt
     return alerts;
   }
 
@@ -905,7 +841,6 @@ class AlertProvider extends ChangeNotifier {
 
   /// Marquer une alerte comme lue (future feature)
   void markAlertAsRead(String alertId) {
-    // TODO: Implémenter persistance
     notifyListeners();
   }
 
@@ -924,34 +859,10 @@ class AlertProvider extends ChangeNotifier {
 
   /// DEBUG: Afficher l'état des animaux
   void debugAnimalsState() {
-    debugPrint('🐑 [DEBUG ANIMALS] ===== ÉTAT ANIMAUX =====');
-    final animals = _animalProvider.animals;
-    debugPrint('Total animaux: ${animals.length}');
-
-    for (final animal in animals.take(5)) {
-      // Afficher les 5 premiers
-      debugPrint('  - ${animal.displayName}');
-      debugPrint('    Status: ${animal.status}');
-      debugPrint('    Age: ${animal.ageInDays} jours');
-      debugPrint(
-          '    Traitements: ${_animalProvider.getAnimalTreatments(animal.id).length}');
-    }
-    if (animals.length > 5) {
-      debugPrint('  ... et ${animals.length - 5} autres');
-    }
   }
 
   /// DEBUG: Appeler depuis HomeScreen ou AlertScreen pour tester
   void debugAlert() {
-    debugPrint('\n\n🔍 ===== DEBUG ALERTE COMPLET =====');
-    debugPrint('FarmId courant: $_currentFarmId');
-    debugPrint('AuthProvider.currentFarmId: ${_authProvider.currentFarmId}');
-    debugAnimalsState();
-    debugPrint('Alertes actuelles: ${_alerts.length}');
-    debugPrint('Urgentes: ${urgentAlerts.length}');
-    debugPrint('Importantes: ${importantAlerts.length}');
-    debugPrint('Routine: ${routineAlerts.length}');
-    debugPrint('===== FIN DEBUG =====\n\n');
   }
 
   // ==================== HELPERS I18N ====================

@@ -154,7 +154,6 @@ class BatchListScreen extends StatelessWidget {
 
   /// Utiliser un lot (naviguer selon l'objectif)
   void _useBatch(BuildContext context, Batch batch) {
-    // TODO: Décommenter et ajuster les imports une fois les screens disponibles
     switch (batch.purpose) {
       case BatchPurpose.sale:
         ScaffoldMessenger.of(context).showSnackBar(

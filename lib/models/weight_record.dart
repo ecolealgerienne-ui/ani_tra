@@ -45,7 +45,7 @@ class WeightRecord implements SyncableEntity {
 
   WeightRecord({
     required this.id,
-    this.farmId = 'mock-farm-001', // Valeur par défaut pour compatibilité mock
+    this.farmId = 'farm_default', // Valeur par défaut pour compatibilité mock
     required this.animalId,
     required this.weight,
     required this.recordedAt,
@@ -191,7 +191,7 @@ class WeightRecord implements SyncableEntity {
   factory WeightRecord.fromMap(Map<String, dynamic> map) {
     return WeightRecord(
       id: map['id'] as String,
-      farmId: map['farm_id'] as String? ?? 'mock-farm-001',
+      farmId: map['farm_id'] as String? ?? 'farm_default',
       animalId: map['animalId'] as String,
       weight: (map['weight'] as num).toDouble(),
       recordedAt: DateTime.parse(map['recordedAt'] as String),
@@ -236,7 +236,7 @@ class WeightRecord implements SyncableEntity {
   factory WeightRecord.fromJson(Map<String, dynamic> json) {
     return WeightRecord(
       id: json['id'] as String,
-      farmId: json['farm_id'] as String? ?? 'mock-farm-001',
+      farmId: json['farm_id'] as String? ?? 'farm_default',
       animalId: json['animal_id'] as String,
       weight: (json['weight'] as num).toDouble(),
       recordedAt: DateTime.parse(json['recorded_at'] as String),

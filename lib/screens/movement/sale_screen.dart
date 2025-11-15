@@ -88,8 +88,6 @@ class _SaleScreenState extends State<SaleScreen> {
       final updatedAnimal = animal.copyWith(status: AnimalStatus.sold);
       await animalProvider.updateAnimal(updatedAnimal);
 
-      debugPrint('✅ Animal ${animal.id} marked as sold in DB and provider');
-
       syncProvider.incrementPendingData();
 
       if (!mounted) return;
@@ -105,8 +103,6 @@ class _SaleScreenState extends State<SaleScreen> {
       // Return after update is complete
       Navigator.pop(context);
     } catch (e) {
-      debugPrint('❌ Error marking animal as sold: $e');
-
       if (!mounted) return;
 
       setState(() => _isConfirming = false);

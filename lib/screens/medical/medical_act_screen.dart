@@ -18,8 +18,6 @@ import '../../providers/treatment_provider.dart';
 //import '../../providers/lot_provider.dart';
 //import '../../providers/sync_provider.dart';
 import '../../providers/veterinarian_provider.dart';
-import '../../data/mocks/mock_medical_products.dart';
-import '../../data/mock_data.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
@@ -160,7 +158,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
 
   /// Obtenir les produits filtrés
   List<MedicalProduct> _getFilteredProducts() {
-    final allProducts = MockMedicalProducts.generateProducts();
+    final allProducts = <MedicalProduct>[];
 
     // Filtrer par type
     var filtered = allProducts.where((p) => p.type == _selectedType).toList();
@@ -230,10 +228,11 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
 
   /// Rechercher un vétérinaire
   void _searchVeterinarian() {
+    final veterinarians = context.read<VeterinarianProvider>().veterinarians;
     showDialog(
       context: context,
       builder: (context) => _VeterinarianSearchDialog(
-        veterinarians: MockData.veterinarians,
+        veterinarians: veterinarians,
         onSelect: (vet) {
           setState(() {
             _selectedVetId = vet.id;
@@ -249,7 +248,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
 
   /// Scanner le QR d'un vétérinaire
   Future<void> _scanVeterinarianQR() async {
-    final vets = MockData.veterinarians;
+    final vets = context.read<VeterinarianProvider>().veterinarians;
     if (vets.isEmpty) return;
 
     final selectedVet = vets.first;

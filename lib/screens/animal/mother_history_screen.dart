@@ -257,7 +257,6 @@ class MotherHistoryScreen extends StatelessWidget {
         ),
         trailing: const Icon(Icons.chevron_right),
         onTap: () {
-          // TODO: Navigation vers détails animal
         },
       ),
     );

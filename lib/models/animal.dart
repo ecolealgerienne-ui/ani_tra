@@ -101,7 +101,7 @@ class Animal implements SyncableEntity {
 
   Animal({
     String? id,
-    this.farmId = 'mock-farm-001', // Valeur par dÃ©faut pour compatibilitÃ© mock
+    this.farmId = 'farm_default', // Valeur par dÃ©faut pour compatibilitÃ© mock
     this.currentEid,
     this.eidHistory,
     this.officialNumber,
@@ -379,7 +379,7 @@ class Animal implements SyncableEntity {
       id: json['id'],
       farmId: json['farmId'] as String? ??
           json['farm_id'] as String? ??
-          'mock-farm-001',
+          'farm_default',
       currentEid: json['current_eid'] ??
           json['currentEid'] ??
           json['eid'], // RÃ©trocompatibilitÃ©

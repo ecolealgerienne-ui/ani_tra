@@ -73,15 +73,14 @@ class VeterinarianProvider with ChangeNotifier {
       _allVeterinarians.removeWhere((v) => v.farmId == _currentFarmId);
       _allVeterinarians.addAll(farmVeterinarians);
     } catch (e) {
-      debugPrint('❌ Error loading veterinarians from repository: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  void loadMockVets(List<Veterinarian> mockVets) {
-    _migrateVeterinariansToRepository(mockVets);
+  void loadInitialVets(List<Veterinarian> vets) {
+    _migrateVeterinariansToRepository(vets);
   }
 
   Future<void> _migrateVeterinariansToRepository(List<Veterinarian> vets) async {
@@ -89,7 +88,6 @@ class VeterinarianProvider with ChangeNotifier {
       try {
         await _repository.create(vet, vet.farmId);
       } catch (e) {
-        debugPrint('⚠️ Veterinarian ${vet.id} already exists or error: $e');
       }
     }
     await _loadVeterinariansFromRepository();
@@ -128,7 +126,6 @@ class VeterinarianProvider with ChangeNotifier {
       _allVeterinarians.add(veterinarianWithFarm);
       notifyListeners();
     } catch (e) {
-      debugPrint('❌ Error adding veterinarian: $e');
       rethrow;
     }
   }
@@ -144,7 +141,6 @@ class VeterinarianProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('❌ Error updating veterinarian: $e');
       rethrow;
     }
   }
@@ -162,7 +158,6 @@ class VeterinarianProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('❌ Error deleting veterinarian: $e');
       rethrow;
     }
   }

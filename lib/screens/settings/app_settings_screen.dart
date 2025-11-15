@@ -509,7 +509,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
 
   Future<void> _calculateCacheSize() async {
     setState(() {
-      _cacheSize = AppConstants.mockCacheSize;
+      _cacheSize = AppConstants.defaultCacheSize;
     });
     await _savePreference('cache_size', _cacheSize);
     if (!mounted) return;

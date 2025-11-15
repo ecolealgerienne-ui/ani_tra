@@ -169,7 +169,7 @@ class Lot implements SyncableEntity {
 
   Lot({
     String? id,
-    this.farmId = 'mock-farm-001', // Valeur par défaut pour compatibilité mock
+    this.farmId = 'farm_default', // Valeur par défaut pour compatibilité mock
     required this.name,
     this.type,
     this.animalIds = const [],
@@ -397,7 +397,7 @@ class Lot implements SyncableEntity {
       id: json['id'],
       farmId: json['farmId'] as String? ??
           json['farm_id'] as String? ??
-          'mock-farm-001',
+          'farm_default',
       name: json['name'],
       type: json['type'] != null
           ? LotType.values.firstWhere((e) => e.name == json['type'])

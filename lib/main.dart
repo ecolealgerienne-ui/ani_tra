@@ -69,16 +69,9 @@ void main() async {
   tz.setLocalLocation(tz.getLocation(AppConstants.defaultTimezone));
 
   // Initialize Database ET récupérer l'instance
-  //final database = await DatabaseInitializer.initialize();
-  // Initialiser la DB une seule fois
-  debugPrint('✅ the  main() DB initialized: $_dbInitialized');
-
   if (!_dbInitialized) {
     _appDatabase = await DatabaseInitializer.initialize();
     _dbInitialized = true;
-    debugPrint('✅ DB initialisée');
-  } else {
-    debugPrint('⭐️ DB déjà initialisée, skip');
   }
 
   final database = _appDatabase!;
@@ -102,7 +95,7 @@ void main() async {
   await flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
     onDidReceiveNotificationResponse: (NotificationResponse response) {
-      debugPrint('Notification cliquée: ${response.payload}');
+      // Notification received
     },
   );
 

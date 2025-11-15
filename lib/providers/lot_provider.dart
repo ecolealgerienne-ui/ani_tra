@@ -87,15 +87,14 @@ class LotProvider extends ChangeNotifier {
       _allLots.removeWhere((l) => l.farmId == _currentFarmId);
       _allLots.addAll(farmLots);
     } catch (e) {
-      debugPrint('❌ Error loading lots from repository: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  void loadMockLots(List<Lot> mockLots) {
-    _migrateLotsToRepository(mockLots);
+  void loadInitialLots(List<Lot> lots) {
+    _migrateLotsToRepository(lots);
   }
 
   Future<void> _migrateLotsToRepository(List<Lot> lots) async {
@@ -103,7 +102,6 @@ class LotProvider extends ChangeNotifier {
       try {
         await _repository.create(lot, lot.farmId);
       } catch (e) {
-        debugPrint('⚠️ Lot ${lot.id} already exists or error: $e');
       }
     }
     await _loadLotsFromRepository();
@@ -129,18 +127,12 @@ class LotProvider extends ChangeNotifier {
     );
 
     try {
-      debugPrint(
-          '📹 Creating lot: name=$name, farmId=$_authProvider.currentFarmId, type=$type');
       await _repository.create(lot, _authProvider.currentFarmId);
-      debugPrint('✅ Lot created in DB: ${lot.id}');
       _allLots.add(lot);
-      debugPrint('✅ Lot added to memory. Total: ${_allLots.length}');
       _activeLot = lot;
       notifyListeners();
-      debugPrint('✅ notifyListeners called');
       return lot;
     } catch (e) {
-      debugPrint('❌ Error creating lot: $e');
       rethrow;
     }
   }
@@ -172,7 +164,6 @@ class LotProvider extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('❌ Error updating lot: $e');
       rethrow;
     }
   }
@@ -208,17 +199,12 @@ class LotProvider extends ChangeNotifier {
     _activeLot = updated;
     notifyListeners();
 
-    debugPrint(
-        '📱 Animal $animalId added to lot (mem). Total: ${updated.animalCount}');
-
     // ✅ ÉTAPE 2: Puis sauvegarder en DB (peut prendre du temps)
     try {
       await updateLot(updated);
-      debugPrint('✅ Animal $animalId saved to DB');
       return true;
     } catch (e) {
       // ✅ ÉTAPE 3: Si la sauvegarde échoue, rollback à l'état précédent
-      debugPrint('❌ Error saving animal $animalId to DB: $e');
       _activeLot = lot;
       notifyListeners();
       return false;
@@ -237,16 +223,11 @@ class LotProvider extends ChangeNotifier {
     _activeLot = updated;
     notifyListeners();
 
-    debugPrint(
-        '📱 Animal $animalId removed from lot (mem). Total: ${updated.animalCount}');
-
     try {
       await updateLot(updated);
-      debugPrint('✅ Animal $animalId removal saved to DB');
       return true;
     } catch (e) {
       // Revenir à l'état précédent si la sauvegarde échoue
-      debugPrint('❌ Error removing animal $animalId from DB: $e');
       _activeLot = lot;
       notifyListeners();
       return false;
@@ -436,7 +417,6 @@ class LotProvider extends ChangeNotifier {
       notifyListeners();
       return duplicated;
     } catch (e) {
-      debugPrint('❌ Error duplicating lot: $e');
       rethrow;
     }
   }
@@ -453,7 +433,6 @@ class LotProvider extends ChangeNotifier {
       }
       notifyListeners();
     } catch (e) {
-      debugPrint('❌ Error deleting lot: $e');
       rethrow;
     }
   }
@@ -575,7 +554,6 @@ class LotProvider extends ChangeNotifier {
       _allLots.add(lot);
       notifyListeners();
     } catch (e) {
-      debugPrint('⚠️ Campaign import error: $e');
     }
   }
 

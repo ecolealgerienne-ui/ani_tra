@@ -9,35 +9,23 @@ class DatabaseInitializer {
 
   static Future<AppDatabase> initialize() async {
     try {
-      debugPrint('$_tag: Démarrage de l\'initialisation...');
-
       final db = AppDatabase();
-      debugPrint('$_tag: Instance DB créée');
 
       await db.customStatement('SELECT 1');
-      debugPrint('$_tag: ✅ Connexion testée avec succès');
-
-      debugPrint('$_tag: ✅ Tables et indexes OK');
 
       await _seedTestData(db);
 
-      debugPrint('$_tag: ✅ Initialisation complète - APP READY');
-
       return db;
     } catch (e, stack) {
-      debugPrint('$_tag: ❌ ERREUR CRITIQUE\n$e\n$stack');
       rethrow;
     }
   }
 
   static Future<void> _seedTestData(AppDatabase db) async {
     try {
-      debugPrint('$_tag: Seeding test data...');
-
       // Vérifier si Farm existe déjà
       final existingFarm = await db.farmDao.findById('farm_default');
       if (existingFarm != null) {
-        debugPrint('$_tag: Data already exists, skipping seed');
         return;
       }
 
@@ -57,9 +45,8 @@ class DatabaseInitializer {
           createdAt: now,
           updatedAt: now,
         ));
-        debugPrint('$_tag:   ✅ Farm 1: Bergerie des Collines');
       } catch (e) {
-        debugPrint('$_tag:   ⚠️ Farm 1: $e');
+        // Silent fail
       }
 
       try {
@@ -71,9 +58,8 @@ class DatabaseInitializer {
           createdAt: now,
           updatedAt: now,
         ));
-        debugPrint('$_tag:   ✅ Farm 2: Élevage du Midi');
       } catch (e) {
-        debugPrint('$_tag:   ⚠️ Farm 2: $e');
+        // Silent fail
       }
 
       try {
@@ -85,9 +71,8 @@ class DatabaseInitializer {
           createdAt: now,
           updatedAt: now,
         ));
-        debugPrint('$_tag:   ✅ Farm 3: Ferme Bio Roussillon');
       } catch (e) {
-        debugPrint('$_tag:   ⚠️ Farm 3: $e');
+        // Silent fail
       }
 
       // Species
@@ -116,9 +101,8 @@ class DatabaseInitializer {
           icon: '🐐',
           displayOrder: const Value(3),
         ));
-        debugPrint('$_tag:   ✅ Species (3)');
       } catch (e) {
-        debugPrint('$_tag:   ⚠️ Species: $e');
+        // Silent fail
       }
 
       // Breeds
@@ -145,9 +129,8 @@ class DatabaseInitializer {
             displayOrder: Value(breed.$6),
           ));
         }
-        debugPrint('$_tag:   ✅ Breeds (9)');
       } catch (e) {
-        debugPrint('$_tag:   ⚠️ Breeds: $e');
+        // Silent fail
       }
 
       // ════════════════════════════════════════════════════════════
@@ -168,9 +151,8 @@ class DatabaseInitializer {
           createdAt: now,
           updatedAt: now,
         ));
-        debugPrint('$_tag:   ✅ Veterinarian');
       } catch (e) {
-        debugPrint('$_tag:   ⚠️ Veterinarian: $e');
+        // Silent fail
       }
 
       // Medical Products (utilise currentStock, stockUnit)
@@ -190,9 +172,8 @@ class DatabaseInitializer {
           createdAt: now,
           updatedAt: now,
         ));
-        debugPrint('$_tag:   ✅ Medical Product');
       } catch (e) {
-        debugPrint('$_tag:   ⚠️ Medical Product: $e');
+        // Silent fail
       }
 
       // Animals
@@ -209,9 +190,8 @@ class DatabaseInitializer {
           createdAt: now,
           updatedAt: now,
         ));
-        debugPrint('$_tag:   ✅ Animal');
       } catch (e) {
-        debugPrint('$_tag:   ⚠️ Animal: $e');
+        // Silent fail
       }
 
       // Treatments (utilise dose)
@@ -229,9 +209,8 @@ class DatabaseInitializer {
           createdAt: now,
           updatedAt: now,
         ));
-        debugPrint('$_tag:   ✅ Treatment');
       } catch (e) {
-        debugPrint('$_tag:   ⚠️ Treatment: $e');
+        // Silent fail
       }
 
       // Vaccinations (utilise animalIds, dose, type, disease, administrationRoute, withdrawalPeriodDays)
@@ -251,9 +230,8 @@ class DatabaseInitializer {
           createdAt: now,
           updatedAt: now,
         ));
-        debugPrint('$_tag:   ✅ Vaccination');
       } catch (e) {
-        debugPrint('$_tag:   ⚠️ Vaccination: $e');
+        // Silent fail
       }
 
       // Weights (utilise recordedAt, source)
@@ -269,9 +247,8 @@ class DatabaseInitializer {
           createdAt: now,
           updatedAt: now,
         ));
-        debugPrint('$_tag:   ✅ Weight');
       } catch (e) {
-        debugPrint('$_tag:   ⚠️ Weight: $e');
+        // Silent fail
       }
 
       // Movements (utilise type, movementDate, fromFarmId, toFarmId)
@@ -286,9 +263,8 @@ class DatabaseInitializer {
           createdAt: now,
           updatedAt: now,
         ));
-        debugPrint('$_tag:   ✅ Movement');
       } catch (e) {
-        debugPrint('$_tag:   ⚠️ Movement: $e');
+        // Silent fail
       }
 
       // Batches (utilise animalIdsJson, purpose)
@@ -303,9 +279,8 @@ class DatabaseInitializer {
           createdAt: now,
           updatedAt: now,
         ));
-        debugPrint('$_tag:   ✅ Batch');
       } catch (e) {
-        debugPrint('$_tag:   ⚠️ Batch: $e');
+        // Silent fail
       }
 
       // Lots - PHASE 1: ADD status field
@@ -321,9 +296,8 @@ class DatabaseInitializer {
           createdAt: now,
           updatedAt: now,
         ));
-        debugPrint('$_tag:   ✅ Lot');
       } catch (e) {
-        debugPrint('$_tag:   ⚠️ Lot: $e');
+        // Silent fail
       }
 
       // ════════════════════════════════════════════════════════════
@@ -463,10 +437,8 @@ class DatabaseInitializer {
           createdAt: now,
           updatedAt: now,
         ));
-
-        debugPrint('$_tag:   ✅ Alert Configurations (8)');
       } catch (e) {
-        debugPrint('$_tag:   ⚠️ Alert Configurations: $e');
+        // Silent fail
       }
 
       // ════════════════════════════════════════════════════════════
@@ -497,14 +469,11 @@ class DatabaseInitializer {
             updatedAt: now,
           ));
         }
-        debugPrint('$_tag:   ✅ Generated Animals (30)');
       } catch (e) {
-        debugPrint('$_tag:   ⚠️ Generated Animals: $e');
+        // Silent fail
       }
-
-      debugPrint('$_tag: ✅ Test data seeded successfully');
     } catch (e, stack) {
-      debugPrint('$_tag: ⚠️ Seed error (continuing): $e\n$stack');
+      // Silent fail
     }
   }
 }

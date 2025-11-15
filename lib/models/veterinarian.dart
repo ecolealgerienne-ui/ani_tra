@@ -65,7 +65,7 @@ class Veterinarian implements SyncableEntity {
 
   Veterinarian({
     required this.id,
-    this.farmId = 'mock-farm-001', // Valeur par défaut pour compatibilité mock
+    this.farmId = 'farm_default', // Valeur par défaut pour compatibilité mock
     required this.firstName,
     required this.lastName,
     this.title,
@@ -272,7 +272,7 @@ class Veterinarian implements SyncableEntity {
   factory Veterinarian.fromJson(Map<String, dynamic> json) {
     return Veterinarian(
       id: json['id'] as String,
-      farmId: json['farm_id'] as String? ?? 'mock-farm-001',
+      farmId: json['farm_id'] as String? ?? 'farm_default',
       firstName: json['firstName'] as String,
       lastName: json['lastName'] as String,
       title: json['title'] as String?,

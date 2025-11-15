@@ -51,7 +51,6 @@ class VaccinationProvider extends ChangeNotifier {
       _allVaccinations.removeWhere((v) => v.farmId == _currentFarmId);
       _allVaccinations.addAll(farmVaccinations);
     } catch (e) {
-      debugPrint('❌ Error loading vaccinations from repository: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -68,8 +67,6 @@ class VaccinationProvider extends ChangeNotifier {
       try {
         await _repository.create(vaccination, vaccination.farmId);
       } catch (e) {
-        debugPrint(
-            '⚠️ Vaccination ${vaccination.id} already exists or error: $e');
       }
     }
     await _loadVaccinationsFromRepository();
@@ -87,7 +84,6 @@ class VaccinationProvider extends ChangeNotifier {
       _allVaccinations.add(vaccinationWithFarm);
       notifyListeners();
     } catch (e) {
-      debugPrint('❌ Error adding vaccination: $e');
       rethrow;
     }
   }
@@ -102,7 +98,6 @@ class VaccinationProvider extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('❌ Error updating vaccination: $e');
       rethrow;
     }
   }
@@ -114,7 +109,6 @@ class VaccinationProvider extends ChangeNotifier {
       _allVaccinations.removeWhere((v) => v.id == id);
       notifyListeners();
     } catch (e) {
-      debugPrint('❌ Error removing vaccination: $e');
       rethrow;
     }
   }

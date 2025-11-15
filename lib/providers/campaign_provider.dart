@@ -70,15 +70,14 @@ class CampaignProvider extends ChangeNotifier {
       _allCampaigns.removeWhere((c) => c.farmId == _currentFarmId);
       _allCampaigns.addAll(farmCampaigns);
     } catch (e) {
-      debugPrint('❌ Error loading campaigns from repository: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  void loadMockCampaigns(List<Campaign> mockCampaigns) {
-    _migrateCampaignsToRepository(mockCampaigns);
+  void loadInitialCampaigns(List<Campaign> campaigns) {
+    _migrateCampaignsToRepository(campaigns);
   }
 
   Future<void> _migrateCampaignsToRepository(List<Campaign> campaigns) async {
@@ -86,7 +85,6 @@ class CampaignProvider extends ChangeNotifier {
       try {
         await _repository.create(campaign, campaign.farmId);
       } catch (e) {
-        debugPrint('⚠️ Campaign ${campaign.id} already exists or error: $e');
       }
     }
     await _loadCampaignsFromRepository();
@@ -127,7 +125,6 @@ class CampaignProvider extends ChangeNotifier {
       notifyListeners();
       return campaign;
     } catch (e) {
-      debugPrint('❌ Error creating campaign: $e');
       rethrow;
     }
   }
@@ -157,7 +154,6 @@ class CampaignProvider extends ChangeNotifier {
       }
       return false;
     } catch (e) {
-      debugPrint('❌ Error adding animal to campaign: $e');
       return false;
     }
   }
@@ -192,7 +188,6 @@ class CampaignProvider extends ChangeNotifier {
       }
       return false;
     } catch (e) {
-      debugPrint('❌ Error removing animal from campaign: $e');
       return false;
     }
   }
@@ -217,7 +212,6 @@ class CampaignProvider extends ChangeNotifier {
       _activeCampaign = null;
       notifyListeners();
     } catch (e) {
-      debugPrint('❌ Error completing campaign: $e');
       rethrow;
     }
   }
@@ -241,7 +235,6 @@ class CampaignProvider extends ChangeNotifier {
         _allCampaigns[index] = updated;
         notifyListeners();
       } catch (e) {
-        debugPrint('❌ Error completing campaign: $e');
         rethrow;
       }
     }
@@ -269,7 +262,6 @@ class CampaignProvider extends ChangeNotifier {
       }
       notifyListeners();
     } catch (e) {
-      debugPrint('❌ Error deleting campaign: $e');
       rethrow;
     }
   }
@@ -297,7 +289,6 @@ class CampaignProvider extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('❌ Error updating campaign: $e');
       rethrow;
     }
   }
