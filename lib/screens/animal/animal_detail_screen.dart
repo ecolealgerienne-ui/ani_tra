@@ -555,12 +555,12 @@ class _InfosTab extends StatelessWidget {
             trailing: IconButton(
               icon: Icon(
                 Icons.edit,
-                color: currentAnimal.canEditRecords ? null : Colors.grey,
+                color: currentAnimal.status == AnimalStatus.alive ? null : Colors.grey,
               ),
-              tooltip: currentAnimal.canEditRecords
+              tooltip: currentAnimal.status == AnimalStatus.alive
                   ? AppLocalizations.of(context).translate(AppStrings.changeEid)
                   : null,
-              onPressed: currentAnimal.canEditRecords
+              onPressed: currentAnimal.status == AnimalStatus.alive
                   ? () => _showChangeEidDialog(context, currentAnimal)
                   : null,
             ),
@@ -639,9 +639,9 @@ class _InfosTab extends StatelessWidget {
             trailing: IconButton(
               icon: Icon(
                 Icons.add_circle,
-                color: currentAnimal.canEditRecords ? null : Colors.grey,
+                color: currentAnimal.status == AnimalStatus.alive ? null : Colors.grey,
               ),
-              onPressed: currentAnimal.canEditRecords
+              onPressed: currentAnimal.status == AnimalStatus.alive
                   ? () => _showAddWeightDialog(context)
                   : null,
             ),
