@@ -982,7 +982,7 @@ class _AlertConfigItem extends StatelessWidget {
           ),
           trailing: Switch(
             value: config.enabled,
-            activeColor: color,
+            activeTrackColor: color,
             onChanged: (value) async {
               try {
                 await alertProvider.toggleEnabled(config.id, value);
@@ -1162,7 +1162,6 @@ class _SettingsCard extends StatelessWidget {
   final String value;
   final String? subtitle;
   final VoidCallback onTap;
-  final bool showChevron;
 
   const _SettingsCard({
     required this.icon,
@@ -1170,7 +1169,6 @@ class _SettingsCard extends StatelessWidget {
     required this.value,
     this.subtitle,
     required this.onTap,
-    this.showChevron = true,
   });
 
   @override
@@ -1232,11 +1230,10 @@ class _SettingsCard extends StatelessWidget {
                   ],
                 ),
               ),
-              if (showChevron)
-                Icon(
-                  Icons.chevron_right,
-                  color: Colors.grey[400],
-                ),
+              Icon(
+                Icons.chevron_right,
+                color: Colors.grey[400],
+              ),
             ],
           ),
         ),
