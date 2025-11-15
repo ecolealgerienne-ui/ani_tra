@@ -782,6 +782,8 @@ class AppStrings {
   static const String motherNotFound = 'motherNotFound';
   static const String animalSavedSuccess = 'animalSavedSuccess';
   static const String errorOccurred = 'errorOccurred';
+  static const String eidAlreadyExists = 'eidAlreadyExists';
+  static const String officialNumberAlreadyExists = 'officialNumberAlreadyExists';
   static const String eidOfMother = 'eidOfMother';
   static const String scanningInProgress = 'scanningInProgress';
   static const String noFemaleAvailable = 'noFemaleAvailable';
