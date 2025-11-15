@@ -1,0 +1,1091 @@
+╔════════════════════════════════════════════════════════════════════════╗
+║                                                                        ║
+║        📋 PHASE 1B DUPPLICATION - SPECS COMPLÈTES 11 ENTITÉS          ║
+║                                                                        ║
+║              Document: SPECIFICATIONS & TEMPLATES                     ║
+║              Status: READY TO CODE                                    ║
+║              Date: 2025-11-11                                         ║
+║                                                                        ║
+╚════════════════════════════════════════════════════════════════════════╝
+
+═══════════════════════════════════════════════════════════════════════════
+0. OVERVIEW
+═══════════════════════════════════════════════════════════════════════════
+
+OBJECTIF:
+  Dupliquer le pattern Animals (B1+B2+B3+B4+A1-A6) aux 11 entités restantes
+
+SCOPE:
+  ✅ 11 entités (voir section 1)
+  ✅ 3 fichiers par entité (Table, DAO, Repository)
+  ✅ Patterns: FK + Indexes + Multi-tenancy + Logging
+  ✅ Multi-farm: 100% complété (DAO level)
+
+SUCCESS CRITERIA:
+  ✅ Tous les fichiers compilent (flutter analyze = 0 erreurs)
+  ✅ Build runner passe sans erreurs
+  ✅ flutter run sans crash
+  ✅ Multi-tenancy sécurisé (farmId obligatoire)
+
+TIMELINE:
+  Tier 1 (4 entités): 2-3 heures
+  Tier 2 (4 entités): 2-3 heures
+  Tier 3 (3 entités): 1-2 heures
+  TOTAL: 5-8 heures
+
+═══════════════════════════════════════════════════════════════════════════
+1. LES 11 ENTITÉS À TRAITER
+═══════════════════════════════════════════════════════════════════════════
+
+TIER 1 - CORE (À FAIRE EN PRIORITÉ - 2-3h):
+  Priority 1: TREATMENTS
+  Priority 2: VACCINATIONS
+  Priority 3: WEIGHTS
+  Priority 4: MOVEMENTS
+
+TIER 2 - SECONDARY (Après Tier 1 - 2-3h):
+  Priority 5: BATCHES
+  Priority 6: LOTS
+  Priority 7: CAMPAIGNS
+  Priority 8: MEDICAL_PRODUCTS
+
+TIER 3 - REFERENCE (Après Tier 2 - 1-2h):
+  Priority 9: BREEDS
+  Priority 10: BREEDING
+  Priority 11: DOCUMENTS
+
+DÉPENDANCES:
+  BREEDING → dépend de ANIMALS + BREEDS
+  LOTS → dépend de BATCHES
+  TREATMENTS → peut être indépendant
+  VACCINATIONS → peut être indépendant
+  WEIGHTS → peut être indépendant
+  MOVEMENTS → peut être indépendant
+
+RECOMMANDATION ORDRE:
+  1. Faire TIER 1 au complet (foundation)
+  2. Puis TIER 2 (dependencies resolved)
+  3. Puis TIER 3 (références)
+
+═══════════════════════════════════════════════════════════════════════════
+2. FICHIERS À MODIFIER PAR ENTITÉ
+═══════════════════════════════════════════════════════════════════════════
+
+FORMAT FICHIER NAMES:
+  Table:      {entity}_table.dart           → lib/drift/tables/
+  DAO:        {entity}_dao.dart             → lib/drift/daos/
+  Repository: {entity}_repository.dart      → lib/repositories/
+  Provider:   {entity}_provider.dart        → lib/providers/ (MODIFIER SI EXISTE)
+  Strings:    app_strings.dart              → lib/i18n/ (AJOUTER CLÉS)
+
+EXEMPLE TREATMENTS:
+  ✅ treatments_table.dart        (CRÉER/MODIFIER)
+  ✅ treatment_dao.dart           (CRÉER/MODIFIER)
+  ✅ treatment_repository.dart    (CRÉER/MODIFIER)
+  ✅ treatment_provider.dart      (MODIFIER existant - ajouter logging)
+  ✅ app_strings.dart             (AJOUTER clés si nouvelles)
+
+POUR CHAQUE ENTITÉ - FICHIERS À TRAITER:
+
+TREATMENTS:
+  ├─ lib/drift/tables/treatments_table.dart (créer/modifier)
+  ├─ lib/drift/daos/treatment_dao.dart (créer/modifier)
+  ├─ lib/repositories/treatment_repository.dart (créer/modifier)
+  └─ lib/providers/treatment_provider.dart (modifier - logging)
+
+VACCINATIONS:
+  ├─ lib/drift/tables/vaccinations_table.dart
+  ├─ lib/drift/daos/vaccination_dao.dart
+  ├─ lib/repositories/vaccination_repository.dart
+  └─ lib/providers/vaccination_provider.dart
+
+WEIGHTS:
+  ├─ lib/drift/tables/weights_table.dart
+  ├─ lib/drift/daos/weight_dao.dart
+  ├─ lib/repositories/weight_repository.dart
+  └─ lib/providers/weight_provider.dart
+
+MOVEMENTS:
+  ├─ lib/drift/tables/movements_table.dart
+  ├─ lib/drift/daos/movement_dao.dart
+  ├─ lib/repositories/movement_repository.dart
+  └─ lib/providers/movement_provider.dart
+
+(idem pour BATCHES, LOTS, CAMPAIGNS, MEDICAL_PRODUCTS, BREEDS, BREEDING, DOCUMENTS)
+
+═══════════════════════════════════════════════════════════════════════════
+3. TEMPLATE GÉNÉRIQUE - TABLE
+═══════════════════════════════════════════════════════════════════════════
+
+PRINCIPE:
+  - Copy-paste cette template
+  - Remplacer [ENTITY_UPPER] par ton entité en MAJUSCULE
+  - Remplacer [entity] par ton entité en minuscule
+  - Adapter les colonnes à l'entité réelle
+  - Garder TOUJOURS: id, farmId, synced, timestamps, deletedAt
+
+STRUCTURE TEMPLATE:
+
+```dart
+// lib/drift/tables/[entity]_table.dart
+import 'package:drift/drift.dart';
+
+class [ENTITY_UPPER]sTable extends Table {
+  @override
+  String get tableName => '[entity]s';
+
+  // ==================== OBLIGATOIRES ====================
+  
+  // Primary key
+  TextColumn get id => text()();
+
+  // Multi-tenancy (TOUJOURS présent)
+  TextColumn get farmId => text().named('farm_id')();
+
+  // [ENTITY] - specific columns
+  // À adapter selon l'entité
+  TextColumn get name => text()();
+  TextColumn get description => text().nullable().named('description')();
+  DateTimeColumn get date => dateTime().nullable().named('date')();
+  TextColumn get type => text().nullable().named('type')();
+  // ... autres colonnes spécifiques ...
+
+  // Sync fields (Phase 2 ready) - TOUJOURS présent
+  BoolColumn get synced => boolean().withDefault(const Constant(false))();
+  DateTimeColumn get lastSyncedAt =>
+      dateTime().nullable().named('last_synced_at')();
+  TextColumn get serverVersion => text().nullable().named('server_version')();
+
+  // Soft-delete (audit trail) - TOUJOURS présent
+  DateTimeColumn get deletedAt => dateTime().nullable().named('deleted_at')();
+
+  // Timestamps - TOUJOURS présent
+  DateTimeColumn get createdAt => dateTime().named('created_at')();
+  DateTimeColumn get updatedAt => dateTime().named('updated_at')();
+
+  @override
+  Set<Column> get primaryKey => {id};
+
+  // ==================== B2: FK + INDEXES ====================
+  @override
+  List<String> get customConstraints => [
+    'FOREIGN KEY (farm_id) REFERENCES farms(id) ON DELETE CASCADE',
+    'CREATE INDEX IF NOT EXISTS idx_[entity]s_farm_id ON [entity]s(farm_id)',
+    'CREATE INDEX IF NOT EXISTS idx_[entity]s_farm_created ON [entity]s(farm_id, created_at DESC)',
+    'CREATE INDEX IF NOT EXISTS idx_[entity]s_deleted_at ON [entity]s(deleted_at)',
+  ];
+}
+```
+
+IMPORTANT:
+  ✅ @override List<String> get customConstraints (PAS customStatements!)
+  ✅ farmId TOUJOURS présent
+  ✅ FK TOUJOURS présent
+  ✅ Sync fields TOUJOURS présents
+  ✅ Soft-delete TOUJOURS présent
+  ✅ 3 indexes MINIMUM (farm_id, farm+date, deleted_at)
+
+═══════════════════════════════════════════════════════════════════════════
+4. TEMPLATE GÉNÉRIQUE - DAO
+═══════════════════════════════════════════════════════════════════════════
+
+STRUCTURE TEMPLATE:
+
+```dart
+// lib/drift/daos/[entity]_dao.dart
+import 'package:drift/drift.dart';
+import '../database.dart';
+import '../tables/[entity]_table.dart';
+
+part '[entity]_dao.g.dart';
+
+@DriftAccessor(tables: [[ENTITY_UPPER]sTable])
+class [ENTITY_UPPER]Dao extends DatabaseAccessor<AppDatabase> with _$[ENTITY_UPPER]DaoMixin {
+  [ENTITY_UPPER]Dao(super.db);
+
+  // ==================== MÉTHODES OBLIGATOIRES ====================
+
+  /// 1. findByFarmId - TOUJOURS filtrer par farmId
+  Future<List<[ENTITY_UPPER]sTableData>> findByFarmId(String farmId) {
+    return (select([entity]sTable)
+          ..where((t) => t.farmId.equals(farmId))
+          ..where((t) => t.deletedAt.isNull()))
+        .get();
+  }
+
+  /// 2. findById - Sécurité farmId
+  Future<[ENTITY_UPPER]sTableData?> findById(String id, String farmId) {
+    return (select([entity]sTable)
+          ..where((t) => t.id.equals(id))
+          ..where((t) => t.farmId.equals(farmId))
+          ..where((t) => t.deletedAt.isNull()))
+        .getSingleOrNull();
+  }
+
+  /// 3. insert
+  Future<int> insertItem([ENTITY_UPPER]sTableCompanion item) {
+    return into([entity]sTable).insert(item);
+  }
+
+  /// 4. update - B1 FIX: farmId MANDATORY
+  Future<int> updateItem([ENTITY_UPPER]sTableCompanion item, String farmId) {
+    return (update([entity]sTable)
+          ..where((t) => t.id.equals(item.id.value))
+          ..where((t) => t.farmId.equals(farmId)))
+        .write(item);  // ✅ .write() PAS .replace()
+  }
+
+  /// 5. softDelete
+  Future<int> softDelete(String id, String farmId) {
+    return (update([entity]sTable)
+          ..where((t) => t.id.equals(id))
+          ..where((t) => t.farmId.equals(farmId)))
+        .write([ENTITY_UPPER]sTableCompanion(
+      deletedAt: Value(DateTime.now()),
+      updatedAt: Value(DateTime.now()),
+    ));
+  }
+
+  /// 6. getUnsynced - Phase 2 ready
+  Future<List<[ENTITY_UPPER]sTableData>> getUnsynced(String farmId) {
+    return (select([entity]sTable)
+          ..where((t) => t.farmId.equals(farmId))
+          ..where((t) => t.synced.equals(false))
+          ..where((t) => t.deletedAt.isNull()))
+        .get();
+  }
+
+  /// 7. markSynced - Phase 2 ready
+  Future<int> markSynced(String id, String farmId) {
+    return (update([entity]sTable)
+          ..where((t) => t.id.equals(id))
+          ..where((t) => t.farmId.equals(farmId)))
+        .write([ENTITY_UPPER]sTableCompanion(
+      synced: const Value(true),
+      lastSyncedAt: Value(DateTime.now()),
+      updatedAt: Value(DateTime.now()),
+    ));
+  }
+
+  // ==================== B3: Compter optimisé ====================
+  Future<int> countByFarmId(String farmId) async {
+    final count = countAll();
+    final query = selectOnly([entity]sTable)
+      ..addColumns([count])
+      ..where([entity]sTable.farmId.equals(farmId))
+      ..where([entity]sTable.deletedAt.isNull());
+
+    final result = await query.getSingle();
+    return result.read(count) ?? 0;
+  }
+}
+```
+
+IMPORTANT:
+  ✅ part '[entity]_dao.g.dart' (OBLIGATOIRE)
+  ✅ @DriftAccessor(tables: [[ENTITY_UPPER]sTable])
+  ✅ Toutes les queries: .where(...farmId) + .where(...deletedAt)
+  ✅ updateItem: .write() PAS .replace()
+  ✅ Future<int> updateItem (PAS Future<bool>)
+  ✅ countByFarmId avec selectOnly (pas full table scan)
+
+═══════════════════════════════════════════════════════════════════════════
+5. TEMPLATE GÉNÉRIQUE - REPOSITORY
+═══════════════════════════════════════════════════════════════════════════
+
+STRUCTURE TEMPLATE:
+
+```dart
+// lib/repositories/[entity]_repository.dart
+import 'dart:convert';
+import 'package:drift/drift.dart';
+import '../drift/database.dart';
+import '../models/[entity].dart';
+
+class [ENTITY_UPPER]Repository {
+  final AppDatabase _db;
+
+  [ENTITY_UPPER]Repository(this._db);
+
+  // ==================== MÉTHODES OBLIGATOIRES ====================
+
+  /// 1. getAll - Liste par farmId
+  Future<List<[ENTITY_UPPER]>> getAll(String farmId) async {
+    final items = await _db.[entity]Dao.findByFarmId(farmId);
+    return items.map((data) => _mapToModel(data)).toList();
+  }
+
+  /// 2. getById - Sécurité farmId
+  Future<[ENTITY_UPPER]?> getById(String id, String farmId) async {
+    final item = await _db.[entity]Dao.findById(id, farmId);
+    if (item == null) return null;
+
+    if (item.farmId != farmId) {
+      throw Exception('Farm ID mismatch - Security violation');
+    }
+
+    return _mapToModel(item);
+  }
+
+  /// 3. create - B4: avec logging
+  Future<void> create([ENTITY_UPPER] item, String farmId) async {
+    final companion = _mapToCompanion(item, farmId);
+    await _db.[entity]Dao.insertItem(companion);
+    debugPrint('✅ [ENTITY_UPPER] créé: ${item.id} dans farm $farmId');
+  }
+
+  /// 4. update - B1 FIX: Pass farmId
+  Future<void> update([ENTITY_UPPER] item, String farmId) async {
+    final existing = await _db.[entity]Dao.findById(item.id, farmId);
+    if (existing == null || existing.farmId != farmId) {
+      throw Exception('[ENTITY_UPPER] not found or farm mismatch');
+    }
+
+    final companion = _mapToCompanion(item, farmId);
+    final result = await _db.[entity]Dao.updateItem(companion, farmId);
+    if (result == 0) {
+      throw Exception('[ENTITY_UPPER] update failed - no rows affected');
+    }
+    debugPrint('✅ [ENTITY_UPPER] mis à jour: ${item.id} dans farm $farmId');
+  }
+
+  /// 5. delete - Soft-delete
+  Future<void> delete(String id, String farmId) async {
+    await _db.[entity]Dao.softDelete(id, farmId);
+    debugPrint('✅ [ENTITY_UPPER] supprimé (soft): $id dans farm $farmId');
+  }
+
+  /// 6. getUnsynced - Phase 2 ready
+  Future<List<[ENTITY_UPPER]>> getUnsynced(String farmId) async {
+    final items = await _db.[entity]Dao.getUnsynced(farmId);
+    return items.map((data) => _mapToModel(data)).toList();
+  }
+
+  // ==================== B3: Compter ====================
+  Future<int> count(String farmId) async {
+    return await _db.[entity]Dao.countByFarmId(farmId);
+  }
+
+  // ==================== MAPPERS ====================
+
+  /// Mapper DB → Model
+  [ENTITY_UPPER] _mapToModel([ENTITY_UPPER]sTableData data) {
+    return [ENTITY_UPPER](
+      id: data.id,
+      farmId: data.farmId,
+      // Adapter selon colonnes réelles de l'entité
+      name: data.name,
+      description: data.description,
+      date: data.date,
+      type: data.type,
+      // ...
+      synced: data.synced,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+      lastSyncedAt: data.lastSyncedAt,
+      serverVersion: data.serverVersion,
+    );
+  }
+
+  /// Mapper Model → DB Companion
+  [ENTITY_UPPER]sTableCompanion _mapToCompanion([ENTITY_UPPER] item, String farmId) {
+    return [ENTITY_UPPER]sTableCompanion(
+      id: Value(item.id),
+      farmId: Value(farmId),
+      // Adapter selon colonnes réelles
+      name: Value(item.name),
+      description: Value(item.description),
+      date: Value(item.date),
+      type: Value(item.type),
+      // ...
+      synced: Value(item.synced),
+      createdAt: Value(item.createdAt),
+      updatedAt: Value(item.updatedAt),
+      lastSyncedAt: Value(item.lastSyncedAt),
+      serverVersion: Value(item.serverVersion),
+      deletedAt: const Value.absent(),
+    );
+  }
+}
+```
+
+IMPORTANT:
+  ✅ Tous les appels incluent farmId parameter
+  ✅ Loggers: debugPrint() pour chaque opération
+  ✅ Mappers adaptés aux colonnes réelles
+  ✅ Security checks au niveau repository
+  ✅ Future<int> updateItem: vérifier result > 0
+
+═══════════════════════════════════════════════════════════════════════════
+6. PIÈGES À ÉVITER (Basé ERREURS ANIMALS)
+═══════════════════════════════════════════════════════════════════════════
+
+PIÈGE #1: customConstraints Type ❌
+  ❌ FAUX: String get customConstraints => 'FK...';
+  ✅ CORRECT: List<String> get customConstraints => ['FK...', 'INDEX...'];
+  
+  FIX: Toujours List<String>, jamais String!
+
+---
+
+PIÈGE #2: customStatements n'existe pas ❌
+  ❌ FAUX: List<String> get customStatements => [...];
+  ✅ CORRECT: Mets les indexes dans customConstraints!
+  
+  FIX: Drift 2.29+ n'a que customConstraints, pas customStatements
+
+---
+
+PIÈGE #3: Multi-ligne expressions ❌
+  ❌ FAUX:
+    return DateTime.now().difference(_lastRefreshTime!).inMinutes <
+        _cacheTTL.inMinutes;
+  
+  ✅ CORRECT:
+    return DateTime.now().difference(_lastRefreshTime!).inMinutes < _cacheTTL.inMinutes;
+  
+  FIX: Garder expressions sur UNE SEULE LIGNE
+
+---
+
+PIÈGE #4: .replace() + .where() ❌
+  ❌ FAUX:
+    return (update(table)
+          ..where((t) => t.id.equals(id)))
+        .replace(companion);
+  
+  ✅ CORRECT:
+    return (update(table)
+          ..where((t) => t.id.equals(id))
+          ..where((t) => t.farmId.equals(farmId)))
+        .write(companion);
+  
+  FIX: Utiliser .write() quand tu as .where(), pas .replace()
+
+---
+
+PIÈGE #5: Type retour updateItem ❌
+  ❌ FAUX: Future<bool> updateItem(...) { return .write(...); }
+  ✅ CORRECT: Future<int> updateItem(...) { return .write(...); }
+  
+  FIX: .write() retourne Future<int> (nombre de lignes), pas bool
+
+---
+
+PIÈGE #6: Oublier farmId parameter ❌
+  ❌ FAUX: await updateItem(companion);
+  ✅ CORRECT: await updateItem(companion, farmId);
+  
+  FIX: farmId TOUJOURS obligatoire! C'est la sécurité multi-tenancy
+
+---
+
+PIÈGE #7: Oublier imports ❌
+  ❌ FAUX: Pas d'import AppLocalizations, pas de import 'models/xxx'
+  ✅ CORRECT: Importer AVANT d'utiliser
+  
+  Imports obligatoires pour DAO:
+    import 'package:drift/drift.dart';
+    import '../database.dart';
+    import '../tables/[entity]_table.dart';
+    part '[entity]_dao.g.dart';
+
+---
+
+PIÈGE #8: Soft-delete oublié ❌
+  ❌ FAUX: Pas de ..where((t) => t.deletedAt.isNull()) dans les queries
+  ✅ CORRECT: TOUJOURS filtrer deletedAt dans les queries
+  
+  Chaque query doit avoir:
+    ..where((t) => t.deletedAt.isNull())
+
+---
+
+PIÈGE #9: Pas de FK constraint ❌
+  ❌ FAUX: Pas de FOREIGN KEY dans customConstraints
+  ✅ CORRECT: TOUJOURS avoir FK farm_id → farms(id)
+  
+  customConstraints DOIT contenir:
+    'FOREIGN KEY (farm_id) REFERENCES farms(id) ON DELETE CASCADE'
+
+---
+
+PIÈGE #10: Index strategy mauvaise ❌
+  ❌ FAUX: Pas d'indexes, ou juste 1 index
+  ✅ CORRECT: Minimum 3 indexes (farm_id, farm+date, deleted_at)
+  
+  Indexes obligatoires:
+    - idx_[entity]s_farm_id: Toutes les queries filtrent farm_id
+    - idx_[entity]s_farm_created: Tri par création courant
+    - idx_[entity]s_deleted_at: Soft-delete check
+
+---
+
+PIÈGE #11: @override oubliée ❌
+  ❌ FAUX: List<String> get customConstraints => [...];
+  ✅ CORRECT: @override List<String> get customConstraints => [...];
+  
+  FIX: Toujours @override sur les getters qui override Table
+
+---
+
+PIÈGE #12: part directive oubliée ❌
+  ❌ FAUX: Pas de part '[entity]_dao.g.dart';
+  ✅ CORRECT: part '[entity]_dao.g.dart'; (PREMIÈRE ligne après imports)
+  
+  FIX: C'est la génération Drift. Sans ça, build_runner crash
+
+---
+
+PIÈGE #13: Oublier .g.dart generation ❌
+  ❌ FAUX: flutter analyze sans build_runner
+  ✅ CORRECT: flutter pub run build_runner build --delete-conflicting-outputs
+  
+  FIX: À faire après chaque modification DAO/Table
+
+---
+
+PIÈGE #14: debugPrint vs print ❌
+  ❌ FAUX: debugPrint('text') ou print sans import
+  ✅ CORRECT: debugPrint('✅ Message') avec import flutter/foundation.dart
+  
+  FIX: Import obligatoire:
+    import 'package:flutter/foundation.dart';
+
+═══════════════════════════════════════════════════════════════════════════
+7. CHECKLIST PAR ENTITÉ
+═══════════════════════════════════════════════════════════════════════════
+
+AVANT DE CODER:
+  [ ] Lire document spécifications (ce fichier)
+  [ ] Identifier colonnes réelles de l'entité
+  [ ] Vérifier dépendances (ex: Lots dépend de Batches)
+  [ ] Checker si ForeignKey vers autre table nécessaire
+  [ ] Avoir le model .dart prêt (sinon copier Animal comme template)
+
+CODING - TABLE:
+  [ ] Fichier créé: lib/drift/tables/[entity]_table.dart
+  [ ] Class extends Table correctement nommée
+  [ ] Colonnes: id, farmId, [specific], synced, timestamps, deletedAt
+  [ ] @override primaryKey = {id}
+  [ ] @override customConstraints avec FK + 3 indexes
+  [ ] Pas de @override customStatements (n'existe pas!)
+  [ ] Imports corrects
+
+CODING - DAO:
+  [ ] Fichier créé: lib/drift/daos/[entity]_dao.dart
+  [ ] part '[entity]_dao.g.dart' ligne 1 après imports
+  [ ] @DriftAccessor(tables: [[ENTITY]sTable])
+  [ ] findByFarmId, findById, insertItem, updateItem, softDelete
+  [ ] Toutes les queries: where farmId + where deletedAt
+  [ ] updateItem: Future<int>, .write() PAS .replace()
+  [ ] countByFarmId avec selectOnly
+  [ ] Imports corrects
+
+CODING - REPOSITORY:
+  [ ] Fichier créé: lib/repositories/[entity]_repository.dart
+  [ ] getAll, getById, create, update, delete, getUnsynced, count
+  [ ] Tous les appels: await ..._dao.method(id, farmId)
+  [ ] Logging: debugPrint() à chaque opération
+  [ ] Mappers: _mapToModel() et _mapToCompanion()
+  [ ] Mappers adaptés aux colonnes réelles
+  [ ] updateItem check: if (result == 0) throw Exception
+  [ ] Import: debugPrint from 'package:flutter/foundation.dart'
+
+TESTING - COMPILATION:
+  [ ] flutter pub run build_runner build --delete-conflicting-outputs
+  [ ] Pas d'erreur "Could not resolve annotation"
+  [ ] Pas d'erreur "Failed assertion"
+  [ ] Pas d'erreur de type
+  [ ] flutter analyze = 0 erreurs
+
+TESTING - RUNTIME:
+  [ ] flutter run
+  [ ] App démarre
+  [ ] Pas de crash
+  [ ] Si UI implémentée: CRUD fonctionne (add/update/delete)
+  [ ] Logs affichent correctement
+
+═══════════════════════════════════════════════════════════════════════════
+8. TIMELINE & STRATÉGIE
+═══════════════════════════════════════════════════════════════════════════
+
+STRATÉGIE BUILD_RUNNER:
+
+OPTION A: Build une fois par entité (Safe)
+  - Faire Entité 1 complet (Table + DAO + Repository)
+  - Build runner
+  - Tester compilation
+  - Puis Entité 2
+  TIMING: 30-40 min par entité
+  RISQUE: Bas (isolé)
+
+OPTION B: Faire tous TIER 1, puis 1 build_runner (Fast)
+  - Faire Entité 1 Table + DAO + Repo
+  - Faire Entité 2 Table + DAO + Repo
+  - Faire Entité 3 Table + DAO + Repo
+  - Faire Entité 4 Table + DAO + Repo
+  - Build runner UNE FOIS
+  - Tester compilation
+  TIMING: 20 min pour code + 3-5 min build_runner
+  RISQUE: Moyen (erreurs difficiles à isoler)
+
+OPTION C: Hybride (Recommandé)
+  - Faire Entité 1 complet
+  - Build runner
+  - Faire Entité 2 + 3 code
+  - Build runner
+  - Faire Entité 4 + Repository des premières
+  - Build runner final
+  TIMING: 4-5 heures total
+  RISQUE: Bas, efficace
+
+RECOMMANDATION: Faire OPTION C
+
+---
+
+TIMELINE DÉTAILLÉE:
+
+TIER 1 (2.5-3h):
+
+  Entité 1: TREATMENTS
+    - Coder: 20 min (Table + DAO + Repo)
+    - Build: 2 min
+    - Test: 2 min
+    Subtotal: 24 min
+
+  Entité 2: VACCINATIONS
+    - Coder: 20 min
+    - Build: 2 min
+    - Test: 2 min
+    Subtotal: 24 min
+
+  Entité 3: WEIGHTS
+    - Coder: 20 min
+    - Build: 2 min
+    - Test: 2 min
+    Subtotal: 24 min
+
+  Entité 4: MOVEMENTS
+    - Coder: 20 min
+    - Build: 2 min
+    - Test: 2 min
+    Subtotal: 24 min
+
+  PAUSE (15 min) ☕
+
+  Total TIER 1: 2h 15 min (avec pause)
+
+---
+
+TIER 2 (2.5-3h):
+
+  Entité 5: BATCHES
+    - Coder: 20 min
+    - Build: 2 min
+    - Test: 2 min
+    Subtotal: 24 min
+
+  Entité 6: LOTS (dépend Batches)
+    - Coder: 20 min (+ FK vers Batches)
+    - Build: 2 min
+    - Test: 2 min
+    Subtotal: 24 min
+
+  Entité 7: CAMPAIGNS
+    - Coder: 20 min
+    - Build: 2 min
+    - Test: 2 min
+    Subtotal: 24 min
+
+  Entité 8: MEDICAL_PRODUCTS
+    - Coder: 20 min
+    - Build: 2 min
+    - Test: 2 min
+    Subtotal: 24 min
+
+  PAUSE (15 min) ☕
+
+  Total TIER 2: 2h 15 min (avec pause)
+
+---
+
+TIER 3 (1-1.5h):
+
+  Entité 9: BREEDS
+    - Coder: 15 min
+    - Build: 2 min
+    - Test: 2 min
+    Subtotal: 19 min
+
+  Entité 10: BREEDING (dépend Animals + Breeds)
+    - Coder: 20 min (+ FK vers Breeds + Animals)
+    - Build: 2 min
+    - Test: 2 min
+    Subtotal: 24 min
+
+  Entité 11: DOCUMENTS
+    - Coder: 15 min
+    - Build: 2 min
+    - Test: 2 min
+    Subtotal: 19 min
+
+  Total TIER 3: 1h 2 min
+
+---
+
+GRAND TOTAL:
+  Tier 1: 2h 15 min
+  Tier 2: 2h 15 min
+  Tier 3: 1h 02 min
+  ───────────────────
+  TOTAL: ~5h 32 min
+
+═══════════════════════════════════════════════════════════════════════════
+9. COMMANDES POWERSHELL ESSENTIELLES
+═══════════════════════════════════════════════════════════════════════════
+
+BUILD RUNNER (À faire après chaque batch d'entités):
+```powershell
+flutter pub run build_runner build --delete-conflicting-outputs
+```
+
+SI BUILD_RUNNER HANG/TIMEOUT:
+```powershell
+flutter pub run build_runner clean
+flutter pub run build_runner build --delete-conflicting-outputs
+```
+
+SI ERREUR "Could not resolve annotation":
+```powershell
+flutter clean
+rm -r -Force .dart_tool, build
+flutter pub get
+flutter pub run build_runner build --delete-conflicting-outputs
+```
+
+ANALYSER FICHIER SPÉCIFIQUE:
+```powershell
+flutter analyze lib/drift/daos/[entity]_dao.dart
+flutter analyze lib/repositories/[entity]_repository.dart
+flutter analyze lib/drift/tables/[entity]_table.dart
+```
+
+ANALYSER TOUT:
+```powershell
+flutter analyze
+```
+
+LANCER APP:
+```powershell
+flutter run
+```
+
+LANCER EN VERBOSE (pour debug):
+```powershell
+flutter run -v
+```
+
+═══════════════════════════════════════════════════════════════════════════
+10. ADAPTATION TEMPLATES PAR ENTITÉ
+═══════════════════════════════════════════════════════════════════════════
+
+QUAND ADAPTER LA TEMPLATE:
+
+1. COLONNES SPÉCIFIQUES
+   - Animals: birthDate, sex, motherId, etc.
+   - Treatments: animalId, productId, startDate, endDate, etc.
+   - Vaccinations: animalId, vaccineId, date, nextDate, etc.
+   - Weights: animalId, weight, date, notes, etc.
+   - Movements: fromLotId, toLotId, date, reason, etc.
+   
+   À FAIRE: Adapter les colonnes dans Table, DAO (select/where) et Repo (mappers)
+
+2. FOREIGN KEYS SUPPLÉMENTAIRES
+   - Lots: FOREIGN KEY (batch_id) REFERENCES batches(id)
+   - Breeding: FOREIGN KEY (female_id) REFERENCES animals(id)
+   - Breeding: FOREIGN KEY (male_id) REFERENCES animals(id)
+   
+   À FAIRE: Ajouter dans customConstraints
+
+3. INDEXES SUPPLÉMENTAIRES
+   - Si queries fréquentes sur colonne X: ADD idx_[entity]_X
+   - Si queries sur X + Y: ADD idx_[entity]_X_Y
+   
+   À FAIRE: Ajouter dans customConstraints
+
+4. LOGIC MÉTIER
+   - Si soft delete logic différente: adapter updateItem
+   - Si query complexe: ajouter méthodes custom dans DAO
+   
+   À FAIRE: Adapter findXxx() methods au besoin
+
+EXEMPLE ADAPTATION - LOTS:
+
+Table change:
+```dart
+// Ajouter:
+TextColumn get batchId => text().named('batch_id')();
+
+// customConstraints ajouter FK:
+'FOREIGN KEY (batch_id) REFERENCES batches(id)',
+```
+
+DAO change:
+```dart
+// Ajouter méthode:
+Future<List<LotsTableData>> findByBatchId(String batchId, String farmId) {
+  return (select(lotsTable)
+        ..where((t) => t.batchId.equals(batchId))
+        ..where((t) => t.farmId.equals(farmId))
+        ..where((t) => t.deletedAt.isNull()))
+      .get();
+}
+```
+
+Repository change:
+```dart
+// Ajouter méthode:
+Future<List<Lot>> findByBatchId(String batchId, String farmId) async {
+  final items = await _db.lotDao.findByBatchId(batchId, farmId);
+  return items.map((data) => _mapToModel(data)).toList();
+}
+```
+
+═══════════════════════════════════════════════════════════════════════════
+11. QUICK REFERENCE - PATTERNS DRIFT
+═══════════════════════════════════════════════════════════════════════════
+
+PATTERN: Simple Query
+```dart
+Future<List<XyzTableData>> findByFarmId(String farmId) {
+  return (select(xyzTable)
+        ..where((t) => t.farmId.equals(farmId))
+        ..where((t) => t.deletedAt.isNull()))
+      .get();
+}
+```
+
+PATTERN: Single Item
+```dart
+Future<XyzTableData?> findById(String id, String farmId) {
+  return (select(xyzTable)
+        ..where((t) => t.id.equals(id))
+        ..where((t) => t.farmId.equals(farmId))
+        ..where((t) => t.deletedAt.isNull()))
+      .getSingleOrNull();
+}
+```
+
+PATTERN: Insert
+```dart
+Future<int> insertItem(XyzTableCompanion item) {
+  return into(xyzTable).insert(item);
+}
+```
+
+PATTERN: Update avec WHERE
+```dart
+Future<int> updateItem(XyzTableCompanion item, String farmId) {
+  return (update(xyzTable)
+        ..where((t) => t.id.equals(item.id.value))
+        ..where((t) => t.farmId.equals(farmId)))
+      .write(item);  // ✅ .write() PAS .replace()
+}
+```
+
+PATTERN: Soft Delete
+```dart
+Future<int> softDelete(String id, String farmId) {
+  return (update(xyzTable)
+        ..where((t) => t.id.equals(id))
+        ..where((t) => t.farmId.equals(farmId)))
+      .write(XyzTableCompanion(
+        deletedAt: Value(DateTime.now()),
+        updatedAt: Value(DateTime.now()),
+      ));
+}
+```
+
+PATTERN: Count
+```dart
+Future<int> countByFarmId(String farmId) async {
+  final count = countAll();
+  final query = selectOnly(xyzTable)
+    ..addColumns([count])
+    ..where(xyzTable.farmId.equals(farmId))
+    ..where(xyzTable.deletedAt.isNull());
+
+  final result = await query.getSingle();
+  return result.read(count) ?? 0;
+}
+```
+
+PATTERN: Mapper DB → Model
+```dart
+Model _mapToModel(XyzTableData data) {
+  return Model(
+    id: data.id,
+    farmId: data.farmId,
+    name: data.name,
+    createdAt: data.createdAt,
+    updatedAt: data.updatedAt,
+    synced: data.synced,
+  );
+}
+```
+
+PATTERN: Mapper Model → Companion
+```dart
+XyzTableCompanion _mapToCompanion(Model item, String farmId) {
+  return XyzTableCompanion(
+    id: Value(item.id),
+    farmId: Value(farmId),
+    name: Value(item.name),
+    createdAt: Value(item.createdAt),
+    updatedAt: Value(item.updatedAt),
+    synced: Value(item.synced),
+    deletedAt: const Value.absent(),
+  );
+}
+```
+
+═══════════════════════════════════════════════════════════════════════════
+12. MULTI-TENANCY CHECKLIST
+═══════════════════════════════════════════════════════════════════════════
+
+POUR CHAQUE ENTITÉ, VÉRIFIER:
+
+TABLE LEVEL:
+  [ ] TextColumn farmId présent
+  [ ] @override customConstraints contient FK farm_id
+  [ ] FK pointe vers farms(id)
+  [ ] FK a ON DELETE CASCADE
+
+DAO LEVEL:
+  [ ] Toutes les queries ont .where((t) => t.farmId.equals(farmId))
+  [ ] Toutes les queries ont .where((t) => t.deletedAt.isNull())
+  [ ] updateItem prend farmId en paramètre
+  [ ] softDelete prend farmId en paramètre
+  [ ] countByFarmId filtre farmId
+
+REPOSITORY LEVEL:
+  [ ] getAll(farmId) passe farmId au DAO
+  [ ] getById(id, farmId) passe farmId au DAO
+  [ ] create(item, farmId) force farmId dans companion
+  [ ] update(item, farmId) force farmId dans companion
+  [ ] delete(id, farmId) passe farmId au DAO
+  [ ] Tous les appels DAO incluent farmId
+
+RÉSULTAT:
+  ✅ Impossible pour user A d'accéder data farm B
+  ✅ Chaque opération filtre farmId
+  ✅ ForeignKey enforce au niveau DB
+  ✅ Security en multi-couches (DAO + Repository + DB)
+
+═══════════════════════════════════════════════════════════════════════════
+13. VALIDATION FINALE CHECKLIST
+═══════════════════════════════════════════════════════════════════════════
+
+APRÈS AVOIR CODÉ TOUTES LES 11 ENTITÉS:
+
+COMPILATION:
+  [ ] flutter pub run build_runner build --delete-conflicting-outputs (0 erreurs)
+  [ ] flutter analyze (0 erreurs)
+  [ ] flutter run (app démarre)
+
+RUNTIME:
+  [ ] App ne crash pas au démarrage
+  [ ] Pas de "Could not find provider" errors
+  [ ] Pas de "Failed assertion" errors
+  [ ] Pas de "Null check operator used" errors
+
+FUNCTIONALITY (si UI implémentée):
+  [ ] CRUD fonctionne pour chaque entité
+  [ ] Logs s'affichent correctement
+  [ ] Multi-farm isolation OK (si testable)
+
+LOGGING:
+  [ ] Chaque create: ✅ [ENTITY] créé
+  [ ] Chaque update: ✅ [ENTITY] mis à jour
+  [ ] Chaque delete: ✅ [ENTITY] supprimé
+  [ ] Erreurs: ⚠️ ERREUR ... (lisible)
+
+BONUS (Nice to have):
+  [ ] Performance: Queries en <100ms
+  [ ] Pas de memory leaks
+  [ ] Pas de dangling connections
+
+═══════════════════════════════════════════════════════════════════════════
+14. ORDRE EXACT À SUIVRE
+═══════════════════════════════════════════════════════════════════════════
+
+JOUR 1 - TIER 1 (Matin/Après-midi):
+
+1. Lire ce document EN ENTIER (20 min)
+2. TREATMENTS (24 min)
+   - Code Table
+   - Code DAO
+   - Code Repository
+   - Build runner
+3. VACCINATIONS (24 min)
+4. WEIGHTS (24 min)
+5. MOVEMENTS (24 min)
+6. PAUSE (15 min)
+7. flutter analyze TIER 1
+8. flutter run (test)
+
+Total: 2h 15 min
+
+---
+
+JOUR 1 - TIER 2 (Après-midi/Soir):
+
+9. BATCHES (24 min)
+10. LOTS (24 min - adapter FK vers Batches)
+11. CAMPAIGNS (24 min)
+12. MEDICAL_PRODUCTS (24 min)
+13. PAUSE (15 min)
+14. flutter analyze TIER 2
+15. flutter run (test)
+
+Total: 2h 15 min
+
+---
+
+JOUR 2 - TIER 3 (Matin):
+
+16. BREEDS (19 min)
+17. BREEDING (24 min - adapter FK vers Animals + Breeds)
+18. DOCUMENTS (19 min)
+19. flutter analyze TIER 3
+20. flutter run (test complet)
+21. flutter analyze (TOUT - final check)
+
+Total: 1h 2 min
+
+---
+
+GRAND TOTAL RÉEL: ~5.5 heures
+
+═══════════════════════════════════════════════════════════════════════════
+END OF DOCUMENT
+═══════════════════════════════════════════════════════════════════════════
+
+PROCHAINES ÉTAPES:
+  1. Lire ce document entièrement
+  2. Préparer fichiers (copy-paste templates)
+  3. Coder Tier 1 + build runner
+  4. Coder Tier 2 + build runner
+  5. Coder Tier 3 + build runner
+  6. Final analysis + flutter run
+  7. ✅ PHASE 1B COMPLÈTE POUR TOUTES LES ENTITÉS!
+
+BON COURAGE! 🚀
+
+
+A ajouter avant chaque demande :
+Pour app_strings et strings_fr, donne moi seulement les string à ajouter
+Pas de Mock, nous sommes à 100% DB.
+Demande moi les fichiers nécessaires pour faire votre travail.
+Sur le document j'ai les phse XXXX et je veux faire la phase YYYYY

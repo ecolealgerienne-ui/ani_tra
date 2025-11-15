@@ -2,8 +2,6 @@
 // Générateur d'alertes mock pour tester le système
 
 import '../models/alert.dart';
-import '../models/alert_type.dart';
-import '../models/alert_category.dart';
 
 /// Générateur d'alertes de test
 class MockAlertsGenerator {
@@ -11,11 +9,6 @@ class MockAlertsGenerator {
   ///
   /// À utiliser TEMPORAIREMENT dans AlertProvider pour tester
   static List<Alert> generateTestAlerts(List<String> animalIds) {
-    if (animalIds.length < 5) {
-      print('⚠️ Pas assez d\'animaux pour générer des alertes de test');
-      return [];
-    }
-
     final alerts = <Alert>[];
 
     // 🚨 ALERTE URGENTE 1 : Rémanence critique
@@ -82,14 +75,6 @@ class MockAlertsGenerator {
       animalCount: 8,
       animalIds: animalIds.take(8).toList(), // 🆕 AJOUTÉ - Premiers 8 animaux
     ));
-
-    print('✅ Généré ${alerts.length} alertes de test');
-    print(
-        '   🚨 Urgentes: ${alerts.where((a) => a.type == AlertType.urgent).length}');
-    print(
-        '   ⚠️ Importantes: ${alerts.where((a) => a.type == AlertType.important).length}');
-    print(
-        '   📋 Routine: ${alerts.where((a) => a.type == AlertType.routine).length}');
 
     return alerts;
   }

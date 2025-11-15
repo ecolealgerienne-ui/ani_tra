@@ -1,16 +1,25 @@
 // lib/models/veterinarian.dart
-class Veterinarian {
+
+import 'syncable_entity.dart';
+
+class Veterinarian implements SyncableEntity {
+  // === Identification ===
+  @override
   final String id;
+  @override
+  final String farmId;
+
+  // === Informations personnelles ===
   final String firstName;
   final String lastName;
   final String? title; // Dr., Pr., etc.
 
-  // Informations professionnelles
+  // === Informations professionnelles ===
   final String licenseNumber; // Numéro d'ordre
   final List<String> specialties; // Spécialités
   final String? clinic; // Nom de la clinique/cabinet
 
-  // Coordonnées
+  // === Coordonnées ===
   final String phone;
   final String? mobile;
   final String? email;
@@ -19,32 +28,44 @@ class Veterinarian {
   final String? postalCode;
   final String? country;
 
-  // Disponibilité
+  // === Disponibilité ===
   final bool isAvailable;
   final bool emergencyService; // Service d'urgence
   final String? workingHours; // Horaires de travail
 
-  // Tarifs
+  // === Tarifs ===
   final double? consultationFee;
   final double? emergencyFee;
   final String? currency;
 
-  // Notes et préférences
+  // === Notes et préférences ===
   final String? notes;
   final bool isPreferred; // Vétérinaire préféré
+  final bool isDefault; // Vétérinaire par défaut
   final int rating; // Note de 1 à 5
 
-  // Statistiques
+  // === Statistiques ===
   final int totalInterventions;
   final DateTime? lastInterventionDate;
 
-  // Métadonnées
+  // === Métadonnées ===
+  @override
   final DateTime createdAt;
-  final DateTime? updatedAt;
+  @override
+  final DateTime updatedAt;
   final bool isActive;
+
+  // === Synchronisation ===
+  @override
+  final bool synced;
+  @override
+  final DateTime? lastSyncedAt;
+  @override
+  final String? serverVersion;
 
   Veterinarian({
     required this.id,
+    this.farmId = 'mock-farm-001', // Valeur par défaut pour compatibilité mock
     required this.firstName,
     required this.lastName,
     this.title,
@@ -66,24 +87,31 @@ class Veterinarian {
     this.currency,
     this.notes,
     this.isPreferred = false,
+    this.isDefault = false,
     this.rating = 5,
     this.totalInterventions = 0,
     this.lastInterventionDate,
-    required this.createdAt,
-    this.updatedAt,
+    DateTime? createdAt,
+    DateTime? updatedAt,
     this.isActive = true,
-  });
+    this.synced = false,
+    this.lastSyncedAt,
+    this.serverVersion,
+  })  : createdAt = createdAt ?? DateTime.now(),
+        updatedAt = updatedAt ?? DateTime.now();
 
-  // Nom complet
+  // === Getters ===
+
+  /// Nom complet
   String get fullName {
     final titlePart = title != null ? '$title ' : '';
     return '$titlePart$firstName $lastName';
   }
 
-  // Nom court
+  /// Nom court
   String get shortName => '$firstName ${lastName[0]}.';
 
-  // Adresse complète
+  /// Adresse complète
   String? get fullAddress {
     if (address == null) return null;
     final parts = [
@@ -94,15 +122,28 @@ class Veterinarian {
     return parts.join(', ');
   }
 
-  // Spécialités formatées
+  /// Spécialités formatées
   String get specialtiesFormatted {
     if (specialties.isEmpty) return 'Généraliste';
     return specialties.join(', ');
   }
 
-  // Copie avec modification
+  // === Vérifications ===
+
+  bool get hasEmail => email != null && email!.isNotEmpty;
+  bool get hasMobile => mobile != null && mobile!.isNotEmpty;
+  bool get hasEmergencyService => emergencyService;
+  bool get hasRecentActivity {
+    if (lastInterventionDate == null) return false;
+    final daysSinceLastIntervention =
+        DateTime.now().difference(lastInterventionDate!).inDays;
+    return daysSinceLastIntervention <= 30;
+  }
+
+  // === Méthodes CRUD ===
+
   Veterinarian copyWith({
-    String? id,
+    String? farmId,
     String? firstName,
     String? lastName,
     String? title,
@@ -124,15 +165,19 @@ class Veterinarian {
     String? currency,
     String? notes,
     bool? isPreferred,
+    bool? isDefault,
     int? rating,
     int? totalInterventions,
     DateTime? lastInterventionDate,
-    DateTime? createdAt,
     DateTime? updatedAt,
     bool? isActive,
+    bool? synced,
+    DateTime? lastSyncedAt,
+    String? serverVersion,
   }) {
     return Veterinarian(
-      id: id ?? this.id,
+      id: id,
+      farmId: farmId ?? this.farmId,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
       title: title ?? this.title,
@@ -154,19 +199,42 @@ class Veterinarian {
       currency: currency ?? this.currency,
       notes: notes ?? this.notes,
       isPreferred: isPreferred ?? this.isPreferred,
+      isDefault: isDefault ?? this.isDefault,
       rating: rating ?? this.rating,
       totalInterventions: totalInterventions ?? this.totalInterventions,
       lastInterventionDate: lastInterventionDate ?? this.lastInterventionDate,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
+      createdAt: createdAt,
+      updatedAt: updatedAt ?? DateTime.now(),
       isActive: isActive ?? this.isActive,
+      synced: synced ?? this.synced,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      serverVersion: serverVersion ?? this.serverVersion,
     );
   }
 
-  // Conversion JSON
+  // === Méthodes de sync ===
+
+  Veterinarian markAsSynced({required String serverVersion}) {
+    return copyWith(
+      synced: true,
+      lastSyncedAt: DateTime.now(),
+      serverVersion: serverVersion,
+    );
+  }
+
+  Veterinarian markAsModified() {
+    return copyWith(
+      synced: false,
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  // === JSON Serialization ===
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'farm_id': farmId,
       'firstName': firstName,
       'lastName': lastName,
       'title': title,
@@ -188,18 +256,23 @@ class Veterinarian {
       'currency': currency,
       'notes': notes,
       'isPreferred': isPreferred,
+      'isDefault': isDefault,
       'rating': rating,
       'totalInterventions': totalInterventions,
       'lastInterventionDate': lastInterventionDate?.toIso8601String(),
       'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt?.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
       'isActive': isActive,
+      'synced': synced,
+      'last_synced_at': lastSyncedAt?.toIso8601String(),
+      'server_version': serverVersion,
     };
   }
 
   factory Veterinarian.fromJson(Map<String, dynamic> json) {
     return Veterinarian(
       id: json['id'] as String,
+      farmId: json['farm_id'] as String? ?? 'mock-farm-001',
       firstName: json['firstName'] as String,
       lastName: json['lastName'] as String,
       title: json['title'] as String?,
@@ -219,32 +292,29 @@ class Veterinarian {
       isAvailable: json['isAvailable'] as bool? ?? true,
       emergencyService: json['emergencyService'] as bool? ?? false,
       workingHours: json['workingHours'] as String?,
-      consultationFee: json['consultationFee'] as double?,
-      emergencyFee: json['emergencyFee'] as double?,
+      consultationFee: (json['consultationFee'] as num?)?.toDouble(),
+      emergencyFee: (json['emergencyFee'] as num?)?.toDouble(),
       currency: json['currency'] as String?,
       notes: json['notes'] as String?,
       isPreferred: json['isPreferred'] as bool? ?? false,
+      isDefault: json['isDefault'] as bool? ?? false,
       rating: json['rating'] as int? ?? 5,
       totalInterventions: json['totalInterventions'] as int? ?? 0,
       lastInterventionDate: json['lastInterventionDate'] != null
           ? DateTime.parse(json['lastInterventionDate'] as String)
           : null,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'] as String)
+          : null,
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'] as String)
           : null,
       isActive: json['isActive'] as bool? ?? true,
+      synced: json['synced'] as bool? ?? false,
+      lastSyncedAt: json['last_synced_at'] != null
+          ? DateTime.parse(json['last_synced_at'] as String)
+          : null,
+      serverVersion: json['server_version'] as String?,
     );
-  }
-
-  // Vérifications
-  bool get hasEmail => email != null && email!.isNotEmpty;
-  bool get hasMobile => mobile != null && mobile!.isNotEmpty;
-  bool get hasEmergencyService => emergencyService;
-  bool get hasRecentActivity {
-    if (lastInterventionDate == null) return false;
-    final daysSinceLastIntervention =
-        DateTime.now().difference(lastInterventionDate!).inDays;
-    return daysSinceLastIntervention <= 30;
   }
 }

@@ -1,32 +1,49 @@
 // lib/providers/alert_provider.dart
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import '../models/alert.dart';
 import '../models/alert_type.dart';
 import '../models/alert_category.dart';
+import '../models/alert_configuration.dart';
 import '../models/animal.dart';
-import '../models/treatment.dart';
-import '../models/weight_record.dart';
-import '../models/weighing_rule.dart';
+
 import '../models/incomplete_event.dart';
-import '../models/sync_status.dart';
+
 import 'animal_provider.dart';
+import 'auth_provider.dart';
 import 'weight_provider.dart';
 import 'sync_provider.dart';
-import '../data/mock_alerts_generator.dart'; // 🆕 MOCK TEMPORAIRE
+import 'vaccination_provider.dart';
+import 'treatment_provider.dart';
+import '../i18n/app_localizations.dart';
+import '../i18n/app_strings.dart';
+import '../utils/constants.dart';
+import '../repositories/alert_configuration_repository.dart';
 
 /// Provider de gestion des alertes métier
 ///
+/// Phase 2: Config-driven via AlertConfigurationRepository
 /// Calcule automatiquement toutes les alertes en écoutant :
+/// - AuthProvider (changements de ferme)
 /// - AnimalProvider (animaux, traitements, mouvements)
 /// - WeightProvider (pesées)
 /// - SyncProvider (synchronisation)
+/// - VaccinationProvider (vaccinations)
+/// - AlertConfigurationRepository (configurations BD)
 ///
 /// Hiérarchise par priorité et fournit les alertes au UI.
+///
+/// ✅ PHASE 4 FIX: Filtrage DRAFT
+/// - Les animaux DRAFT ne reçoivent QUE des alertes de brouillon
+/// - Alertes métier (traitement, vaccination, etc.) exclues pour les DRAFT
 class AlertProvider extends ChangeNotifier {
+  final AuthProvider _authProvider;
   final AnimalProvider _animalProvider;
   final WeightProvider _weightProvider;
   final SyncProvider _syncProvider;
+  final VaccinationProvider _vaccinationProvider;
+  final TreatmentProvider _treatmentProvider;
+  final AlertConfigurationRepository _alertConfigRepository;
 
   /// Liste de toutes les alertes calculées
   List<Alert> _alerts = [];
@@ -40,17 +57,34 @@ class AlertProvider extends ChangeNotifier {
   /// Configuration : Tolérance pesée par défaut (jours)
   int _weighingToleranceDays = 7;
 
+  /// FarmId courant (peut changer au runtime)
+  String _currentFarmId;
+
   AlertProvider({
+    required AuthProvider authProvider,
     required AnimalProvider animalProvider,
     required WeightProvider weightProvider,
     required SyncProvider syncProvider,
-  })  : _animalProvider = animalProvider,
+    required VaccinationProvider vaccinationProvider,
+    required TreatmentProvider treatmentProvider,
+    required AlertConfigurationRepository alertConfigRepository,
+  })  : _authProvider = authProvider,
+        _animalProvider = animalProvider,
         _weightProvider = weightProvider,
-        _syncProvider = syncProvider {
+        _syncProvider = syncProvider,
+        _vaccinationProvider = vaccinationProvider,
+        _treatmentProvider = treatmentProvider,
+        _alertConfigRepository = alertConfigRepository,
+        _currentFarmId = authProvider.currentFarmId {
+    // ✅ ÉCOUTER CHANGEMENTS FERME
+    _authProvider.addListener(_onFarmChanged);
+
     // Écouter les changements des providers
     _animalProvider.addListener(_recalculateAlerts);
     _weightProvider.addListener(_recalculateAlerts);
     _syncProvider.addListener(_recalculateAlerts);
+    _vaccinationProvider.addListener(_recalculateAlerts);
+    _treatmentProvider.addListener(_recalculateAlerts);
 
     // Calcul initial
     _recalculateAlerts();
@@ -58,10 +92,40 @@ class AlertProvider extends ChangeNotifier {
 
   @override
   void dispose() {
+    _authProvider.removeListener(_onFarmChanged);
     _animalProvider.removeListener(_recalculateAlerts);
     _weightProvider.removeListener(_recalculateAlerts);
     _syncProvider.removeListener(_recalculateAlerts);
+    _vaccinationProvider.removeListener(_recalculateAlerts);
+    _treatmentProvider.removeListener(_recalculateAlerts);
     super.dispose();
+  }
+
+  // ==================== FARM CHANGE DETECTION ====================
+
+  /// ✅ NOUVELLE MÉTHODE: Détecter changement de ferme depuis AuthProvider
+  /// Pattern copié de AnimalProvider
+  void _onFarmChanged() {
+    if (_currentFarmId != _authProvider.currentFarmId) {
+      debugPrint(
+          '🔄 [ALERT] Farm changée: $_currentFarmId → ${_authProvider.currentFarmId}');
+      _currentFarmId = _authProvider.currentFarmId;
+      _alerts = [];
+      _incompleteEvents = [];
+      _recalculateAlerts();
+    }
+  }
+
+  // ==================== SETTERS ====================
+
+  /// Définir la ferme courante (à appeler au login/switch farm)
+  /// ⚠️ NOTE: Normalement appelé automatiquement via _onFarmChanged()
+  /// Garder pour backward compatibility et appels explicites
+  Future<void> setCurrentFarm(String farmId) async {
+    if (_currentFarmId == farmId) return;
+    debugPrint('🔄 [ALERT] setCurrentFarm: $farmId');
+    _currentFarmId = farmId;
+    await _recalculateAlerts();
   }
 
   // ==================== GETTERS ====================
@@ -114,114 +178,529 @@ class AlertProvider extends ChangeNotifier {
     _recalculateAlerts();
   }
 
-  // ==================== CALCUL ALERTES ====================
+  // ==================== CALCUL ALERTES - PHASE 2 ====================
 
   /// Recalculer toutes les alertes
-  void _recalculateAlerts() {
+  /// Phase 2: Charge configurations depuis BD via AlertConfigurationRepository
+  Future<void> _recalculateAlerts() async {
+    if (_currentFarmId.isEmpty) {
+      debugPrint('⚠️ [ALERT] _recalculateAlerts: farmId VIDE, skip');
+      _alerts = [];
+      notifyListeners();
+      return;
+    }
+
+    try {
+      await generateAlerts(_currentFarmId);
+    } catch (e) {
+      debugPrint('❌ Erreur calcul alertes: $e');
+      _alerts = [];
+      notifyListeners();
+    }
+  }
+
+  /// Générer toutes les alertes pour une ferme (Phase 2 - Config-driven + DEBUG)
+  Future<void> generateAlerts(String farmId) async {
+    debugPrint('🔍 [ALERT DEBUG] generateAlerts START - farmId: $farmId');
     final newAlerts = <Alert>[];
 
-    // 1. Alertes de rémanence
-    newAlerts.addAll(_calculateRemanenceAlerts());
+    try {
+      // Vérification 0: farmId vide?
+      if (farmId.isEmpty) {
+        debugPrint('⚠️ [ALERT] farmId est VIDE! Arrêt.');
+        _alerts = [];
+        notifyListeners();
+        return;
+      }
 
-    // 2. Alertes d'identification
-    newAlerts.addAll(_calculateIdentificationAlerts());
+      // 1. Charger configurations activées depuis BD
+      debugPrint('📦 [ALERT] Chargement configurations...');
+      final configs = await _alertConfigRepository.getEnabled(farmId);
+      debugPrint('✅ [ALERT] Configs trouvées: ${configs.length}');
+      for (final c in configs) {
+        debugPrint(
+            '   - ${c.evaluationType}: ${c.titleKey} (enabled: ${c.enabled})');
+      }
 
-    // 3. Alertes de synchronisation
-    final syncAlert = _calculateSyncAlert();
-    if (syncAlert != null) newAlerts.add(syncAlert);
+      if (configs.isEmpty) {
+        debugPrint(
+            '⚠️ [ALERT] AUCUNE configuration trouvée pour farmId: $farmId');
+        debugPrint(
+            '   → Vérifier si AlertConfigurationSeeds.seedDatabase() a été appelé');
+      }
 
-    // 4. Tâches de pesée
-    newAlerts.addAll(_calculateWeighingTasks());
+      // 2. Pour chaque configuration, évaluer le type
+      for (final config in configs) {
+        try {
+          debugPrint('🔄 [ALERT] Évaluation: ${config.evaluationType}');
 
-    // 5. Événements incomplets
-    _incompleteEvents = _calculateIncompleteEvents();
-    newAlerts.addAll(_incompleteEvents
-        .where((e) => e.needsAlert)
-        .map((e) => Alert.incompleteEvent(
-              eventId: e.id,
-              eventType: e.type.labelFr,
-              description: e.entityName,
-              daysOld: e.daysOld,
-            )));
-
-    // 6. Traitements à renouveler
-    newAlerts.addAll(_calculateTreatmentRenewals());
-
-    // 🆕 MOCK TEMPORAIRE : Ajouter des alertes de test
-    final animalIds = _animalProvider.animals.map((a) => a.id).toList();
-    if (animalIds.length >= 5) {
-      MockAlertsGenerator.addMockAlertsToProvider(newAlerts, animalIds);
-    }
-
-    // Trier par priorité (urgent > important > routine)
-    newAlerts.sort((a, b) => a.type.priority.compareTo(b.type.priority));
-
-    _alerts = newAlerts;
-    notifyListeners();
-
-    debugPrint('🔔 Alertes recalculées : ${_alerts.length} alertes');
-    debugPrint('   🚨 Urgent: ${urgentAlertCount}');
-    debugPrint('   ⚠️ Important: ${importantAlertCount}');
-    debugPrint('   📋 Routine: ${routineAlerts.length}');
-  }
-
-  /// Calculer alertes de rémanence
-  List<Alert> _calculateRemanenceAlerts() {
-    final alerts = <Alert>[];
-    final animals = _animalProvider.animals
-        .where((a) => a.status == AnimalStatus.alive)
-        .toList();
-
-    for (final animal in animals) {
-      final treatments = _animalProvider.getAnimalTreatments(animal.id);
-
-      for (final treatment in treatments) {
-        if (!treatment.isWithdrawalActive) continue;
-
-        final daysRemaining = treatment.daysUntilWithdrawalEnd;
-
-        // Créer alerte si < 7 jours
-        if (daysRemaining < 7) {
-          alerts.add(Alert.remanence(
-            animalId: animal.id,
-            animalName: animal.officialNumber ?? animal.eid,
-            daysRemaining: daysRemaining,
-            treatmentName: treatment.productName ?? 'Traitement',
-          ));
+          switch (config.evaluationType) {
+            case AlertEvaluationType.remanence:
+              final remanenceAlerts = await _checkAndBuildRemanence(config);
+              debugPrint('   ↳ Remanence: ${remanenceAlerts.length} alertes');
+              newAlerts.addAll(remanenceAlerts);
+              break;
+            case AlertEvaluationType.weighing:
+              final weighingAlerts = await _checkAndBuildWeighing(config);
+              debugPrint('   ↳ Weighing: ${weighingAlerts.length} alertes');
+              newAlerts.addAll(weighingAlerts);
+              break;
+            case AlertEvaluationType.vaccination:
+              final vacAlerts = await _checkAndBuildVaccination(config);
+              debugPrint('   ↳ Vaccination: ${vacAlerts.length} alertes');
+              newAlerts.addAll(vacAlerts);
+              break;
+            case AlertEvaluationType.identification:
+              final idAlerts = await _checkAndBuildIdentification(config);
+              debugPrint('   ↳ Identification: ${idAlerts.length} alertes');
+              newAlerts.addAll(idAlerts);
+              break;
+            case AlertEvaluationType.syncRequired:
+              final syncAlert = await _checkAndBuildSyncRequired(config);
+              if (syncAlert != null) {
+                debugPrint('   ↳ Sync: 1 alerte');
+                newAlerts.add(syncAlert);
+              } else {
+                debugPrint('   ↳ Sync: 0 alertes');
+              }
+              break;
+            case AlertEvaluationType.treatmentRenewal:
+              final treatAlerts = await _checkAndBuildTreatmentRenewal(config);
+              debugPrint(
+                  '   ↳ Treatment: ${treatAlerts.length} alertes (TODO)');
+              newAlerts.addAll(treatAlerts);
+              break;
+            case AlertEvaluationType.batchToFinalize:
+              final batchAlerts = await _checkAndBuildBatchToFinalize(config);
+              debugPrint('   ↳ Batch: ${batchAlerts.length} alertes (TODO)');
+              newAlerts.addAll(batchAlerts);
+              break;
+            case AlertEvaluationType.draftAnimals:
+              final draftAlerts = await _checkAndBuildDraftAnimals(config);
+              debugPrint('   ↳ Draft Animals: ${draftAlerts.length} alertes');
+              newAlerts.addAll(draftAlerts);
+              break;
+          }
+        } catch (e) {
+          debugPrint(
+              '❌ [ALERT] Erreur évaluation ${config.evaluationType}: $e');
         }
       }
-    }
 
-    return alerts;
+      // 3. ✅ PHASE 4 FIX: Alertes DRAFT (brouillons depuis > 48h)
+      debugPrint('🔄 [ALERT] Calcul alertes brouillons (DRAFT)...');
+      final draftAlerts = await _checkAndBuildDraftAlerts(null);
+      debugPrint('   ↳ Brouillons: ${draftAlerts.length} alertes');
+      newAlerts.addAll(draftAlerts);
+
+      // 4. Événements incomplets (legacy support - brouillons)
+      debugPrint('🔄 [ALERT] Calcul événements incomplets...');
+      _incompleteEvents = _calculateIncompleteEvents();
+      debugPrint('   ↳ Brouillons: ${_incompleteEvents.length}');
+      newAlerts.addAll(_incompleteEvents
+          .where((e) => e.needsAlert)
+          .map((e) => Alert.incompleteEvent(
+                eventId: e.id,
+                eventType: e.type.labelFr,
+                description: e.entityName,
+                daysOld: e.daysOld,
+              )));
+
+      // 5. Trier par priorité
+      newAlerts.sort((a, b) => a.type.priority.compareTo(b.type.priority));
+
+      debugPrint('✅ [ALERT] TOTAL alertes générées: ${newAlerts.length}');
+      for (final alert in newAlerts) {
+        debugPrint(
+            '   - ${alert.type.labelFr}: ${alert.title} (${alert.category.labelFr})');
+      }
+
+      _alerts = newAlerts;
+      notifyListeners();
+    } catch (e) {
+      debugPrint('❌ [ALERT] ERREUR CRITIQUE generateAlerts: $e');
+      debugPrint('   Stack: ${StackTrace.current}');
+      rethrow;
+    }
   }
 
-  /// Calculer alertes d'identification manquante
-  List<Alert> _calculateIdentificationAlerts() {
+  // ==================== ÉVALUATIONS PAR TYPE (Phase 2) ====================
+
+  /// ✅ PHASE 4 FIX - Évaluation DRAFT (Brouillons en alerte)
+  /// Crée des alertes pour les animaux en brouillon depuis > 48h
+  Future<List<Alert>> _checkAndBuildDraftAlerts(
+    AlertConfiguration? config,
+  ) async {
     final alerts = <Alert>[];
-    final animals = _animalProvider.animals
-        .where((a) => a.status == AnimalStatus.alive)
+    final drafts = _animalProvider.animals
+        .where((a) => a.status == AnimalStatus.draft)
         .toList();
 
-    for (final animal in animals) {
-      // Vérifier si EID manquant ou invalide
-      if (animal.eid.isEmpty ||
-          animal.eid.length < 10 ||
-          animal.eid.startsWith('TEMP_')) {
-        alerts.add(Alert.missingIdentification(
-          animalId: animal.id,
-          animalName:
-              animal.officialNumber ?? 'Animal ${animal.id.substring(0, 8)}',
-          ageInDays: animal.ageInDays,
-        ));
+    debugPrint('🔍 [DRAFT] Analyse ${drafts.length} brouillons');
+
+    for (final animal in drafts) {
+      final hoursSinceCreation =
+          DateTime.now().difference(animal.createdAt).inHours;
+
+      debugPrint(
+          '   - ${animal.displayName}: $hoursSinceCreation heures en brouillon');
+
+      // ✅ URGENT si > 7 jours (HARD LIMIT)
+      if (hoursSinceCreation >= AppConstants.draftAlertLimitHours) {
+        debugPrint(
+            '     ⚠️ URGENT: Dépasse ${AppConstants.draftAlertLimitHours}h!');
+
+        final daysOld = hoursSinceCreation ~/ 24;
+        final alert = Alert(
+          id: 'draft_critical_${animal.id}',
+          type: AlertType.urgent,
+          category: AlertCategory.registre,
+          title: 'Brouillon urgent',
+          message: '${_getAnimalDisplayName(animal)}: À valider ou supprimer!',
+          entityId: animal.id,
+          entityType: 'animal',
+          entityName: _getAnimalDisplayName(animal),
+          dueDate: animal.createdAt
+              .add(const Duration(hours: AppConstants.draftAlertLimitHours)),
+          actionLabel: 'Valider',
+          animalIds: [animal.id],
+          titleKey: config?.titleKey ?? AppStrings.draftUrgentAlert,
+          messageKey: config?.messageKey,
+          messageParams: {
+            'animalName': _getAnimalDisplayName(animal),
+            'days': daysOld.toString(),
+            'hours': hoursSinceCreation.toString(),
+          },
+        );
+        alerts.add(alert);
+      }
+      // ✅ IMPORTANT si > 48h
+      else if (hoursSinceCreation >= AppConstants.draftAlertHours) {
+        debugPrint(
+            '     ⚠️ IMPORTANT: Dépasse ${AppConstants.draftAlertHours}h');
+
+        final alert = Alert(
+          id: 'draft_warning_${animal.id}',
+          type: AlertType.important,
+          category: AlertCategory.registre,
+          title: 'Brouillon important',
+          message: '${_getAnimalDisplayName(animal)}: À valider ou supprimer',
+          entityId: animal.id,
+          entityType: 'animal',
+          entityName: _getAnimalDisplayName(animal),
+          dueDate: animal.createdAt
+              .add(const Duration(hours: AppConstants.draftAlertHours)),
+          actionLabel: 'Valider',
+          animalIds: [animal.id],
+          titleKey: config?.titleKey ?? AppStrings.draftWarningAlert,
+          messageKey: config?.messageKey,
+          messageParams: {
+            'animalName': _getAnimalDisplayName(animal),
+            'hours': hoursSinceCreation.toString(),
+          },
+        );
+        alerts.add(alert);
       }
     }
 
     return alerts;
   }
 
-  /// Calculer alerte de synchronisation
-  /// Calculer alerte de synchronisation
-  Alert? _calculateSyncAlert() {
+  /// Évaluation REMANENCE (Délai abattage)
+  /// Cherche les animaux avec traitement actif et délai court
+  /// ✅ PHASE 4 FIX: EXCLUDE DRAFT animals
+  Future<List<Alert>> _checkAndBuildRemanence(
+    AlertConfiguration config,
+  ) async {
+    final alerts = <Alert>[];
+
+    // ✅ PHASE 2: Utiliser TreatmentProvider + constantes
+    final treatmentsInWithdrawal =
+        _treatmentProvider.getTreatmentsInWithdrawalPeriod();
+
+    for (final treatment in treatmentsInWithdrawal) {
+      final daysRemaining = treatment.daysUntilWithdrawalEnd;
+
+      // ✅ PHASE 4 FIX: Récupérer l'animal et vérifier son statut
+      final animal = _animalProvider.animals.firstWhere(
+        (a) => a.id == treatment.animalId,
+        orElse: () => Animal(
+          id: 'unknown',
+          farmId: _currentFarmId,
+          currentEid: 'Unknown',
+          visualId: 'Unknown',
+          officialNumber: '',
+          speciesId: '',
+          birthDate: DateTime.now(),
+          sex: AnimalSex.male,
+          status: AnimalStatus.alive,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ),
+      );
+
+      // ✅ PHASE 4 FIX: SKIP si DRAFT
+      if (animal.status == AnimalStatus.draft) {
+        debugPrint(
+            '   ↳ SKIP remanence alerte for DRAFT animal: ${animal.displayName}');
+        continue;
+      }
+
+      // Créer alerte si < 7 jours (constante)
+      if (daysRemaining < 7) {
+        final alertType = daysRemaining <= AppConstants.alertRemanenceDaysUrgent
+            ? AlertType.urgent
+            : daysRemaining <= AppConstants.alertRemanenceDaysImportant
+                ? AlertType.important
+                : AlertType.routine;
+
+        final alert = Alert(
+          id: 'remanence_${animal.id}',
+          type: alertType,
+          category: AlertCategory.remanence,
+          title: '',
+          message: '',
+          entityId: animal.id,
+          entityType: 'animal',
+          entityName: _getAnimalDisplayName(animal),
+          dueDate: DateTime.now().add(Duration(days: daysRemaining)),
+          actionLabel: 'Voir l\'animal',
+          animalIds: [animal.id],
+          titleKey: config.titleKey,
+          messageKey: config.messageKey,
+          messageParams: {
+            'animalName': _getAnimalDisplayName(animal),
+            'daysRemaining': daysRemaining.toString(),
+            'treatmentName': treatment.productName,
+          },
+        );
+        alerts.add(alert);
+      }
+    }
+
+    return alerts;
+  }
+
+  /// Évaluation WEIGHING (Pesée manquante)
+  Future<List<Alert>> _checkAndBuildWeighing(
+    AlertConfiguration config,
+  ) async {
+    final alerts = <Alert>[];
+    final animals = _animalProvider.animals
+        .where((a) => a.status == AnimalStatus.alive)
+        .toList();
+
+    for (final animal in animals) {
+      // ✅ PHASE 2: Chercher la dernière pesée pour cet animal
+      final lastWeight = _weightProvider.weights
+          .where((w) => w.animalId == animal.id)
+          .fold<DateTime?>(
+            null,
+            (latest, w) => latest == null || w.recordedAt.isAfter(latest)
+                ? w.recordedAt
+                : latest,
+          );
+
+      if (lastWeight == null) {
+        // Aucune pesée du tout - IMPORTANT si animal adulte
+        final alertType =
+            animal.ageInDays > 30 ? AlertType.important : AlertType.routine;
+
+        final alert = Alert(
+          id: 'weighing_${animal.id}',
+          type: alertType,
+          category: AlertCategory.weighing,
+          title: '',
+          message: '',
+          entityId: animal.id,
+          entityType: 'animal',
+          entityName: _getAnimalDisplayName(animal),
+          actionLabel: 'Peser',
+          animalIds: [animal.id],
+          titleKey: config.titleKey,
+          messageKey: config.messageKey,
+          messageParams: {
+            'animalName': _getAnimalDisplayName(animal),
+            'daysSinceWeight': '∞',
+          },
+        );
+        alerts.add(alert);
+        continue;
+      }
+
+      final daysSinceWeight = DateTime.now().difference(lastWeight).inDays;
+
+      // ✅ PHASE 2: Alerte si > tolérance (constante)
+      if (daysSinceWeight > AppConstants.alertWeighingToleranceDays) {
+        final alert = Alert(
+          id: 'weighing_${animal.id}',
+          type: AlertType.routine,
+          category: AlertCategory.weighing,
+          title: '',
+          message: '',
+          entityId: animal.id,
+          entityType: 'animal',
+          entityName: _getAnimalDisplayName(animal),
+          actionLabel: 'Peser',
+          animalIds: [animal.id],
+          titleKey: config.titleKey,
+          messageKey: config.messageKey,
+          messageParams: {
+            'animalName': _getAnimalDisplayName(animal),
+            'daysSinceWeight': daysSinceWeight.toString(),
+          },
+        );
+        alerts.add(alert);
+      }
+    }
+
+    return alerts;
+  }
+
+  /// Évaluation VACCINATION (Vaccination due)
+  /// ✅ PHASE 4 FIX: EXCLUDE DRAFT animals
+  Future<List<Alert>> _checkAndBuildVaccination(
+    AlertConfiguration config,
+  ) async {
+    final alerts = <Alert>[];
+    final vaccinations = _vaccinationProvider.getVaccinationsWithRemindersDue();
+
+    for (final vaccination in vaccinations) {
+      if (vaccination.nextDueDate == null) continue;
+
+      // ✅ PHASE 4 FIX: Vérifier le statut de l'animal
+      if (!vaccination.isGroupVaccination && vaccination.animalId != null) {
+        try {
+          final animal = _animalProvider.animals.firstWhere(
+            (a) => a.id == vaccination.animalId,
+          );
+
+          // SKIP si animal DRAFT
+          if (animal.status == AnimalStatus.draft) {
+            debugPrint(
+                '   ↳ SKIP vaccination alerte for DRAFT animal: ${animal.displayName}');
+            continue;
+          }
+        } catch (e) {
+          // Animal non trouvé, on continue
+          debugPrint(
+              '   ↳ Animal not found for vaccination: ${vaccination.animalId}');
+          continue;
+        }
+      }
+
+      final daysUntil =
+          vaccination.nextDueDate!.difference(DateTime.now()).inDays;
+
+      // ✅ PHASE 2: Alerte si rappel due ou passé (utilise constantes)
+      if (daysUntil <= AppConstants.alertVaccinationDaysDue) {
+        final alertType = daysUntil <= AppConstants.alertVaccinationDaysOverdue
+            ? AlertType.urgent
+            : daysUntil <= 3
+                ? AlertType.important
+                : AlertType.routine;
+
+        final entityName = vaccination.isGroupVaccination
+            ? '${vaccination.animalCount} animaux'
+            : _animalProvider.animals
+                .firstWhere(
+                  (a) => a.id == vaccination.animalId,
+                  orElse: () => Animal(
+                    id: 'unknown',
+                    farmId: _currentFarmId,
+                    currentEid: 'Unknown',
+                    visualId: 'Unknown',
+                    officialNumber: '',
+                    speciesId: '',
+                    birthDate: DateTime.now(),
+                    sex: AnimalSex.male,
+                    status: AnimalStatus.alive,
+                    createdAt: DateTime.now(),
+                    updatedAt: DateTime.now(),
+                  ),
+                )
+                .displayName;
+
+        final daysOverdue = daysUntil < 0 ? -daysUntil : 0;
+
+        final alert = Alert(
+          id: 'vaccination_${vaccination.id}',
+          type: alertType,
+          category: AlertCategory.treatment,
+          title: '',
+          message: '',
+          entityId: vaccination.animalId,
+          entityType: 'vaccination',
+          entityName: entityName,
+          dueDate: vaccination.nextDueDate,
+          actionLabel: 'Vacciner',
+          animalIds: vaccination.animalIds,
+          titleKey: config.titleKey,
+          messageKey: config.messageKey,
+          messageParams: {
+            'animalName': entityName,
+            'daysOverdue': daysOverdue.toString(),
+          },
+        );
+        alerts.add(alert);
+      }
+    }
+
+    return alerts;
+  }
+
+  /// Évaluation IDENTIFICATION (ID officiel manquant) ✅ PHASE 2
+  Future<List<Alert>> _checkAndBuildIdentification(
+    AlertConfiguration config,
+  ) async {
+    final alerts = <Alert>[];
+    final animals = _animalProvider.animals
+        .where((a) => a.status == AnimalStatus.alive)
+        .toList();
+
+    for (final animal in animals) {
+      // ✅ PHASE 2: Vérifier si l'animal a un official number/ID valide
+      final hasOfficialId =
+          animal.officialNumber != null && animal.officialNumber!.isNotEmpty;
+
+      if (!hasOfficialId) {
+        // ✅ PHASE 2: Utiliser constantes d'âge pour sévérité
+        final alertType =
+            animal.ageInDays > AppConstants.alertIdentificationAgeDaysUrgent
+                ? AlertType.urgent
+                : animal.ageInDays > AppConstants.alertIdentificationAgeDays
+                    ? AlertType.important
+                    : AlertType.routine;
+
+        final alert = Alert(
+          id: 'identification_${animal.id}',
+          type: alertType,
+          category: AlertCategory.identification,
+          title: '',
+          message: '',
+          entityId: animal.id,
+          entityType: 'animal',
+          entityName: _getAnimalDisplayName(animal),
+          actionLabel: 'Ajouter ID officiel',
+          animalIds: [animal.id],
+          titleKey: config.titleKey,
+          messageKey: config.messageKey,
+          messageParams: {
+            'animalName': _getAnimalDisplayName(animal),
+            'ageInDays': animal.ageInDays.toString(),
+          },
+        );
+        alerts.add(alert);
+      }
+    }
+
+    return alerts;
+  }
+
+  /// Évaluation SYNC REQUIRED (Sync en retard)
+  Future<Alert?> _checkAndBuildSyncRequired(
+    AlertConfiguration config,
+  ) async {
     // Si sync en cours, pas d'alerte
     if (_syncProvider.isSyncing) return null;
 
@@ -238,116 +717,111 @@ class AlertProvider extends ChangeNotifier {
         daysSinceLastSync > _maxSyncDelayDays || pendingItems > 10;
 
     if (needsSync) {
-      return Alert.syncRequired(
-        daysSinceLastSync: daysSinceLastSync,
-        pendingItems: pendingItems,
+      final type = daysSinceLastSync > 14
+          ? AlertType.urgent
+          : daysSinceLastSync > 7
+              ? AlertType.important
+              : AlertType.routine;
+
+      final alert = Alert(
+        id: 'sync_required',
+        type: type,
+        category: AlertCategory.sync,
+        title: '',
+        message: '',
+        actionLabel: 'Synchroniser',
+        count: pendingItems,
+        titleKey: config.titleKey,
+        messageKey: config.messageKey,
+        messageParams: {
+          'daysSince': daysSinceLastSync.toString(),
+          'pending': pendingItems.toString(),
+        },
       );
+      return alert;
     }
 
     return null;
   }
 
-  /// Calculer tâches de pesée
-  List<Alert> _calculateWeighingTasks() {
+  /// Évaluation TREATMENT RENEWAL (Traitement à renouveler)
+  Future<List<Alert>> _checkAndBuildTreatmentRenewal(
+    AlertConfiguration config,
+  ) async {
     final alerts = <Alert>[];
-    final animals = _animalProvider.animals
-        .where((a) => a.status == AnimalStatus.alive)
+    // TODO: Implémenter la logique quand treatments ont renewal date
+    return alerts;
+  }
+
+  /// Évaluation BATCH TO FINALIZE (Lot à finaliser)
+  Future<List<Alert>> _checkAndBuildBatchToFinalize(
+    AlertConfiguration config,
+  ) async {
+    final alerts = <Alert>[];
+    // TODO: Implémenter quand Batch model est prêt
+    return alerts;
+  }
+
+  /// Évaluation DRAFT ANIMALS (Animaux en brouillon)
+  Future<List<Alert>> _checkAndBuildDraftAnimals(
+    AlertConfiguration config,
+  ) async {
+    final alerts = <Alert>[];
+
+    // Récupérer tous les animaux en mode draft
+    final draftAnimals = _animalProvider.animals
+        .where((animal) => animal.status == AnimalStatus.draft)
         .toList();
 
-    // Grouper par raison de pesée
-    final animalsByReason = <String, List<String>>{};
-
-    for (final animal in animals) {
-      // Récupérer les règles pour cette espèce
-      final rules = WeighingRulesConfig.getRulesForSpecies(
-        animal.speciesId ?? 'ovine',
-      );
-
-      // Obtenir la dernière pesée
-      final weights = _weightProvider.weights
-          .where((w) => w.animalId == animal.id)
-          .toList();
-      weights.sort((a, b) => b.recordedAt.compareTo(a.recordedAt));
-      final lastWeight = weights.isNotEmpty ? weights.first : null;
-
-      // Calculer la prochaine pesée attendue
-      for (final rule in rules) {
-        if (rule.ageInDays != null) {
-          // Règle à âge précis
-          final targetAge = rule.ageInDays!;
-          final currentAge = animal.ageInDays;
-
-          // Animal a-t-il atteint cet âge ?
-          if (currentAge >= targetAge) {
-            // A-t-il été pesé à cet âge ?
-            final hasWeightAtAge = weights.any((w) {
-              final weightAge =
-                  animal.birthDate.difference(w.recordedAt).inDays.abs();
-              return (weightAge - targetAge).abs() <= rule.toleranceDays;
-            });
-
-            if (!hasWeightAtAge) {
-              final delay = currentAge - targetAge;
-              if (delay <= _weighingToleranceDays) {
-                final reason = rule.label;
-                animalsByReason.putIfAbsent(reason, () => []);
-                animalsByReason[reason]!.add(animal.id);
-              }
-            }
-          }
-        } else if (rule.recurringDays != null && lastWeight != null) {
-          // Règle récurrente
-          final daysSinceLastWeight =
-              DateTime.now().difference(lastWeight.recordedAt).inDays;
-
-          if (daysSinceLastWeight >= rule.recurringDays!) {
-            final reason = rule.label;
-            animalsByReason.putIfAbsent(reason, () => []);
-            animalsByReason[reason]!.add(animal.id);
-          }
-        }
+    // Créer une alerte pour les animaux en brouillon
+    if (draftAnimals.isNotEmpty) {
+      // Déterminer le type d'alerte selon la sévérité
+      AlertType alertType;
+      switch (config.severity) {
+        case 3:
+          alertType = AlertType.urgent;
+          break;
+        case 2:
+          alertType = AlertType.important;
+          break;
+        case 1:
+        default:
+          alertType = AlertType.routine;
+          break;
       }
+
+      alerts.add(Alert(
+        id: 'draft_animals_${DateTime.now().millisecondsSinceEpoch}',
+        type: alertType,
+        category: AlertCategory.registre,
+        title: '${config.iconName} Animaux en brouillon', // Fallback title
+        message: '${draftAnimals.length} animal(aux) non validé(s)',
+        count: draftAnimals.length,
+        animalIds: draftAnimals.map((a) => a.id).toList(),
+        titleKey: config.titleKey,
+        messageKey: config.messageKey,
+        messageParams: {
+          'count': draftAnimals.length.toString(),
+        },
+      ));
     }
-
-    // Créer une alerte par groupe
-    animalsByReason.forEach((reason, animalIds) {
-      if (animalIds.isNotEmpty) {
-        alerts.add(Alert.weighingRequired(
-          animalIds: animalIds,
-          reason: reason,
-        ));
-      }
-    });
 
     return alerts;
   }
 
-  /// Calculer événements incomplets
+  // ==================== LEGACY HELPERS ====================
+
+  /// Calculer alertes incomplets (legacy - garde pour backward compat)
   List<IncompleteEvent> _calculateIncompleteEvents() {
     final events = <IncompleteEvent>[];
 
-    // Vérifier les animaux incomplets
     for (final animal in _animalProvider.animals) {
+      if (animal.status != AnimalStatus.draft) continue;
+
       final missingFields = <String>[];
       var completionRate = 1.0;
 
-      // Champs critiques manquants
-      if (animal.birthDate == null) {
-        missingFields.add('Date de naissance');
-        completionRate -= 0.2;
-      }
-
-      if (animal.sex == null) {
-        missingFields.add('Sexe');
-        completionRate -= 0.1;
-      }
-
-      if (animal.speciesId == null || animal.speciesId!.isEmpty) {
-        missingFields.add('Type');
-        completionRate -= 0.3;
-      }
-
-      if (animal.eid.isEmpty || animal.eid.length < 10) {
+      if (animal.displayName.isEmpty || animal.displayName.length < 10) {
         missingFields.add('EID valide');
         completionRate -= 0.4;
       }
@@ -356,7 +830,7 @@ class AlertProvider extends ChangeNotifier {
       if (missingFields.isNotEmpty && completionRate < 0.9) {
         events.add(IncompleteEvent.animal(
           animalId: animal.id,
-          animalName: animal.officialNumber ?? animal.eid,
+          animalName: _getAnimalDisplayName(animal),
           missingFields: missingFields,
           completionRate: completionRate,
           createdAt: animal.createdAt,
@@ -365,14 +839,6 @@ class AlertProvider extends ChangeNotifier {
     }
 
     return events;
-  }
-
-  /// Calculer traitements à renouveler
-  List<Alert> _calculateTreatmentRenewals() {
-    final alerts = <Alert>[];
-    // TODO: Implémenter la logique de renouvellement
-    // Pour l'instant, retour vide
-    return alerts;
   }
 
   // ==================== FILTRES ====================
@@ -388,8 +854,32 @@ class AlertProvider extends ChangeNotifier {
   }
 
   /// Obtenir alertes pour un animal spécifique
+  /// Cherche dans entityId (alerte spécifique) ET animalIds (alertes de groupe)
   List<Alert> getAlertsForAnimal(String animalId) {
-    return _alerts.where((a) => a.entityId == animalId).toList();
+    return _alerts
+        .where((a) =>
+                a.entityId == animalId || // Alerte spécifique à cet animal
+                (a.animalIds?.contains(animalId) ??
+                    false) // Alerte de groupe (brouillons, pesées, etc)
+            )
+        .toList();
+  }
+
+  /// Obtenir SEULEMENT les alertes spécifiques à un animal
+  /// Inclut:
+  /// - Alertes spécifiques (entityId == animalId)
+  /// - Alertes DRAFT (animalIds contient animalId)
+  /// Exclut les alertes de groupe (pesées collectives, vaccinations groupe, etc)
+  /// Utilisé dans l'écran de détail animal pour afficher uniquement
+  /// les problèmes relatifs à CET animal, pas des autres
+  List<Alert> getSpecificAlertsForAnimal(String animalId) {
+    return _alerts
+        .where((a) =>
+                a.entityId == animalId || // Alerte spécifique à cet animal
+                (a.animalIds?.contains(animalId) ??
+                    false) // Alerte de groupe (DRAFT, pesées, etc)
+            )
+        .toList();
   }
 
   // ==================== STATS ====================
@@ -431,12 +921,53 @@ class AlertProvider extends ChangeNotifier {
     _recalculateAlerts();
   }
 
-  // ==================== HELPERS ====================
+  // ==================== DEBUG HELPERS ====================
 
-  /// Message de résumé pour l'utilisateur
-  String getSummary() {
+  /// DEBUG: Afficher l'état des animaux
+  void debugAnimalsState() {
+    debugPrint('🐑 [DEBUG ANIMALS] ===== ÉTAT ANIMAUX =====');
+    final animals = _animalProvider.animals;
+    debugPrint('Total animaux: ${animals.length}');
+
+    for (final animal in animals.take(5)) {
+      // Afficher les 5 premiers
+      debugPrint('  - ${animal.displayName}');
+      debugPrint('    Status: ${animal.status}');
+      debugPrint('    Age: ${animal.ageInDays} jours');
+      debugPrint(
+          '    Traitements: ${_animalProvider.getAnimalTreatments(animal.id).length}');
+    }
+    if (animals.length > 5) {
+      debugPrint('  ... et ${animals.length - 5} autres');
+    }
+  }
+
+  /// DEBUG: Appeler depuis HomeScreen ou AlertScreen pour tester
+  void debugAlert() {
+    debugPrint('\n\n🔍 ===== DEBUG ALERTE COMPLET =====');
+    debugPrint('FarmId courant: $_currentFarmId');
+    debugPrint('AuthProvider.currentFarmId: ${_authProvider.currentFarmId}');
+    debugAnimalsState();
+    debugPrint('Alertes actuelles: ${_alerts.length}');
+    debugPrint('Urgentes: ${urgentAlerts.length}');
+    debugPrint('Importantes: ${importantAlerts.length}');
+    debugPrint('Routine: ${routineAlerts.length}');
+    debugPrint('===== FIN DEBUG =====\n\n');
+  }
+
+  // ==================== HELPERS I18N ====================
+
+  /// Obtenir le nom d'affichage d'un animal avec fallback
+  String _getAnimalDisplayName(Animal animal) {
+    return animal.displayName;
+  }
+
+  /// Message de résumé pour l'utilisateur (avec i18n)
+  ///
+  /// ⚠️ Cette méthode nécessite un BuildContext pour la traduction
+  String getSummary(BuildContext context) {
     if (_alerts.isEmpty) {
-      return 'Aucune alerte 🎉';
+      return AppLocalizations.of(context).translate(AppStrings.noAlert);
     }
 
     final urgent = urgentAlertCount;
@@ -444,23 +975,52 @@ class AlertProvider extends ChangeNotifier {
     final routine = routineAlerts.length;
 
     final parts = <String>[];
-    if (urgent > 0) parts.add('$urgent urgente${urgent > 1 ? 's' : ''}');
-    if (important > 0) {
-      parts.add('$important importante${important > 1 ? 's' : ''}');
+    if (urgent > 0) {
+      parts.add('$urgent ${_getPluralLabel(context, urgent, 'urgent')}');
     }
-    if (routine > 0) parts.add('$routine tâche${routine > 1 ? 's' : ''}');
+    if (important > 0) {
+      parts.add(
+          '$important ${_getPluralLabel(context, important, 'important')}');
+    }
+    if (routine > 0) {
+      parts.add('$routine ${_getPluralLabel(context, routine, 'task')}');
+    }
 
     return parts.join(', ');
   }
 
-  /// Message pour la bannière rouge
-  String? getUrgentBannerMessage() {
+  /// Message pour la bannière rouge (avec i18n)
+  ///
+  /// ⚠️ Cette méthode nécessite un BuildContext pour la traduction
+  String? getUrgentBannerMessage(BuildContext context) {
     if (!hasUrgentAlerts) return null;
 
     final count = urgentAlertCount;
     if (count == 1) {
       return '🚨 ${urgentAlerts.first.title}';
     }
-    return '🚨 $count ALERTES URGENTES';
+    return '🚨 $count ${AppLocalizations.of(context).translate(AppStrings.urgentAlerts).toUpperCase()}';
+  }
+
+  /// Helper : Label pluriel selon le type et le count
+  String _getPluralLabel(BuildContext context, int count, String type) {
+    final l10n = AppLocalizations.of(context);
+
+    switch (type) {
+      case 'urgent':
+        return count > 1
+            ? '${l10n.translate(AppStrings.urgentLabel).toLowerCase()}s'
+            : l10n.translate(AppStrings.urgentLabel).toLowerCase();
+      case 'important':
+        return count > 1
+            ? '${l10n.translate(AppStrings.importantLabel).toLowerCase()}es'
+            : l10n.translate(AppStrings.importantLabel).toLowerCase();
+      case 'task':
+        return count > 1
+            ? '${l10n.translate(AppStrings.routineLabel).toLowerCase()}s'
+            : l10n.translate(AppStrings.routineLabel).toLowerCase();
+      default:
+        return '';
+    }
   }
 }

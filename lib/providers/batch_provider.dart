@@ -1,16 +1,26 @@
-// providers/batch_provider.dart
+// lib/providers/batch_provider.dart
 import 'package:flutter/foundation.dart';
 import '../models/batch.dart';
+import '../repositories/batch_repository.dart';
+import 'auth_provider.dart';
 
-/// Provider pour la gestion des lots d'animaux
-///
-/// Gère la création, modification et utilisation des lots pour :
-/// - Vente groupée
-/// - Abattage groupé
-/// - Traitement groupé
-/// - Autres actions de masse
+/// BatchProvider - Phase 1C
+/// CHANGEMENT: Utilise Repository pour Batches (SQLite)
 class BatchProvider with ChangeNotifier {
-  // ==================== Constantes (clés de messages / logs) ====================
+  final AuthProvider _authProvider;
+  final BatchRepository _repository;
+  String _currentFarmId;
+
+  // Données principales (cache local)
+  final List<Batch> _allBatches = [];
+
+  // Loading state
+  bool _isLoading = false;
+
+  // Lot actuellement en cours de création (scan en cours)
+  Batch? _activeBatch;
+
+  // ==================== Constantes ====================
   static const String kLogBatchCreated = 'log.batch.created';
   static const String kLogBatchNoActive = 'log.batch.no_active';
   static const String kLogBatchAnimalAlreadyIn = 'log.batch.animal_already_in';
@@ -26,55 +36,79 @@ class BatchProvider with ChangeNotifier {
   static const String kLogBatchMockLoaded = 'log.batch.mock_loaded';
   static const String kLogBatchReset = 'log.batch.reset';
 
-  // Pour exceptions (clés d’erreur)
   static const String kErrBatchNotFound = 'err.batch.not_found';
   static const String kErrCannotReactivateCompleted =
       'err.batch.cannot_reactivate_completed';
 
-  // ==================== État ====================
+  BatchProvider(this._authProvider, this._repository)
+      : _currentFarmId = _authProvider.currentFarmId {
+    _authProvider.addListener(_onFarmChanged);
+    _loadBatchesFromRepository();
+  }
 
-  /// Liste de tous les lots (actifs et complétés)
-  List<Batch> _batches = [];
-
-  /// Lot actuellement en cours de création (scan en cours)
-  Batch? _activeBatch;
+  void _onFarmChanged() {
+    if (_currentFarmId != _authProvider.currentFarmId) {
+      _currentFarmId = _authProvider.currentFarmId;
+      _activeBatch = null;
+      _loadBatchesFromRepository();
+    }
+  }
 
   // ==================== Getters ====================
 
-  /// Tous les lots
-  List<Batch> get batches => List.unmodifiable(_batches);
+  List<Batch> get batches => List.unmodifiable(
+      _allBatches.where((b) => b.farmId == _authProvider.currentFarmId));
 
-  /// Lots non complétés uniquement
-  List<Batch> get activeBatches {
-    return _batches.where((batch) => !batch.completed).toList();
-  }
+  List<Batch> get activeBatches => batches.where((b) => !b.completed).toList();
 
-  /// Lots complétés uniquement
-  List<Batch> get completedBatches {
-    return _batches.where((batch) => batch.completed).toList();
-  }
+  List<Batch> get completedBatches =>
+      batches.where((b) => b.completed).toList();
 
-  /// Lot en cours de création/modification
   Batch? get activeBatch => _activeBatch;
-
-  /// Y a-t-il un lot actif ?
   bool get hasActiveBatch => _activeBatch != null;
+  bool get isLoading => _isLoading;
 
-  /// Nombre total de lots
-  int get batchCount => _batches.length;
-
-  /// Nombre de lots actifs
+  int get batchCount => batches.length;
   int get activeBatchCount => activeBatches.length;
 
-  // ==================== Méthodes Publiques ====================
+  // ==================== Repository Loading ====================
 
-  /// Créer un nouveau lot et le définir comme actif
-  ///
-  /// [name] : Nom du lot (ex: "Abattage Novembre 2025")
-  /// [purpose] : Objectif du lot (vente, abattage, traitement, autre)
-  ///
-  /// Retourne le lot créé
-  Batch createBatch(String name, BatchPurpose purpose) {
+  Future<void> _loadBatchesFromRepository() async {
+    if (_currentFarmId.isEmpty) return;
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final farmBatches = await _repository.findAllByFarm(_currentFarmId);
+      _allBatches.removeWhere((b) => b.farmId == _currentFarmId);
+      _allBatches.addAll(farmBatches);
+    } catch (e) {
+      debugPrint('❌ Error loading batches from repository: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void initializeWithMockData(List<Batch> mockBatches) {
+    _migrateBatchesToRepository(mockBatches);
+  }
+
+  Future<void> _migrateBatchesToRepository(List<Batch> batches) async {
+    for (final batch in batches) {
+      try {
+        await _repository.create(batch, batch.farmId);
+      } catch (e) {
+        debugPrint('⚠️ Batch ${batch.id} already exists or error: $e');
+      }
+    }
+    await _loadBatchesFromRepository();
+  }
+
+  // ==================== CRUD: Batches ====================
+
+  Future<Batch> createBatch(String name, BatchPurpose purpose) async {
     final batch = Batch(
       id: _generateId(),
       name: name,
@@ -83,37 +117,25 @@ class BatchProvider with ChangeNotifier {
       createdAt: DateTime.now(),
       completed: false,
       synced: false,
+      farmId: _authProvider.currentFarmId,
     );
 
-    _batches.add(batch);
-    _activeBatch = batch;
-
-    notifyListeners();
-
-    // Logs via clés (multi-langue gérée au-dessus si besoin)
-    debugPrint('$kLogBatchCreated|name=$name|purpose=${purpose.name}');
-
-    return batch;
+    try {
+      await _repository.create(batch, _authProvider.currentFarmId);
+      _allBatches.add(batch);
+      _activeBatch = batch;
+      notifyListeners();
+      return batch;
+    } catch (e) {
+      debugPrint('❌ Error creating batch: $e');
+      rethrow;
+    }
   }
 
-  /// Ajouter un animal au lot actif
-  ///
-  /// [animalId] : ID de l'animal à ajouter
-  ///
-  /// Retourne true si ajouté avec succès, false si doublon
-  bool addAnimalToBatch(String animalId) {
-    if (_activeBatch == null) {
-      debugPrint(kLogBatchNoActive);
-      return false;
-    }
+  Future<bool> addAnimalToBatch(String animalId) async {
+    if (_activeBatch == null) return false;
+    if (_activeBatch!.animalIds.contains(animalId)) return false;
 
-    // Vérifier doublon
-    if (_activeBatch!.animalIds.contains(animalId)) {
-      debugPrint('$kLogBatchAnimalAlreadyIn|animalId=$animalId');
-      return false;
-    }
-
-    // Créer une copie modifiée du lot
     final updatedBatch = Batch(
       id: _activeBatch!.id,
       name: _activeBatch!.name,
@@ -122,41 +144,30 @@ class BatchProvider with ChangeNotifier {
       createdAt: _activeBatch!.createdAt,
       usedAt: _activeBatch!.usedAt,
       completed: _activeBatch!.completed,
-      synced: false, // Marquer comme non synchronisé
+      synced: false,
+      farmId: _activeBatch!.farmId,
     );
 
-    // Remplacer dans la liste
-    final index = _batches.indexWhere((b) => b.id == _activeBatch!.id);
-    if (index != -1) {
-      _batches[index] = updatedBatch;
-      _activeBatch = updatedBatch;
+    try {
+      await _repository.update(updatedBatch, _authProvider.currentFarmId);
+
+      final index = _allBatches.indexWhere((b) => b.id == _activeBatch!.id);
+      if (index != -1) {
+        _allBatches[index] = updatedBatch;
+        _activeBatch = updatedBatch;
+      }
+      notifyListeners();
+      return true;
+    } catch (e) {
+      debugPrint('❌ Error adding animal to batch: $e');
+      return false;
     }
-
-    notifyListeners();
-
-    debugPrint(
-        '$kLogBatchAnimalAdded|animalId=$animalId|count=${updatedBatch.animalCount}');
-
-    return true;
   }
 
-  /// Retirer un animal du lot actif
-  ///
-  /// [animalId] : ID de l'animal à retirer
-  ///
-  /// Retourne true si retiré avec succès
-  bool removeAnimalFromBatch(String animalId) {
-    if (_activeBatch == null) {
-      debugPrint(kLogBatchNoActive);
-      return false;
-    }
+  Future<bool> removeAnimalFromBatch(String animalId) async {
+    if (_activeBatch == null) return false;
+    if (!_activeBatch!.animalIds.contains(animalId)) return false;
 
-    if (!_activeBatch!.animalIds.contains(animalId)) {
-      debugPrint('$kLogBatchAnimalAlreadyIn|not_present|animalId=$animalId');
-      return false;
-    }
-
-    // Créer une copie modifiée
     final updatedAnimalIds = List<String>.from(_activeBatch!.animalIds)
       ..remove(animalId);
 
@@ -169,46 +180,35 @@ class BatchProvider with ChangeNotifier {
       usedAt: _activeBatch!.usedAt,
       completed: _activeBatch!.completed,
       synced: false,
+      farmId: _activeBatch!.farmId,
     );
 
-    // Remplacer dans la liste
-    final index = _batches.indexWhere((b) => b.id == _activeBatch!.id);
-    if (index != -1) {
-      _batches[index] = updatedBatch;
-      _activeBatch = updatedBatch;
+    try {
+      await _repository.update(updatedBatch, _authProvider.currentFarmId);
+
+      final index = _allBatches.indexWhere((b) => b.id == _activeBatch!.id);
+      if (index != -1) {
+        _allBatches[index] = updatedBatch;
+        _activeBatch = updatedBatch;
+      }
+      notifyListeners();
+      return true;
+    } catch (e) {
+      debugPrint('❌ Error removing animal from batch: $e');
+      return false;
     }
-
-    notifyListeners();
-
-    debugPrint(
-        '$kLogBatchAnimalRemoved|animalId=$animalId|count=${updatedBatch.animalCount}');
-
-    return true;
   }
 
-  /// Vérifier si un animal est déjà dans le lot actif
-  ///
-  /// Utilisé pour détecter les doublons lors du scan
   bool isAnimalInActiveBatch(String animalId) {
     if (_activeBatch == null) return false;
     return _activeBatch!.animalIds.contains(animalId);
   }
 
-  /// Marquer un lot comme complété (utilisé)
-  ///
-  /// [batchId] : ID du lot à compléter
-  ///
-  /// Appelé après une vente, un abattage, etc.
-  void completeBatch(String batchId) {
-    final index = _batches.indexWhere((b) => b.id == batchId);
+  Future<void> completeBatch(String batchId) async {
+    final index = _allBatches.indexWhere((b) => b.id == batchId);
+    if (index == -1) return;
 
-    if (index == -1) {
-      debugPrint('$kLogBatchNotFound|id=$batchId');
-      return;
-    }
-
-    final batch = _batches[index];
-
+    final batch = _allBatches[index];
     final updatedBatch = Batch(
       id: batch.id,
       name: batch.name,
@@ -218,148 +218,83 @@ class BatchProvider with ChangeNotifier {
       usedAt: DateTime.now(),
       completed: true,
       synced: false,
+      farmId: batch.farmId,
     );
 
-    _batches[index] = updatedBatch;
+    try {
+      await _repository.update(updatedBatch, _authProvider.currentFarmId);
 
-    // Si c'était le lot actif, le déréférencer
-    if (_activeBatch?.id == batchId) {
-      _activeBatch = null;
+      _allBatches[index] = updatedBatch;
+      if (_activeBatch?.id == batchId) {
+        _activeBatch = null;
+      }
+      notifyListeners();
+    } catch (e) {
+      debugPrint('❌ Error completing batch: $e');
+      rethrow;
     }
-
-    notifyListeners();
-
-    debugPrint('$kLogBatchCompleted|name=${batch.name}');
   }
 
-  /// Supprimer un lot
-  ///
-  /// [batchId] : ID du lot à supprimer
-  void deleteBatch(String batchId) {
-    final index = _batches.indexWhere((b) => b.id == batchId);
+  Future<void> deleteBatch(String batchId) async {
+    try {
+      await _repository.delete(batchId, _authProvider.currentFarmId);
 
-    if (index == -1) {
-      debugPrint('$kLogBatchNotFound|id=$batchId');
-      return;
+      _allBatches.removeWhere((b) => b.id == batchId);
+      if (_activeBatch?.id == batchId) {
+        _activeBatch = null;
+      }
+      notifyListeners();
+    } catch (e) {
+      debugPrint('❌ Error deleting batch: $e');
+      rethrow;
     }
-
-    final batch = _batches[index];
-
-    _batches.removeAt(index);
-
-    // Si c'était le lot actif, le déréférencer
-    if (_activeBatch?.id == batchId) {
-      _activeBatch = null;
-    }
-
-    notifyListeners();
-
-    debugPrint('$kLogBatchDeleted|name=${batch.name}');
   }
 
-  /// Réinitialiser le lot actif (abandon de création)
   void clearActiveBatch() {
     if (_activeBatch != null) {
-      debugPrint('$kLogBatchActiveReset|name=${_activeBatch!.name}');
       _activeBatch = null;
       notifyListeners();
     }
   }
 
-  /// Définir un lot existant comme actif (pour modification)
-  ///
-  /// [batchId] : ID du lot à réactiver
   void setActiveBatch(String batchId) {
-    final batch = _batches.firstWhere(
+    final batch = _allBatches.firstWhere(
       (b) => b.id == batchId,
       orElse: () => throw Exception(kErrBatchNotFound),
     );
 
-    if (batch.completed) {
-      // On garde un log neutre (clé), et on ne réactive pas
-      debugPrint(kErrCannotReactivateCompleted);
-      return;
-    }
+    if (batch.completed) return;
 
     _activeBatch = batch;
     notifyListeners();
-
-    debugPrint('$kLogBatchActivated|name=${batch.name}');
   }
 
-  /// Obtenir un lot par son ID
-  ///
-  /// Retourne null si non trouvé
+  // ==================== Query Methods ====================
+
   Batch? getBatchById(String batchId) {
     try {
-      return _batches.firstWhere((b) => b.id == batchId);
+      return batches.firstWhere((b) => b.id == batchId);
     } catch (e) {
       return null;
     }
   }
 
-  /// Obtenir tous les lots contenant un animal spécifique
-  ///
-  /// Utile pour vérifier si un animal est déjà dans un lot
   List<Batch> getBatchesContainingAnimal(String animalId) {
-    return _batches
+    return batches
         .where((batch) => batch.animalIds.contains(animalId))
         .toList();
   }
 
-  /// Obtenir les lots par objectif
   List<Batch> getBatchesByPurpose(BatchPurpose purpose) {
-    return _batches.where((b) => b.purpose == purpose).toList();
+    return batches.where((b) => b.purpose == purpose).toList();
   }
 
-  // ==================== Méthodes de Chargement ====================
+  // ==================== Statistics ====================
 
-  /// Charger les lots depuis une source (base locale, API, etc.)
-  ///
-  /// À implémenter avec la base de données SQLite
-  Future<void> loadBatches() async {
-    // TODO: Implémenter chargement depuis SQLite
-    debugPrint(kLogBatchLoading);
-
-    // Pour l'instant, on garde les données en mémoire
-    notifyListeners();
-  }
-
-  /// Sauvegarder les lots (vers base locale)
-  ///
-  /// À implémenter avec la base de données SQLite
-  Future<void> saveBatches() async {
-    // TODO: Implémenter sauvegarde vers SQLite
-    debugPrint(kLogBatchSaving);
-  }
-
-  /// Initialiser avec des données de test (mock)
-  void initializeWithMockData(List<Batch> mockBatches) {
-    _batches = mockBatches;
-    notifyListeners();
-
-    debugPrint('$kLogBatchMockLoaded|count=${mockBatches.length}');
-  }
-
-  // ==================== Méthodes Privées ====================
-
-  /// Générer un ID unique pour un lot
-  ///
-  /// Format: batch_[timestamp]_[random]
-  String _generateId() {
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final random = (timestamp % 10000).toString().padLeft(4, '0');
-    return 'batch_${timestamp}_$random';
-  }
-
-  // ==================== Statistiques ====================
-
-  /// Obtenir le nombre total d'animaux dans tous les lots actifs
   int get totalAnimalsInActiveBatches {
     return activeBatches.fold(0, (sum, batch) => sum + batch.animalCount);
   }
 
-  /// Obtenir la distribution des lots par objectif
   Map<BatchPurpose, int> get batchesByPurposeCount {
     final Map<BatchPurpose, int> distribution = {
       BatchPurpose.sale: 0,
@@ -368,19 +303,37 @@ class BatchProvider with ChangeNotifier {
       BatchPurpose.other: 0,
     };
 
-    for (final batch in _batches) {
+    for (final batch in batches) {
       distribution[batch.purpose] = (distribution[batch.purpose] ?? 0) + 1;
     }
 
     return distribution;
   }
 
-  /// Réinitialiser toutes les données (pour tests)
+  // ==================== Refresh ====================
+
+  Future<void> refresh() async {
+    await _loadBatchesFromRepository();
+  }
+
+  // ==================== Private ====================
+
+  String _generateId() {
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final random = (timestamp % 10000).toString().padLeft(4, '0');
+    return 'batch_${timestamp}_$random';
+  }
+
   @visibleForTesting
   void reset() {
-    _batches.clear();
+    _allBatches.clear();
     _activeBatch = null;
     notifyListeners();
-    debugPrint(kLogBatchReset);
+  }
+
+  @override
+  void dispose() {
+    _authProvider.removeListener(_onFarmChanged);
+    super.dispose();
   }
 }

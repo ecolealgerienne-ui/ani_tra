@@ -1,0 +1,715 @@
+// lib/screens/alerts_screen.dart
+
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../providers/alert_provider.dart';
+import '../../providers/animal_provider.dart';
+import '../../models/alert.dart';
+
+import '../../models/alert_category.dart';
+import '../animal/animal_detail_screen.dart';
+import '../animal/animal_list_screen.dart';
+import '../sync/sync_screen.dart';
+import '../../i18n/app_localizations.dart';
+import '../../i18n/app_strings.dart';
+import '../../utils/constants.dart';
+
+/// Écran de détails des alertes
+///
+/// Affiche toutes les alertes triées par priorité :
+/// - Urgentes (rouge)
+/// - Importantes (orange)
+/// - Routine (bleu)
+///
+/// Chaque alerte est cliquable pour naviguer vers l'entité concernée
+class AlertsScreen extends StatelessWidget {
+  const AlertsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context).translate(AppStrings.alerts)),
+        actions: [
+          // Badge avec le nombre total d'alertes
+          Consumer<AlertProvider>(
+            builder: (context, alertProvider, child) {
+              final count = alertProvider.alertCount;
+              if (count == 0) return const SizedBox.shrink();
+
+              return Padding(
+                padding: const EdgeInsets.only(right: 16),
+                child: Center(
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      '$count',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: AppConstants.fontSizeMedium,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      body: Consumer<AlertProvider>(
+        builder: (context, alertProvider, child) {
+          // Si aucune alerte
+          if (alertProvider.alertCount == 0) {
+            return _buildEmptyState();
+          }
+
+          return RefreshIndicator(
+            onRefresh: () async {
+              alertProvider.refresh();
+              await Future.delayed(AppConstants.longAnimation);
+            },
+            child: ListView(
+              padding: const EdgeInsets.all(AppConstants.spacingMedium),
+              children: [
+                // Résumé en haut
+                _buildSummaryCard(context, alertProvider),
+                const SizedBox(height: AppConstants.spacingMediumLarge),
+
+                // Alertes URGENTES
+                if (alertProvider.urgentAlerts.isNotEmpty) ...[
+                  _buildSectionHeader(
+                    context: context,
+                    icon: Icons.error_rounded,
+                    title: AppLocalizations.of(context)
+                        .translate(AppStrings.urgentAlerts),
+                    count: alertProvider.urgentAlertCount,
+                    color: Colors.red.shade700,
+                  ),
+                  const SizedBox(height: AppConstants.spacingSmall),
+                  ...alertProvider.urgentAlerts.map(
+                    (alert) =>
+                        _buildAlertCard(context, alert, Colors.red.shade700),
+                  ),
+                  const SizedBox(height: AppConstants.spacingMediumLarge),
+                ],
+
+                // Alertes IMPORTANTES
+                if (alertProvider.importantAlerts.isNotEmpty) ...[
+                  _buildSectionHeader(
+                    context: context,
+                    icon: Icons.warning_rounded,
+                    title: AppLocalizations.of(context)
+                        .translate(AppStrings.importantAlerts),
+                    count: alertProvider.importantAlertCount,
+                    color: Colors.orange.shade700,
+                  ),
+                  const SizedBox(height: AppConstants.spacingSmall),
+                  ...alertProvider.importantAlerts.map(
+                    (alert) =>
+                        _buildAlertCard(context, alert, Colors.orange.shade700),
+                  ),
+                  const SizedBox(height: AppConstants.spacingMediumLarge),
+                ],
+
+                // Alertes ROUTINE
+                if (alertProvider.routineAlerts.isNotEmpty) ...[
+                  _buildSectionHeader(
+                    context: context,
+                    icon: Icons.info_rounded,
+                    title: AppLocalizations.of(context)
+                        .translate(AppStrings.routineAlerts),
+                    count: alertProvider.routineAlerts.length,
+                    color: Colors.blue.shade700,
+                  ),
+                  const SizedBox(height: AppConstants.spacingSmall),
+                  ...alertProvider.routineAlerts.map(
+                    (alert) =>
+                        _buildAlertCard(context, alert, Colors.blue.shade700),
+                  ),
+                ],
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  /// Widget : État vide (aucune alerte)
+  Widget _buildEmptyState() {
+    return Consumer<AlertProvider>(
+      builder: (context, alertProvider, child) {
+        return Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(AppConstants.spacingMediumLarge),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.check_circle_outline,
+                  size: AppConstants.iconSizeHuge,
+                  color: Colors.green.shade300,
+                ),
+                const SizedBox(height: AppConstants.spacingMediumLarge),
+                Text(
+                  AppLocalizations.of(context)
+                      .translate(AppStrings.noAlertsTitle),
+                  style: const TextStyle(
+                    fontSize: AppConstants.fontSizeExtraLarge,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: AppConstants.spacingExtraSmall),
+                Text(
+                  AppLocalizations.of(context)
+                      .translate(AppStrings.allGoodWithHerd),
+                  style: TextStyle(
+                    fontSize: AppConstants.fontSizeMedium,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+                const SizedBox(height: AppConstants.spacingLarge),
+                // Bouton pour forcer le recalcul
+                ElevatedButton.icon(
+                  onPressed: () {
+                    alertProvider.refresh();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(AppLocalizations.of(context)
+                            .translate(AppStrings.alertsRecalculated)),
+                        duration: AppConstants.snackBarDurationShort,
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.refresh),
+                  label: Text(AppLocalizations.of(context)
+                      .translate(AppStrings.recalculateAlerts)),
+                ),
+                const SizedBox(height: AppConstants.spacingMedium),
+                // Debug info
+                Container(
+                  padding: const EdgeInsets.all(AppConstants.spacingMedium),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)
+                            .translate(AppStrings.debugInfo),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey.shade700,
+                        ),
+                      ),
+                      const SizedBox(height: AppConstants.spacingExtraSmall),
+                      Text(
+                        'Alertes urgentes: ${alertProvider.urgentAlertCount}',
+                        style: TextStyle(
+                            fontSize: AppConstants.fontSizeSmall, color: Colors.grey.shade600),
+                      ),
+                      Text(
+                        'Alertes importantes: ${alertProvider.importantAlertCount}',
+                        style: TextStyle(
+                            fontSize: AppConstants.fontSizeSmall, color: Colors.grey.shade600),
+                      ),
+                      Text(
+                        'Alertes routine: ${alertProvider.routineAlerts.length}',
+                        style: TextStyle(
+                            fontSize: AppConstants.fontSizeSmall, color: Colors.grey.shade600),
+                      ),
+                      Text(
+                        'Total: ${alertProvider.alertCount}',
+                        style: TextStyle(
+                            fontSize: AppConstants.fontSizeSmall, color: Colors.grey.shade600),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// Widget : Carte de résumé en haut
+  Widget _buildSummaryCard(BuildContext context, AlertProvider alertProvider) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.blue.shade700, Colors.blue.shade500],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blue.withValues(alpha: 0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.notifications_active,
+                  color: Colors.white, size: AppConstants.iconSizeMedium),
+              const SizedBox(width: AppConstants.spacingSmall),
+              Text(
+                AppLocalizations.of(context).translate(AppStrings.overview),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: AppConstants.fontSizeLarge,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppConstants.spacingMedium),
+          Text(
+            alertProvider.getSummary(context),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: AppConstants.fontSizeMedium,
+            ),
+          ),
+          const SizedBox(height: AppConstants.spacingMedium),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildStatBadge(
+                context: context,
+                label: AppLocalizations.of(context)
+                    .translate(AppStrings.urgentLabel),
+                value: alertProvider.urgentAlertCount,
+                color: Colors.red.shade300,
+              ),
+              _buildStatBadge(
+                context: context,
+                label: AppLocalizations.of(context)
+                    .translate(AppStrings.importantLabel),
+                value: alertProvider.importantAlertCount,
+                color: Colors.orange.shade300,
+              ),
+              _buildStatBadge(
+                context: context,
+                label: AppLocalizations.of(context)
+                    .translate(AppStrings.routineLabel),
+                value: alertProvider.routineAlerts.length,
+                color: Colors.green.shade300,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Widget : Badge de statistique
+  Widget _buildStatBadge({
+    required BuildContext context,
+    required String label,
+    required int value,
+    required Color color,
+  }) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            '$value',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: AppConstants.fontSizeLarge,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        const SizedBox(height: AppConstants.spacingTiny),
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: AppConstants.fontSizeSmall,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Widget : Header de section
+  Widget _buildSectionHeader({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required int count,
+    required Color color,
+  }) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(AppConstants.spacingExtraSmall),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
+          ),
+          child: Icon(icon, color: color, size: AppConstants.iconSizeMedium),
+        ),
+        const SizedBox(width: AppConstants.spacingSmall),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: AppConstants.fontSizeImportant,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+        const SizedBox(width: AppConstants.spacingExtraSmall),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.2),
+            borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
+          ),
+          child: Text(
+            '$count',
+            style: TextStyle(
+              color: color,
+              fontSize: AppConstants.fontSizeBody,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Widget : Carte d'alerte
+  Widget _buildAlertCard(BuildContext context, Alert alert, Color color) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
+        side: BorderSide(color: color.withValues(alpha: 0.3), width: 1),
+      ),
+      child: InkWell(
+        onTap: () => _handleAlertTap(context, alert),
+        borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
+        child: Padding(
+          padding: const EdgeInsets.all(AppConstants.spacingMedium),
+          child: Row(
+            children: [
+              // Icône de catégorie
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  _getAlertIcon(alert.category),
+                  color: color,
+                  size: AppConstants.iconSizeMedium,
+                ),
+              ),
+              const SizedBox(width: AppConstants.spacingMedium),
+
+              // Contenu
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      alert.getTitle(context),
+                      style: const TextStyle(
+                        fontSize: AppConstants.fontSizeMedium,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: AppConstants.spacingTiny),
+                    Text(
+                      alert.getMessage(context),
+                      style: TextStyle(
+                        fontSize: AppConstants.fontSizeBody,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                    if (alert.actionLabel != null) ...[
+                      const SizedBox(height: AppConstants.spacingExtraSmall),
+                      Text(
+                        alert.actionLabel!,
+                        style: TextStyle(
+                          fontSize: AppConstants.fontSizeSmall,
+                          color: color,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+
+              // Flèche
+              Icon(
+                Icons.chevron_right,
+                color: Colors.grey.shade400,
+                size: AppConstants.iconSizeMedium,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Obtenir l'icône selon la catégorie d'alerte
+  IconData _getAlertIcon(AlertCategory category) {
+    switch (category) {
+      case AlertCategory.remanence:
+        return Icons.medical_services_rounded;
+      case AlertCategory.identification:
+        return Icons.badge_rounded;
+      case AlertCategory.weighing:
+        return Icons.monitor_weight_rounded;
+      case AlertCategory.sync:
+        return Icons.cloud_sync_rounded;
+      case AlertCategory.treatment:
+        return Icons.healing_rounded;
+      case AlertCategory.registre:
+        return Icons.pending_actions_rounded;
+      case AlertCategory.batch:
+        return Icons.inventory_2_rounded;
+      case AlertCategory.birth:
+        return Icons.child_care_rounded;
+      case AlertCategory.death:
+        return Icons.dangerous_rounded;
+      case AlertCategory.other:
+        return Icons.info_rounded;
+    }
+  }
+
+  /// Gérer le clic sur une alerte
+  void _handleAlertTap(BuildContext context, Alert alert) {
+    final animalProvider = context.read<AnimalProvider>();
+
+    switch (alert.category) {
+      case AlertCategory.remanence:
+      case AlertCategory.identification:
+        // Naviguer vers l'animal concerné (alerte avec entityId = animalId)
+        if (alert.entityId != null) {
+          final animal = animalProvider.getAnimalById(alert.entityId!);
+          if (animal != null) {
+            // Définir l'animal courant et naviguer vers
+            animalProvider.setCurrentAnimal(animal);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    AnimalDetailScreen(preloadedAnimal: animal),
+              ),
+            );
+          }
+        }
+        break;
+
+      case AlertCategory.treatment:
+        // Traitement à renouveler → Naviguer vers l'animal concerné
+        if (alert.entityId != null) {
+          final animal = animalProvider.getAnimalById(alert.entityId!);
+          if (animal != null) {
+            animalProvider.setCurrentAnimal(animal);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => AnimalDetailScreen(preloadedAnimal: animal),
+              ),
+            );
+          } else {
+            // Animal introuvable
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  AppLocalizations.of(context)
+                      .translate(AppStrings.animalNotFoundAlert)
+                      .replaceAll('{name}', alert.entityName ?? ''),
+                ),
+                duration: AppConstants.snackBarDurationMedium,
+              ),
+            );
+          }
+        }
+        break;
+
+      case AlertCategory.weighing:
+        // ✅ PHASE 4 FIX: Si 1 seul animal → Aller au détail, sinon → Liste
+        if (alert.animalIds != null && alert.animalIds!.isNotEmpty) {
+          if (alert.animalIds!.length == 1) {
+            // 1 seul animal → Naviguer directement vers AnimalDetailScreen
+            final animal = animalProvider.getAnimalById(alert.animalIds!.first);
+            if (animal != null) {
+              animalProvider.setCurrentAnimal(animal);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      AnimalDetailScreen(preloadedAnimal: animal),
+                ),
+              );
+            } else {
+              // Animal introuvable
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    AppLocalizations.of(context)
+                        .translate(AppStrings.animalNotFoundAlert)
+                        .replaceAll('{name}', alert.entityName ?? ''),
+                  ),
+                  duration: AppConstants.snackBarDurationMedium,
+                ),
+              );
+            }
+          } else {
+            // Plusieurs animaux → Naviguer vers AnimalListScreen avec filtre
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => AnimalListScreen(
+                  filterAnimalIds: alert.animalIds!,
+                  customTitle: AppLocalizations.of(context)
+                      .translate(AppStrings.animalsToWeigh)
+                      .replaceAll('{count}', '${alert.count}'),
+                ),
+              ),
+            );
+          }
+        } else {
+          // Pas d'IDs → Afficher message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(alert.message),
+              duration: AppConstants.snackBarDurationMedium,
+            ),
+          );
+        }
+        break;
+
+      case AlertCategory.sync:
+        // Naviguer vers l'écran de synchronisation
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const SyncScreen(),
+          ),
+        );
+        break;
+
+      case AlertCategory.registre:
+        // ✅ PHASE 4 FIX: Distinguer les alertes DRAFT des autres événements incomplets
+        if (alert.entityType == 'animal' && alert.entityId != null) {
+          // Alerte DRAFT → Naviguer vers l'animal
+          final animal = animalProvider.getAnimalById(alert.entityId!);
+          if (animal != null) {
+            animalProvider.setCurrentAnimal(animal);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    AnimalDetailScreen(preloadedAnimal: animal),
+              ),
+            );
+          } else {
+            // Animal introuvable
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  AppLocalizations.of(context)
+                      .translate(AppStrings.animalNotFoundAlert)
+                      .replaceAll('{name}', alert.entityName ?? ''),
+                ),
+                duration: AppConstants.snackBarDurationMedium,
+              ),
+            );
+          }
+        } else {
+          // Autres événements incomplets → Afficher message seulement
+          if (alert.entityId != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  AppLocalizations.of(context)
+                      .translate(AppStrings.incompleteEvent)
+                      .replaceAll('{message}', alert.message),
+                ),
+                action: SnackBarAction(
+                  label: AppLocalizations.of(context)
+                      .translate(AppStrings.complete),
+                  onPressed: () {},
+                ),
+                duration: AppConstants.snackBarDurationLong,
+              ),
+            );
+          }
+        }
+        break;
+
+      case AlertCategory.batch:
+        // Lot à finaliser → Naviguer vers la liste des animaux du lot
+        if (alert.animalIds != null && alert.animalIds!.isNotEmpty) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => AnimalListScreen(
+                filterAnimalIds: alert.animalIds!,
+                customTitle: alert.entityName ??
+                    AppLocalizations.of(context)
+                        .translate(AppStrings.batchAnimals),
+              ),
+            ),
+          );
+        } else {
+          // Pas d'IDs → Afficher message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(alert.message),
+              action: SnackBarAction(
+                label: AppLocalizations.of(context).translate(AppStrings.ok),
+                onPressed: () {},
+              ),
+              duration: AppConstants.snackBarDurationLong,
+            ),
+          );
+        }
+        break;
+
+      case AlertCategory.birth:
+      case AlertCategory.death:
+      case AlertCategory.other:
+        // Afficher les détails de l'alerte
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${alert.title}\n${alert.message}'),
+            duration: AppConstants.snackBarDurationLong,
+          ),
+        );
+        break;
+    }
+  }
+}

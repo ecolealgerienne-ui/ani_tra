@@ -1,0 +1,203 @@
+// lib/screens/export_registry_screen.dart
+
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../services/pdf_export_service.dart';
+import '../../providers/animal_provider.dart';
+import '../../providers/settings_provider.dart';
+import '../../i18n/app_localizations.dart';
+import '../../i18n/app_strings.dart';
+import '../../utils/constants.dart';
+
+class ExportRegistryScreen extends StatefulWidget {
+  const ExportRegistryScreen({super.key});
+
+  @override
+  State<ExportRegistryScreen> createState() => _ExportRegistryScreenState();
+}
+
+class _ExportRegistryScreenState extends State<ExportRegistryScreen> {
+  String? _generatingDocId;
+
+  Future<void> _generateDocument(BuildContext context, String docType) async {
+    setState(() => _generatingDocId = docType);
+
+    try {
+      final animalProvider = context.read<AnimalProvider>();
+      final settings = context.read<SettingsProvider>();
+
+      final pdfService = PdfExportService();
+
+      switch (docType) {
+        case 'registre_complet':
+        case 'inventaire':
+          await pdfService.generateInventoryPdf(
+            animals: animalProvider.animals,
+            farmName: settings.farmName ??
+                AppLocalizations.of(context).translate(AppStrings.myFarm),
+            translations: _getPdfTranslations(context),
+          );
+          break;
+      }
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              AppLocalizations.of(context).translate(AppStrings.pdfDownloaded)),
+          backgroundColor: Colors.green,
+          duration: AppConstants.snackBarDurationMedium,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              '❌ ${AppLocalizations.of(context).translate(AppStrings.error)}: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _generatingDocId = null);
+      }
+    }
+  }
+
+  Map<String, String> _getPdfTranslations(BuildContext context) {
+    return {
+      'animalInventory':
+          AppLocalizations.of(context).translate(AppStrings.animalInventory),
+      'date': AppLocalizations.of(context).translate(AppStrings.date),
+      'total': AppLocalizations.of(context).translate(AppStrings.total),
+      'animalsCount':
+          AppLocalizations.of(context).translate(AppStrings.animalsCount),
+      'officialNumber':
+          AppLocalizations.of(context).translate(AppStrings.officialNumber),
+      'eid': AppLocalizations.of(context).translate(AppStrings.eidLabel),
+      'sex': AppLocalizations.of(context).translate(AppStrings.sex),
+      'breed': AppLocalizations.of(context).translate(AppStrings.breed),
+      'age': AppLocalizations.of(context).translate(AppStrings.age),
+      'male': AppLocalizations.of(context).translate(AppStrings.maleShort),
+      'female': AppLocalizations.of(context).translate(AppStrings.femaleShort),
+      'cannotAccessDownloads': AppLocalizations.of(context)
+          .translate(AppStrings.cannotAccessDownloads),
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+            AppLocalizations.of(context).translate(AppStrings.exportDocuments)),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(AppConstants.spacingMedium),
+        children: [
+          _buildDocumentCard(
+            context: context,
+            id: 'registre_complet',
+            icon: Icons.description,
+            iconColor: Colors.blue,
+            title: AppLocalizations.of(context)
+                .translate(AppStrings.completeRegistry),
+            subtitle: AppLocalizations.of(context)
+                .translate(AppStrings.herdInventory),
+            enabled: true,
+          ),
+          const SizedBox(height: AppConstants.spacingSmall),
+          _buildDocumentCard(
+            context: context,
+            id: 'inventaire',
+            icon: Icons.list_alt,
+            iconColor: Colors.green,
+            title: AppLocalizations.of(context)
+                .translate(AppStrings.animalInventory),
+            subtitle: AppLocalizations.of(context)
+                .translate(AppStrings.completeHerdList),
+            enabled: true,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDocumentCard({
+    required BuildContext context,
+    required String id,
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String subtitle,
+    required bool enabled,
+  }) {
+    final isGenerating = _generatingDocId == id;
+
+    return Card(
+      elevation: 2,
+      child: InkWell(
+        onTap: enabled && !isGenerating
+            ? () => _generateDocument(context, id)
+            : null,
+        borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
+        child: Padding(
+          padding: const EdgeInsets.all(AppConstants.spacingMedium),
+          child: Row(
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: iconColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
+                ),
+                child: Icon(
+                  icon,
+                  color: iconColor,
+                  size: AppConstants.iconSizeMedium,
+                ),
+              ),
+              const SizedBox(width: AppConstants.spacingMedium),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: AppConstants.fontSizeMedium,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: AppConstants.spacingTiny),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: AppConstants.fontSizeSubtitle,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (isGenerating)
+                const SizedBox(
+                  width: AppConstants.spacingMediumLarge,
+                  height: AppConstants.spacingMediumLarge,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              else
+                Icon(
+                  Icons.download,
+                  color: enabled ? iconColor : Colors.grey,
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

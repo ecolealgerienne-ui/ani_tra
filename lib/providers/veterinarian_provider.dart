@@ -1,27 +1,102 @@
 // lib/providers/veterinarian_provider.dart
 import 'package:flutter/foundation.dart';
 import '../models/veterinarian.dart';
+import '../repositories/veterinarian_repository.dart';
+import 'auth_provider.dart';
 
+/// VeterinarianProvider - Phase 1C
+/// CHANGEMENT: Utilise Repository pour Veterinarians (SQLite)
 class VeterinarianProvider with ChangeNotifier {
-  final List<Veterinarian> _veterinarians = [];
+  final AuthProvider _authProvider;
+  final VeterinarianRepository _repository;
+  String _currentFarmId;
 
-  List<Veterinarian> get veterinarians => List.unmodifiable(_veterinarians);
+  // Données principales (cache local)
+  final List<Veterinarian> _allVeterinarians = [];
 
-  // Filtres
+  // Loading state
+  bool _isLoading = false;
+
+  VeterinarianProvider(this._authProvider, this._repository)
+      : _currentFarmId = _authProvider.currentFarmId {
+    _authProvider.addListener(_onFarmChanged);
+    _loadVeterinariansFromRepository();
+  }
+
+  void _onFarmChanged() {
+    if (_currentFarmId != _authProvider.currentFarmId) {
+      _currentFarmId = _authProvider.currentFarmId;
+      _loadVeterinariansFromRepository();
+    }
+  }
+
+  // ==================== Getters ====================
+
+  List<Veterinarian> get veterinarians => List.unmodifiable(
+      _allVeterinarians.where((v) => v.farmId == _authProvider.currentFarmId));
+
+  bool get isLoading => _isLoading;
+
   List<Veterinarian> get activeVeterinarians =>
-      _veterinarians.where((v) => v.isActive).toList();
+      veterinarians.where((v) => v.isActive).toList();
 
   List<Veterinarian> get availableVeterinarians =>
-      _veterinarians.where((v) => v.isAvailable && v.isActive).toList();
+      veterinarians.where((v) => v.isAvailable && v.isActive).toList();
 
   List<Veterinarian> get preferredVeterinarians =>
-      _veterinarians.where((v) => v.isPreferred && v.isActive).toList();
+      veterinarians.where((v) => v.isPreferred && v.isActive).toList();
 
-  List<Veterinarian> get emergencyVeterinarians => _veterinarians
+  List<Veterinarian> get emergencyVeterinarians => veterinarians
       .where((v) => v.emergencyService && v.isAvailable && v.isActive)
       .toList();
 
-  // Statistiques
+  Veterinarian? get defaultVeterinarian {
+    try {
+      return veterinarians.firstWhere(
+        (v) => v.isDefault && v.isActive,
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // ==================== Repository Loading ====================
+
+  Future<void> _loadVeterinariansFromRepository() async {
+    if (_currentFarmId.isEmpty) return;
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final farmVeterinarians = await _repository.getAll(_currentFarmId);
+      _allVeterinarians.removeWhere((v) => v.farmId == _currentFarmId);
+      _allVeterinarians.addAll(farmVeterinarians);
+    } catch (e) {
+      debugPrint('❌ Error loading veterinarians from repository: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void loadMockVets(List<Veterinarian> mockVets) {
+    _migrateVeterinariansToRepository(mockVets);
+  }
+
+  Future<void> _migrateVeterinariansToRepository(List<Veterinarian> vets) async {
+    for (final vet in vets) {
+      try {
+        await _repository.create(vet, vet.farmId);
+      } catch (e) {
+        debugPrint('⚠️ Veterinarian ${vet.id} already exists or error: $e');
+      }
+    }
+    await _loadVeterinariansFromRepository();
+  }
+
+  // ==================== Statistics ====================
+
   Map<String, dynamic> get stats {
     final active = activeVeterinarians;
     return {
@@ -34,7 +109,6 @@ class VeterinarianProvider with ChangeNotifier {
     };
   }
 
-  // Spécialités disponibles
   List<String> get allSpecialties {
     final specialties = <String>{};
     for (var vet in activeVeterinarians) {
@@ -43,174 +117,75 @@ class VeterinarianProvider with ChangeNotifier {
     return specialties.toList()..sort();
   }
 
-  VeterinarianProvider() {
-    _loadMockData();
+  // ==================== CRUD ====================
+
+  Future<void> addVeterinarian(Veterinarian veterinarian) async {
+    final veterinarianWithFarm =
+        veterinarian.copyWith(farmId: _authProvider.currentFarmId);
+
+    try {
+      await _repository.create(veterinarianWithFarm, _authProvider.currentFarmId);
+      _allVeterinarians.add(veterinarianWithFarm);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('❌ Error adding veterinarian: $e');
+      rethrow;
+    }
   }
 
-  // Charger des données de démonstration
-  void _loadMockData() {
-    _veterinarians.addAll([
-      Veterinarian(
-        id: '1',
-        firstName: 'Jean',
-        lastName: 'Martin',
-        title: 'Dr.',
-        licenseNumber: 'VET-75-12345',
-        specialties: ['Bovins', 'Ovins', 'Chirurgie'],
-        clinic: 'Clinique Vétérinaire Rurale',
-        phone: '+33 1 23 45 67 89',
-        mobile: '+33 6 12 34 56 78',
-        email: 'j.martin@vet-clinique.fr',
-        address: '15 Rue de la Ferme',
-        city: 'Lyon',
-        postalCode: '69000',
-        country: 'France',
-        isAvailable: true,
-        emergencyService: true,
-        workingHours: 'Lun-Ven: 8h-18h, Sam: 8h-12h',
-        consultationFee: 65.0,
-        emergencyFee: 120.0,
-        currency: 'EUR',
-        notes: 'Disponible pour interventions d\'urgence 24/7',
-        isPreferred: true,
-        rating: 5,
-        totalInterventions: 156,
-        lastInterventionDate: DateTime.now().subtract(const Duration(days: 3)),
-        createdAt: DateTime(2023, 1, 15),
-        updatedAt: DateTime(2024, 10, 20),
-      ),
-      Veterinarian(
-        id: '2',
-        firstName: 'Sophie',
-        lastName: 'Dubois',
-        title: 'Dr.',
-        licenseNumber: 'VET-69-67890',
-        specialties: ['Ovins', 'Caprins', 'Médecine préventive'],
-        clinic: 'Cabinet Vétérinaire des Monts',
-        phone: '+33 4 78 90 12 34',
-        mobile: '+33 6 98 76 54 32',
-        email: 's.dubois@cabinet-vet.fr',
-        address: '8 Avenue des Bergeries',
-        city: 'Saint-Étienne',
-        postalCode: '42000',
-        country: 'France',
-        isAvailable: true,
-        emergencyService: false,
-        workingHours: 'Lun-Ven: 9h-17h',
-        consultationFee: 55.0,
-        emergencyFee: 100.0,
-        currency: 'EUR',
-        notes: 'Spécialiste reproduction ovine',
-        isPreferred: true,
-        rating: 5,
-        totalInterventions: 98,
-        lastInterventionDate: DateTime.now().subtract(const Duration(days: 7)),
-        createdAt: DateTime(2023, 3, 10),
-      ),
-      Veterinarian(
-        id: '3',
-        firstName: 'Pierre',
-        lastName: 'Lefebvre',
-        title: 'Dr.',
-        licenseNumber: 'VET-38-45678',
-        specialties: ['Bovins', 'Parasitologie'],
-        clinic: 'Vétérinaire Rural Associé',
-        phone: '+33 4 76 54 32 10',
-        mobile: '+33 6 45 67 89 01',
-        email: 'p.lefebvre@vet-rural.fr',
-        address: '22 Chemin des Prés',
-        city: 'Grenoble',
-        postalCode: '38000',
-        country: 'France',
-        isAvailable: false, // En congés
-        emergencyService: false,
-        workingHours: 'Lun-Ven: 8h-16h',
-        consultationFee: 60.0,
-        currency: 'EUR',
-        notes: 'En congés jusqu\'au 15 novembre',
-        isPreferred: false,
-        rating: 4,
-        totalInterventions: 72,
-        lastInterventionDate: DateTime.now().subtract(const Duration(days: 45)),
-        createdAt: DateTime(2023, 6, 5),
-      ),
-      Veterinarian(
-        id: '4',
-        firstName: 'Marie',
-        lastName: 'Bernard',
-        title: 'Dr.',
-        licenseNumber: 'VET-01-23456',
-        specialties: ['Ovins', 'Nutrition', 'Pathologie digestive'],
-        clinic: 'Cabinet Vétérinaire Bergerie',
-        phone: '+33 4 74 12 34 56',
-        mobile: '+33 6 23 45 67 89',
-        email: 'm.bernard@bergerie-vet.fr',
-        address: '5 Place du Marché',
-        city: 'Bourg-en-Bresse',
-        postalCode: '01000',
-        country: 'France',
-        isAvailable: true,
-        emergencyService: true,
-        workingHours: 'Lun-Sam: 8h-19h',
-        consultationFee: 70.0,
-        emergencyFee: 130.0,
-        currency: 'EUR',
-        notes:
-            'Experte en nutrition ovine, consultations nutritionnelles disponibles',
-        isPreferred: true,
-        rating: 5,
-        totalInterventions: 134,
-        lastInterventionDate: DateTime.now().subtract(const Duration(days: 1)),
-        createdAt: DateTime(2022, 11, 20),
-      ),
-      Veterinarian(
-        id: '5',
-        firstName: 'Thomas',
-        lastName: 'Petit',
-        title: 'Dr.',
-        licenseNumber: 'VET-42-78901',
-        specialties: ['Bovins', 'Caprins', 'Échographie'],
-        clinic: 'Clinique Vétérinaire de la Vallée',
-        phone: '+33 4 77 89 01 23',
-        email: 't.petit@vallee-vet.fr',
-        address: '30 Route de la Vallée',
-        city: 'Roanne',
-        postalCode: '42300',
-        country: 'France',
-        isAvailable: true,
-        emergencyService: false,
-        workingHours: 'Mar-Sam: 9h-18h',
-        consultationFee: 58.0,
-        currency: 'EUR',
-        notes: 'Équipé pour échographies, suivi de gestation',
-        isPreferred: false,
-        rating: 4,
-        totalInterventions: 45,
-        lastInterventionDate: DateTime.now().subtract(const Duration(days: 12)),
-        createdAt: DateTime(2024, 2, 1),
-      ),
-    ]);
-    notifyListeners();
+  Future<void> updateVeterinarian(Veterinarian veterinarian) async {
+    try {
+      final updated = veterinarian.copyWith(updatedAt: DateTime.now());
+      await _repository.update(updated, _authProvider.currentFarmId);
+      
+      final index = _allVeterinarians.indexWhere((v) => v.id == veterinarian.id);
+      if (index != -1) {
+        _allVeterinarians[index] = updated;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('❌ Error updating veterinarian: $e');
+      rethrow;
+    }
   }
 
-  // CRUD Operations
+  Future<void> deleteVeterinarian(String id) async {
+    try {
+      final index = _allVeterinarians.indexWhere((v) => v.id == id);
+      if (index != -1) {
+        final updated = _allVeterinarians[index].copyWith(
+          isActive: false,
+          updatedAt: DateTime.now(),
+        );
+        await _repository.update(updated, _authProvider.currentFarmId);
+        _allVeterinarians[index] = updated;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('❌ Error deleting veterinarian: $e');
+      rethrow;
+    }
+  }
+
+  // ==================== Query Methods ====================
+
   Veterinarian? getVeterinarianById(String id) {
     try {
-      return _veterinarians.firstWhere((v) => v.id == id);
+      return veterinarians.firstWhere((v) => v.id == id);
     } catch (e) {
       return null;
     }
   }
 
   List<Veterinarian> getVeterinariansBySpecialty(String specialty) {
-    return _veterinarians
+    return veterinarians
         .where((v) => v.specialties.contains(specialty) && v.isActive)
         .toList();
   }
 
   List<Veterinarian> searchVeterinarians(String query) {
     final lowerQuery = query.toLowerCase();
-    return _veterinarians.where((v) {
+    return veterinarians.where((v) {
       return v.isActive &&
           (v.firstName.toLowerCase().contains(lowerQuery) ||
               v.lastName.toLowerCase().contains(lowerQuery) ||
@@ -221,89 +196,75 @@ class VeterinarianProvider with ChangeNotifier {
     }).toList();
   }
 
-  void addVeterinarian(Veterinarian veterinarian) {
-    _veterinarians.add(veterinarian);
-    notifyListeners();
-  }
+  // ==================== Toggles ====================
 
-  void updateVeterinarian(Veterinarian veterinarian) {
-    final index = _veterinarians.indexWhere((v) => v.id == veterinarian.id);
+  Future<void> togglePreferred(String id) async {
+    final index = _allVeterinarians.indexWhere((v) => v.id == id);
     if (index != -1) {
-      _veterinarians[index] = veterinarian.copyWith(updatedAt: DateTime.now());
-      notifyListeners();
-    }
-  }
-
-  void deleteVeterinarian(String id) {
-    final index = _veterinarians.indexWhere((v) => v.id == id);
-    if (index != -1) {
-      _veterinarians[index] = _veterinarians[index].copyWith(
-        isActive: false,
+      final updated = _allVeterinarians[index].copyWith(
+        isPreferred: !_allVeterinarians[index].isPreferred,
         updatedAt: DateTime.now(),
       );
-      notifyListeners();
+      await updateVeterinarian(updated);
     }
   }
 
-  // Gestion des préférés
-  void togglePreferred(String id) {
-    final index = _veterinarians.indexWhere((v) => v.id == id);
+  Future<void> toggleAvailability(String id) async {
+    final index = _allVeterinarians.indexWhere((v) => v.id == id);
     if (index != -1) {
-      _veterinarians[index] = _veterinarians[index].copyWith(
-        isPreferred: !_veterinarians[index].isPreferred,
+      final updated = _allVeterinarians[index].copyWith(
+        isAvailable: !_allVeterinarians[index].isAvailable,
         updatedAt: DateTime.now(),
       );
-      notifyListeners();
+      await updateVeterinarian(updated);
     }
   }
 
-  // Gestion de la disponibilité
-  void toggleAvailability(String id) {
-    final index = _veterinarians.indexWhere((v) => v.id == id);
+  Future<void> updateRating(String id, int rating) async {
+    final index = _allVeterinarians.indexWhere((v) => v.id == id);
     if (index != -1) {
-      _veterinarians[index] = _veterinarians[index].copyWith(
-        isAvailable: !_veterinarians[index].isAvailable,
-        updatedAt: DateTime.now(),
-      );
-      notifyListeners();
-    }
-  }
-
-  // Mise à jour du rating
-  void updateRating(String id, int rating) {
-    final index = _veterinarians.indexWhere((v) => v.id == id);
-    if (index != -1) {
-      _veterinarians[index] = _veterinarians[index].copyWith(
+      final updated = _allVeterinarians[index].copyWith(
         rating: rating,
         updatedAt: DateTime.now(),
       );
-      notifyListeners();
+      await updateVeterinarian(updated);
     }
   }
 
-  // Incrémenter les interventions
-  void incrementInterventions(String id) {
-    final index = _veterinarians.indexWhere((v) => v.id == id);
+  Future<void> incrementInterventions(String id) async {
+    final index = _allVeterinarians.indexWhere((v) => v.id == id);
     if (index != -1) {
-      _veterinarians[index] = _veterinarians[index].copyWith(
-        totalInterventions: _veterinarians[index].totalInterventions + 1,
+      final updated = _allVeterinarians[index].copyWith(
+        totalInterventions: _allVeterinarians[index].totalInterventions + 1,
         lastInterventionDate: DateTime.now(),
         updatedAt: DateTime.now(),
       );
-      notifyListeners();
+      await updateVeterinarian(updated);
     }
   }
 
-  // Obtenir le vétérinaire le plus actif
+  // ==================== Statistics ====================
+
   Veterinarian? getMostActiveVeterinarian() {
     if (activeVeterinarians.isEmpty) return null;
     return activeVeterinarians
         .reduce((a, b) => a.totalInterventions > b.totalInterventions ? a : b);
   }
 
-  // Obtenir les vétérinaires par note
   List<Veterinarian> getVeterinariansByRating(int minRating) {
     return activeVeterinarians.where((v) => v.rating >= minRating).toList()
       ..sort((a, b) => b.rating.compareTo(a.rating));
+  }
+
+  // ==================== Refresh ====================
+
+  Future<void> refresh() async {
+    await _loadVeterinariansFromRepository();
+  }
+
+  @override
+  void dispose() {
+    _authProvider.removeListener(_onFarmChanged);
+    super.dispose();
   }
 }

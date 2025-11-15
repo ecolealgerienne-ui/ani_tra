@@ -1,12 +1,16 @@
 // lib/models/alert.dart
 
+import 'package:flutter/material.dart';
 import 'alert_type.dart';
 import 'alert_category.dart';
+import '../i18n/app_localizations.dart';
 
 /// Modèle d'alerte métier
 ///
 /// Représente une alerte/tâche à réaliser par l'éleveur.
 /// Hiérarchisée par type (urgent/important/routine) et catégorie métier.
+///
+/// Phase 2: Support titleKey + messageKey + messageParams pour I18N config-driven
 class Alert {
   /// Identifiant unique de l'alerte
   final String id;
@@ -22,6 +26,18 @@ class Alert {
 
   /// Message détaillé
   final String message;
+
+  /// Phase 2: Clé I18N pour le titre (replaces hardcoded title)
+  /// Ex: AppStrings.alertRemanenceTitle
+  String? titleKey;
+
+  /// Phase 2: Clé I18N pour le message (replaces hardcoded message)
+  /// Ex: AppStrings.alertRemanenceMsg
+  String? messageKey;
+
+  /// Phase 2: Paramètres pour interpolation du message
+  /// Ex: {'animalName': 'BR-001', 'daysRemaining': '3'}
+  Map<String, dynamic>? messageParams;
 
   /// ID de l'entité concernée (animal, lot, traitement...)
   /// Permet de naviguer vers le détail
@@ -75,10 +91,16 @@ class Alert {
     this.dueDate,
     this.actionLabel,
     this.count,
-    this.animalIds, // 🆕 AJOUTÉ
+    this.animalIds,
+    this.titleKey,
+    this.messageKey,
+    this.messageParams,
   }) : createdAt = createdAt ?? DateTime.now();
 
   /// Constructeur : Alerte de rémanence
+  ///
+  /// ⚠️ IMPORTANT : Ce constructeur crée des messages HARDCODÉS
+  /// qui seront traduits au niveau UI (AlertProvider)
   factory Alert.remanence({
     required String animalId,
     required String animalName,
@@ -91,6 +113,8 @@ class Alert {
             ? AlertType.important
             : AlertType.routine;
 
+    // Messages hardcodés pour l'instant
+    // Traduction faite au niveau Provider/UI
     return Alert(
       id: 'remanence_$animalId',
       type: type,
@@ -105,7 +129,7 @@ class Alert {
       entityName: animalName,
       dueDate: DateTime.now().add(Duration(days: daysRemaining)),
       actionLabel: 'Voir l\'animal',
-      animalIds: [animalId], // 🆕 Liste avec 1 ID
+      animalIds: [animalId],
     );
   }
 
@@ -125,7 +149,7 @@ class Alert {
       entityType: 'animal',
       entityName: animalName,
       actionLabel: 'Ajouter EID',
-      animalIds: [animalId], // 🆕 Liste avec 1 ID
+      animalIds: [animalId],
     );
   }
 
@@ -237,6 +261,63 @@ class Alert {
     );
   }
 
+  /// 🆕 PART3 - Constructeur : Mère non déclarée
+  factory Alert.missingMother({
+    required String animalId,
+    required String animalName,
+  }) {
+    return Alert(
+      id: 'missing_mother_$animalId',
+      type: AlertType.important,
+      category: AlertCategory.registre,
+      title: 'Mère non déclarée',
+      message: '$animalName : Animal né dans l\'élevage sans mère',
+      entityId: animalId,
+      entityType: 'animal',
+      entityName: animalName,
+      actionLabel: 'Déclarer la mère',
+      animalIds: [animalId],
+    );
+  }
+
+  /// 🆕 PART3 - Constructeur : Mère invalide
+  factory Alert.invalidMother({
+    required String animalId,
+    required String animalName,
+    required String reason,
+  }) {
+    return Alert(
+      id: 'invalid_mother_$animalId',
+      type: AlertType.urgent,
+      category: AlertCategory.registre,
+      title: 'Mère invalide',
+      message: '$animalName : $reason',
+      entityId: animalId,
+      entityType: 'animal',
+      entityName: animalName,
+      actionLabel: 'Corriger',
+      animalIds: [animalId],
+    );
+  }
+
+  /// Constructeur : Animaux en brouillon
+  factory Alert.draftsPending({
+    required int draftCount,
+    required List<String> draftIds,
+    required AlertType type,
+  }) {
+    return Alert(
+      id: 'drafts_pending',
+      type: type,
+      category: AlertCategory.registre,
+      title: '📋 Brouillons en attente',
+      message: '$draftCount animal(aux) à valider',
+      actionLabel: 'Valider brouillons',
+      count: draftCount,
+      animalIds: draftIds,
+    );
+  }
+
   /// Copie avec modifications
   Alert copyWith({
     String? id,
@@ -251,6 +332,9 @@ class Alert {
     DateTime? dueDate,
     String? actionLabel,
     int? count,
+    String? titleKey,
+    String? messageKey,
+    Map<String, dynamic>? messageParams,
   }) {
     return Alert(
       id: id ?? this.id,
@@ -265,7 +349,47 @@ class Alert {
       dueDate: dueDate ?? this.dueDate,
       actionLabel: actionLabel ?? this.actionLabel,
       count: count ?? this.count,
+      titleKey: titleKey ?? this.titleKey,
+      messageKey: messageKey ?? this.messageKey,
+      messageParams: messageParams ?? this.messageParams,
     );
+  }
+
+  /// Phase 2: Obtenir le titre traduit avec I18N
+  /// Utilise titleKey si présent (config-driven), sinon title hardcodé
+  String getTitle(BuildContext context) {
+    if (titleKey != null && titleKey!.isNotEmpty) {
+      try {
+        return AppLocalizations.of(context).translate(titleKey!);
+      } catch (e) {
+        return title; // Fallback
+      }
+    }
+    return title;
+  }
+
+  /// Phase 2: Obtenir le message traduit avec I18N
+  /// Utilise messageKey si présent (config-driven), puis interpole messageParams
+  String getMessage(BuildContext context) {
+    String message = this.message;
+
+    if (messageKey != null && messageKey!.isNotEmpty) {
+      try {
+        message = AppLocalizations.of(context).translate(messageKey!);
+      } catch (e) {
+        // Fallback sur message hardcodé
+        message = this.message;
+      }
+    }
+
+    // Interpoler les params
+    if (messageParams != null && messageParams!.isNotEmpty) {
+      messageParams!.forEach((key, value) {
+        message = message.replaceAll('{$key}', value.toString());
+      });
+    }
+
+    return message;
   }
 
   /// Conversion en Map (pour persistance)
@@ -276,6 +400,9 @@ class Alert {
       'category': category.name,
       'title': title,
       'message': message,
+      'titleKey': titleKey,
+      'messageKey': messageKey,
+      'messageParams': messageParams,
       'entityId': entityId,
       'entityType': entityType,
       'entityName': entityName,
@@ -295,6 +422,11 @@ class Alert {
           AlertCategory.values.firstWhere((e) => e.name == json['category']),
       title: json['title'],
       message: json['message'],
+      titleKey: json['titleKey'],
+      messageKey: json['messageKey'],
+      messageParams: json['messageParams'] != null
+          ? Map<String, dynamic>.from(json['messageParams'])
+          : null,
       entityId: json['entityId'],
       entityType: json['entityType'],
       entityName: json['entityName'],

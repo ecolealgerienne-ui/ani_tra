@@ -92,7 +92,7 @@ class QRProvider extends ChangeNotifier {
       case 'ANIMAL':
         return '$kPrefixAnimal$timestamp';
       case 'VET':
-        return '${kPrefixVet}${timestamp}_VALID';
+        return '$kPrefixVet${timestamp}_VALID';
       default:
         return 'QR_INVALID_$timestamp';
     }

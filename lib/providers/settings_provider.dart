@@ -42,7 +42,6 @@ class SettingsProvider extends ChangeNotifier {
   void initializeWithDefaults() {
     _settings = FarmSettings.defaultSettings();
     notifyListeners();
-    debugPrint('⚙️ Paramètres initialisés par défaut');
   }
 
   /// Charger les paramètres (depuis SharedPreferences ou API)
@@ -54,8 +53,6 @@ class SettingsProvider extends ChangeNotifier {
     //   _settings = FarmSettings.fromJson(jsonDecode(json));
     //   notifyListeners();
     // }
-
-    debugPrint('⚙️ Paramètres chargés');
   }
 
   /// Sauvegarder les paramètres (dans SharedPreferences)
@@ -64,7 +61,6 @@ class SettingsProvider extends ChangeNotifier {
     // final prefs = await SharedPreferences.getInstance();
     // await prefs.setString('farm_settings', jsonEncode(_settings.toJson()));
 
-    debugPrint('⚙️ Paramètres sauvegardés: $_settings');
   }
 
   // ==================== MODIFICATION DES PARAMÈTRES ====================
@@ -80,7 +76,6 @@ class SettingsProvider extends ChangeNotifier {
     );
     notifyListeners();
     saveSettings();
-    debugPrint('⚙️ Type/race par défaut: $speciesId - $breedId');
   }
 
   /// Définir le type d'animal par défaut
@@ -88,7 +83,6 @@ class SettingsProvider extends ChangeNotifier {
     _settings = _settings.copyWith(defaultSpeciesId: speciesId);
     notifyListeners();
     saveSettings();
-    debugPrint('⚙️ Type par défaut: $speciesId');
   }
 
   /// Définir la race par défaut
@@ -96,7 +90,6 @@ class SettingsProvider extends ChangeNotifier {
     _settings = _settings.copyWith(defaultBreedId: breedId);
     notifyListeners();
     saveSettings();
-    debugPrint('⚙️ Race par défaut: $breedId');
   }
 
   /// Définir le nom de l'exploitation
@@ -104,7 +97,6 @@ class SettingsProvider extends ChangeNotifier {
     _settings = _settings.copyWith(farmName: name);
     notifyListeners();
     saveSettings();
-    debugPrint('⚙️ Nom exploitation: $name');
   }
 
   /// Changer la langue
@@ -112,7 +104,6 @@ class SettingsProvider extends ChangeNotifier {
     _settings = _settings.copyWith(locale: locale);
     notifyListeners();
     saveSettings();
-    debugPrint('⚙️ Langue: $locale');
   }
 
   /// Activer/désactiver le thème sombre
@@ -120,7 +111,6 @@ class SettingsProvider extends ChangeNotifier {
     _settings = _settings.copyWith(darkMode: enabled);
     notifyListeners();
     saveSettings();
-    debugPrint('⚙️ Mode sombre: $enabled');
   }
 
   /// Activer/désactiver les notifications
@@ -128,7 +118,6 @@ class SettingsProvider extends ChangeNotifier {
     _settings = _settings.copyWith(notificationsEnabled: enabled);
     notifyListeners();
     saveSettings();
-    debugPrint('⚙️ Notifications: $enabled');
   }
 
   /// Mettre à jour tous les paramètres
@@ -136,7 +125,6 @@ class SettingsProvider extends ChangeNotifier {
     _settings = newSettings;
     notifyListeners();
     saveSettings();
-    debugPrint('⚙️ Paramètres mis à jour');
   }
 
   /// Réinitialiser aux valeurs par défaut
@@ -144,7 +132,6 @@ class SettingsProvider extends ChangeNotifier {
     _settings = FarmSettings.defaultSettings();
     notifyListeners();
     saveSettings();
-    debugPrint('⚙️ Paramètres réinitialisés');
   }
 
   // ==================== UTILITAIRES ====================

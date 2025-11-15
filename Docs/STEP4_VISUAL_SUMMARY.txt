@@ -1,0 +1,339 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    🐑 ANIMAL TRACE - STEP 4 VISUAL SUMMARY                ║
+║                   Phase 1C STEP 4: sync_queue + Phase 2 Ready              ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+════════════════════════════════════════════════════════════════════════════
+1️⃣  BLOCAGE OFFICIALID - Architecture
+════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          CRÉATION ANIMAL                                 │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  AnimalScreen                                                            │
+│    ↓                                                                     │
+│  AnimalProvider.addAnimal()                                             │
+│    ↓                                                                     │
+│  AnimalRepository.create(animal, farmId)                                │
+│    ↓                                                                     │
+│  🔍 SyncValidator.validateAnimal()                                      │
+│    ├─ if officialNumber == null && blockSyncIfNoOfficialId              │
+│    │   ❌ THROW SyncBlockedException                                    │
+│    │   └─ Message: "Official ID obligatoire pour synchroniser"         │
+│    │                                                                    │
+│    ├─ if dev mode && forceSyncDev:                                      │
+│    │   ✅ Continuer (bypass validation)                                │
+│    │                                                                    │
+│    └─ Validation OK                                                     │
+│    ↓                                                                     │
+│  AnimalDao.insertAnimal()                                               │
+│    ↓ INSERT INTO animals                                                │
+│  SQLite (synced=false, lastSyncedAt=null)                               │
+│    ↓                                                                     │
+│  SyncQueueRepository.enqueueWithValidation()                            │
+│    ↓ INSERT INTO sync_queue                                             │
+│  ✅ Item ajouté à queue (entityType='animal', action='insert')          │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+
+════════════════════════════════════════════════════════════════════════════
+2️⃣  CONFIGURATION FLAGS - Dev vs Production
+════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────┬──────────────┬────────────────┬──────────────────┐
+│ Flag                │ Mode DEV     │ Mode TEST      │ Production       │
+├─────────────────────┼──────────────┼────────────────┼──────────────────┤
+│ isDevelopmentMode   │ ✅ true      │ ✅ true        │ 🔴 false         │
+│ blockOfficialId     │ 🟢 false     │ 🟢 false       │ 🔴 TRUE ✓        │
+│ mockServerMode      │ ✅ true      │ ✅ true        │ 🔴 false         │
+│ testMode            │ ✅ true      │ ✅ true        │ 🔴 false         │
+├─────────────────────┼──────────────┼────────────────┼──────────────────┤
+│ Créer sans offID    │ ✅ OK        │ ✅ OK          │ ❌ BLOQUÉ        │
+│ Items en queue      │ ✅ Enqueued  │ ✅ Enqueued    │ ✅ Enqueued      │
+│ Items synced        │ 🤖 Mock      │ 🤖 Mock        │ ✅ REAL API      │
+│ Debug Screen        │ ✅ Visible   │ ✅ Visible     │ ❌ Hidden        │
+└─────────────────────┴──────────────┴────────────────┴──────────────────┘
+
+════════════════════════════════════════════════════════════════════════════
+3️⃣  SYNC QUEUE FLOW - De la création à la synchronisation
+════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    SYNC QUEUE LIFECYCLE                                  │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  📝 CREATED                                                              │
+│    ├─ id: generated UUID                                               │
+│    ├─ farmId: filtered                                                 │
+│    ├─ entityType: 'animal'                                             │
+│    ├─ entityId: animal uuid                                            │
+│    ├─ action: 'insert'/'update'/'delete'                              │
+│    ├─ payload: JSON (encrypted)                                        │
+│    ├─ synced: false                                                    │
+│    └─ retryCount: 0                                                    │
+│    ↓                                                                     │
+│  ⏳ PENDING (awaiting sync)                                             │
+│    ├─ syncedAt: NULL                                                   │
+│    ├─ Display: "⏳ En attente de synchronisation"                       │
+│    └─ Peut: sync, retry, delete                                        │
+│    ↓                                                                     │
+│  🔄 SYNCING (during sync operation)                                     │
+│    ├─ Envoyé au serveur                                                │
+│    ├─ Display: "🔄 Synchronisation..."                                 │
+│    └─ Attendant réponse API                                            │
+│    ↓                                                                     │
+│  ✅ SYNCED (success)                                                    │
+│    ├─ syncedAt: NOW()                                                  │
+│    ├─ serverVersion: from API                                          │
+│    ├─ Display: "✅ Synchronisé"                                        │
+│    └─ Eligible cleanup (après 30j)                                     │
+│    ↓                                                                     │
+│  🗑️  DELETED (cleanup)                                                  │
+│    ├─ Supprimé DB après 30 jours                                       │
+│    └─ Display: N/A (item gone)                                         │
+│                                                                          │
+│  ❌ FAILED (error path)                                                  │
+│    ├─ retryCount: incremented (max 3)                                  │
+│    ├─ errorMessage: error text                                         │
+│    ├─ Display: "❌ Erreur sync (tentative N)"                          │
+│    └─ Si retries exhausted → STALLED                                   │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+
+════════════════════════════════════════════════════════════════════════════
+4️⃣  TESTING WITHOUT SERVER - Debug Mode
+════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     DEBUG SYNC SCREEN (DEV ONLY)                        │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  🔴 FAB in corner: "🐛 Debug Sync"                                      │
+│                                                                          │
+│  ⚙️  Configuration                                                       │
+│  ├─ isDevelopmentMode: true                                            │
+│  ├─ blockSyncIfNoOfficialId: false                                     │
+│  ├─ mockServerMode: true                                               │
+│  └─ testMode: true                                                     │
+│                                                                          │
+│  🔄 Test Sync Operations                                                │
+│  ├─ [Simuler Sync Réussie]                                             │
+│  │   └─ Marque tous items: synced=true                                 │
+│  ├─ [Simuler Sync Échouée]                                             │
+│  │   └─ Incrémente retryCount, stocke erreur                           │
+│  └─ [Inspecter Queue]                                                  │
+│      └─ Affiche console: items en attente, retries, erreurs            │
+│                                                                          │
+│  🧹 Queue Management                                                    │
+│  ├─ [Nettoyer (>30j)]                                                  │
+│  │   └─ DELETE WHERE synced_at < 30days_ago                            │
+│  └─ [Vider Tous (⚠️  DANGER)]                                          │
+│      └─ DELETE ALL (confirmation dialog)                               │
+│                                                                          │
+│  📊 Status                                                              │
+│  └─ Pending Items: N                                                   │
+│     ├─ 0 items: 🟢 OK (vert)                                           │
+│     └─ N items: 🟠 WARNING (orange)                                    │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+
+════════════════════════════════════════════════════════════════════════════
+5️⃣  CLEANUP QUEUE - Settings UI
+════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│              Settings → Sync Tab (visible prod + dev)                    │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  🔒 Bloquer Sync sans Official ID                                       │
+│  └─ [Toggle] Activé en production                                      │
+│                                                                          │
+│  📊 Queue Status                                                        │
+│  ├─ Pending items: 42 ⏳                                                │
+│  └─ ⚠️  En attente de synchronisation                                   │
+│                                                                          │
+│  🧹 Maintenance Queue                                                   │
+│  ├─ [🧹 Nettoyer (items > 30 jours)]                                   │
+│  │   └─ Supprime: items synced > 30j ago                               │
+│  │      Conserve: items récents + pending                              │
+│  │                                                                     │
+│  └─ [⚠️  Vider Tous (DANGER)]                                          │
+│      └─ Supprime: TOUS les items (dev only!)                           │
+│         Confirmation: "Êtes-vous sûr?"                                 │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+
+════════════════════════════════════════════════════════════════════════════
+6️⃣  MULTI-FARM ISOLATION - Critical Architecture
+════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     FARM A (Sheep)            FARM B (Goats)            │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  Animals:                            Animals:                           │
+│  ├─ Sheep-001 (officialNum: FR-A1)  ├─ Goat-001 (officialNum: FR-B1)   │
+│  ├─ Sheep-002 (officialNum: FR-A2)  ├─ Goat-002 (officialNum: FR-B2)   │
+│  └─ ...                              └─ ...                             │
+│                                                                          │
+│  Sync Queue:                         Sync Queue:                        │
+│  ├─ Item 1: Sheep-001 (insert)      ├─ Item 1: Goat-001 (insert)       │
+│  ├─ Item 2: Sheep-001 (update)      ├─ Item 2: Goat-001 (treatment)    │
+│  └─ ...                              └─ ...                             │
+│                                                                          │
+│  getPending('farm-A')                getPending('farm-B')               │
+│  └─ Retourne SEULEMENT items de      └─ Retourne SEULEMENT items de    │
+│     farm-A (WHERE farmId='farm-A')      farm-B (WHERE farmId='farm-B')  │
+│                                                                          │
+│  🔒 ISOLATION COMPLÈTE - aucun mélange                                  │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+
+════════════════════════════════════════════════════════════════════════════
+7️⃣  FILELIST - Documents créés pour STEP 4
+════════════════════════════════════════════════════════════════════════════
+
+📁 /mnt/user-data/outputs/
+
+├─ STEP4_SYNC_QUEUE_COMPLETE_STRATEGY.md ⭐ 
+│  └─ Stratégie COMPLÈTE avec checklists détaillées
+│     ├─ Vérifications complètes
+│     ├─ Blocage officialID + Configuration
+│     ├─ Mode test sans serveur
+│     ├─ Outils cleanup
+│     └─ Architecture sync complète
+│
+├─ STEP4_EXECUTIVE_SUMMARY.md ⭐
+│  └─ Résumé ACTIONABLE avec plan exécution
+│     ├─ Quoi vérifier (bash commands)
+│     ├─ Quoi implémenter (fichiers)
+│     ├─ Étapes d'intégration
+│     ├─ Configuration par env
+│     └─ Checklist validation
+│
+├─ STEP4_CODE_SNIPPETS.md ⭐
+│  └─ CODE PRÊT À COPIER-COLLER
+│     ├─ sync_config.dart (8 snippets)
+│     ├─ sync_validator.dart
+│     ├─ sync_queue_repository.dart
+│     ├─ mock_sync_service.dart
+│     ├─ Constants, main.dart, etc.
+│     └─ Settings sync tab
+│
+├─ STEP4_RECOMMENDATIONS_IMPORTANT.md ⭐
+│  └─ RECOMMANDATIONS & REMARQUES CRITIQUES
+│     ├─ Observations sur officialID
+│     ├─ Multi-farm isolation
+│     ├─ Dev vs test vs prod
+│     ├─ Retry logic
+│     ├─ Cleanup strategy
+│     ├─ Monitoring
+│     ├─ Sécurité
+│     ├─ Performance
+│     └─ FAQ
+│
+└─ STEP4_VISUAL_SUMMARY.txt (CE FICHIER)
+   └─ Diagrammes + Flowcharts visuels
+
+════════════════════════════════════════════════════════════════════════════
+8️⃣  QUICK START - Pour commencer immédiatement
+════════════════════════════════════════════════════════════════════════════
+
+JOUR 1: Setup
+  $ 1. Créer fichiers (snippets)
+  $    lib/utils/sync_config.dart
+  $    lib/utils/sync_validator.dart
+  $    lib/repositories/sync_queue_repository.dart
+  $    lib/services/mock_sync_service.dart
+  $
+  $ 2. Build runner
+  $    flutter pub run build_runner build --delete-conflicting-outputs
+  $
+  $ 3. Test compilation
+  $    flutter analyze
+
+JOUR 2: UI + Debug
+  $ 1. Créer DebugSyncScreen
+  $ 2. Ajouter FAB debug à main.dart
+  $ 3. Ajouter Sync Tab à Settings
+  $ 4. Test app
+  $    flutter run
+
+JOUR 3: Validation
+  $ 1. Tester creation animal avec/sans officialID
+  $ 2. Tester mock sync (success + failure)
+  $ 3. Tester cleanup queue
+  $ 4. Multi-farm tests (si applicable)
+  $ 5. Performance tests
+  $ ✅ STEP 4 COMPLETE!
+
+════════════════════════════════════════════════════════════════════════════
+9️⃣  SUCCESS CRITERIA - Validation STEP 4
+════════════════════════════════════════════════════════════════════════════
+
+✅ INFRASTRUCTURE
+   ☐ sync_queue table + DAO existent
+   ☐ SyncValidator bloque/autorise officialID
+   ☐ SyncConfig avec flags dev/test/prod
+   ☐ getUnsynced() + markSynced() partout
+
+✅ TESTING
+   ☐ Créer animal avec officialID → enqueued ✅
+   ☐ Créer animal sans officialID → bloqué ✅
+   ☐ Mock sync success → items synced ✅
+   ☐ Mock sync failure → retry ✅
+   ☐ Cleanup queue → items supprimés ✅
+   ☐ Multi-farm isolation → OK ✅
+
+✅ CODE QUALITY
+   ☐ flutter analyze = 0 errors
+   ☐ No hard-deletes (soft-delete only)
+   ☐ FarmId filtering everywhere
+   ☐ Performance: queries < 50ms
+
+🎉 SI TOUS ✅ = PHASE 2 READY!
+
+════════════════════════════════════════════════════════════════════════════
+🔟 KEY NUMBERS - Retention & Performance
+════════════════════════════════════════════════════════════════════════════
+
+Rétention Queue:
+  • SYNCED items:     30 jours (cleanup après)
+  • PENDING items:    ∞ (jamais supprimer)
+  • FAILED/STALLED:   7 jours (review/quarantine)
+
+Performance Targets:
+  • getPending():     < 50ms
+  • countPending():   < 10ms
+  • markSynced():     < 20ms
+  • DB size:          < 20MB (mock)
+
+Retries:
+  • maxRetries:       3 tentatives
+  • initialDelay:     5000ms (5 sec)
+  • backoff:          exponentiel (5, 10, 20)
+
+Cleanup:
+  • Schedule:         Automatique daily
+  • Manual:           Settings UI + DebugScreen
+  • Force:            Dev only
+
+════════════════════════════════════════════════════════════════════════════
+
+📞 SUPPORT
+  
+  1. Tous les documents sont dans /mnt/user-data/outputs/
+  2. Code snippets sont prêts à copier-coller
+  3. Checklists = validation complète
+  4. Recommendations = best practices
+
+════════════════════════════════════════════════════════════════════════════
+
+✅ STEP 4 est complet et prêt à implémenter!
+
+Phase 1C: STEP 4 ✅ → STEP 5 (Mock Data Migration)
+           ↓
+Phase 2: SyncService (connexion serveur réelle) 🚀
+
+════════════════════════════════════════════════════════════════════════════

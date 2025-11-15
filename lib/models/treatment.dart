@@ -1,8 +1,15 @@
 // lib/models/treatment.dart
-//import 'package:flutter/foundation.dart';
 
-class Treatment {
+import 'syncable_entity.dart';
+
+class Treatment implements SyncableEntity {
+  // === Identification ===
+  @override
   final String id;
+  @override
+  final String farmId;
+
+  // === Données métier ===
   final String animalId;
   final String productId;
   final String productName;
@@ -11,15 +18,26 @@ class Treatment {
   final DateTime withdrawalEndDate;
   final String? notes;
 
-  // === Ajouts chirurgicaux pour alignement mock/providers ===
-  final String? veterinarianId; // optionnel
-  final String? veterinarianName; // optionnel
-  final String? campaignId; // optionnel
-  final bool synced; // défaut false
-  final DateTime createdAt; // requis (présent dans mock)
+  // === Informations additionnelles ===
+  final String? veterinarianId;
+  final String? veterinarianName;
+  final String? campaignId;
 
-  const Treatment({
+  // === Synchronisation ===
+  @override
+  final bool synced;
+  @override
+  final DateTime createdAt;
+  @override
+  final DateTime updatedAt;
+  @override
+  final DateTime? lastSyncedAt;
+  @override
+  final String? serverVersion;
+
+  Treatment({
     required this.id,
+    this.farmId = 'mock-farm-001', // Valeur par défaut pour compatibilité mock
     required this.animalId,
     required this.productId,
     required this.productName,
@@ -31,8 +49,14 @@ class Treatment {
     this.veterinarianName,
     this.campaignId,
     this.synced = false,
-    required this.createdAt,
-  });
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    this.lastSyncedAt,
+    this.serverVersion,
+  })  : createdAt = createdAt ?? DateTime.now(),
+        updatedAt = updatedAt ?? DateTime.now();
+
+  // === Getters ===
 
   /// Indique si la période de retrait est encore active (non terminée).
   bool get isWithdrawalActive => DateTime.now().isBefore(withdrawalEndDate);
@@ -43,8 +67,10 @@ class Treatment {
     return diff < 0 ? 0 : diff;
   }
 
+  // === Méthodes CRUD ===
+
   Treatment copyWith({
-    String? id,
+    String? farmId,
     String? animalId,
     String? productId,
     String? productName,
@@ -56,10 +82,13 @@ class Treatment {
     String? veterinarianName,
     String? campaignId,
     bool? synced,
-    DateTime? createdAt,
+    DateTime? updatedAt,
+    DateTime? lastSyncedAt,
+    String? serverVersion,
   }) {
     return Treatment(
-      id: id ?? this.id,
+      id: id,
+      farmId: farmId ?? this.farmId,
       animalId: animalId ?? this.animalId,
       productId: productId ?? this.productId,
       productName: productName ?? this.productName,
@@ -71,12 +100,35 @@ class Treatment {
       veterinarianName: veterinarianName ?? this.veterinarianName,
       campaignId: campaignId ?? this.campaignId,
       synced: synced ?? this.synced,
-      createdAt: createdAt ?? this.createdAt,
+      createdAt: createdAt,
+      updatedAt: updatedAt ?? DateTime.now(),
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      serverVersion: serverVersion ?? this.serverVersion,
     );
   }
 
+  // === Méthodes de sync ===
+
+  Treatment markAsSynced({required String serverVersion}) {
+    return copyWith(
+      synced: true,
+      lastSyncedAt: DateTime.now(),
+      serverVersion: serverVersion,
+    );
+  }
+
+  Treatment markAsModified() {
+    return copyWith(
+      synced: false,
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  // === JSON Serialization (SNAKE_CASE) ===
+
   Map<String, dynamic> toJson() => {
         'id': id,
+        'farm_id': farmId,
         'animal_id': animalId,
         'product_id': productId,
         'product_name': productName,
@@ -84,17 +136,20 @@ class Treatment {
         'treatment_date': treatmentDate.toIso8601String(),
         'withdrawal_end_date': withdrawalEndDate.toIso8601String(),
         'notes': notes,
-        // ajouts
         'veterinarian_id': veterinarianId,
         'veterinarian_name': veterinarianName,
         'campaign_id': campaignId,
         'synced': synced,
         'created_at': createdAt.toIso8601String(),
+        'updated_at': updatedAt.toIso8601String(),
+        'last_synced_at': lastSyncedAt?.toIso8601String(),
+        'server_version': serverVersion,
       };
 
   factory Treatment.fromJson(Map<String, dynamic> json) {
     return Treatment(
       id: json['id'] as String,
+      farmId: json['farm_id'] as String? ?? 'mock-farm-001',
       animalId: json['animal_id'] as String,
       productId: json['product_id'] as String,
       productName: json['product_name'] as String,
@@ -102,12 +157,20 @@ class Treatment {
       treatmentDate: DateTime.parse(json['treatment_date'] as String),
       withdrawalEndDate: DateTime.parse(json['withdrawal_end_date'] as String),
       notes: json['notes'] as String?,
-      // ajouts
       veterinarianId: json['veterinarian_id'] as String?,
       veterinarianName: json['veterinarian_name'] as String?,
       campaignId: json['campaign_id'] as String?,
       synced: json['synced'] as bool? ?? false,
-      createdAt: DateTime.parse(json['created_at'] as String),
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'] as String)
+          : null,
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'] as String)
+          : null,
+      lastSyncedAt: json['last_synced_at'] != null
+          ? DateTime.parse(json['last_synced_at'] as String)
+          : null,
+      serverVersion: json['server_version'] as String?,
     );
   }
 

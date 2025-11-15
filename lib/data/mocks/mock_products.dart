@@ -13,7 +13,8 @@ class MockProducts {
         withdrawalDaysMeat: 16,
         withdrawalDaysMilk: 5,
         dosagePerKg: 0.2,
-      ),
+      
+        farmId: 'farm_default',),
       Product(
         id: 'product_002',
         name: 'Vaccin Entérotoxémie',
@@ -21,7 +22,8 @@ class MockProducts {
         withdrawalDaysMeat: 0,
         withdrawalDaysMilk: 0,
         dosagePerKg: 2.0,
-      ),
+      
+        farmId: 'farm_default',),
       Product(
         id: 'product_003',
         name: 'Oxytétracycline LA',
@@ -29,7 +31,8 @@ class MockProducts {
         withdrawalDaysMeat: 28,
         withdrawalDaysMilk: 7,
         dosagePerKg: 20.0,
-      ),
+      
+        farmId: 'farm_default',),
       Product(
         id: 'product_004',
         name: 'Doramectine',
@@ -37,7 +40,8 @@ class MockProducts {
         withdrawalDaysMeat: 35,
         withdrawalDaysMilk: 7,
         dosagePerKg: 0.3,
-      ),
+      
+        farmId: 'farm_default',),
       Product(
         id: 'product_005',
         name: 'Pénicilline G',
@@ -45,7 +49,8 @@ class MockProducts {
         withdrawalDaysMeat: 10,
         withdrawalDaysMilk: 3,
         dosagePerKg: 15.0,
-      ),
+      
+        farmId: 'farm_default',),
       Product(
         id: 'product_006',
         name: 'Vaccin Pasteurellose',
@@ -53,7 +58,8 @@ class MockProducts {
         withdrawalDaysMeat: 0,
         withdrawalDaysMilk: 0,
         dosagePerKg: 2.0,
-      ),
+      
+        farmId: 'farm_default',),
       Product(
         id: 'product_007',
         name: 'Méloxicam',
@@ -61,7 +67,8 @@ class MockProducts {
         withdrawalDaysMeat: 5,
         withdrawalDaysMilk: 0,
         dosagePerKg: 0.5,
-      ),
+      
+        farmId: 'farm_default',),
       Product(
         id: 'product_008',
         name: 'Albendazole',
@@ -69,7 +76,8 @@ class MockProducts {
         withdrawalDaysMeat: 14,
         withdrawalDaysMilk: 4,
         dosagePerKg: 5.0,
-      ),
+      
+        farmId: 'farm_default',),
       Product(
         id: 'product_009',
         name: 'Closantel',
@@ -77,7 +85,8 @@ class MockProducts {
         withdrawalDaysMeat: 28,
         withdrawalDaysMilk: 14,
         dosagePerKg: 10.0,
-      ),
+      
+        farmId: 'farm_default',),
       Product(
         id: 'product_010',
         name: 'Vaccin Fièvre Q',
@@ -85,7 +94,8 @@ class MockProducts {
         withdrawalDaysMeat: 0,
         withdrawalDaysMilk: 0,
         dosagePerKg: 2.0,
-      ),
+      
+        farmId: 'farm_default',),
     ];
   }
 }

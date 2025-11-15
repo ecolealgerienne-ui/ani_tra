@@ -16,6 +16,7 @@ class MockTreatments {
         productId: 'product_001',
         dose: 0.2,
         treatmentDate: now.subtract(const Duration(days: 5)),
+        farmId: 'farm_default',
         withdrawalEndDate: now.add(const Duration(days: 11)), // 16j - 5j = 11j restants
         veterinarianId: 'vet_001',
         synced: true,
@@ -30,6 +31,7 @@ class MockTreatments {
         productId: 'product_002',
         dose: 2.0,
         treatmentDate: now.subtract(const Duration(days: 180)),
+        farmId: 'farm_default',
         withdrawalEndDate: now.subtract(const Duration(days: 180)),
         veterinarianId: 'vet_003',
         synced: true,
@@ -44,6 +46,7 @@ class MockTreatments {
         productId: 'product_008',
         dose: 5.0,
         treatmentDate: now.subtract(const Duration(days: 60)),
+        farmId: 'farm_default',
         withdrawalEndDate: now.subtract(const Duration(days: 46)), // 14j passés
         veterinarianId: 'vet_001',
         synced: true,
@@ -58,6 +61,7 @@ class MockTreatments {
         productId: 'product_006',
         dose: 2.0,
         treatmentDate: now.subtract(const Duration(days: 90)),
+        farmId: 'farm_default',
         withdrawalEndDate: now.subtract(const Duration(days: 90)),
         veterinarianId: 'vet_002',
         synced: true,
@@ -70,6 +74,7 @@ class MockTreatments {
         productId: 'product_007',
         dose: 0.5,
         treatmentDate: now.subtract(const Duration(days: 15)),
+        farmId: 'farm_default',
         withdrawalEndDate: now.subtract(const Duration(days: 10)), // 5j terminés
         veterinarianId: 'vet_001',
         synced: true,
