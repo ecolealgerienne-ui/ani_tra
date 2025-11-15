@@ -611,7 +611,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                 final locale = settingsProvider.locale;
 
                 return DropdownButtonFormField<String>(
-                  value: _selectedBreedId != null &&
+                  initialValue: _selectedBreedId != null &&
                           availableBreeds.any((b) => b.id == _selectedBreedId)
                       ? _selectedBreedId
                       : null,
@@ -632,7 +632,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                       : availableBreeds.map((breed) {
                           return DropdownMenuItem(
                             value: breed.id,
-                            child: Text('${breed.icon} ${breed.getName(locale)}'),
+                            child: Text(breed.getName(locale)),
                           );
                         }).toList(),
                   onChanged: _selectedSpeciesId == null
