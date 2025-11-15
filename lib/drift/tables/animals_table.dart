@@ -65,5 +65,12 @@ class AnimalsTable extends Table {
   @override
   List<String> get customConstraints => [
         'FOREIGN KEY (farm_id) REFERENCES farms(id) ON DELETE CASCADE',
+        // ==================== UNIQUE Constraints ====================
+        // Un EID (current_eid) doit être unique par ferme (doublons interdits)
+        // Note: SQLite permet plusieurs NULL sans violation
+        'UNIQUE(farm_id, current_eid)',
+        // Un numéro officiel (official_number) doit être unique par ferme
+        'UNIQUE(farm_id, official_number)',
+        // visual_id: PAS de contrainte UNIQUE (doublons autorisés)
       ];
 }

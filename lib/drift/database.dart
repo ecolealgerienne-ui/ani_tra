@@ -179,7 +179,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   // ═══════════════════════════════════════════════════════════
   // MIGRATION STRATEGY
@@ -240,11 +240,12 @@ class AppDatabase extends _$AppDatabase {
           // await _createSyncQueueIndexes();
         },
         onUpgrade: (Migrator m, int from, int to) async {
-          // Migrations futures ici
-          // Exemple:
-          // if (from < 2) {
-          //   await m.addColumn(animalsTable, animalsTable.newColumn);
-          // }
+          // ───────────────────────────────────────────────────
+          // MIGRATION v1 → v2: Add UNIQUE constraints on animals table
+          // ───────────────────────────────────────────────────
+          if (from < 2) {
+            await _migrateToV2AddUniqueConstraints();
+          }
         },
       );
   // ═══════════════════════════════════════════════════════════
@@ -1056,6 +1057,113 @@ class AppDatabase extends _$AppDatabase {
       'CREATE INDEX IF NOT EXISTS idx_alert_config_deleted_at '
       'ON alert_configurations_table(deleted_at);',
     );
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // MIGRATION HELPERS
+  // ═══════════════════════════════════════════════════════════
+
+  /// Migration v1 → v2: Ajouter des contraintes UNIQUE sur EID et officialNumber
+  ///
+  /// Cette migration recrée la table animals avec les contraintes UNIQUE :
+  /// - UNIQUE(farm_id, current_eid) - Un EID unique par ferme
+  /// - UNIQUE(farm_id, official_number) - Un numéro officiel unique par ferme
+  ///
+  /// ⚠️ Important: Cette migration échouera si des doublons existent déjà
+  Future<void> _migrateToV2AddUniqueConstraints() async {
+    // Étape 1: Vérifier s'il y a des doublons d'EID
+    final eidDuplicates = await customSelect(
+      '''
+      SELECT farm_id, current_eid, COUNT(*) as count
+      FROM animals
+      WHERE current_eid IS NOT NULL AND deleted_at IS NULL
+      GROUP BY farm_id, current_eid
+      HAVING count > 1
+      ''',
+    ).get();
+
+    if (eidDuplicates.isNotEmpty) {
+      final duplicateEids = eidDuplicates
+          .map((row) => '${row.data['farm_id']}: ${row.data['current_eid']}')
+          .join(', ');
+      throw Exception(
+        'Migration échouée: Des doublons d\'EID existent dans la base de données. '
+        'Veuillez les corriger avant de migrer. Doublons trouvés: $duplicateEids',
+      );
+    }
+
+    // Étape 2: Vérifier s'il y a des doublons de numéros officiels
+    final officialNumberDuplicates = await customSelect(
+      '''
+      SELECT farm_id, official_number, COUNT(*) as count
+      FROM animals
+      WHERE official_number IS NOT NULL AND deleted_at IS NULL
+      GROUP BY farm_id, official_number
+      HAVING count > 1
+      ''',
+    ).get();
+
+    if (officialNumberDuplicates.isNotEmpty) {
+      final duplicateNumbers = officialNumberDuplicates
+          .map((row) => '${row.data['farm_id']}: ${row.data['official_number']}')
+          .join(', ');
+      throw Exception(
+        'Migration échouée: Des doublons de numéros officiels existent dans la base de données. '
+        'Veuillez les corriger avant de migrer. Doublons trouvés: $duplicateNumbers',
+      );
+    }
+
+    // Étape 3: Pas de doublons - Procéder à la migration
+    // Désactiver temporairement les contraintes de clés étrangères
+    await customStatement('PRAGMA foreign_keys = OFF;');
+
+    // Étape 4: Renommer l'ancienne table
+    await customStatement('ALTER TABLE animals RENAME TO animals_old;');
+
+    // Étape 5: Créer la nouvelle table avec les contraintes UNIQUE
+    await customStatement('''
+      CREATE TABLE animals (
+        id TEXT NOT NULL PRIMARY KEY,
+        farm_id TEXT NOT NULL,
+        current_eid TEXT,
+        official_number TEXT,
+        visual_id TEXT,
+        eid_history TEXT,
+        birth_date INTEGER NOT NULL,
+        sex TEXT NOT NULL,
+        mother_id TEXT,
+        status TEXT NOT NULL,
+        validated_at INTEGER,
+        species_id TEXT,
+        breed_id TEXT,
+        photo_url TEXT,
+        days INTEGER,
+        synced INTEGER NOT NULL DEFAULT 0,
+        last_synced_at INTEGER,
+        server_version TEXT,
+        deleted_at INTEGER,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        FOREIGN KEY (farm_id) REFERENCES farms(id) ON DELETE CASCADE,
+        UNIQUE(farm_id, current_eid),
+        UNIQUE(farm_id, official_number)
+      );
+    ''');
+
+    // Étape 6: Copier les données de l'ancienne table vers la nouvelle
+    await customStatement('''
+      INSERT INTO animals
+      SELECT * FROM animals_old;
+    ''');
+
+    // Étape 7: Supprimer l'ancienne table
+    await customStatement('DROP TABLE animals_old;');
+
+    // Étape 8: Recréer les indexes
+    await _createAnimalsIndexes();
+
+    // Étape 9: Réactiver les contraintes de clés étrangères
+    await customStatement('PRAGMA foreign_keys = ON;');
   }
 
   // ═══════════════════════════════════════════════════════════
