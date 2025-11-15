@@ -413,10 +413,13 @@ class _FarmSelectionSection extends StatelessWidget {
         title: Text(l10n.translate(AppStrings.selectFarm)),
         content: SizedBox(
           width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: farms.length,
-            itemBuilder: (context, index) {
+          child: ListTileTheme(
+            textColor: Colors.black,
+            iconColor: Colors.grey,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: farms.length,
+              itemBuilder: (context, index) {
               final farm = farms[index];
               final isSelected = farm.id == currentFarmId;
 
@@ -455,6 +458,7 @@ class _FarmSelectionSection extends StatelessWidget {
                 },
               );
             },
+          ),
           ),
         ),
         actions: [
@@ -571,12 +575,15 @@ class _BreedingPreferencesSection extends StatelessWidget {
         title: Text(l10n.translate(AppStrings.selectDefaultSpecies)),
         content: SizedBox(
           width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: speciesOptions.length,
-            itemBuilder: (context, index) {
-              final species = speciesOptions[index];
-              final isSelected = species['id'] == defaultSpeciesId;
+          child: ListTileTheme(
+            textColor: Colors.black,
+            iconColor: Colors.grey,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: speciesOptions.length,
+              itemBuilder: (context, index) {
+                final species = speciesOptions[index];
+                final isSelected = species['id'] == defaultSpeciesId;
 
               return ListTile(
                 leading: Icon(
@@ -608,6 +615,7 @@ class _BreedingPreferencesSection extends StatelessWidget {
               );
             },
           ),
+          ),
         ),
         actions: [
           TextButton(
@@ -633,12 +641,15 @@ class _BreedingPreferencesSection extends StatelessWidget {
         title: Text(l10n.translate(AppStrings.selectDefaultBreed)),
         content: SizedBox(
           width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: optionsWithNone.length,
-            itemBuilder: (context, index) {
-              final breed = optionsWithNone[index];
-              final isSelected = breed['id'] == defaultBreedId;
+          child: ListTileTheme(
+            textColor: Colors.black,
+            iconColor: Colors.grey,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: optionsWithNone.length,
+              itemBuilder: (context, index) {
+                final breed = optionsWithNone[index];
+                final isSelected = breed['id'] == defaultBreedId;
 
               return ListTile(
                 leading: Icon(
@@ -669,6 +680,7 @@ class _BreedingPreferencesSection extends StatelessWidget {
                 },
               );
             },
+          ),
           ),
         ),
         actions: [
@@ -745,12 +757,15 @@ class _VeterinarianSettingsSection extends StatelessWidget {
         title: Text(l10n.translate(AppStrings.selectDefaultVeterinarian)),
         content: SizedBox(
           width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: optionsWithNone.length,
-            itemBuilder: (context, index) {
-              final vet = optionsWithNone[index];
-              final isSelected = vet?.id == defaultVeterinarianId;
+          child: ListTileTheme(
+            textColor: Colors.black,
+            iconColor: Colors.grey,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: optionsWithNone.length,
+              itemBuilder: (context, index) {
+                final vet = optionsWithNone[index];
+                final isSelected = vet?.id == defaultVeterinarianId;
 
               if (vet == null) {
                 return ListTile(
@@ -819,6 +834,7 @@ class _VeterinarianSettingsSection extends StatelessWidget {
                 },
               );
             },
+          ),
           ),
         ),
         actions: [
