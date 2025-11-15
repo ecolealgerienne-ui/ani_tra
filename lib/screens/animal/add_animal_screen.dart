@@ -551,44 +551,50 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
             const SizedBox(height: AppConstants.spacingMedium),
 
             // Dropdown Type d'animal
-            DropdownButtonFormField<String>(
-              initialValue: _selectedSpeciesId,
-              decoration: InputDecoration(
-                labelText: AppLocalizations.of(context)
-                    .translate(AppStrings.animalType),
-                prefixIcon: Icon(
-                  Icons.pets,
-                  color: Theme.of(context).primaryColor,
-                ),
-              ),
-              items: AnimalConfig.availableSpecies.map((species) {
-                return DropdownMenuItem(
-                  value: species.id,
-                  child: Text('${species.icon} ${species.nameFr}'),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  _selectedSpeciesId = value;
-                  // RÃƒÂ©initialiser la race si on change de type
-                  if (value != null) {
-                    final breeds =
-                        context.read<BreedProvider>().getBySpeciesId(value);
-                    if (breeds.isNotEmpty &&
-                        (breeds.every((b) => b.id != _selectedBreedId))) {
-                      _selectedBreedId = breeds.first.id;
+            Consumer<SettingsProvider>(
+              builder: (context, settingsProvider, child) {
+                final locale = settingsProvider.locale;
+
+                return DropdownButtonFormField<String>(
+                  initialValue: _selectedSpeciesId,
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)
+                        .translate(AppStrings.animalType),
+                    prefixIcon: Icon(
+                      Icons.pets,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                  items: AnimalConfig.availableSpecies.map((species) {
+                    return DropdownMenuItem(
+                      value: species.id,
+                      child: Text('${species.icon} ${species.getName(locale)}'),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedSpeciesId = value;
+                      // RÃƒÂ©initialiser la race si on change de type
+                      if (value != null) {
+                        final breeds =
+                            context.read<BreedProvider>().getBySpeciesId(value);
+                        if (breeds.isNotEmpty &&
+                            (breeds.every((b) => b.id != _selectedBreedId))) {
+                          _selectedBreedId = breeds.first.id;
+                        }
+                      } else {
+                        _selectedBreedId = null;
+                      }
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return AppLocalizations.of(context)
+                          .translate(AppStrings.animalTypeRequired);
                     }
-                  } else {
-                    _selectedBreedId = null;
-                  }
-                });
-              },
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return AppLocalizations.of(context)
-                      .translate(AppStrings.animalTypeRequired);
-                }
-                return null;
+                    return null;
+                  },
+                );
               },
             ),
 
