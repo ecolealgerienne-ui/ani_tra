@@ -65,6 +65,7 @@ class FarmProvider with ChangeNotifier {
       _allFarms.clear();
       _allFarms.addAll(allFarms);
     } catch (e) {
+      // Ignore errors
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -81,6 +82,7 @@ class FarmProvider with ChangeNotifier {
       _allFarms.clear();
       _allFarms.addAll(ownerFarms);
     } catch (e) {
+      // Ignore errors
     } finally {
       _isLoading = false;
       notifyListeners();

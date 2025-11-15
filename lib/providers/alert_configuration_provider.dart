@@ -81,6 +81,7 @@ class AlertConfigurationProvider with ChangeNotifier {
       // Cela permet d'ajouter de nouvelles alertes aux fermes existantes
       await initializeDefaultConfigurations();
     } catch (e) {
+      // Ignore errors
     } finally {
       _isLoading = false;
       notifyListeners();

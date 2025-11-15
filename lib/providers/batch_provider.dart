@@ -84,6 +84,7 @@ class BatchProvider with ChangeNotifier {
       _allBatches.removeWhere((b) => b.farmId == _currentFarmId);
       _allBatches.addAll(farmBatches);
     } catch (e) {
+      // Ignore errors
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -99,6 +100,7 @@ class BatchProvider with ChangeNotifier {
       try {
         await _repository.create(batch, batch.farmId);
       } catch (e) {
+        // Ignore errors
       }
     }
     await _loadBatchesFromRepository();

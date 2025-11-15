@@ -102,6 +102,7 @@ class AuthProvider extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_prefKeySelectedFarmId, farmId);
     } catch (e) {
+      // Ignore errors
     }
   }
 

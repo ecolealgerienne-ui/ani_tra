@@ -87,6 +87,7 @@ class LotProvider extends ChangeNotifier {
       _allLots.removeWhere((l) => l.farmId == _currentFarmId);
       _allLots.addAll(farmLots);
     } catch (e) {
+      // Ignore errors
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -102,6 +103,7 @@ class LotProvider extends ChangeNotifier {
       try {
         await _repository.create(lot, lot.farmId);
       } catch (e) {
+        // Ignore errors
       }
     }
     await _loadLotsFromRepository();
@@ -554,6 +556,7 @@ class LotProvider extends ChangeNotifier {
       _allLots.add(lot);
       notifyListeners();
     } catch (e) {
+      // Ignore errors
     }
   }
 

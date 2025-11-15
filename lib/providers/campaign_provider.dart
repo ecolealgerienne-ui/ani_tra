@@ -70,6 +70,7 @@ class CampaignProvider extends ChangeNotifier {
       _allCampaigns.removeWhere((c) => c.farmId == _currentFarmId);
       _allCampaigns.addAll(farmCampaigns);
     } catch (e) {
+      // Ignore errors
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -85,6 +86,7 @@ class CampaignProvider extends ChangeNotifier {
       try {
         await _repository.create(campaign, campaign.farmId);
       } catch (e) {
+        // Ignore errors
       }
     }
     await _loadCampaignsFromRepository();
