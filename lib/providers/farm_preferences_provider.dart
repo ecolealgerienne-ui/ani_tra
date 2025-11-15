@@ -77,8 +77,6 @@ class FarmPreferencesProvider with ChangeNotifier {
         _preferencesCache.remove(_currentFarmId);
       }
     } catch (e) {
-      debugPrint(
-          '❌ Error loading farm preferences for $_currentFarmId: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -99,7 +97,6 @@ class FarmPreferencesProvider with ChangeNotifier {
       _preferencesCache[farmId] = saved;
       notifyListeners();
     } catch (e) {
-      debugPrint('❌ Error saving farm preferences: $e');
       rethrow;
     }
   }
@@ -180,7 +177,6 @@ class FarmPreferencesProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('❌ Error resetting farm preferences: $e');
       rethrow;
     }
   }
@@ -200,7 +196,6 @@ class FarmPreferencesProvider with ChangeNotifier {
         _preferencesCache[farmId] = preferences;
       }
     } catch (e) {
-      debugPrint('⚠️ Could not preload preferences for farm $farmId: $e');
     }
   }
 

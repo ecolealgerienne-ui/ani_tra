@@ -53,9 +53,7 @@ class BreedProvider extends ChangeNotifier {
       _allBreeds.clear();
       _allBreeds.addAll(breeds);
       _initialized = true;
-      debugPrint('✅ BreedProvider: ${_allBreeds.length} races chargées');
     } catch (e) {
-      debugPrint('❌ BreedProvider ERROR: $e');
       _initialized = false;
       // Ne pas réappeler - attendre un refresh()
     } finally {

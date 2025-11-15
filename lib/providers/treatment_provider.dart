@@ -51,7 +51,6 @@ class TreatmentProvider extends ChangeNotifier {
       _allTreatments.removeWhere((t) => t.farmId == _currentFarmId);
       _allTreatments.addAll(farmTreatments);
     } catch (e) {
-      debugPrint('❌ Error loading treatments from repository: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -68,7 +67,6 @@ class TreatmentProvider extends ChangeNotifier {
       try {
         await _repository.create(treatment, treatment.farmId);
       } catch (e) {
-        debugPrint('⚠️ Treatment ${treatment.id} already exists or error: $e');
       }
     }
     await _loadTreatmentsFromRepository();
@@ -85,7 +83,6 @@ class TreatmentProvider extends ChangeNotifier {
       _allTreatments.add(treatmentWithFarm);
       notifyListeners();
     } catch (e) {
-      debugPrint('❌ Error adding treatment: $e');
       rethrow;
     }
   }
@@ -100,7 +97,6 @@ class TreatmentProvider extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('❌ Error updating treatment: $e');
       rethrow;
     }
   }
@@ -112,7 +108,6 @@ class TreatmentProvider extends ChangeNotifier {
       _allTreatments.removeWhere((t) => t.id == id);
       notifyListeners();
     } catch (e) {
-      debugPrint('❌ Error removing treatment: $e');
       rethrow;
     }
   }

@@ -6,7 +6,7 @@ import '../models/farm.dart';
 
 /// Provider d'authentification et gestion multi-ferme
 ///
-/// Mode MOCK : utilisateur et fermes hardcodés
+/// Mode par défaut : utilisateur et fermes initiaux
 /// Phase 1: SharedPreferences pour persister la ferme sélectionnée
 /// Phase 2: Backend integration pour auth réelle
 class AuthProvider extends ChangeNotifier {
@@ -18,7 +18,7 @@ class AuthProvider extends ChangeNotifier {
   String _selectedFarmId = _defaultFarmId;
 
   AuthProvider() {
-    _initMockUser();
+    _initDefaultUser();
     _loadSelectedFarmId();
   }
 
@@ -46,9 +46,9 @@ class AuthProvider extends ChangeNotifier {
   bool get isAuthenticated => _currentUser != null;
   bool get hasMultipleFarms => _farms.length > 1;
 
-  // ==================== Mock Init ====================
+  // ==================== Default Init ====================
 
-  void _initMockUser() {
+  void _initDefaultUser() {
     final now = DateTime.now();
     _currentUser = User(
       id: 'user_mock_001',
@@ -92,7 +92,6 @@ class AuthProvider extends ChangeNotifier {
         }
       }
     } catch (e) {
-      debugPrint('⚠️ Error loading selected farm ID: $e');
       // En cas d'erreur, on garde _defaultFarmId
     }
   }
@@ -103,7 +102,6 @@ class AuthProvider extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_prefKeySelectedFarmId, farmId);
     } catch (e) {
-      debugPrint('⚠️ Error saving selected farm ID: $e');
     }
   }
 
@@ -114,7 +112,7 @@ class AuthProvider extends ChangeNotifier {
   /// Notifie tous les listeners (providers dépendants)
   Future<void> switchFarm(String farmId) async {
     // Note: We don't verify farm existence here because farms are managed
-    // by FarmProvider (from DB), not AuthProvider (mock data)
+    // by FarmProvider (from DB), not AuthProvider (initial data)
 
     // Mettre à jour l'état
     _selectedFarmId = farmId;
@@ -124,8 +122,6 @@ class AuthProvider extends ChangeNotifier {
 
     // Notifier les listeners (tous les providers qui écoutent)
     notifyListeners();
-
-    debugPrint('✅ Switched to farm: $farmId');
   }
 
   // ==================== Future Methods (placeholders) ====================

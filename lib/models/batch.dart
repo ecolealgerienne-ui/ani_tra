@@ -65,7 +65,7 @@ class Batch implements SyncableEntity {
 
   Batch({
     required this.id,
-    this.farmId = 'mock-farm-001', // Valeur par défaut pour compatibilité mock
+    this.farmId = 'farm_default', // Valeur par défaut pour compatibilité mock
     required this.name,
     required this.purpose,
     required this.animalIds,
@@ -327,7 +327,7 @@ class Batch implements SyncableEntity {
   factory Batch.fromMap(Map<String, dynamic> map) {
     return Batch(
       id: map['id'] as String,
-      farmId: map['farmId'] as String? ?? 'mock-farm-001',
+      farmId: map['farmId'] as String? ?? 'farm_default',
       name: map['name'] as String,
       purpose: BatchPurpose.values.firstWhere(
         (e) => e.toString().split('.').last == map['purpose'],
@@ -378,7 +378,7 @@ class Batch implements SyncableEntity {
       id: json['id'] as String,
       farmId: json['farmId'] as String? ??
           json['farm_id'] as String? ??
-          'mock-farm-001',
+          'farm_default',
       name: json['name'] as String,
       purpose: BatchPurpose.values.byName(json['purpose'] as String),
       animalIds:

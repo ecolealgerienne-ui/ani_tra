@@ -105,15 +105,14 @@ class DocumentProvider extends ChangeNotifier {
       _allDocuments.removeWhere((d) => d.farmId == _currentFarmId);
       _allDocuments.addAll(farmDocuments);
     } catch (e) {
-      debugPrint('❌ Error loading documents from repository: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  Future<void> loadMockData(List<Document> mockDocuments) async {
-    await _migrateDocumentsToRepository(mockDocuments);
+  Future<void> loadInitialData(List<Document> documents) async {
+    await _migrateDocumentsToRepository(documents);
   }
 
   Future<void> _migrateDocumentsToRepository(List<Document> documents) async {
@@ -121,7 +120,6 @@ class DocumentProvider extends ChangeNotifier {
       try {
         await _repository.create(document, document.farmId);
       } catch (e) {
-        debugPrint('⚠️ Document ${document.id} already exists or error: $e');
       }
     }
     await _loadDocumentsFromRepository();
@@ -138,7 +136,6 @@ class DocumentProvider extends ChangeNotifier {
       _allDocuments.add(documentWithFarm);
       notifyListeners();
     } catch (e) {
-      debugPrint('❌ Error adding document: $e');
       rethrow;
     }
   }
@@ -155,7 +152,6 @@ class DocumentProvider extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('❌ Error updating document: $e');
       rethrow;
     }
   }
@@ -168,7 +164,6 @@ class DocumentProvider extends ChangeNotifier {
       _allDocuments.removeWhere((d) => d.id == id);
       notifyListeners();
     } catch (e) {
-      debugPrint('❌ Error deleting document: $e');
       rethrow;
     }
   }
@@ -211,7 +206,6 @@ class DocumentProvider extends ChangeNotifier {
       _allDocuments.removeWhere((d) => d.animalId == animalId);
       notifyListeners();
     } catch (e) {
-      debugPrint('❌ Error deleting documents for animal: $e');
       rethrow;
     }
   }

@@ -222,7 +222,7 @@ class AppConstants {
 
   // ============ MISC ============
   static const double colorCircleRadius = 12.0;
-  static const int mockCacheSize = 15728640; // 15 MB
+  static const int defaultCacheSize = 15728640; // 15 MB
   static const double logoSize = 80.0;
   static const double letterSpacing = 1.2;
 

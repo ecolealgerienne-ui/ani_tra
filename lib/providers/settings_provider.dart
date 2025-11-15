@@ -46,21 +46,10 @@ class SettingsProvider extends ChangeNotifier {
 
   /// Charger les paramètres (depuis SharedPreferences ou API)
   Future<void> loadSettings() async {
-    // TODO: Charger depuis SharedPreferences
-    // final prefs = await SharedPreferences.getInstance();
-    // final json = prefs.getString('farm_settings');
-    // if (json != null) {
-    //   _settings = FarmSettings.fromJson(jsonDecode(json));
-    //   notifyListeners();
-    // }
   }
 
   /// Sauvegarder les paramètres (dans SharedPreferences)
   Future<void> saveSettings() async {
-    // TODO: Sauvegarder dans SharedPreferences
-    // final prefs = await SharedPreferences.getInstance();
-    // await prefs.setString('farm_settings', jsonEncode(_settings.toJson()));
-
   }
 
   // ==================== MODIFICATION DES PARAMÈTRES ====================

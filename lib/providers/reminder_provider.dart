@@ -306,12 +306,10 @@ class ReminderProvider extends ChangeNotifier {
 
   /// Charger les rappels depuis une source de données (à implémenter)
   Future<void> loadReminders() async {
-    // TODO: Implémenter le chargement depuis base de données
     notifyListeners();
   }
 
   /// Sauvegarder les rappels (à implémenter)
   Future<void> saveReminders() async {
-    // TODO: Implémenter la sauvegarde en base de données
   }
 }

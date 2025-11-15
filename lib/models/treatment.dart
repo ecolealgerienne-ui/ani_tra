@@ -37,7 +37,7 @@ class Treatment implements SyncableEntity {
 
   Treatment({
     required this.id,
-    this.farmId = 'mock-farm-001', // Valeur par défaut pour compatibilité mock
+    this.farmId = 'farm_default', // Valeur par défaut pour compatibilité mock
     required this.animalId,
     required this.productId,
     required this.productName,
@@ -149,7 +149,7 @@ class Treatment implements SyncableEntity {
   factory Treatment.fromJson(Map<String, dynamic> json) {
     return Treatment(
       id: json['id'] as String,
-      farmId: json['farm_id'] as String? ?? 'mock-farm-001',
+      farmId: json['farm_id'] as String? ?? 'farm_default',
       animalId: json['animal_id'] as String,
       productId: json['product_id'] as String,
       productName: json['product_name'] as String,

@@ -36,7 +36,7 @@ class Movement implements SyncableEntity {
 
   Movement({
     String? id,
-    this.farmId = 'mock-farm-001', // Valeur par défaut pour compatibilité mock
+    this.farmId = 'farm_default', // Valeur par défaut pour compatibilité mock
     required this.animalId,
     required this.type,
     required this.movementDate,
@@ -132,7 +132,7 @@ class Movement implements SyncableEntity {
   factory Movement.fromJson(Map<String, dynamic> json) {
     return Movement(
       id: json['id'],
-      farmId: json['farm_id'] as String? ?? 'mock-farm-001',
+      farmId: json['farm_id'] as String? ?? 'farm_default',
       animalId: json['animal_id'],
       type: MovementType.values.firstWhere((e) => e.name == json['type']),
       movementDate: DateTime.parse(json['movement_date']),

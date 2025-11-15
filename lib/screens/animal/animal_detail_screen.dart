@@ -15,11 +15,11 @@ import '../../providers/sync_provider.dart';
 import '../../providers/alert_provider.dart';
 import '../../providers/vaccination_provider.dart';
 import '../../providers/treatment_provider.dart';
+import '../../providers/veterinarian_provider.dart';
 import '../../models/alert.dart';
 import '../../models/alert_type.dart';
 import '../../models/alert_category.dart';
 import '../../models/vaccination.dart';
-import '../../data/mock_data.dart';
 import '../../widgets/change_eid_dialog.dart';
 import '../../widgets/eid_history_card.dart';
 import '../movement/death_screen.dart';
@@ -88,7 +88,6 @@ class _AnimalDetailScreenState extends State<AnimalDetailScreen> {
       setState(() {
         _scannedAnimal = updatedAnimal;
       });
-      debugPrint('✅ Animal reloaded: ${updatedAnimal.status}');
     }
   }
 
@@ -1364,9 +1363,13 @@ class _InfoRow extends StatelessWidget {
 }
 
 class _VeterinarianSearchDialog extends StatefulWidget {
+  final List<dynamic> veterinarians;
   final Function(dynamic) onSelect;
 
-  const _VeterinarianSearchDialog({required this.onSelect});
+  const _VeterinarianSearchDialog({
+    required this.veterinarians,
+    required this.onSelect,
+  });
 
   @override
   State<_VeterinarianSearchDialog> createState() =>
@@ -1380,7 +1383,7 @@ class _VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
   @override
   void initState() {
     super.initState();
-    _filteredVets = MockData.veterinarians;
+    _filteredVets = widget.veterinarians;
   }
 
   @override
@@ -1390,7 +1393,7 @@ class _VeterinarianSearchDialogState extends State<_VeterinarianSearchDialog> {
   }
 
   void _filterVets(String query) {
-    final allVets = MockData.veterinarians;
+    final allVets = widget.veterinarians;
     setState(() {
       if (query.isEmpty) {
         _filteredVets = allVets;

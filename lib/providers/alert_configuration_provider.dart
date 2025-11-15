@@ -81,7 +81,6 @@ class AlertConfigurationProvider with ChangeNotifier {
       // Cela permet d'ajouter de nouvelles alertes aux fermes existantes
       await initializeDefaultConfigurations();
     } catch (e) {
-      debugPrint('❌ Error loading alert configurations from repository: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -100,7 +99,6 @@ class AlertConfigurationProvider with ChangeNotifier {
       _allConfigurations.add(created);
       notifyListeners();
     } catch (e) {
-      debugPrint('❌ Error adding alert configuration: $e');
       rethrow;
     }
   }
@@ -117,7 +115,6 @@ class AlertConfigurationProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('❌ Error updating alert configuration: $e');
       rethrow;
     }
   }
@@ -130,7 +127,6 @@ class AlertConfigurationProvider with ChangeNotifier {
       _allConfigurations.removeWhere((c) => c.id == id);
       notifyListeners();
     } catch (e) {
-      debugPrint('❌ Error deleting alert configuration: $e');
       rethrow;
     }
   }
@@ -152,7 +148,6 @@ class AlertConfigurationProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('❌ Error toggling alert configuration: $e');
       rethrow;
     }
   }
@@ -164,7 +159,6 @@ class AlertConfigurationProvider with ChangeNotifier {
         await toggleEnabled(config.id, true);
       }
     } catch (e) {
-      debugPrint('❌ Error enabling all configurations: $e');
       rethrow;
     }
   }
@@ -176,7 +170,6 @@ class AlertConfigurationProvider with ChangeNotifier {
         await toggleEnabled(config.id, false);
       }
     } catch (e) {
-      debugPrint('❌ Error disabling all configurations: $e');
       rethrow;
     }
   }
@@ -212,7 +205,6 @@ class AlertConfigurationProvider with ChangeNotifier {
   /// OU ajoute les configurations manquantes pour les fermes existantes
   Future<void> initializeDefaultConfigurations() async {
     if (_currentFarmId.isEmpty) {
-      debugPrint('⚠️ Cannot initialize alerts: no farm selected');
       return;
     }
 
@@ -224,11 +216,8 @@ class AlertConfigurationProvider with ChangeNotifier {
     // Si toutes les 8 alertes existent, ne rien faire
     if (existingTypes.length >= 8 &&
         existingTypes.contains(AlertEvaluationType.draftAnimals)) {
-      debugPrint('✅ All 8 alert configurations already exist for farm $_currentFarmId');
       return;
     }
-
-    debugPrint('🔧 Initializing missing alert configurations for farm $_currentFarmId (${existingTypes.length}/8 exist)');
 
     final now = DateTime.now();
     const uuid = Uuid();
@@ -378,7 +367,6 @@ class AlertConfigurationProvider with ChangeNotifier {
         .toList();
 
     if (missingConfigs.isEmpty) {
-      debugPrint('✅ No missing alert configurations for farm $_currentFarmId');
       return;
     }
 
@@ -387,12 +375,9 @@ class AlertConfigurationProvider with ChangeNotifier {
       for (final config in missingConfigs) {
         await _repository.create(config, _currentFarmId);
         _allConfigurations.add(config);
-        debugPrint('   ✅ Created: ${config.evaluationType}');
       }
       notifyListeners();
-      debugPrint('✅ Successfully created ${missingConfigs.length} missing alert configuration(s)');
     } catch (e) {
-      debugPrint('❌ Error creating alert configurations: $e');
       rethrow;
     }
   }

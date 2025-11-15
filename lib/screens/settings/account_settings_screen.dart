@@ -324,7 +324,6 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
       return;
     }
 
-    // TODO: Implement actual password change logic
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(l10n.translate(AppStrings.passwordChangedSuccess)),

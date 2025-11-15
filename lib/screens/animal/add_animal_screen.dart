@@ -389,7 +389,6 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
       if (movement != null) {
         // Note: Les mouvements sont gÃƒÂ©rÃƒÂ©s via MovementProvider
         // Pour l'instant, on les ignore dans cet ÃƒÂ©cran simplifiÃƒÂ©
-        // TODO: Ajouter la gestion des mouvements si nÃƒÂ©cessaire
       }
 
       // 3. IncrÃƒÂ©menter les donnÃƒÂ©es en attente de sync
@@ -1061,12 +1060,12 @@ class _ScanMotherDialogState extends State<_ScanMotherDialog> {
       }
 
       // Prendre une femelle alÃƒÂ©atoirement pour simuler
-      final mockMother = (females..shuffle()).first;
+      final scannedMother = (females..shuffle()).first;
 
       setState(() {
         _isScanning = false;
-        _scannedMother = mockMother;
-        _eidController.text = mockMother.eid ?? '';
+        _scannedMother = scannedMother;
+        _eidController.text = scannedMother.eid ?? '';
       });
     });
   }
@@ -1291,12 +1290,12 @@ class _ScanEIDDialogState extends State<_ScanEIDDialog> {
     Future.delayed(const Duration(milliseconds: 800), () {
       // GÃƒÂ©nÃƒÂ©ration d'un EID simulÃƒÂ© au format FR + 13 chiffres
       final random = DateTime.now().millisecondsSinceEpoch % 10000000000000;
-      final mockEid = 'FR${random.toString().padLeft(13, '0')}';
+      final generatedEid = 'FR${random.toString().padLeft(13, '0')}';
 
       setState(() {
         _isScanning = false;
-        _scannedEID = mockEid;
-        _eidController.text = mockEid;
+        _scannedEID = generatedEid;
+        _eidController.text = generatedEid;
       });
     });
   }

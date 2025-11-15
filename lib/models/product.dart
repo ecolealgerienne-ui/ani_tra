@@ -30,7 +30,7 @@ class Product implements SyncableEntity {
 
   Product({
     required this.id,
-    this.farmId = 'mock-farm-001', // Valeur par défaut pour compatibilité mock
+    this.farmId = 'farm_default', // Valeur par défaut pour compatibilité mock
     required this.name,
     required this.activeSubstance,
     required this.withdrawalDaysMeat,
@@ -109,7 +109,7 @@ class Product implements SyncableEntity {
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
       id: json['id'] as String,
-      farmId: json['farm_id'] as String? ?? 'mock-farm-001',
+      farmId: json['farm_id'] as String? ?? 'farm_default',
       name: json['name'] as String,
       activeSubstance: json['active_substance'] as String,
       withdrawalDaysMeat: json['withdrawal_days_meat'] as int,

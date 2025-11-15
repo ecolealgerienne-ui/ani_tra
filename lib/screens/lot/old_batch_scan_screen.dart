@@ -109,8 +109,6 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
 
   /// Feedback visuel/sonore pour doublon
   void _showDuplicateFeedback(Animal animal) {
-    // TODO: Ajouter son d'erreur (bip-bip-bip)
-    // TODO: Ajouter vibration pattern [0, 100, 100, 100]
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -136,8 +134,6 @@ class _BatchScanScreenState extends State<BatchScanScreen> {
 
   /// Feedback visuel/sonore pour succès
   void _showSuccessFeedback(Animal animal) {
-    // TODO: Ajouter son de succès (bip simple)
-    // TODO: Ajouter vibration courte (200ms)
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

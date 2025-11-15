@@ -68,7 +68,7 @@ class Campaign implements SyncableEntity {
 
   Campaign({
     String? id,
-    this.farmId = 'mock-farm-001', // Valeur par défaut pour compatibilité mock
+    this.farmId = 'farm_default', // Valeur par défaut pour compatibilité mock
     required this.name,
     required this.productId,
     required this.productName,
@@ -231,7 +231,7 @@ class Campaign implements SyncableEntity {
       id: json['id'],
       farmId: json['farmId'] as String? ??
           json['farm_id'] as String? ??
-          'mock-farm-001',
+          'farm_default',
       name: json['name'],
       productId: json['productId'] ?? json['product_id'],
       productName: json['productName'] ?? json['product_name'],
