@@ -105,6 +105,7 @@ class DocumentProvider extends ChangeNotifier {
       _allDocuments.removeWhere((d) => d.farmId == _currentFarmId);
       _allDocuments.addAll(farmDocuments);
     } catch (e) {
+      // Ignore errors
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -120,6 +121,7 @@ class DocumentProvider extends ChangeNotifier {
       try {
         await _repository.create(document, document.farmId);
       } catch (e) {
+        // Ignore errors
       }
     }
     await _loadDocumentsFromRepository();

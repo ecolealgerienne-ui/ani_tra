@@ -1,5 +1,4 @@
 // lib/core/database/database_initializer.dart
-import 'package:flutter/foundation.dart';
 import 'package:drift/drift.dart';
 import 'package:animal_trace/drift/database.dart';
 import 'package:animal_trace/models/animal.dart';
@@ -16,7 +15,7 @@ class DatabaseInitializer {
       await _seedTestData(db);
 
       return db;
-    } catch (e, stack) {
+    } catch (e) {
       rethrow;
     }
   }
@@ -472,7 +471,7 @@ class DatabaseInitializer {
       } catch (e) {
         // Silent fail
       }
-    } catch (e, stack) {
+    } catch (e) {
       // Silent fail
     }
   }

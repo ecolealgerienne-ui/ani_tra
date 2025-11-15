@@ -73,6 +73,7 @@ class VeterinarianProvider with ChangeNotifier {
       _allVeterinarians.removeWhere((v) => v.farmId == _currentFarmId);
       _allVeterinarians.addAll(farmVeterinarians);
     } catch (e) {
+      // Ignore errors
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -88,6 +89,7 @@ class VeterinarianProvider with ChangeNotifier {
       try {
         await _repository.create(vet, vet.farmId);
       } catch (e) {
+        // Ignore errors
       }
     }
     await _loadVeterinariansFromRepository();

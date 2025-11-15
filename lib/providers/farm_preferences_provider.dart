@@ -77,6 +77,7 @@ class FarmPreferencesProvider with ChangeNotifier {
         _preferencesCache.remove(_currentFarmId);
       }
     } catch (e) {
+      // Ignore errors
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -196,6 +197,7 @@ class FarmPreferencesProvider with ChangeNotifier {
         _preferencesCache[farmId] = preferences;
       }
     } catch (e) {
+      // Ignore errors
     }
   }
 

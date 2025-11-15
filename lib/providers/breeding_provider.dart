@@ -91,6 +91,7 @@ class BreedingProvider extends ChangeNotifier {
       _allBreedings.removeWhere((b) => b.farmId == _currentFarmId);
       _allBreedings.addAll(farmBreedings);
     } catch (e) {
+      // Ignore errors
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -106,6 +107,7 @@ class BreedingProvider extends ChangeNotifier {
       try {
         await _repository.create(breeding, breeding.farmId);
       } catch (e) {
+        // Ignore errors
       }
     }
     await _loadBreedingsFromRepository();

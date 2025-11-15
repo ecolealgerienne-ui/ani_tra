@@ -248,6 +248,7 @@ class AlertProvider extends ChangeNotifier {
               break;
           }
         } catch (e) {
+          // Ignore errors
         }
       }
 

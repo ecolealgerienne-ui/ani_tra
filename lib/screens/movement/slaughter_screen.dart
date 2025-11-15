@@ -55,10 +55,7 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
 
     try {
       // Build notes with slaughterhouse info
-      final notesText = 'Abattoir: ${_slaughterhouseNameController.text}' +
-          (_slaughterhouseIdController.text.isNotEmpty
-              ? ' (N°${_slaughterhouseIdController.text})'
-              : '');
+      final notesText = 'Abattoir: ${_slaughterhouseNameController.text}${_slaughterhouseIdController.text.isNotEmpty ? ' (N°${_slaughterhouseIdController.text})' : ''}';
 
       // Create slaughter movement
       final movement = Movement(

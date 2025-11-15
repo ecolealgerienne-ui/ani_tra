@@ -51,6 +51,7 @@ class VaccinationProvider extends ChangeNotifier {
       _allVaccinations.removeWhere((v) => v.farmId == _currentFarmId);
       _allVaccinations.addAll(farmVaccinations);
     } catch (e) {
+      // Ignore errors
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -67,6 +68,7 @@ class VaccinationProvider extends ChangeNotifier {
       try {
         await _repository.create(vaccination, vaccination.farmId);
       } catch (e) {
+        // Ignore errors
       }
     }
     await _loadVaccinationsFromRepository();

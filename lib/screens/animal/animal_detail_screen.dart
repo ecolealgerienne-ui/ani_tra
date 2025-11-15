@@ -15,7 +15,6 @@ import '../../providers/sync_provider.dart';
 import '../../providers/alert_provider.dart';
 import '../../providers/vaccination_provider.dart';
 import '../../providers/treatment_provider.dart';
-import '../../providers/veterinarian_provider.dart';
 import '../../models/alert.dart';
 import '../../models/alert_type.dart';
 import '../../models/alert_category.dart';

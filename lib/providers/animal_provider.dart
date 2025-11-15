@@ -117,6 +117,7 @@ class AnimalProvider extends ChangeNotifier {
       _allAnimals.addAll(farmAnimals);
       _lastRefreshTime = DateTime.now(); // A5: Marquer le refresh
     } catch (e) {
+      // Ignore errors
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -149,6 +150,7 @@ class AnimalProvider extends ChangeNotifier {
       try {
         await _repository.create(animal, animal.farmId);
       } catch (e) {
+        // Ignore errors
       }
     }
     await _loadAnimalsFromRepository();

@@ -51,6 +51,7 @@ class TreatmentProvider extends ChangeNotifier {
       _allTreatments.removeWhere((t) => t.farmId == _currentFarmId);
       _allTreatments.addAll(farmTreatments);
     } catch (e) {
+      // Ignore errors
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -67,6 +68,7 @@ class TreatmentProvider extends ChangeNotifier {
       try {
         await _repository.create(treatment, treatment.farmId);
       } catch (e) {
+        // Ignore errors
       }
     }
     await _loadTreatmentsFromRepository();
