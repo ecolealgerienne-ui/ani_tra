@@ -428,12 +428,12 @@ class VaccinationDetailScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final hasNotes = currentVaccination.notes != null && currentVaccination.notes!.isNotEmpty;
 
-    // Vérifier si l'animal peut avoir ses enregistrements modifiés
+    // Vérifier si l'animal peut recevoir des soins (vivant uniquement)
     final animalProvider = context.read<AnimalProvider>();
     final animal = currentVaccination.animalId != null
         ? animalProvider.getAnimalById(currentVaccination.animalId!)
         : null;
-    final canEdit = animal?.canEditRecords ?? false;
+    final canEdit = animal?.canReceiveCare ?? false;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: AppConstants.spacingMedium),

@@ -320,6 +320,8 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
               localeProvider.setLocale(const Locale('fr'));
             } else if (value == 'ar') {
               localeProvider.setLocale(const Locale('ar'));
+            } else if (value == 'en') {
+              localeProvider.setLocale(const Locale('en'));
             }
           },
           child: Column(
@@ -328,6 +330,11 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                 title: const Text('Français'),
                 leading: const Radio<String>(value: 'fr'),
                 onTap: () => localeProvider.setLocale(const Locale('fr')),
+              ),
+              ListTile(
+                title: const Text('English'),
+                leading: const Radio<String>(value: 'en'),
+                onTap: () => localeProvider.setLocale(const Locale('en')),
               ),
               ListTile(
                 title: const Text('العربية'),
