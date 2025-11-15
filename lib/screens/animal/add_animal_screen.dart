@@ -14,6 +14,7 @@ import '../../providers/animal_provider.dart';
 import '../../providers/breed_provider.dart';
 import '../../providers/sync_provider.dart';
 import '../../providers/settings_provider.dart';
+import '../../providers/farm_preferences_provider.dart';
 import '../../data/animal_config.dart';
 //import 'universal_scanner_screen.dart';
 import 'animal_finder_screen.dart';
@@ -95,23 +96,23 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
       }
     }
 
-    // ÉTAPE 5 : Charger les valeurs par défaut du SettingsProvider
+    // ÉTAPE 5 : Charger les valeurs par défaut depuis FarmPreferencesProvider
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final settings = context.read<SettingsProvider>();
+      final farmPrefs = context.read<FarmPreferencesProvider>();
       if (!_isEditMode) {
         setState(() {
-          _selectedSpeciesId = settings.defaultSpeciesId;
-          _selectedBreedId = settings.defaultBreedId;
+          _selectedSpeciesId = farmPrefs.defaultSpeciesId;
+          _selectedBreedId = farmPrefs.defaultBreedId;
         });
       } else {
         if (_selectedSpeciesId == null) {
           setState(() {
-            _selectedSpeciesId = settings.defaultSpeciesId;
+            _selectedSpeciesId = farmPrefs.defaultSpeciesId;
           });
         }
         if (_selectedBreedId == null) {
           setState(() {
-            _selectedBreedId = settings.defaultBreedId;
+            _selectedBreedId = farmPrefs.defaultBreedId;
           });
         }
       }
