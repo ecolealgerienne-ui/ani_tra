@@ -228,7 +228,7 @@ class AlertConfigurationProvider with ChangeNotifier {
     final now = DateTime.now();
     const uuid = Uuid();
 
-    // Définition des 7 configurations par défaut
+    // Définition des 8 configurations par défaut
     final defaultConfigs = [
       // 1. Rémanence - Délai d'abattage (CRITIQUE)
       AlertConfiguration(
@@ -344,6 +344,23 @@ class AlertConfigurationProvider with ChangeNotifier {
         severity: 1, // Routine
         iconName: '📦',
         colorHex: '#2196F3', // Bleu (unifié selon sévérité)
+        enabled: true,
+        createdAt: now,
+        updatedAt: now,
+      ),
+
+      // 8. Animaux en brouillon - Animaux non validés (IMPORTANT)
+      AlertConfiguration(
+        id: uuid.v4(),
+        farmId: _currentFarmId,
+        evaluationType: AlertEvaluationType.draftAnimals,
+        type: 'important',
+        category: 'registre',
+        titleKey: AppStrings.alertDraftTitle,
+        messageKey: AppStrings.alertDraftMsg,
+        severity: 2, // Important
+        iconName: '📝',
+        colorHex: '#FF9800', // Orange (unifié selon sévérité)
         enabled: true,
         createdAt: now,
         updatedAt: now,

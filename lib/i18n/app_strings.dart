@@ -1000,6 +1000,9 @@ class AppStrings {
   static const String alertBatchTitle = 'alertBatchTitle';
   static const String alertBatchMsg = 'alertBatchMsg';
 
+  static const String alertDraftTitle = 'alertDraftTitle';
+  static const String alertDraftMsg = 'alertDraftMsg';
+
   // ============ BREEDING NOTES ============
   static const String breedingFailedNote = 'breedingFailedNote';
   static const String breedingAbortedNote = 'breedingAbortedNote';

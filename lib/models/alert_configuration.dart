@@ -10,6 +10,7 @@ enum AlertEvaluationType {
   syncRequired,     // Sync en retard
   treatmentRenewal, // Traitement à renouveler
   batchToFinalize,  // Lot à finaliser
+  draftAnimals,     // Animaux en brouillon à valider
 }
 
 extension AlertEvaluationTypeExtension on AlertEvaluationType {

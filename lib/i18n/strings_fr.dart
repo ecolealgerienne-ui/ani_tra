@@ -1004,6 +1004,9 @@ const Map<String, String> stringsFr = {
   'alertBatchTitle': 'Lot à finaliser',
   'alertBatchMsg': '{batchName}: {animalCount} animal(aux)',
 
+  'alertDraftTitle': 'Animaux en brouillon',
+  'alertDraftMsg': 'Animaux non validés à finaliser',
+
   // ========== BREEDING NOTES ==========
   'breedingFailedNote': 'Échec:',
   'breedingAbortedNote': 'Avortement:',
