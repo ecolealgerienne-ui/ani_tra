@@ -818,7 +818,9 @@ class _AlertSettingsSection extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final alertProvider = context.watch<AlertConfigurationProvider>();
 
-    final configs = alertProvider.configurations;
+    // Sort configurations by severity: CRITIQUE (3) → IMPORTANT (2) → ROUTINE (1)
+    final configs = alertProvider.configurations.toList()
+      ..sort((a, b) => b.severity.compareTo(a.severity));
     final stats = alertProvider.stats;
 
     return Column(
