@@ -553,10 +553,16 @@ class _InfosTab extends StatelessWidget {
           _InfoCard(
             title: AppLocalizations.of(context).translate(AppStrings.rfidIdentification),
             trailing: IconButton(
-              icon: const Icon(Icons.edit),
-              tooltip:
-                  AppLocalizations.of(context).translate(AppStrings.changeEid),
-              onPressed: () => _showChangeEidDialog(context, currentAnimal),
+              icon: Icon(
+                Icons.edit,
+                color: currentAnimal.canEditRecords ? null : Colors.grey,
+              ),
+              tooltip: currentAnimal.canEditRecords
+                  ? AppLocalizations.of(context).translate(AppStrings.changeEid)
+                  : null,
+              onPressed: currentAnimal.canEditRecords
+                  ? () => _showChangeEidDialog(context, currentAnimal)
+                  : null,
             ),
             children: [
               _InfoRow(
@@ -631,8 +637,13 @@ class _InfosTab extends StatelessWidget {
           _InfoCard(
             title: AppLocalizations.of(context).translate(AppStrings.weight),
             trailing: IconButton(
-              icon: const Icon(Icons.add_circle),
-              onPressed: () => _showAddWeightDialog(context),
+              icon: Icon(
+                Icons.add_circle,
+                color: currentAnimal.canEditRecords ? null : Colors.grey,
+              ),
+              onPressed: currentAnimal.canEditRecords
+                  ? () => _showAddWeightDialog(context)
+                  : null,
             ),
             children: [
               if (latestWeight != null) ...[
@@ -704,24 +715,24 @@ class _InfosTab extends StatelessWidget {
           // ✅ Invisible si DRAFT
           if (!currentAnimal.isDraft)
             OutlinedButton.icon(
-              onPressed: currentAnimal.status == AnimalStatus.dead
-                  ? null
-                  : () {
+              onPressed: currentAnimal.status == AnimalStatus.alive
+                  ? () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
                                 DeathScreen(animal: currentAnimal)),
                       );
-                    },
+                    }
+                  : null,
               icon: const Icon(Icons.dangerous),
               label: Text(AppLocalizations.of(context)
                   .translate(AppStrings.declareDeath)),
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size.fromHeight(48),
-                foregroundColor: currentAnimal.status == AnimalStatus.dead
-                    ? Colors.grey
-                    : Colors.red,
+                foregroundColor: currentAnimal.status == AnimalStatus.alive
+                    ? Colors.red
+                    : Colors.grey,
               ),
             ),
 

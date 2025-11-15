@@ -428,6 +428,13 @@ class VaccinationDetailScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final hasNotes = currentVaccination.notes != null && currentVaccination.notes!.isNotEmpty;
 
+    // Vérifier si l'animal peut avoir ses enregistrements modifiés
+    final animalProvider = context.read<AnimalProvider>();
+    final animal = currentVaccination.animalId != null
+        ? animalProvider.getAnimalById(currentVaccination.animalId!)
+        : null;
+    final canEdit = animal?.canEditRecords ?? false;
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: AppConstants.spacingMedium),
       child: Padding(
@@ -453,9 +460,13 @@ class VaccinationDetailScreen extends StatelessWidget {
                   ],
                 ),
                 IconButton(
-                  icon: const Icon(Icons.edit, size: AppConstants.iconSizeRegular),
-                  onPressed: () => _showEditNotesDialog(context, currentVaccination),
-                  tooltip: l10n.translate(AppStrings.editNotes),
+                  icon: Icon(
+                    Icons.edit,
+                    size: AppConstants.iconSizeRegular,
+                    color: canEdit ? null : Colors.grey,
+                  ),
+                  onPressed: canEdit ? () => _showEditNotesDialog(context, currentVaccination) : null,
+                  tooltip: canEdit ? l10n.translate(AppStrings.editNotes) : null,
                 ),
               ],
             ),
