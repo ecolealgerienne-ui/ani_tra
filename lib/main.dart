@@ -420,6 +420,18 @@ class MyApp extends StatelessWidget {
                   vertical: 12.0,
                 ),
               ),
+              dialogTheme: const DialogTheme(
+                backgroundColor: Colors.white,
+                titleTextStyle: TextStyle(
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+                contentTextStyle: TextStyle(
+                  color: Colors.black87,
+                  fontSize: 16,
+                ),
+              ),
             ),
             locale: localeProvider.locale,
             supportedLocales: const [

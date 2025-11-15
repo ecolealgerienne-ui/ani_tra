@@ -434,13 +434,13 @@ class _FarmSelectionSection extends StatelessWidget {
                         isSelected ? FontWeight.bold : FontWeight.normal,
                     color: isSelected
                         ? Theme.of(context).primaryColor
-                        : Colors.black87,
+                        : Colors.black,
                   ),
                 ),
                 subtitle: Text(
                   farm.location,
                   style: const TextStyle(
-                    color: Colors.black54,
+                    color: Colors.black,
                   ),
                 ),
                 trailing: isSelected
@@ -592,7 +592,7 @@ class _BreedingPreferencesSection extends StatelessWidget {
                         isSelected ? FontWeight.bold : FontWeight.normal,
                     color: isSelected
                         ? Theme.of(context).primaryColor
-                        : Colors.black87,
+                        : Colors.black,
                   ),
                 ),
                 trailing: isSelected
@@ -654,7 +654,7 @@ class _BreedingPreferencesSection extends StatelessWidget {
                         isSelected ? FontWeight.bold : FontWeight.normal,
                     color: isSelected
                         ? Theme.of(context).primaryColor
-                        : Colors.black87,
+                        : Colors.black,
                   ),
                 ),
                 trailing: isSelected
@@ -768,7 +768,7 @@ class _VeterinarianSettingsSection extends StatelessWidget {
                           : FontWeight.normal,
                       color: defaultVeterinarianId == null
                           ? Theme.of(context).primaryColor
-                          : Colors.black87,
+                          : Colors.black,
                     ),
                   ),
                   trailing: defaultVeterinarianId == null
@@ -798,13 +798,13 @@ class _VeterinarianSettingsSection extends StatelessWidget {
                         isSelected ? FontWeight.bold : FontWeight.normal,
                     color: isSelected
                         ? Theme.of(context).primaryColor
-                        : Colors.black87,
+                        : Colors.black,
                   ),
                 ),
                 subtitle: Text(
                   vet.clinic ?? '',
                   style: const TextStyle(
-                    color: Colors.black54,
+                    color: Colors.black,
                   ),
                 ),
                 trailing: isSelected
