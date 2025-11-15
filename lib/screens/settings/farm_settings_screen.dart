@@ -848,17 +848,17 @@ class _AlertSettingsSection extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _AlertStat(
-                    label: 'Total',
+                    label: AppLocalizations.of(context).translate(AppStrings.total),
                     value: stats['total'].toString(),
                     color: Colors.blue,
                   ),
                   _AlertStat(
-                    label: 'Activées',
+                    label: AppLocalizations.of(context).translate(AppStrings.enabled),
                     value: stats['enabled'].toString(),
                     color: AppConstants.successGreen,
                   ),
                   _AlertStat(
-                    label: 'Désactivées',
+                    label: AppLocalizations.of(context).translate(AppStrings.disabled),
                     value: stats['disabled'].toString(),
                     color: Colors.grey,
                   ),
@@ -1000,7 +1000,7 @@ class _AlertConfigItem extends StatelessWidget {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Erreur lors de la mise à jour: $e'),
+                      content: Text('${AppLocalizations.of(context).translate(AppStrings.errorUpdatingPreferences)}: $e'),
                       backgroundColor: AppConstants.statusDanger,
                     ),
                   );

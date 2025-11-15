@@ -1084,4 +1084,10 @@ const Map<String, String> stringsFr = {
   'syncOnDemand': 'Synchronisation à la demande',
   'automaticBackup': 'Sauvegarde automatique',
   'backupDailyCloud': 'Sauvegarde quotidienne dans le cloud',
+
+  // ============ FARM SETTINGS & ALERT STATS ============
+  'enabled': 'Activées',
+  'disabled': 'Désactivées',
+  'draftUrgentAlert': '🚨 URGENT: Brouillon depuis {days}j',
+  'draftWarningAlert': '⚠️ Brouillon depuis {hours}h',
 };

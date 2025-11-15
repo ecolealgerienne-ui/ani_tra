@@ -1083,4 +1083,10 @@ class AppStrings {
   static const String automaticBackup = 'automaticBackup';
   static const String backupDailyCloud = 'backupDailyCloud';
 
+  // ============ FARM SETTINGS & ALERT STATS ============
+  static const String enabled = 'enabled';
+  static const String disabled = 'disabled';
+  static const String draftUrgentAlert = 'draftUrgentAlert';
+  static const String draftWarningAlert = 'draftWarningAlert';
+
 }

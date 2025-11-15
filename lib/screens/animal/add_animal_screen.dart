@@ -919,7 +919,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                 prefixIcon: const Icon(Icons.note),
               ),
               maxLines: 3,
-              maxLength: 500,
+              maxLength: AppConstants.maxNotesLength,
             ),
 
             const SizedBox(height: AppConstants.spacingLarge),

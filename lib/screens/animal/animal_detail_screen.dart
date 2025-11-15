@@ -1150,9 +1150,9 @@ class _GenealogieTab extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium)),
             )
           else
-            const Text('Mère inconnue', style: TextStyle(color: Colors.grey)),
+            Text(AppLocalizations.of(context).translate(AppStrings.motherUnknown), style: const TextStyle(color: Colors.grey)),
           const SizedBox(height: AppConstants.spacingMediumLarge),
-          Text('Descendants (${children.length})',
+          Text('${AppLocalizations.of(context).translate(AppStrings.descendants)} (${children.length})',
               style:
                   const TextStyle(fontSize: AppConstants.fontSizeImportant, fontWeight: FontWeight.bold)),
           const SizedBox(height: AppConstants.spacingExtraSmall),
