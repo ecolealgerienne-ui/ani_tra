@@ -275,6 +275,11 @@ class AlertProvider extends ChangeNotifier {
               debugPrint('   ↳ Batch: ${batchAlerts.length} alertes (TODO)');
               newAlerts.addAll(batchAlerts);
               break;
+            case AlertEvaluationType.draftAnimals:
+              final draftAlerts = await _checkAndBuildDraftAnimals(config);
+              debugPrint('   ↳ Draft Animals: ${draftAlerts.length} alertes');
+              newAlerts.addAll(draftAlerts);
+              break;
           }
         } catch (e) {
           debugPrint(
@@ -754,6 +759,37 @@ class AlertProvider extends ChangeNotifier {
   ) async {
     final alerts = <Alert>[];
     // TODO: Implémenter quand Batch model est prêt
+    return alerts;
+  }
+
+  /// Évaluation DRAFT ANIMALS (Animaux en brouillon)
+  Future<List<Alert>> _checkAndBuildDraftAnimals(
+    AlertConfiguration config,
+  ) async {
+    final alerts = <Alert>[];
+
+    // Récupérer tous les animaux en mode draft
+    final draftAnimals = _animalProvider.animals
+        .where((animal) => animal.status == AnimalStatus.draft)
+        .toList();
+
+    // Créer une alerte pour les animaux en brouillon
+    if (draftAnimals.isNotEmpty) {
+      final now = DateTime.now();
+      alerts.add(Alert(
+        id: 'draft_animals_${now.millisecondsSinceEpoch}',
+        farmId: _authProvider.currentFarmId,
+        title: config.titleKey,
+        message: config.messageKey,
+        category: AlertCategory.registre,
+        severity: config.severity,
+        iconName: config.iconName,
+        colorHex: config.colorHex,
+        createdAt: now,
+        updatedAt: now,
+      ));
+    }
+
     return alerts;
   }
 
