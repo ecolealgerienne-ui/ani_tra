@@ -147,6 +147,11 @@ class Animal implements SyncableEntity {
   /// ❌ DRAFT, DEAD, SOLD, SLAUGHTERED: non
   bool get canReceiveCare => status == AnimalStatus.alive && isValidated;
 
+  /// L'animal peut-il avoir des enregistrements modifiés (pesées, traitements, etc.)?
+  /// ✅ ALIVE validé
+  /// ❌ DRAFT, DEAD, SOLD, SLAUGHTERED: non
+  bool get canEditRecords => status == AnimalStatus.alive && isValidated;
+
   /// Getter de compatibilitÃ© pour le code existant
   /// @deprecated Utiliser currentEid Ã  la place
   String? get eid => currentEid;
