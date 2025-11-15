@@ -1210,7 +1210,8 @@ class AppDatabase extends _$AppDatabase {
   // ───────────────────────────────────────────────────────────
   @override
   FarmDao get farmDao => FarmDao(this);
-  @override
+  // FIXME: Uncomment @override after regenerating database.g.dart with build_runner
+  // @override
   FarmPreferencesDao get farmPreferencesDao => FarmPreferencesDao(this);
 
   // ───────────────────────────────────────────────────────────
