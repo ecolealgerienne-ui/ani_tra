@@ -121,6 +121,9 @@ class AppConstants {
   /// Opacité moyenne pour les backgrounds de cards
   static const double opacityMedium = 0.2;
 
+  /// Opacité subtile pour le texte secondaire
+  static const double opacitySubtle = 0.85;
+
   // ============ ICON SIZES (si absentes) ============
   /// Taille extra petite pour petites icônes inline
   static const double iconSizeXSmall = 16.0;

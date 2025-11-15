@@ -109,12 +109,27 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    auth.currentUserName ?? 'Utilisateur',
-                    style: const TextStyle(
-                      fontSize: AppConstants.fontSizeBody,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        auth.currentUserName ?? 'Utilisateur',
+                        style: const TextStyle(
+                          fontSize: AppConstants.fontSizeBody,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: AppConstants.spacingMicro),
+                      Text(
+                        auth.currentFarmName ?? '',
+                        style: TextStyle(
+                          fontSize: AppConstants.fontSizeSmall,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.white.withOpacity(AppConstants.opacitySubtle),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(width: AppConstants.spacingTiny),
                   const Icon(Icons.arrow_drop_down, size: AppConstants.iconSizeRegular),
@@ -146,54 +161,6 @@ class _HomeScreenState extends State<HomeScreen> {
           },
         ),
         actions: [
-          // 🆕 Bouton Alertes avec badge
-          Consumer<AlertProvider>(
-            builder: (context, alertProvider, child) {
-              final alertCount = alertProvider.alertCount;
-              return Stack(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.notifications),
-                    tooltip: AppLocalizations.of(context)
-                        .translate(AppStrings.alerts),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AlertsScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  if (alertCount > 0)
-                    Positioned(
-                      right: 8,
-                      top: 8,
-                      child: Container(
-                        padding: const EdgeInsets.all(AppConstants.spacingTiny),
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
-                        constraints: const BoxConstraints(
-                          minWidth: 16,
-                          minHeight: 16,
-                        ),
-                        child: Text(
-                          alertCount > 9 ? '9+' : '$alertCount',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: AppConstants.fontSizeMicro,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                ],
-              );
-            },
-          ),
           IconButton(
             icon: const Icon(Icons.settings),
             tooltip: l10n.translate(AppStrings.settings),
