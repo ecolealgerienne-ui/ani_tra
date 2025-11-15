@@ -823,6 +823,7 @@ const Map<String, String> stringsEn = {
   'actions': 'Actions',
   'recordWeight': 'Weigh',
   'declareDeath': 'Declare death',
+  'death': 'Death',
   'noActiveAlert': 'No active alert',
   'vaccinations': 'Vaccinations',
   'noVaccination': 'No vaccination recorded',

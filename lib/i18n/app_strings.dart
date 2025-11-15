@@ -873,6 +873,7 @@ class AppStrings {
   static const String actions = 'actions';
   static const String recordWeight = 'recordWeight';
   static const String declareDeath = 'declareDeath';
+  static const String death = 'death';
   static const String noActiveAlert = 'noActiveAlert';
   static const String vaccinations = 'vaccinations';
   static const String noVaccination = 'noVaccination';

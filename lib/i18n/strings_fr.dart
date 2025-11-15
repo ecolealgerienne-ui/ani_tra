@@ -878,6 +878,7 @@ const Map<String, String> stringsFr = {
   'actions': 'Actions',
   'recordWeight': 'Peser',
   'declareDeath': 'Déclarer mort',
+  'death': 'Mort',
   'noActiveAlert': 'Aucune alerte active',
   'vaccinations': 'Vaccinations',
   'noVaccination': 'Aucune vaccination enregistrée',
