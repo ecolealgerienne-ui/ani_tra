@@ -25,6 +25,7 @@ import '../../widgets/eid_history_card.dart';
 import '../movement/death_screen.dart';
 //import '../treatment/0_treatment_screen.dart';
 import '../vaccination/vaccination_detail_screen.dart';
+import '../treatment/treatment_detail_screen.dart';
 import '../medical/medical_act_screen.dart';
 import 'add_animal_screen.dart';
 import '../../i18n/app_localizations.dart';
@@ -1044,11 +1045,21 @@ class _TreatmentCard extends StatelessWidget {
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(AppConstants.spacingMedium),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => TreatmentDetailScreen(treatment: treatment),
+            ),
+          );
+        },
+        borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
+        child: Padding(
+          padding: const EdgeInsets.all(AppConstants.spacingMedium),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             Row(
               children: [
                 const Icon(Icons.medical_services, color: Colors.blue),
@@ -1100,6 +1111,7 @@ class _TreatmentCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }
