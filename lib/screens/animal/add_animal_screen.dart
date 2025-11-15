@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 
 import '../../models/animal.dart';
 import '../../models/movement.dart';
+import '../../models/breed.dart';
 //import '../../models/scan_result.dart';
 
 import '../../providers/animal_provider.dart';
@@ -594,8 +595,58 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
             const SizedBox(height: AppConstants.spacingMedium),
 
             // Dropdown Race
-            // Origine
+            Consumer<BreedProvider>(
+              builder: (context, breedProvider, child) {
+                // Filtrer les races selon le type sélectionné
+                final availableBreeds = _selectedSpeciesId != null
+                    ? breedProvider.getBySpeciesId(_selectedSpeciesId!)
+                    : <Breed>[];
 
+                return DropdownButtonFormField<String>(
+                  value: _selectedBreedId != null &&
+                          availableBreeds.any((b) => b.id == _selectedBreedId)
+                      ? _selectedBreedId
+                      : null,
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)
+                        .translate(AppStrings.breedOptional),
+                    prefixIcon: Icon(
+                      Icons.category,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    helperText: _selectedSpeciesId == null
+                        ? AppLocalizations.of(context)
+                            .translate(AppStrings.selectTypeFirst)
+                        : null,
+                  ),
+                  items: availableBreeds.isEmpty
+                      ? []
+                      : availableBreeds.map((breed) {
+                          return DropdownMenuItem(
+                            value: breed.id,
+                            child: Text('${breed.icon} ${breed.nameFr}'),
+                          );
+                        }).toList(),
+                  onChanged: _selectedSpeciesId == null
+                      ? null
+                      : (value) {
+                          setState(() {
+                            _selectedBreedId = value;
+                          });
+                        },
+                );
+              },
+            ),
+
+            const SizedBox(height: AppConstants.spacingMediumLarge),
+            const SizedBox(height: AppConstants.spacingMediumLarge),
+
+            // === Section : Origine ===
+            _buildSectionHeader(AppLocalizations.of(context)
+                .translate(AppStrings.origin)),
+            const SizedBox(height: AppConstants.spacingMedium),
+
+            // Origine
             // Initialiser à null si vide (pour éviter le doublon)
             DropdownButtonFormField<String>(
               initialValue: validOrigin,
