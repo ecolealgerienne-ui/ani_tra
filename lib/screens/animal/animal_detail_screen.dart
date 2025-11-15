@@ -23,6 +23,8 @@ import '../../data/mock_data.dart';
 import '../../widgets/change_eid_dialog.dart';
 import '../../widgets/eid_history_card.dart';
 import '../movement/death_screen.dart';
+import '../movement/slaughter_screen.dart';
+import '../movement/sale_screen.dart';
 //import '../treatment/0_treatment_screen.dart';
 import '../vaccination/vaccination_detail_screen.dart';
 import '../treatment/treatment_detail_screen.dart';
@@ -712,29 +714,74 @@ class _InfosTab extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppConstants.spacingMedium),
-          // ✅ Invisible si DRAFT
-          if (!currentAnimal.isDraft)
+
+          // ✅ BOUTONS MOUVEMENTS (Abattage, Vente, Mort) - Visible seulement si ALIVE et NON DRAFT
+          if (currentAnimal.status == AnimalStatus.alive && !currentAnimal.isDraft) ...[
+            // Bouton Abattage
             OutlinedButton.icon(
-              onPressed: currentAnimal.status == AnimalStatus.alive
-                  ? () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                DeathScreen(animal: currentAnimal)),
-                      );
-                    }
-                  : null,
-              icon: const Icon(Icons.dangerous),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SlaughterScreen(
+                      animalIds: [currentAnimal.id],
+                      animalCount: 1,
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.store),
               label: Text(AppLocalizations.of(context)
-                  .translate(AppStrings.declareDeath)),
+                  .translate(AppStrings.slaughter)),
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size.fromHeight(48),
-                foregroundColor: currentAnimal.status == AnimalStatus.alive
-                    ? Colors.red
-                    : Colors.grey,
+                foregroundColor: Colors.orange,
               ),
             ),
+            const SizedBox(height: AppConstants.spacingSmall),
+
+            // Bouton Vente
+            OutlinedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SaleScreen(
+                      animalIds: [currentAnimal.id],
+                      animalCount: 1,
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.sell),
+              label: Text(AppLocalizations.of(context)
+                  .translate(AppStrings.sale)),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size.fromHeight(48),
+                foregroundColor: Colors.blue,
+              ),
+            ),
+            const SizedBox(height: AppConstants.spacingSmall),
+
+            // Bouton Mort
+            OutlinedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DeathScreen(animal: currentAnimal),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.dangerous),
+              label: Text(AppLocalizations.of(context)
+                  .translate(AppStrings.death)),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size.fromHeight(48),
+                foregroundColor: Colors.red,
+              ),
+            ),
+          ],
 
           // ✅ BOUTONS DRAFT (Modifier, Valider, Supprimer)
           if (currentAnimal.isDraft) ...[

@@ -820,6 +820,7 @@ const Map<String, String> stringsAr = {
   'actions': 'إجراءات',
   'recordWeight': 'وزن',
   'declareDeath': 'تسجيل نفوق',
+  'death': 'نفوق',
   'noActiveAlert': 'لا توجد تنبيهات نشطة',
   'vaccinations': 'التطعيمات',
   'noVaccination': 'لا يوجد تطعيم مسجّل',
