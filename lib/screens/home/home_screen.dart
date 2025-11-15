@@ -126,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: TextStyle(
                           fontSize: AppConstants.fontSizeSmall,
                           fontWeight: FontWeight.w400,
-                          color: Colors.white.withOpacity(AppConstants.opacitySubtle),
+                          color: Colors.white.withValues(alpha: AppConstants.opacitySubtle),
                         ),
                       ),
                     ],
