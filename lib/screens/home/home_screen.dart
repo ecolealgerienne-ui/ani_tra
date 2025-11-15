@@ -8,6 +8,7 @@ import '../../providers/batch_provider.dart';
 import '../../../providers/sync_provider.dart';
 import '../../providers/alert_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/farm_provider.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
@@ -86,8 +87,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Consumer<AuthProvider>(
-          builder: (context, auth, child) {
+        title: Consumer2<AuthProvider, FarmProvider>(
+          builder: (context, auth, farmProvider, child) {
             return PopupMenuButton<String>(
               onSelected: (value) {
                 if (value == 'account') {
@@ -122,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: AppConstants.spacingMicro),
                       Text(
-                        auth.currentFarmName ?? '',
+                        farmProvider.currentFarm?.name ?? '',
                         style: TextStyle(
                           fontSize: AppConstants.fontSizeSmall,
                           fontWeight: FontWeight.w400,
