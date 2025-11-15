@@ -288,24 +288,24 @@ class _FarmSelectionSection extends StatelessWidget {
             subtitle: l10n.translate(AppStrings.farmSelectionSubtitle),
             icon: Icons.business,
           ),
-          const Padding(
-            padding: EdgeInsets.all(AppConstants.farmSettingsSectionPaddingH),
+          Padding(
+            padding: const EdgeInsets.all(AppConstants.farmSettingsSectionPaddingH),
             child: Card(
               elevation: AppConstants.mainCardElevation,
               child: Padding(
-                padding: EdgeInsets.all(AppConstants.spacingMedium),
+                padding: const EdgeInsets.all(AppConstants.spacingMedium),
                 child: Column(
                   children: [
-                    Icon(Icons.warning, color: Colors.orange, size: 48),
-                    SizedBox(height: AppConstants.spacingSmall),
+                    const Icon(Icons.warning, color: Colors.orange, size: 48),
+                    const SizedBox(height: AppConstants.spacingSmall),
                     Text(
                       l10n.translate(AppStrings.noFarmAvailable),
-                      style: TextStyle(fontSize: AppConstants.fontSizeImportant),
+                      style: const TextStyle(fontSize: AppConstants.fontSizeImportant),
                     ),
-                    SizedBox(height: AppConstants.spacingTiny),
+                    const SizedBox(height: AppConstants.spacingTiny),
                     Text(
                       l10n.translate(AppStrings.pleaseCreateFarm),
-                      style: TextStyle(fontSize: AppConstants.fontSizeSmall, color: Colors.grey),
+                      style: const TextStyle(fontSize: AppConstants.fontSizeSmall, color: Colors.grey),
                     ),
                   ],
                 ),
@@ -463,12 +463,13 @@ class _FarmSelectionSection extends StatelessWidget {
               );
             },
           ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.translate(AppStrings.cancel)),
           ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.translate(AppStrings.cancel)),
+            ),
+          ],
         ),
       ),
     );
@@ -622,12 +623,13 @@ class _BreedingPreferencesSection extends StatelessWidget {
               );
             },
           ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.translate(AppStrings.cancel)),
           ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.translate(AppStrings.cancel)),
+            ),
+          ],
         ),
       ),
     );
@@ -691,12 +693,13 @@ class _BreedingPreferencesSection extends StatelessWidget {
               );
             },
           ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.translate(AppStrings.cancel)),
           ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.translate(AppStrings.cancel)),
+            ),
+          ],
         ),
       ),
     );
@@ -848,12 +851,13 @@ class _VeterinarianSettingsSection extends StatelessWidget {
               );
             },
           ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.translate(AppStrings.cancel)),
           ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.translate(AppStrings.cancel)),
+            ),
+          ],
         ),
       ),
     );
