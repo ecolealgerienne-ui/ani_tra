@@ -1140,7 +1140,8 @@ class AppDatabase extends _$AppDatabase {
 
     if (officialNumberDuplicates.isNotEmpty) {
       final duplicateNumbers = officialNumberDuplicates
-          .map((row) => '${row.data['farm_id']}: ${row.data['official_number']}')
+          .map(
+              (row) => '${row.data['farm_id']}: ${row.data['official_number']}')
           .join(', ');
       throw Exception(
         'Migration échouée: Des doublons de numéros officiels existent dans la base de données. '
@@ -1212,6 +1213,7 @@ class AppDatabase extends _$AppDatabase {
   FarmDao get farmDao => FarmDao(this);
   // FIXME: Uncomment @override after regenerating database.g.dart with build_runner
   // @override
+  @override
   FarmPreferencesDao get farmPreferencesDao => FarmPreferencesDao(this);
 
   // ───────────────────────────────────────────────────────────

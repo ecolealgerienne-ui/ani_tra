@@ -516,6 +516,623 @@ class FarmsTableCompanion extends UpdateCompanion<FarmsTableData> {
   }
 }
 
+class $FarmPreferencesTableTable extends FarmPreferencesTable
+    with TableInfo<$FarmPreferencesTableTable, FarmPreferencesTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FarmPreferencesTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _farmIdMeta = const VerificationMeta('farmId');
+  @override
+  late final GeneratedColumn<String> farmId = GeneratedColumn<String>(
+      'farm_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _defaultVeterinarianIdMeta =
+      const VerificationMeta('defaultVeterinarianId');
+  @override
+  late final GeneratedColumn<String> defaultVeterinarianId =
+      GeneratedColumn<String>('default_veterinarian_id', aliasedName, true,
+          type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _defaultSpeciesIdMeta =
+      const VerificationMeta('defaultSpeciesId');
+  @override
+  late final GeneratedColumn<String> defaultSpeciesId = GeneratedColumn<String>(
+      'default_species_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _defaultBreedIdMeta =
+      const VerificationMeta('defaultBreedId');
+  @override
+  late final GeneratedColumn<String> defaultBreedId = GeneratedColumn<String>(
+      'default_breed_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+      'synced', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("synced" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _lastSyncedAtMeta =
+      const VerificationMeta('lastSyncedAt');
+  @override
+  late final GeneratedColumn<DateTime> lastSyncedAt = GeneratedColumn<DateTime>(
+      'last_synced_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _serverVersionMeta =
+      const VerificationMeta('serverVersion');
+  @override
+  late final GeneratedColumn<String> serverVersion = GeneratedColumn<String>(
+      'server_version', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _deletedAtMeta =
+      const VerificationMeta('deletedAt');
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+      'deleted_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        farmId,
+        defaultVeterinarianId,
+        defaultSpeciesId,
+        defaultBreedId,
+        synced,
+        lastSyncedAt,
+        serverVersion,
+        deletedAt,
+        createdAt,
+        updatedAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'farm_preferences';
+  @override
+  VerificationContext validateIntegrity(
+      Insertable<FarmPreferencesTableData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('farm_id')) {
+      context.handle(_farmIdMeta,
+          farmId.isAcceptableOrUnknown(data['farm_id']!, _farmIdMeta));
+    } else if (isInserting) {
+      context.missing(_farmIdMeta);
+    }
+    if (data.containsKey('default_veterinarian_id')) {
+      context.handle(
+          _defaultVeterinarianIdMeta,
+          defaultVeterinarianId.isAcceptableOrUnknown(
+              data['default_veterinarian_id']!, _defaultVeterinarianIdMeta));
+    }
+    if (data.containsKey('default_species_id')) {
+      context.handle(
+          _defaultSpeciesIdMeta,
+          defaultSpeciesId.isAcceptableOrUnknown(
+              data['default_species_id']!, _defaultSpeciesIdMeta));
+    } else if (isInserting) {
+      context.missing(_defaultSpeciesIdMeta);
+    }
+    if (data.containsKey('default_breed_id')) {
+      context.handle(
+          _defaultBreedIdMeta,
+          defaultBreedId.isAcceptableOrUnknown(
+              data['default_breed_id']!, _defaultBreedIdMeta));
+    }
+    if (data.containsKey('synced')) {
+      context.handle(_syncedMeta,
+          synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta));
+    }
+    if (data.containsKey('last_synced_at')) {
+      context.handle(
+          _lastSyncedAtMeta,
+          lastSyncedAt.isAcceptableOrUnknown(
+              data['last_synced_at']!, _lastSyncedAtMeta));
+    }
+    if (data.containsKey('server_version')) {
+      context.handle(
+          _serverVersionMeta,
+          serverVersion.isAcceptableOrUnknown(
+              data['server_version']!, _serverVersionMeta));
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(_deletedAtMeta,
+          deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+        {farmId},
+      ];
+  @override
+  FarmPreferencesTableData map(Map<String, dynamic> data,
+      {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FarmPreferencesTableData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      farmId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}farm_id'])!,
+      defaultVeterinarianId: attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}default_veterinarian_id']),
+      defaultSpeciesId: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}default_species_id'])!,
+      defaultBreedId: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}default_breed_id']),
+      synced: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}synced'])!,
+      lastSyncedAt: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}last_synced_at']),
+      serverVersion: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}server_version']),
+      deletedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}deleted_at']),
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+    );
+  }
+
+  @override
+  $FarmPreferencesTableTable createAlias(String alias) {
+    return $FarmPreferencesTableTable(attachedDatabase, alias);
+  }
+}
+
+class FarmPreferencesTableData extends DataClass
+    implements Insertable<FarmPreferencesTableData> {
+  final String id;
+
+  /// Référence à la table farms
+  final String farmId;
+
+  /// Vétérinaire par défaut pour cette ferme (FK → veterinarians, nullable)
+  final String? defaultVeterinarianId;
+
+  /// Type d'animal par défaut (Ex: 'sheep', 'cattle', 'goat')
+  final String defaultSpeciesId;
+
+  /// Race par défaut (Ex: 'merinos', 'charolaise', nullable)
+  final String? defaultBreedId;
+
+  /// Cette ligne a-t-elle été synchronisée avec le backend ?
+  final bool synced;
+
+  /// Quand cette ligne a-t-elle été synchronisée pour la dernière fois ?
+  final DateTime? lastSyncedAt;
+
+  /// Version du serveur (pour résolution de conflits)
+  final String? serverVersion;
+
+  /// Soft-delete timestamp (null = active)
+  final DateTime? deletedAt;
+
+  /// Date de création
+  final DateTime createdAt;
+
+  /// Date de dernière modification
+  final DateTime updatedAt;
+  const FarmPreferencesTableData(
+      {required this.id,
+      required this.farmId,
+      this.defaultVeterinarianId,
+      required this.defaultSpeciesId,
+      this.defaultBreedId,
+      required this.synced,
+      this.lastSyncedAt,
+      this.serverVersion,
+      this.deletedAt,
+      required this.createdAt,
+      required this.updatedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['farm_id'] = Variable<String>(farmId);
+    if (!nullToAbsent || defaultVeterinarianId != null) {
+      map['default_veterinarian_id'] = Variable<String>(defaultVeterinarianId);
+    }
+    map['default_species_id'] = Variable<String>(defaultSpeciesId);
+    if (!nullToAbsent || defaultBreedId != null) {
+      map['default_breed_id'] = Variable<String>(defaultBreedId);
+    }
+    map['synced'] = Variable<bool>(synced);
+    if (!nullToAbsent || lastSyncedAt != null) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt);
+    }
+    if (!nullToAbsent || serverVersion != null) {
+      map['server_version'] = Variable<String>(serverVersion);
+    }
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  FarmPreferencesTableCompanion toCompanion(bool nullToAbsent) {
+    return FarmPreferencesTableCompanion(
+      id: Value(id),
+      farmId: Value(farmId),
+      defaultVeterinarianId: defaultVeterinarianId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(defaultVeterinarianId),
+      defaultSpeciesId: Value(defaultSpeciesId),
+      defaultBreedId: defaultBreedId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(defaultBreedId),
+      synced: Value(synced),
+      lastSyncedAt: lastSyncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSyncedAt),
+      serverVersion: serverVersion == null && nullToAbsent
+          ? const Value.absent()
+          : Value(serverVersion),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory FarmPreferencesTableData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FarmPreferencesTableData(
+      id: serializer.fromJson<String>(json['id']),
+      farmId: serializer.fromJson<String>(json['farmId']),
+      defaultVeterinarianId:
+          serializer.fromJson<String?>(json['defaultVeterinarianId']),
+      defaultSpeciesId: serializer.fromJson<String>(json['defaultSpeciesId']),
+      defaultBreedId: serializer.fromJson<String?>(json['defaultBreedId']),
+      synced: serializer.fromJson<bool>(json['synced']),
+      lastSyncedAt: serializer.fromJson<DateTime?>(json['lastSyncedAt']),
+      serverVersion: serializer.fromJson<String?>(json['serverVersion']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'farmId': serializer.toJson<String>(farmId),
+      'defaultVeterinarianId':
+          serializer.toJson<String?>(defaultVeterinarianId),
+      'defaultSpeciesId': serializer.toJson<String>(defaultSpeciesId),
+      'defaultBreedId': serializer.toJson<String?>(defaultBreedId),
+      'synced': serializer.toJson<bool>(synced),
+      'lastSyncedAt': serializer.toJson<DateTime?>(lastSyncedAt),
+      'serverVersion': serializer.toJson<String?>(serverVersion),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  FarmPreferencesTableData copyWith(
+          {String? id,
+          String? farmId,
+          Value<String?> defaultVeterinarianId = const Value.absent(),
+          String? defaultSpeciesId,
+          Value<String?> defaultBreedId = const Value.absent(),
+          bool? synced,
+          Value<DateTime?> lastSyncedAt = const Value.absent(),
+          Value<String?> serverVersion = const Value.absent(),
+          Value<DateTime?> deletedAt = const Value.absent(),
+          DateTime? createdAt,
+          DateTime? updatedAt}) =>
+      FarmPreferencesTableData(
+        id: id ?? this.id,
+        farmId: farmId ?? this.farmId,
+        defaultVeterinarianId: defaultVeterinarianId.present
+            ? defaultVeterinarianId.value
+            : this.defaultVeterinarianId,
+        defaultSpeciesId: defaultSpeciesId ?? this.defaultSpeciesId,
+        defaultBreedId:
+            defaultBreedId.present ? defaultBreedId.value : this.defaultBreedId,
+        synced: synced ?? this.synced,
+        lastSyncedAt:
+            lastSyncedAt.present ? lastSyncedAt.value : this.lastSyncedAt,
+        serverVersion:
+            serverVersion.present ? serverVersion.value : this.serverVersion,
+        deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+  FarmPreferencesTableData copyWithCompanion(
+      FarmPreferencesTableCompanion data) {
+    return FarmPreferencesTableData(
+      id: data.id.present ? data.id.value : this.id,
+      farmId: data.farmId.present ? data.farmId.value : this.farmId,
+      defaultVeterinarianId: data.defaultVeterinarianId.present
+          ? data.defaultVeterinarianId.value
+          : this.defaultVeterinarianId,
+      defaultSpeciesId: data.defaultSpeciesId.present
+          ? data.defaultSpeciesId.value
+          : this.defaultSpeciesId,
+      defaultBreedId: data.defaultBreedId.present
+          ? data.defaultBreedId.value
+          : this.defaultBreedId,
+      synced: data.synced.present ? data.synced.value : this.synced,
+      lastSyncedAt: data.lastSyncedAt.present
+          ? data.lastSyncedAt.value
+          : this.lastSyncedAt,
+      serverVersion: data.serverVersion.present
+          ? data.serverVersion.value
+          : this.serverVersion,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FarmPreferencesTableData(')
+          ..write('id: $id, ')
+          ..write('farmId: $farmId, ')
+          ..write('defaultVeterinarianId: $defaultVeterinarianId, ')
+          ..write('defaultSpeciesId: $defaultSpeciesId, ')
+          ..write('defaultBreedId: $defaultBreedId, ')
+          ..write('synced: $synced, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('serverVersion: $serverVersion, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id,
+      farmId,
+      defaultVeterinarianId,
+      defaultSpeciesId,
+      defaultBreedId,
+      synced,
+      lastSyncedAt,
+      serverVersion,
+      deletedAt,
+      createdAt,
+      updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FarmPreferencesTableData &&
+          other.id == this.id &&
+          other.farmId == this.farmId &&
+          other.defaultVeterinarianId == this.defaultVeterinarianId &&
+          other.defaultSpeciesId == this.defaultSpeciesId &&
+          other.defaultBreedId == this.defaultBreedId &&
+          other.synced == this.synced &&
+          other.lastSyncedAt == this.lastSyncedAt &&
+          other.serverVersion == this.serverVersion &&
+          other.deletedAt == this.deletedAt &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class FarmPreferencesTableCompanion
+    extends UpdateCompanion<FarmPreferencesTableData> {
+  final Value<String> id;
+  final Value<String> farmId;
+  final Value<String?> defaultVeterinarianId;
+  final Value<String> defaultSpeciesId;
+  final Value<String?> defaultBreedId;
+  final Value<bool> synced;
+  final Value<DateTime?> lastSyncedAt;
+  final Value<String?> serverVersion;
+  final Value<DateTime?> deletedAt;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const FarmPreferencesTableCompanion({
+    this.id = const Value.absent(),
+    this.farmId = const Value.absent(),
+    this.defaultVeterinarianId = const Value.absent(),
+    this.defaultSpeciesId = const Value.absent(),
+    this.defaultBreedId = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.serverVersion = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  FarmPreferencesTableCompanion.insert({
+    required String id,
+    required String farmId,
+    this.defaultVeterinarianId = const Value.absent(),
+    required String defaultSpeciesId,
+    this.defaultBreedId = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.serverVersion = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        farmId = Value(farmId),
+        defaultSpeciesId = Value(defaultSpeciesId),
+        createdAt = Value(createdAt),
+        updatedAt = Value(updatedAt);
+  static Insertable<FarmPreferencesTableData> custom({
+    Expression<String>? id,
+    Expression<String>? farmId,
+    Expression<String>? defaultVeterinarianId,
+    Expression<String>? defaultSpeciesId,
+    Expression<String>? defaultBreedId,
+    Expression<bool>? synced,
+    Expression<DateTime>? lastSyncedAt,
+    Expression<String>? serverVersion,
+    Expression<DateTime>? deletedAt,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (farmId != null) 'farm_id': farmId,
+      if (defaultVeterinarianId != null)
+        'default_veterinarian_id': defaultVeterinarianId,
+      if (defaultSpeciesId != null) 'default_species_id': defaultSpeciesId,
+      if (defaultBreedId != null) 'default_breed_id': defaultBreedId,
+      if (synced != null) 'synced': synced,
+      if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
+      if (serverVersion != null) 'server_version': serverVersion,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  FarmPreferencesTableCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? farmId,
+      Value<String?>? defaultVeterinarianId,
+      Value<String>? defaultSpeciesId,
+      Value<String?>? defaultBreedId,
+      Value<bool>? synced,
+      Value<DateTime?>? lastSyncedAt,
+      Value<String?>? serverVersion,
+      Value<DateTime?>? deletedAt,
+      Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt,
+      Value<int>? rowid}) {
+    return FarmPreferencesTableCompanion(
+      id: id ?? this.id,
+      farmId: farmId ?? this.farmId,
+      defaultVeterinarianId:
+          defaultVeterinarianId ?? this.defaultVeterinarianId,
+      defaultSpeciesId: defaultSpeciesId ?? this.defaultSpeciesId,
+      defaultBreedId: defaultBreedId ?? this.defaultBreedId,
+      synced: synced ?? this.synced,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      serverVersion: serverVersion ?? this.serverVersion,
+      deletedAt: deletedAt ?? this.deletedAt,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (farmId.present) {
+      map['farm_id'] = Variable<String>(farmId.value);
+    }
+    if (defaultVeterinarianId.present) {
+      map['default_veterinarian_id'] =
+          Variable<String>(defaultVeterinarianId.value);
+    }
+    if (defaultSpeciesId.present) {
+      map['default_species_id'] = Variable<String>(defaultSpeciesId.value);
+    }
+    if (defaultBreedId.present) {
+      map['default_breed_id'] = Variable<String>(defaultBreedId.value);
+    }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
+    if (lastSyncedAt.present) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt.value);
+    }
+    if (serverVersion.present) {
+      map['server_version'] = Variable<String>(serverVersion.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FarmPreferencesTableCompanion(')
+          ..write('id: $id, ')
+          ..write('farmId: $farmId, ')
+          ..write('defaultVeterinarianId: $defaultVeterinarianId, ')
+          ..write('defaultSpeciesId: $defaultSpeciesId, ')
+          ..write('defaultBreedId: $defaultBreedId, ')
+          ..write('synced: $synced, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('serverVersion: $serverVersion, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $AnimalsTableTable extends AnimalsTable
     with TableInfo<$AnimalsTableTable, AnimalsTableData> {
   @override
@@ -602,6 +1219,11 @@ class $AnimalsTableTable extends AnimalsTable
   late final GeneratedColumn<String> photoUrl = GeneratedColumn<String>(
       'photo_url', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+      'notes', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _daysMeta = const VerificationMeta('days');
   @override
   late final GeneratedColumn<int> days = GeneratedColumn<int>(
@@ -662,6 +1284,7 @@ class $AnimalsTableTable extends AnimalsTable
         speciesId,
         breedId,
         photoUrl,
+        notes,
         days,
         synced,
         lastSyncedAt,
@@ -753,6 +1376,10 @@ class $AnimalsTableTable extends AnimalsTable
       context.handle(_photoUrlMeta,
           photoUrl.isAcceptableOrUnknown(data['photo_url']!, _photoUrlMeta));
     }
+    if (data.containsKey('notes')) {
+      context.handle(
+          _notesMeta, notes.isAcceptableOrUnknown(data['notes']!, _notesMeta));
+    }
     if (data.containsKey('days')) {
       context.handle(
           _daysMeta, days.isAcceptableOrUnknown(data['days']!, _daysMeta));
@@ -826,6 +1453,8 @@ class $AnimalsTableTable extends AnimalsTable
           .read(DriftSqlType.string, data['${effectivePrefix}breed_id']),
       photoUrl: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}photo_url']),
+      notes: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}notes']),
       days: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}days']),
       synced: attachedDatabase.typeMapping
@@ -865,6 +1494,7 @@ class AnimalsTableData extends DataClass
   final String? speciesId;
   final String? breedId;
   final String? photoUrl;
+  final String? notes;
   final int? days;
   final bool synced;
   final DateTime? lastSyncedAt;
@@ -887,6 +1517,7 @@ class AnimalsTableData extends DataClass
       this.speciesId,
       this.breedId,
       this.photoUrl,
+      this.notes,
       this.days,
       required this.synced,
       this.lastSyncedAt,
@@ -928,6 +1559,9 @@ class AnimalsTableData extends DataClass
     }
     if (!nullToAbsent || photoUrl != null) {
       map['photo_url'] = Variable<String>(photoUrl);
+    }
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
     }
     if (!nullToAbsent || days != null) {
       map['days'] = Variable<int>(days);
@@ -981,6 +1615,8 @@ class AnimalsTableData extends DataClass
       photoUrl: photoUrl == null && nullToAbsent
           ? const Value.absent()
           : Value(photoUrl),
+      notes:
+          notes == null && nullToAbsent ? const Value.absent() : Value(notes),
       days: days == null && nullToAbsent ? const Value.absent() : Value(days),
       synced: Value(synced),
       lastSyncedAt: lastSyncedAt == null && nullToAbsent
@@ -1015,6 +1651,7 @@ class AnimalsTableData extends DataClass
       speciesId: serializer.fromJson<String?>(json['speciesId']),
       breedId: serializer.fromJson<String?>(json['breedId']),
       photoUrl: serializer.fromJson<String?>(json['photoUrl']),
+      notes: serializer.fromJson<String?>(json['notes']),
       days: serializer.fromJson<int?>(json['days']),
       synced: serializer.fromJson<bool>(json['synced']),
       lastSyncedAt: serializer.fromJson<DateTime?>(json['lastSyncedAt']),
@@ -1042,6 +1679,7 @@ class AnimalsTableData extends DataClass
       'speciesId': serializer.toJson<String?>(speciesId),
       'breedId': serializer.toJson<String?>(breedId),
       'photoUrl': serializer.toJson<String?>(photoUrl),
+      'notes': serializer.toJson<String?>(notes),
       'days': serializer.toJson<int?>(days),
       'synced': serializer.toJson<bool>(synced),
       'lastSyncedAt': serializer.toJson<DateTime?>(lastSyncedAt),
@@ -1067,6 +1705,7 @@ class AnimalsTableData extends DataClass
           Value<String?> speciesId = const Value.absent(),
           Value<String?> breedId = const Value.absent(),
           Value<String?> photoUrl = const Value.absent(),
+          Value<String?> notes = const Value.absent(),
           Value<int?> days = const Value.absent(),
           bool? synced,
           Value<DateTime?> lastSyncedAt = const Value.absent(),
@@ -1090,6 +1729,7 @@ class AnimalsTableData extends DataClass
         speciesId: speciesId.present ? speciesId.value : this.speciesId,
         breedId: breedId.present ? breedId.value : this.breedId,
         photoUrl: photoUrl.present ? photoUrl.value : this.photoUrl,
+        notes: notes.present ? notes.value : this.notes,
         days: days.present ? days.value : this.days,
         synced: synced ?? this.synced,
         lastSyncedAt:
@@ -1121,6 +1761,7 @@ class AnimalsTableData extends DataClass
       speciesId: data.speciesId.present ? data.speciesId.value : this.speciesId,
       breedId: data.breedId.present ? data.breedId.value : this.breedId,
       photoUrl: data.photoUrl.present ? data.photoUrl.value : this.photoUrl,
+      notes: data.notes.present ? data.notes.value : this.notes,
       days: data.days.present ? data.days.value : this.days,
       synced: data.synced.present ? data.synced.value : this.synced,
       lastSyncedAt: data.lastSyncedAt.present
@@ -1152,6 +1793,7 @@ class AnimalsTableData extends DataClass
           ..write('speciesId: $speciesId, ')
           ..write('breedId: $breedId, ')
           ..write('photoUrl: $photoUrl, ')
+          ..write('notes: $notes, ')
           ..write('days: $days, ')
           ..write('synced: $synced, ')
           ..write('lastSyncedAt: $lastSyncedAt, ')
@@ -1179,6 +1821,7 @@ class AnimalsTableData extends DataClass
         speciesId,
         breedId,
         photoUrl,
+        notes,
         days,
         synced,
         lastSyncedAt,
@@ -1205,6 +1848,7 @@ class AnimalsTableData extends DataClass
           other.speciesId == this.speciesId &&
           other.breedId == this.breedId &&
           other.photoUrl == this.photoUrl &&
+          other.notes == this.notes &&
           other.days == this.days &&
           other.synced == this.synced &&
           other.lastSyncedAt == this.lastSyncedAt &&
@@ -1229,6 +1873,7 @@ class AnimalsTableCompanion extends UpdateCompanion<AnimalsTableData> {
   final Value<String?> speciesId;
   final Value<String?> breedId;
   final Value<String?> photoUrl;
+  final Value<String?> notes;
   final Value<int?> days;
   final Value<bool> synced;
   final Value<DateTime?> lastSyncedAt;
@@ -1252,6 +1897,7 @@ class AnimalsTableCompanion extends UpdateCompanion<AnimalsTableData> {
     this.speciesId = const Value.absent(),
     this.breedId = const Value.absent(),
     this.photoUrl = const Value.absent(),
+    this.notes = const Value.absent(),
     this.days = const Value.absent(),
     this.synced = const Value.absent(),
     this.lastSyncedAt = const Value.absent(),
@@ -1276,6 +1922,7 @@ class AnimalsTableCompanion extends UpdateCompanion<AnimalsTableData> {
     this.speciesId = const Value.absent(),
     this.breedId = const Value.absent(),
     this.photoUrl = const Value.absent(),
+    this.notes = const Value.absent(),
     this.days = const Value.absent(),
     this.synced = const Value.absent(),
     this.lastSyncedAt = const Value.absent(),
@@ -1306,6 +1953,7 @@ class AnimalsTableCompanion extends UpdateCompanion<AnimalsTableData> {
     Expression<String>? speciesId,
     Expression<String>? breedId,
     Expression<String>? photoUrl,
+    Expression<String>? notes,
     Expression<int>? days,
     Expression<bool>? synced,
     Expression<DateTime>? lastSyncedAt,
@@ -1330,6 +1978,7 @@ class AnimalsTableCompanion extends UpdateCompanion<AnimalsTableData> {
       if (speciesId != null) 'species_id': speciesId,
       if (breedId != null) 'breed_id': breedId,
       if (photoUrl != null) 'photo_url': photoUrl,
+      if (notes != null) 'notes': notes,
       if (days != null) 'days': days,
       if (synced != null) 'synced': synced,
       if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
@@ -1356,6 +2005,7 @@ class AnimalsTableCompanion extends UpdateCompanion<AnimalsTableData> {
       Value<String?>? speciesId,
       Value<String?>? breedId,
       Value<String?>? photoUrl,
+      Value<String?>? notes,
       Value<int?>? days,
       Value<bool>? synced,
       Value<DateTime?>? lastSyncedAt,
@@ -1379,6 +2029,7 @@ class AnimalsTableCompanion extends UpdateCompanion<AnimalsTableData> {
       speciesId: speciesId ?? this.speciesId,
       breedId: breedId ?? this.breedId,
       photoUrl: photoUrl ?? this.photoUrl,
+      notes: notes ?? this.notes,
       days: days ?? this.days,
       synced: synced ?? this.synced,
       lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
@@ -1435,6 +2086,9 @@ class AnimalsTableCompanion extends UpdateCompanion<AnimalsTableData> {
     if (photoUrl.present) {
       map['photo_url'] = Variable<String>(photoUrl.value);
     }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
     if (days.present) {
       map['days'] = Variable<int>(days.value);
     }
@@ -1479,6 +2133,7 @@ class AnimalsTableCompanion extends UpdateCompanion<AnimalsTableData> {
           ..write('speciesId: $speciesId, ')
           ..write('breedId: $breedId, ')
           ..write('photoUrl: $photoUrl, ')
+          ..write('notes: $notes, ')
           ..write('days: $days, ')
           ..write('synced: $synced, ')
           ..write('lastSyncedAt: $lastSyncedAt, ')
@@ -15538,6 +16193,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $FarmsTableTable farmsTable = $FarmsTableTable(this);
+  late final $FarmPreferencesTableTable farmPreferencesTable =
+      $FarmPreferencesTableTable(this);
   late final $AnimalsTableTable animalsTable = $AnimalsTableTable(this);
   late final $BreedingsTableTable breedingsTable = $BreedingsTableTable(this);
   late final $DocumentsTableTable documentsTable = $DocumentsTableTable(this);
@@ -15560,6 +16217,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $AlertConfigurationsTableTable alertConfigurationsTable =
       $AlertConfigurationsTableTable(this);
   late final FarmDao farmDao = FarmDao(this as AppDatabase);
+  late final FarmPreferencesDao farmPreferencesDao =
+      FarmPreferencesDao(this as AppDatabase);
   late final AnimalDao animalDao = AnimalDao(this as AppDatabase);
   late final BreedingDao breedingDao = BreedingDao(this as AppDatabase);
   late final DocumentDao documentDao = DocumentDao(this as AppDatabase);
@@ -15586,6 +16245,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
         farmsTable,
+        farmPreferencesTable,
         animalsTable,
         breedingsTable,
         documentsTable,
@@ -15852,6 +16512,283 @@ typedef $$FarmsTableTableProcessedTableManager = ProcessedTableManager<
     ),
     FarmsTableData,
     PrefetchHooks Function()>;
+typedef $$FarmPreferencesTableTableCreateCompanionBuilder
+    = FarmPreferencesTableCompanion Function({
+  required String id,
+  required String farmId,
+  Value<String?> defaultVeterinarianId,
+  required String defaultSpeciesId,
+  Value<String?> defaultBreedId,
+  Value<bool> synced,
+  Value<DateTime?> lastSyncedAt,
+  Value<String?> serverVersion,
+  Value<DateTime?> deletedAt,
+  required DateTime createdAt,
+  required DateTime updatedAt,
+  Value<int> rowid,
+});
+typedef $$FarmPreferencesTableTableUpdateCompanionBuilder
+    = FarmPreferencesTableCompanion Function({
+  Value<String> id,
+  Value<String> farmId,
+  Value<String?> defaultVeterinarianId,
+  Value<String> defaultSpeciesId,
+  Value<String?> defaultBreedId,
+  Value<bool> synced,
+  Value<DateTime?> lastSyncedAt,
+  Value<String?> serverVersion,
+  Value<DateTime?> deletedAt,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<int> rowid,
+});
+
+class $$FarmPreferencesTableTableFilterComposer
+    extends Composer<_$AppDatabase, $FarmPreferencesTableTable> {
+  $$FarmPreferencesTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get farmId => $composableBuilder(
+      column: $table.farmId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get defaultVeterinarianId => $composableBuilder(
+      column: $table.defaultVeterinarianId,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get defaultSpeciesId => $composableBuilder(
+      column: $table.defaultSpeciesId,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get defaultBreedId => $composableBuilder(
+      column: $table.defaultBreedId,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+      column: $table.synced, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get serverVersion => $composableBuilder(
+      column: $table.serverVersion, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+      column: $table.deletedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$FarmPreferencesTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $FarmPreferencesTableTable> {
+  $$FarmPreferencesTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get farmId => $composableBuilder(
+      column: $table.farmId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get defaultVeterinarianId => $composableBuilder(
+      column: $table.defaultVeterinarianId,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get defaultSpeciesId => $composableBuilder(
+      column: $table.defaultSpeciesId,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get defaultBreedId => $composableBuilder(
+      column: $table.defaultBreedId,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+      column: $table.synced, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get serverVersion => $composableBuilder(
+      column: $table.serverVersion,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+      column: $table.deletedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$FarmPreferencesTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FarmPreferencesTableTable> {
+  $$FarmPreferencesTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get farmId =>
+      $composableBuilder(column: $table.farmId, builder: (column) => column);
+
+  GeneratedColumn<String> get defaultVeterinarianId => $composableBuilder(
+      column: $table.defaultVeterinarianId, builder: (column) => column);
+
+  GeneratedColumn<String> get defaultSpeciesId => $composableBuilder(
+      column: $table.defaultSpeciesId, builder: (column) => column);
+
+  GeneratedColumn<String> get defaultBreedId => $composableBuilder(
+      column: $table.defaultBreedId, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get serverVersion => $composableBuilder(
+      column: $table.serverVersion, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$FarmPreferencesTableTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $FarmPreferencesTableTable,
+    FarmPreferencesTableData,
+    $$FarmPreferencesTableTableFilterComposer,
+    $$FarmPreferencesTableTableOrderingComposer,
+    $$FarmPreferencesTableTableAnnotationComposer,
+    $$FarmPreferencesTableTableCreateCompanionBuilder,
+    $$FarmPreferencesTableTableUpdateCompanionBuilder,
+    (
+      FarmPreferencesTableData,
+      BaseReferences<_$AppDatabase, $FarmPreferencesTableTable,
+          FarmPreferencesTableData>
+    ),
+    FarmPreferencesTableData,
+    PrefetchHooks Function()> {
+  $$FarmPreferencesTableTableTableManager(
+      _$AppDatabase db, $FarmPreferencesTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FarmPreferencesTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FarmPreferencesTableTableOrderingComposer(
+                  $db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FarmPreferencesTableTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> farmId = const Value.absent(),
+            Value<String?> defaultVeterinarianId = const Value.absent(),
+            Value<String> defaultSpeciesId = const Value.absent(),
+            Value<String?> defaultBreedId = const Value.absent(),
+            Value<bool> synced = const Value.absent(),
+            Value<DateTime?> lastSyncedAt = const Value.absent(),
+            Value<String?> serverVersion = const Value.absent(),
+            Value<DateTime?> deletedAt = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              FarmPreferencesTableCompanion(
+            id: id,
+            farmId: farmId,
+            defaultVeterinarianId: defaultVeterinarianId,
+            defaultSpeciesId: defaultSpeciesId,
+            defaultBreedId: defaultBreedId,
+            synced: synced,
+            lastSyncedAt: lastSyncedAt,
+            serverVersion: serverVersion,
+            deletedAt: deletedAt,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String farmId,
+            Value<String?> defaultVeterinarianId = const Value.absent(),
+            required String defaultSpeciesId,
+            Value<String?> defaultBreedId = const Value.absent(),
+            Value<bool> synced = const Value.absent(),
+            Value<DateTime?> lastSyncedAt = const Value.absent(),
+            Value<String?> serverVersion = const Value.absent(),
+            Value<DateTime?> deletedAt = const Value.absent(),
+            required DateTime createdAt,
+            required DateTime updatedAt,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              FarmPreferencesTableCompanion.insert(
+            id: id,
+            farmId: farmId,
+            defaultVeterinarianId: defaultVeterinarianId,
+            defaultSpeciesId: defaultSpeciesId,
+            defaultBreedId: defaultBreedId,
+            synced: synced,
+            lastSyncedAt: lastSyncedAt,
+            serverVersion: serverVersion,
+            deletedAt: deletedAt,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$FarmPreferencesTableTableProcessedTableManager
+    = ProcessedTableManager<
+        _$AppDatabase,
+        $FarmPreferencesTableTable,
+        FarmPreferencesTableData,
+        $$FarmPreferencesTableTableFilterComposer,
+        $$FarmPreferencesTableTableOrderingComposer,
+        $$FarmPreferencesTableTableAnnotationComposer,
+        $$FarmPreferencesTableTableCreateCompanionBuilder,
+        $$FarmPreferencesTableTableUpdateCompanionBuilder,
+        (
+          FarmPreferencesTableData,
+          BaseReferences<_$AppDatabase, $FarmPreferencesTableTable,
+              FarmPreferencesTableData>
+        ),
+        FarmPreferencesTableData,
+        PrefetchHooks Function()>;
 typedef $$AnimalsTableTableCreateCompanionBuilder = AnimalsTableCompanion
     Function({
   required String id,
@@ -15868,6 +16805,7 @@ typedef $$AnimalsTableTableCreateCompanionBuilder = AnimalsTableCompanion
   Value<String?> speciesId,
   Value<String?> breedId,
   Value<String?> photoUrl,
+  Value<String?> notes,
   Value<int?> days,
   Value<bool> synced,
   Value<DateTime?> lastSyncedAt,
@@ -15893,6 +16831,7 @@ typedef $$AnimalsTableTableUpdateCompanionBuilder = AnimalsTableCompanion
   Value<String?> speciesId,
   Value<String?> breedId,
   Value<String?> photoUrl,
+  Value<String?> notes,
   Value<int?> days,
   Value<bool> synced,
   Value<DateTime?> lastSyncedAt,
@@ -15954,6 +16893,9 @@ class $$AnimalsTableTableFilterComposer
 
   ColumnFilters<String> get photoUrl => $composableBuilder(
       column: $table.photoUrl, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<int> get days => $composableBuilder(
       column: $table.days, builder: (column) => ColumnFilters(column));
@@ -16028,6 +16970,9 @@ class $$AnimalsTableTableOrderingComposer
 
   ColumnOrderings<String> get photoUrl => $composableBuilder(
       column: $table.photoUrl, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<int> get days => $composableBuilder(
       column: $table.days, builder: (column) => ColumnOrderings(column));
@@ -16104,6 +17049,9 @@ class $$AnimalsTableTableAnnotationComposer
   GeneratedColumn<String> get photoUrl =>
       $composableBuilder(column: $table.photoUrl, builder: (column) => column);
 
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
   GeneratedColumn<int> get days =>
       $composableBuilder(column: $table.days, builder: (column) => column);
 
@@ -16166,6 +17114,7 @@ class $$AnimalsTableTableTableManager extends RootTableManager<
             Value<String?> speciesId = const Value.absent(),
             Value<String?> breedId = const Value.absent(),
             Value<String?> photoUrl = const Value.absent(),
+            Value<String?> notes = const Value.absent(),
             Value<int?> days = const Value.absent(),
             Value<bool> synced = const Value.absent(),
             Value<DateTime?> lastSyncedAt = const Value.absent(),
@@ -16190,6 +17139,7 @@ class $$AnimalsTableTableTableManager extends RootTableManager<
             speciesId: speciesId,
             breedId: breedId,
             photoUrl: photoUrl,
+            notes: notes,
             days: days,
             synced: synced,
             lastSyncedAt: lastSyncedAt,
@@ -16214,6 +17164,7 @@ class $$AnimalsTableTableTableManager extends RootTableManager<
             Value<String?> speciesId = const Value.absent(),
             Value<String?> breedId = const Value.absent(),
             Value<String?> photoUrl = const Value.absent(),
+            Value<String?> notes = const Value.absent(),
             Value<int?> days = const Value.absent(),
             Value<bool> synced = const Value.absent(),
             Value<DateTime?> lastSyncedAt = const Value.absent(),
@@ -16238,6 +17189,7 @@ class $$AnimalsTableTableTableManager extends RootTableManager<
             speciesId: speciesId,
             breedId: breedId,
             photoUrl: photoUrl,
+            notes: notes,
             days: days,
             synced: synced,
             lastSyncedAt: lastSyncedAt,
@@ -22303,6 +23255,8 @@ class $AppDatabaseManager {
   $AppDatabaseManager(this._db);
   $$FarmsTableTableTableManager get farmsTable =>
       $$FarmsTableTableTableManager(_db, _db.farmsTable);
+  $$FarmPreferencesTableTableTableManager get farmPreferencesTable =>
+      $$FarmPreferencesTableTableTableManager(_db, _db.farmPreferencesTable);
   $$AnimalsTableTableTableManager get animalsTable =>
       $$AnimalsTableTableTableManager(_db, _db.animalsTable);
   $$BreedingsTableTableTableManager get breedingsTable =>
