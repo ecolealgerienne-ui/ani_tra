@@ -6,8 +6,10 @@ import '../../providers/farm_provider.dart';
 import '../../providers/farm_preferences_provider.dart';
 import '../../providers/veterinarian_provider.dart';
 import '../../providers/breed_provider.dart';
+import '../../providers/alert_configuration_provider.dart';
 import '../../models/farm.dart';
 import '../../models/veterinarian.dart';
+import '../../models/alert_configuration.dart';
 import '../../data/animal_config.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
@@ -101,11 +103,8 @@ class _FarmSettingsScreenState extends State<FarmSettingsScreen> {
 
                 // ========================================
                 // SECTION 4 : Paramètres d'alertes
-                // TODO: Implement alert settings in Phase 1B
                 // ========================================
-                // _AlertSettingsSection(
-                //   onManageAlerts: () => _navigateToAlertSettings(),
-                // ),
+                const _AlertSettingsSection(),
 
                 const SizedBox(height: AppConstants.spacingLarge),
               ],
@@ -259,15 +258,6 @@ class _FarmSettingsScreenState extends State<FarmSettingsScreen> {
     }
   }
 
-  // TODO Phase 1B: Implement alert settings navigation
-  // void _navigateToAlertSettings() {
-  //   // Navigate to alert configuration screen when implemented
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     const SnackBar(
-  //       content: Text('Gestion des alertes - À implémenter en Phase 1B'),
-  //     ),
-  //   );
-  // }
 }
 
 // ==========================================
@@ -821,15 +811,15 @@ class _VeterinarianSettingsSection extends StatelessWidget {
 // SECTION 4: Alert Settings
 // ==========================================
 class _AlertSettingsSection extends StatelessWidget {
-  final VoidCallback onManageAlerts;
-
-  const _AlertSettingsSection({
-    required this.onManageAlerts,
-  });
+  const _AlertSettingsSection();
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final alertProvider = context.watch<AlertConfigurationProvider>();
+
+    final configs = alertProvider.configurations;
+    final stats = alertProvider.stats;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -839,16 +829,264 @@ class _AlertSettingsSection extends StatelessWidget {
           subtitle: l10n.translate(AppStrings.alertSettingsSubtitle),
           icon: Icons.notifications_active,
         ),
+
+        // Statistics Card
         Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: AppConstants.farmSettingsSectionPaddingH,
           ),
-          child: _SettingsCard(
-            icon: Icons.settings,
-            title: l10n.translate(AppStrings.manageAlertPreferences),
-            value: '',
-            onTap: onManageAlerts,
-            showChevron: true,
+          child: Card(
+            elevation: AppConstants.mainCardElevation,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppConstants.farmSettingsCardRadius),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(AppConstants.farmSettingsCardPadding),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _AlertStat(
+                    label: 'Total',
+                    value: stats['total'].toString(),
+                    color: Colors.blue,
+                  ),
+                  _AlertStat(
+                    label: 'Activées',
+                    value: stats['enabled'].toString(),
+                    color: AppConstants.successGreen,
+                  ),
+                  _AlertStat(
+                    label: 'Désactivées',
+                    value: stats['disabled'].toString(),
+                    color: Colors.grey,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+
+        const SizedBox(height: AppConstants.spacingSmall),
+
+        // Alert Configurations List
+        if (configs.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppConstants.farmSettingsSectionPaddingH,
+            ),
+            child: Card(
+              elevation: AppConstants.mainCardElevation,
+              child: Padding(
+                padding: const EdgeInsets.all(AppConstants.spacingMedium),
+                child: Center(
+                  child: Text(
+                    'Aucune configuration d\'alerte disponible',
+                    style: TextStyle(color: Colors.grey[600]),
+                  ),
+                ),
+              ),
+            ),
+          )
+        else
+          ...configs.map((config) => _AlertConfigItem(config: config)),
+      ],
+    );
+  }
+}
+
+/// Single Alert Configuration Item with Toggle
+class _AlertConfigItem extends StatelessWidget {
+  final AlertConfiguration config;
+
+  const _AlertConfigItem({required this.config});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final alertProvider = context.read<AlertConfigurationProvider>();
+
+    // Get title and message from i18n
+    final title = l10n.translate(config.titleKey);
+    final message = l10n.translate(config.messageKey);
+
+    // Parse color from hex
+    final color = Color(int.parse(config.colorHex.replaceFirst('#', '0xFF')));
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppConstants.farmSettingsSectionPaddingH,
+        vertical: 4,
+      ),
+      child: Card(
+        elevation: AppConstants.mainCardElevation,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppConstants.farmSettingsCardRadius),
+        ),
+        child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: AppConstants.farmSettingsCardPadding,
+            vertical: 8,
+          ),
+          leading: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
+            ),
+            child: Text(
+              config.iconName,
+              style: const TextStyle(fontSize: 24),
+            ),
+          ),
+          title: Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: AppConstants.fontSizeImportant,
+            ),
+          ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 4),
+              Text(
+                message,
+                style: TextStyle(
+                  fontSize: AppConstants.fontSizeSmall,
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  _SeverityBadge(severity: config.severity),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      config.type.toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          trailing: Switch(
+            value: config.enabled,
+            activeColor: color,
+            onChanged: (value) async {
+              try {
+                await alertProvider.toggleEnabled(config.id, value);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        value
+                            ? 'Alerte activée : $title'
+                            : 'Alerte désactivée : $title',
+                      ),
+                      backgroundColor: value ? AppConstants.successGreen : Colors.grey,
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Erreur lors de la mise à jour: $e'),
+                      backgroundColor: AppConstants.statusDanger,
+                    ),
+                  );
+                }
+              }
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Severity Badge Widget
+class _SeverityBadge extends StatelessWidget {
+  final int severity;
+
+  const _SeverityBadge({required this.severity});
+
+  @override
+  Widget build(BuildContext context) {
+    final severityConfig = _getSeverityConfig(severity);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: severityConfig['color'],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        severityConfig['label'],
+        style: const TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+
+  Map<String, dynamic> _getSeverityConfig(int severity) {
+    switch (severity) {
+      case 3:
+        return {'label': 'CRITIQUE', 'color': AppConstants.statusDanger};
+      case 2:
+        return {'label': 'IMPORTANT', 'color': AppConstants.statusWarning};
+      case 1:
+      default:
+        return {'label': 'ROUTINE', 'color': Colors.blue};
+    }
+  }
+}
+
+/// Alert Statistics Widget
+class _AlertStat extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color color;
+
+  const _AlertStat({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey[600],
           ),
         ),
       ],
