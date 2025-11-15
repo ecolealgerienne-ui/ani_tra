@@ -148,9 +148,9 @@ class Animal implements SyncableEntity {
   bool get isModifiable => isDraft;
   
   /// L'animal peut-il recevoir des soins?
-  /// ✅ ALIVE validé
+  /// ✅ ALIVE (vivant)
   /// ❌ DRAFT, DEAD, SOLD, SLAUGHTERED: non
-  bool get canReceiveCare => status == AnimalStatus.alive && isValidated;
+  bool get canReceiveCare => status == AnimalStatus.alive;
 
   /// Getter de compatibilitÃ© pour le code existant
   /// @deprecated Utiliser currentEid Ã  la place
