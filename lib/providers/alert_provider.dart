@@ -287,11 +287,9 @@ class AlertProvider extends ChangeNotifier {
         }
       }
 
-      // 3. ✅ PHASE 4 FIX: Alertes DRAFT (brouillons depuis > 48h)
-      debugPrint('🔄 [ALERT] Calcul alertes brouillons (DRAFT)...');
-      final draftAlerts = await _checkAndBuildDraftAlerts(null);
-      debugPrint('   ↳ Brouillons: ${draftAlerts.length} alertes');
-      newAlerts.addAll(draftAlerts);
+      // 3. ✅ PHASE 4 FIX: Alertes DRAFT désormais gérées par config (draftAnimals)
+      // REMOVED: Legacy _checkAndBuildDraftAlerts() call to avoid duplicate alerts
+      debugPrint('✅ [ALERT] Alertes brouillons gérées par configuration');
 
       // 4. Événements incomplets (legacy support - brouillons)
       debugPrint('🔄 [ALERT] Calcul événements incomplets...');
