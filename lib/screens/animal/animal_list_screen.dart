@@ -498,51 +498,6 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       appBar: AppBar(
         title: Text(widget.customTitle ?? AppLocalizations.of(context).translate(AppStrings.animals)),
         actions: [
-          // ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã¢â‚¬Â¢ Badge d'alertes
-          Consumer<AlertProvider>(
-            builder: (context, alertProvider, child) {
-              final alertCount = alertProvider.alertCount;
-              if (alertCount == 0) return const SizedBox.shrink();
-
-              return Padding(
-                padding: const EdgeInsets.only(right: AppConstants.spacingExtraSmall),
-                child: Stack(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.notifications),
-                      onPressed: () {
-                        // Navigation vers alerts_screen si besoin
-                      },
-                    ),
-                    Positioned(
-                      right: 8,
-                      top: 8,
-                      child: Container(
-                        padding: const EdgeInsets.all(AppConstants.spacingTiny),
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
-                        constraints: const BoxConstraints(
-                          minWidth: 16,
-                          minHeight: 16,
-                        ),
-                        child: Text(
-                          alertCount > 9 ? '9+' : '$alertCount',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: AppConstants.fontSizeMicro,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
           IconButton(
             icon: Badge(
               isLabelVisible: _activeFilterCount > 0,
