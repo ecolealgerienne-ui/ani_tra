@@ -409,13 +409,17 @@ class _FarmSelectionSection extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.translate(AppStrings.selectFarm)),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListTileTheme(
-            textColor: Colors.black,
-            iconColor: Colors.grey,
+      builder: (context) => Theme(
+        data: Theme.of(context).copyWith(
+          textTheme: Theme.of(context).textTheme.copyWith(
+            bodyLarge: const TextStyle(color: Colors.black),
+            bodyMedium: const TextStyle(color: Colors.black87),
+          ),
+        ),
+        child: AlertDialog(
+          title: Text(l10n.translate(AppStrings.selectFarm)),
+          content: SizedBox(
+            width: double.maxFinite,
             child: ListView.builder(
               shrinkWrap: true,
               itemCount: farms.length,
@@ -459,7 +463,6 @@ class _FarmSelectionSection extends StatelessWidget {
               );
             },
           ),
-          ),
         ),
         actions: [
           TextButton(
@@ -467,6 +470,7 @@ class _FarmSelectionSection extends StatelessWidget {
             child: Text(l10n.translate(AppStrings.cancel)),
           ),
         ],
+        ),
       ),
     );
   }
@@ -571,13 +575,17 @@ class _BreedingPreferencesSection extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.translate(AppStrings.selectDefaultSpecies)),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListTileTheme(
-            textColor: Colors.black,
-            iconColor: Colors.grey,
+      builder: (context) => Theme(
+        data: Theme.of(context).copyWith(
+          textTheme: Theme.of(context).textTheme.copyWith(
+            bodyLarge: const TextStyle(color: Colors.black),
+            bodyMedium: const TextStyle(color: Colors.black87),
+          ),
+        ),
+        child: AlertDialog(
+          title: Text(l10n.translate(AppStrings.selectDefaultSpecies)),
+          content: SizedBox(
+            width: double.maxFinite,
             child: ListView.builder(
               shrinkWrap: true,
               itemCount: speciesOptions.length,
@@ -615,7 +623,6 @@ class _BreedingPreferencesSection extends StatelessWidget {
               );
             },
           ),
-          ),
         ),
         actions: [
           TextButton(
@@ -623,6 +630,7 @@ class _BreedingPreferencesSection extends StatelessWidget {
             child: Text(l10n.translate(AppStrings.cancel)),
           ),
         ],
+        ),
       ),
     );
   }
@@ -637,13 +645,17 @@ class _BreedingPreferencesSection extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.translate(AppStrings.selectDefaultBreed)),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListTileTheme(
-            textColor: Colors.black,
-            iconColor: Colors.grey,
+      builder: (context) => Theme(
+        data: Theme.of(context).copyWith(
+          textTheme: Theme.of(context).textTheme.copyWith(
+            bodyLarge: const TextStyle(color: Colors.black),
+            bodyMedium: const TextStyle(color: Colors.black87),
+          ),
+        ),
+        child: AlertDialog(
+          title: Text(l10n.translate(AppStrings.selectDefaultBreed)),
+          content: SizedBox(
+            width: double.maxFinite,
             child: ListView.builder(
               shrinkWrap: true,
               itemCount: optionsWithNone.length,
@@ -681,7 +693,6 @@ class _BreedingPreferencesSection extends StatelessWidget {
               );
             },
           ),
-          ),
         ),
         actions: [
           TextButton(
@@ -689,6 +700,7 @@ class _BreedingPreferencesSection extends StatelessWidget {
             child: Text(l10n.translate(AppStrings.cancel)),
           ),
         ],
+        ),
       ),
     );
   }
@@ -753,13 +765,17 @@ class _VeterinarianSettingsSection extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.translate(AppStrings.selectDefaultVeterinarian)),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListTileTheme(
-            textColor: Colors.black,
-            iconColor: Colors.grey,
+      builder: (context) => Theme(
+        data: Theme.of(context).copyWith(
+          textTheme: Theme.of(context).textTheme.copyWith(
+            bodyLarge: const TextStyle(color: Colors.black),
+            bodyMedium: const TextStyle(color: Colors.black87),
+          ),
+        ),
+        child: AlertDialog(
+          title: Text(l10n.translate(AppStrings.selectDefaultVeterinarian)),
+          content: SizedBox(
+            width: double.maxFinite,
             child: ListView.builder(
               shrinkWrap: true,
               itemCount: optionsWithNone.length,
@@ -835,7 +851,6 @@ class _VeterinarianSettingsSection extends StatelessWidget {
               );
             },
           ),
-          ),
         ),
         actions: [
           TextButton(
@@ -843,6 +858,7 @@ class _VeterinarianSettingsSection extends StatelessWidget {
             child: Text(l10n.translate(AppStrings.cancel)),
           ),
         ],
+        ),
       ),
     );
   }
