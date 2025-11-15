@@ -18,7 +18,7 @@ import '../../models/alert_type.dart';
 
 import '../animal/animal_list_screen.dart';
 import '../animal/animal_detail_screen.dart';
-//import '../animal/animal_finder_screen.dart';
+import '../animal/animal_finder_screen.dart';
 import '../lot/lot_list_screen.dart';
 import '../settings/account_settings_screen.dart';
 import '../settings/farm_settings_screen.dart';
@@ -76,6 +76,28 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           backgroundColor: Colors.red,
           duration: AppConstants.snackBarDurationMedium,
+        ),
+      );
+    }
+  }
+
+  /// Scanner un animal et l'ouvrir
+  Future<void> _scanAnimal() async {
+    final animal = await Navigator.push<Animal>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AnimalFinderScreen(
+          mode: AnimalFinderMode.single,
+          title: AppLocalizations.of(context).translate(AppStrings.scanAnimal),
+        ),
+      ),
+    );
+
+    if (animal != null && mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AnimalDetailScreen(preloadedAnimal: animal),
         ),
       );
     }
@@ -465,16 +487,27 @@ class _HomeScreenState extends State<HomeScreen> {
           hintText:
               AppLocalizations.of(context).translate(AppStrings.searchHint),
           prefixIcon: const Icon(Icons.search, color: Colors.grey),
-          suffixIcon: _searchController.text.isNotEmpty
-              ? IconButton(
+          suffixIcon: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Bouton clear (si texte présent)
+              if (_searchController.text.isNotEmpty)
+                IconButton(
                   icon: const Icon(Icons.clear),
                   onPressed: () {
                     setState(() {
                       _searchController.clear();
                     });
                   },
-                )
-              : null,
+                ),
+              // Bouton scan (toujours visible)
+              IconButton(
+                icon: const Icon(Icons.qr_code_scanner),
+                tooltip: AppLocalizations.of(context).translate(AppStrings.scanner),
+                onPressed: _scanAnimal,
+              ),
+            ],
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
             borderSide: BorderSide.none,
