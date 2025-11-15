@@ -595,12 +595,14 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
             const SizedBox(height: AppConstants.spacingMedium),
 
             // Dropdown Race
-            Consumer<BreedProvider>(
-              builder: (context, breedProvider, child) {
+            Consumer2<BreedProvider, SettingsProvider>(
+              builder: (context, breedProvider, settingsProvider, child) {
                 // Filtrer les races selon le type sélectionné
                 final availableBreeds = _selectedSpeciesId != null
                     ? breedProvider.getBySpeciesId(_selectedSpeciesId!)
                     : <Breed>[];
+
+                final locale = settingsProvider.locale;
 
                 return DropdownButtonFormField<String>(
                   value: _selectedBreedId != null &&
@@ -624,7 +626,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                       : availableBreeds.map((breed) {
                           return DropdownMenuItem(
                             value: breed.id,
-                            child: Text('${breed.icon} ${breed.nameFr}'),
+                            child: Text('${breed.icon} ${breed.getName(locale)}'),
                           );
                         }).toList(),
                   onChanged: _selectedSpeciesId == null
