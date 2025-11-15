@@ -1,8 +1,10 @@
 // lib/providers/alert_configuration_provider.dart
 import 'package:flutter/foundation.dart';
+import 'package:uuid/uuid.dart';
 import '../models/alert_configuration.dart';
 import '../repositories/alert_configuration_repository.dart';
 import 'auth_provider.dart';
+import '../i18n/app_strings.dart';
 
 /// AlertConfigurationProvider - Phase 1 Farm Settings
 /// Gère les configurations d'alertes spécifiques à chaque ferme
@@ -74,6 +76,12 @@ class AlertConfigurationProvider with ChangeNotifier {
       final farmConfigs = await _repository.getAll(_currentFarmId);
       _allConfigurations.removeWhere((c) => c.farmId == _currentFarmId);
       _allConfigurations.addAll(farmConfigs);
+
+      // Si aucune configuration n'existe pour cette ferme, initialiser les configurations par défaut
+      if (farmConfigs.isEmpty) {
+        debugPrint('📋 No alert configurations found for farm $_currentFarmId, initializing defaults...');
+        await initializeDefaultConfigurations();
+      }
     } catch (e) {
       debugPrint('❌ Error loading alert configurations from repository: $e');
     } finally {
@@ -204,11 +212,156 @@ class AlertConfigurationProvider with ChangeNotifier {
   /// Initialise les configurations par défaut pour une nouvelle ferme
   /// Appelé lors de la première configuration d'une ferme
   Future<void> initializeDefaultConfigurations() async {
-    // NOTE: Implémentation des configurations par défaut
-    // À définir selon les besoins métier (rémanence, vaccination, etc.)
-    // Pour l'instant, on laisse vide - sera implémenté en Phase 1B
-    debugPrint(
-        '⚠️ Initialize default alert configurations not yet implemented');
+    if (_currentFarmId.isEmpty) {
+      debugPrint('⚠️ Cannot initialize alerts: no farm selected');
+      return;
+    }
+
+    // Vérifier si des configs existent déjà
+    if (configurations.isNotEmpty) {
+      debugPrint('✅ Alert configurations already exist for farm $_currentFarmId');
+      return;
+    }
+
+    debugPrint('🔧 Initializing default alert configurations for farm $_currentFarmId');
+
+    final now = DateTime.now();
+    const uuid = Uuid();
+
+    // Définition des 7 configurations par défaut
+    final defaultConfigs = [
+      // 1. Rémanence - Délai d'abattage (CRITIQUE)
+      AlertConfiguration(
+        id: uuid.v4(),
+        farmId: _currentFarmId,
+        evaluationType: AlertEvaluationType.remanence,
+        type: 'urgent',
+        category: 'remanence',
+        titleKey: AppStrings.alertRemanenceTitle,
+        messageKey: AppStrings.alertRemanenceMsg,
+        severity: 3, // Critique
+        iconName: '📊',
+        colorHex: '#D32F2F', // Rouge
+        enabled: true,
+        createdAt: now,
+        updatedAt: now,
+      ),
+
+      // 2. Pesée - Pesée manquante (IMPORTANT)
+      AlertConfiguration(
+        id: uuid.v4(),
+        farmId: _currentFarmId,
+        evaluationType: AlertEvaluationType.weighing,
+        type: 'routine',
+        category: 'weighing',
+        titleKey: AppStrings.alertWeighingTitle,
+        messageKey: AppStrings.alertWeighingMsg,
+        severity: 2, // Important
+        iconName: '⚖️',
+        colorHex: '#FF9800', // Orange
+        enabled: true,
+        createdAt: now,
+        updatedAt: now,
+      ),
+
+      // 3. Vaccination - Vaccination due (IMPORTANT)
+      AlertConfiguration(
+        id: uuid.v4(),
+        farmId: _currentFarmId,
+        evaluationType: AlertEvaluationType.vaccination,
+        type: 'important',
+        category: 'treatment',
+        titleKey: AppStrings.alertVaccinationTitle,
+        messageKey: AppStrings.alertVaccinationMsg,
+        severity: 2, // Important
+        iconName: '💉',
+        colorHex: '#4CAF50', // Vert
+        enabled: true,
+        createdAt: now,
+        updatedAt: now,
+      ),
+
+      // 4. Identification - EID manquant (CRITIQUE)
+      AlertConfiguration(
+        id: uuid.v4(),
+        farmId: _currentFarmId,
+        evaluationType: AlertEvaluationType.identification,
+        type: 'urgent',
+        category: 'identification',
+        titleKey: AppStrings.alertIdentificationTitle,
+        messageKey: AppStrings.alertIdentificationMsg,
+        severity: 3, // Critique
+        iconName: '🏷️',
+        colorHex: '#D32F2F', // Rouge
+        enabled: true,
+        createdAt: now,
+        updatedAt: now,
+      ),
+
+      // 5. Synchronisation - Sync en retard (ROUTINE)
+      AlertConfiguration(
+        id: uuid.v4(),
+        farmId: _currentFarmId,
+        evaluationType: AlertEvaluationType.syncRequired,
+        type: 'routine',
+        category: 'sync',
+        titleKey: AppStrings.alertSyncTitle,
+        messageKey: AppStrings.alertSyncMsg,
+        severity: 1, // Routine
+        iconName: '☁️',
+        colorHex: '#2196F3', // Bleu
+        enabled: true,
+        createdAt: now,
+        updatedAt: now,
+      ),
+
+      // 6. Traitement - Traitement à renouveler (IMPORTANT)
+      AlertConfiguration(
+        id: uuid.v4(),
+        farmId: _currentFarmId,
+        evaluationType: AlertEvaluationType.treatmentRenewal,
+        type: 'important',
+        category: 'treatment',
+        titleKey: AppStrings.alertTreatmentTitle,
+        messageKey: AppStrings.alertTreatmentMsg,
+        severity: 2, // Important
+        iconName: '💊',
+        colorHex: '#FF9800', // Orange
+        enabled: true,
+        createdAt: now,
+        updatedAt: now,
+      ),
+
+      // 7. Lot - Lot à finaliser (ROUTINE)
+      AlertConfiguration(
+        id: uuid.v4(),
+        farmId: _currentFarmId,
+        evaluationType: AlertEvaluationType.batchToFinalize,
+        type: 'routine',
+        category: 'batch',
+        titleKey: AppStrings.alertBatchTitle,
+        messageKey: AppStrings.alertBatchMsg,
+        severity: 1, // Routine
+        iconName: '📦',
+        colorHex: '#9E9E9E', // Gris
+        enabled: true,
+        createdAt: now,
+        updatedAt: now,
+      ),
+    ];
+
+    // Créer toutes les configurations en BD
+    try {
+      for (final config in defaultConfigs) {
+        await _repository.create(config, _currentFarmId);
+        _allConfigurations.add(config);
+      }
+      notifyListeners();
+      debugPrint('✅ Successfully created ${defaultConfigs.length} default alert configurations');
+    } catch (e) {
+      debugPrint('❌ Error creating default alert configurations: $e');
+      rethrow;
+    }
   }
 
   // ==================== Refresh ====================

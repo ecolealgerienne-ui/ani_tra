@@ -869,7 +869,14 @@ class _AlertSettingsSection extends StatelessWidget {
         const SizedBox(height: AppConstants.spacingSmall),
 
         // Alert Configurations List
-        if (configs.isEmpty)
+        if (alertProvider.isLoading)
+          const Padding(
+            padding: EdgeInsets.all(AppConstants.spacingLarge),
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          )
+        else if (configs.isEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: AppConstants.farmSettingsSectionPaddingH,
@@ -878,11 +885,27 @@ class _AlertSettingsSection extends StatelessWidget {
               elevation: AppConstants.mainCardElevation,
               child: Padding(
                 padding: const EdgeInsets.all(AppConstants.spacingMedium),
-                child: Center(
-                  child: Text(
-                    'Aucune configuration d\'alerte disponible',
-                    style: TextStyle(color: Colors.grey[600]),
-                  ),
+                child: Column(
+                  children: [
+                    const Icon(Icons.info_outline, size: 48, color: Colors.blue),
+                    const SizedBox(height: AppConstants.spacingSmall),
+                    Text(
+                      'Initialisation des alertes...',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: AppConstants.fontSizeImportant,
+                      ),
+                    ),
+                    const SizedBox(height: AppConstants.spacingTiny),
+                    Text(
+                      'Les configurations par défaut sont en cours de création',
+                      style: TextStyle(
+                        color: Colors.grey[500],
+                        fontSize: AppConstants.fontSizeSmall,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               ),
             ),
