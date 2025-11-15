@@ -775,18 +775,34 @@ class AlertProvider extends ChangeNotifier {
 
     // Créer une alerte pour les animaux en brouillon
     if (draftAnimals.isNotEmpty) {
-      final now = DateTime.now();
+      // Déterminer le type d'alerte selon la sévérité
+      AlertType alertType;
+      switch (config.severity) {
+        case 3:
+          alertType = AlertType.urgent;
+          break;
+        case 2:
+          alertType = AlertType.important;
+          break;
+        case 1:
+        default:
+          alertType = AlertType.routine;
+          break;
+      }
+
       alerts.add(Alert(
-        id: 'draft_animals_${now.millisecondsSinceEpoch}',
-        farmId: _authProvider.currentFarmId,
-        title: config.titleKey,
-        message: config.messageKey,
+        id: 'draft_animals_${DateTime.now().millisecondsSinceEpoch}',
+        type: alertType,
         category: AlertCategory.registre,
-        severity: config.severity,
-        iconName: config.iconName,
-        colorHex: config.colorHex,
-        createdAt: now,
-        updatedAt: now,
+        title: '${config.iconName} Animaux en brouillon', // Fallback title
+        message: '${draftAnimals.length} animal(aux) non validé(s)',
+        count: draftAnimals.length,
+        animalIds: draftAnimals.map((a) => a.id).toList(),
+        titleKey: config.titleKey,
+        messageKey: config.messageKey,
+        messageParams: {
+          'count': draftAnimals.length.toString(),
+        },
       ));
     }
 
