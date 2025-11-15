@@ -673,53 +673,58 @@ class _InfosTab extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppConstants.spacingMedium),
-          _InfoCard(
-            title: AppLocalizations.of(context).translate(AppStrings.withdrawal),
-            children: [
-              Container(
-                padding: const EdgeInsets.all(AppConstants.spacingSmall),
-                decoration: BoxDecoration(
-                  color:
-                      hasActiveWithdrawal ? Colors.red[50] : Colors.green[50],
-                  borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
-                  border: Border.all(
-                    color: hasActiveWithdrawal ? Colors.red : Colors.green,
-                    width: AppConstants.spacingMicro,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      hasActiveWithdrawal ? Icons.warning : Icons.check_circle,
+          // ✅ Afficher la section Rémanence seulement si l'animal n'est pas vendu/mort/abattu
+          if (currentAnimal.status != AnimalStatus.sold &&
+              currentAnimal.status != AnimalStatus.dead &&
+              currentAnimal.status != AnimalStatus.slaughtered) ...[
+            _InfoCard(
+              title: AppLocalizations.of(context).translate(AppStrings.withdrawal),
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(AppConstants.spacingSmall),
+                  decoration: BoxDecoration(
+                    color:
+                        hasActiveWithdrawal ? Colors.red[50] : Colors.green[50],
+                    borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
+                    border: Border.all(
                       color: hasActiveWithdrawal ? Colors.red : Colors.green,
-                      size: AppConstants.iconSizeMedium,
+                      width: AppConstants.spacingMicro,
                     ),
-                    const SizedBox(width: AppConstants.spacingSmall),
-                    Expanded(
-                      child: Text(
-                        hasActiveWithdrawal
-                            ? AppLocalizations.of(context).translate(AppStrings.doNotSlaughter)
-                            : AppLocalizations.of(context).translate(AppStrings.okForSlaughter),
-                        style: TextStyle(
-                          fontSize: AppConstants.fontSizeMedium,
-                          fontWeight: FontWeight.bold,
-                          color:
-                              hasActiveWithdrawal ? Colors.red : Colors.green,
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        hasActiveWithdrawal ? Icons.warning : Icons.check_circle,
+                        color: hasActiveWithdrawal ? Colors.red : Colors.green,
+                        size: AppConstants.iconSizeMedium,
+                      ),
+                      const SizedBox(width: AppConstants.spacingSmall),
+                      Expanded(
+                        child: Text(
+                          hasActiveWithdrawal
+                              ? AppLocalizations.of(context).translate(AppStrings.doNotSlaughter)
+                              : AppLocalizations.of(context).translate(AppStrings.okForSlaughter),
+                          style: TextStyle(
+                            fontSize: AppConstants.fontSizeMedium,
+                            fontWeight: FontWeight.bold,
+                            color:
+                                hasActiveWithdrawal ? Colors.red : Colors.green,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppConstants.spacingMedium),
+              ],
+            ),
+            const SizedBox(height: AppConstants.spacingMedium),
+          ],
 
           // ✅ BOUTONS MOUVEMENTS (Abattage, Vente, Mort) - Visible seulement si ALIVE et NON DRAFT
           if (currentAnimal.status == AnimalStatus.alive && !currentAnimal.isDraft) ...[
-            // Bouton Abattage
+            // Bouton Abattage (désactivé si période de rémanence active)
             OutlinedButton.icon(
-              onPressed: () {
+              onPressed: hasActiveWithdrawal ? null : () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
