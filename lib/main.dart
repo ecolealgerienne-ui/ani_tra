@@ -420,7 +420,7 @@ class MyApp extends StatelessWidget {
                   vertical: 12.0,
                 ),
               ),
-              dialogTheme: const DialogTheme(
+              dialogTheme: const DialogThemeData(
                 backgroundColor: Colors.white,
                 titleTextStyle: TextStyle(
                   color: Colors.black,
