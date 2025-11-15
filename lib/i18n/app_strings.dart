@@ -506,6 +506,7 @@ class AppStrings {
   static const String recordSale = 'recordSale';
   static const String confirmSale = 'confirmSale';
   static const String saleRecorded = 'saleRecorded';
+  static const String slaughterRecorded = 'slaughterRecorded';
   static const String recordDeath = 'recordDeath';
   static const String confirmDeath = 'confirmDeath';
   static const String deathRecorded = 'deathRecorded';

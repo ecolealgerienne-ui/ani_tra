@@ -513,6 +513,7 @@ const Map<String, String> stringsFr = {
   'recordSale': 'Enregistrer une vente',
   'confirmSale': 'Confirmer la vente',
   'saleRecorded': 'Vente enregistrée',
+  'slaughterRecorded': 'Abattage enregistré',
   'recordDeath': 'Enregistrer une mortalité',
   'confirmDeath': 'Confirmer la mortalité',
   'deathRecorded': 'Mortalité enregistrée',

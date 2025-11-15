@@ -726,6 +726,7 @@ class _InfosTab extends StatelessWidget {
                     builder: (context) => SlaughterScreen(
                       animalIds: [currentAnimal.id],
                       animalCount: 1,
+                      animal: currentAnimal,
                     ),
                   ),
                 );
@@ -749,6 +750,7 @@ class _InfosTab extends StatelessWidget {
                     builder: (context) => SaleScreen(
                       animalIds: [currentAnimal.id],
                       animalCount: 1,
+                      animal: currentAnimal,
                     ),
                   ),
                 );

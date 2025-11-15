@@ -470,6 +470,7 @@ const Map<String, String> stringsEn = {
   'recordSale': 'Record a sale',
   'confirmSale': 'Confirm sale',
   'saleRecorded': 'Sale recorded',
+  'slaughterRecorded': 'Slaughter recorded',
   'recordDeath': 'Record mortality',
   'confirmDeath': 'Confirm mortality',
   'deathRecorded': 'Mortality recorded',
