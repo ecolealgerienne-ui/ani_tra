@@ -302,10 +302,10 @@ class TreatmentDetailScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final hasNotes = currentTreatment.notes != null && currentTreatment.notes!.isNotEmpty;
 
-    // Vérifier si l'animal peut avoir ses enregistrements modifiés
+    // Vérifier si l'animal peut recevoir des soins (vivant uniquement)
     final animalProvider = context.read<AnimalProvider>();
     final animal = animalProvider.getAnimalById(currentTreatment.animalId);
-    final canEdit = animal?.canEditRecords ?? false;
+    final canEdit = animal?.canReceiveCare ?? false;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: AppConstants.spacingMedium),
