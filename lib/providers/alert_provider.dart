@@ -276,9 +276,8 @@ class AlertProvider extends ChangeNotifier {
               newAlerts.addAll(batchAlerts);
               break;
             case AlertEvaluationType.draftAnimals:
-              final draftAlerts = await _checkAndBuildDraftAnimals(config);
-              debugPrint('   ↳ Draft Animals: ${draftAlerts.length} alertes');
-              newAlerts.addAll(draftAlerts);
+              // SKIP: draftAnimals handled by legacy _checkAndBuildDraftAlerts below
+              debugPrint('   ↳ Draft Animals: skipped (using individual alerts)');
               break;
           }
         } catch (e) {
@@ -287,9 +286,11 @@ class AlertProvider extends ChangeNotifier {
         }
       }
 
-      // 3. ✅ PHASE 4 FIX: Alertes DRAFT désormais gérées par config (draftAnimals)
-      // REMOVED: Legacy _checkAndBuildDraftAlerts() call to avoid duplicate alerts
-      debugPrint('✅ [ALERT] Alertes brouillons gérées par configuration');
+      // 3. ✅ PHASE 4 FIX: Alertes DRAFT individuelles par animal
+      debugPrint('🔄 [ALERT] Calcul alertes brouillons individuelles (DRAFT)...');
+      final draftAlerts = await _checkAndBuildDraftAlerts(null);
+      debugPrint('   ↳ Brouillons individuels: ${draftAlerts.length} alertes');
+      newAlerts.addAll(draftAlerts);
 
       // 4. Événements incomplets (legacy support - brouillons)
       debugPrint('🔄 [ALERT] Calcul événements incomplets...');
