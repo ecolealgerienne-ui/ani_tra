@@ -358,14 +358,24 @@ class Alert {
   /// Phase 2: Obtenir le titre traduit avec I18N
   /// Utilise titleKey si présent (config-driven), sinon title hardcodé
   String getTitle(BuildContext context) {
+    String titleText = title; // Default fallback
+
     if (titleKey != null && titleKey!.isNotEmpty) {
       try {
-        return AppLocalizations.of(context).translate(titleKey!);
+        titleText = AppLocalizations.of(context).translate(titleKey!);
       } catch (e) {
-        return title; // Fallback
+        titleText = title; // Fallback
       }
     }
-    return title;
+
+    // Interpoler les params (même logique que getMessage)
+    if (messageParams != null && messageParams!.isNotEmpty) {
+      messageParams!.forEach((key, value) {
+        titleText = titleText.replaceAll('{$key}', value.toString());
+      });
+    }
+
+    return titleText;
   }
 
   /// Phase 2: Obtenir le message traduit avec I18N
