@@ -886,6 +886,13 @@ class _SoinsTab extends StatelessWidget {
     // ✅ Récupérer l'animal à jour depuis le provider
     final currentAnimal = animalProvider.getAnimalById(animal.id) ?? animal;
 
+    // 🐛 DEBUG: Afficher les informations de l'animal
+    debugPrint('🔍 SOINS TAB - Animal ID: ${currentAnimal.id}');
+    debugPrint('🔍 SOINS TAB - Status: ${currentAnimal.status}');
+    debugPrint('🔍 SOINS TAB - ValidatedAt: ${currentAnimal.validatedAt}');
+    debugPrint('🔍 SOINS TAB - IsValidated: ${currentAnimal.isValidated}');
+    debugPrint('🔍 SOINS TAB - CanReceiveCare: ${currentAnimal.canReceiveCare}');
+
     final treatments = animalProvider.getAnimalTreatments(animal.id);
     final vaccinations =
         vaccinationProvider.getVaccinationsForAnimal(animal.id);
