@@ -198,30 +198,46 @@ class _MovementDetailScreenState extends State<MovementDetailScreen> {
 
   /// Enregistre le retour d'un mouvement temporaire
   Future<void> _recordReturn(BuildContext context, Movement outMovement) async {
+    final l10n = AppLocalizations.of(context);
+
+    // Ouvrir le dialog pour saisir la date et les notes
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (context) => _ReturnDateDialog(
+        outMovement: outMovement,
+      ),
+    );
+
+    if (result == null) return; // Utilisateur a annulé
+
     setState(() => _isRecordingReturn = true);
 
     try {
       final movementProvider = context.read<MovementProvider>();
       final animalProvider = context.read<AnimalProvider>();
 
+      final DateTime returnDate = result['returnDate'];
+      final String? notes = result['notes'];
+
       // Créer le mouvement de retour
       final returnMovement = Movement(
         farmId: outMovement.farmId,
         animalId: outMovement.animalId,
         type: MovementType.temporaryReturn,
-        movementDate: DateTime.now(),
+        movementDate: returnDate,
         fromFarmId: outMovement.toFarmId,
         toFarmId: outMovement.fromFarmId,
-        notes: 'Retour du mouvement temporaire du ${DateFormat('dd/MM/yyyy').format(outMovement.movementDate)}',
+        notes: notes ?? 'Retour du mouvement temporaire du ${DateFormat('dd/MM/yyyy').format(outMovement.movementDate)}',
         relatedMovementId: outMovement.id,
       );
 
       // Sauvegarder le mouvement de retour
       await movementProvider.addMovement(returnMovement);
 
-      // Mettre à jour le mouvement sortant avec le lien vers le retour
+      // Mettre à jour le mouvement sortant avec le lien vers le retour ET le statut "closed"
       final updatedOutMovement = outMovement.copyWith(
         relatedMovementId: returnMovement.id,
+        status: MovementStatus.closed,
       );
       await movementProvider.updateMovement(updatedOutMovement);
 
@@ -843,6 +859,141 @@ class _InfoRow extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Dialog pour saisir la date de retour et les notes
+class _ReturnDateDialog extends StatefulWidget {
+  final Movement outMovement;
+
+  const _ReturnDateDialog({required this.outMovement});
+
+  @override
+  State<_ReturnDateDialog> createState() => _ReturnDateDialogState();
+}
+
+class _ReturnDateDialogState extends State<_ReturnDateDialog> {
+  late DateTime _returnDate;
+  final _notesController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _returnDate = DateTime.now();
+  }
+
+  @override
+  void dispose() {
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _selectDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _returnDate,
+      firstDate: widget.outMovement.movementDate,
+      lastDate: DateTime.now().add(const Duration(days: 1)),
+      locale: const Locale('fr', 'FR'),
+    );
+    if (picked != null) {
+      setState(() => _returnDate = picked);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return AlertDialog(
+      title: const Text('Enregistrer le retour'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Date de retour
+            Text(
+              'Date de retour *',
+              style: TextStyle(
+                fontSize: AppConstants.fontSizeSmall,
+                color: Colors.grey[700],
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: AppConstants.spacingSmall),
+            InkWell(
+              onTap: _selectDate,
+              child: Container(
+                padding: const EdgeInsets.all(AppConstants.spacingMedium),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey[300]!),
+                  borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.calendar_today, size: 20),
+                    const SizedBox(width: AppConstants.spacingSmall),
+                    Text(
+                      DateFormat('dd/MM/yyyy').format(_returnDate),
+                      style: const TextStyle(fontSize: AppConstants.fontSizeBody),
+                    ),
+                    const Spacer(),
+                    Icon(Icons.arrow_drop_down, color: Colors.grey[600]),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: AppConstants.spacingMediumLarge),
+
+            // Notes (optionnel)
+            Text(
+              'Notes (optionnel)',
+              style: TextStyle(
+                fontSize: AppConstants.fontSizeSmall,
+                color: Colors.grey[700],
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: AppConstants.spacingSmall),
+            TextField(
+              controller: _notesController,
+              maxLines: 3,
+              maxLength: 500,
+              decoration: InputDecoration(
+                hintText: 'Ex: Animal en bonne santé, aucun problème constaté',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
+                ),
+                contentPadding: const EdgeInsets.all(AppConstants.spacingMedium),
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.translate(AppStrings.cancel)),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.pop(context, {
+              'returnDate': _returnDate,
+              'notes': _notesController.text.trim().isEmpty
+                  ? null
+                  : _notesController.text.trim(),
+            });
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.teal,
+            foregroundColor: Colors.white,
+          ),
+          child: const Text('Valider'),
+        ),
+      ],
     );
   }
 }

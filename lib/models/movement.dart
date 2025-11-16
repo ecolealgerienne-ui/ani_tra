@@ -13,6 +13,12 @@ enum MovementType {
   temporaryReturn // Retour de mouvement temporaire
 }
 
+enum MovementStatus {
+  draft, // Brouillon (en cours de création)
+  active, // Actif (mouvement enregistré)
+  closed // Clos (mouvement terminé, ex: retour effectué)
+}
+
 class Movement implements SyncableEntity {
   // === Identification ===
   @override
@@ -43,6 +49,9 @@ class Movement implements SyncableEntity {
   final String? temporaryMovementType; // 'loan', 'transhumance', 'boarding', etc.
   final DateTime? expectedReturnDate;
   final String? relatedMovementId; // Lien bidirectionnel (out ↔ return)
+
+  // === Status ===
+  final MovementStatus status; // draft, active, closed
 
   // === Synchronisation ===
   @override
@@ -79,6 +88,8 @@ class Movement implements SyncableEntity {
     this.temporaryMovementType,
     this.expectedReturnDate,
     this.relatedMovementId,
+    // Status
+    this.status = MovementStatus.active,
     // Synchronisation
     this.synced = false,
     DateTime? createdAt,
@@ -113,6 +124,8 @@ class Movement implements SyncableEntity {
     String? temporaryMovementType,
     DateTime? expectedReturnDate,
     String? relatedMovementId,
+    // Status
+    MovementStatus? status,
     // Sync
     bool? synced,
     DateTime? updatedAt,
@@ -143,6 +156,8 @@ class Movement implements SyncableEntity {
           temporaryMovementType ?? this.temporaryMovementType,
       expectedReturnDate: expectedReturnDate ?? this.expectedReturnDate,
       relatedMovementId: relatedMovementId ?? this.relatedMovementId,
+      // Status
+      status: status ?? this.status,
       // Sync
       synced: synced ?? this.synced,
       createdAt: createdAt,
@@ -211,6 +226,8 @@ class Movement implements SyncableEntity {
       'temporary_movement_type': temporaryMovementType,
       'expected_return_date': expectedReturnDate?.toIso8601String(),
       'related_movement_id': relatedMovementId,
+      // Status
+      'status': status.name,
       // Sync
       'synced': synced,
       'created_at': createdAt.toIso8601String(),
@@ -246,6 +263,10 @@ class Movement implements SyncableEntity {
           ? DateTime.parse(json['expected_return_date'] as String)
           : null,
       relatedMovementId: json['related_movement_id'],
+      // Status
+      status: json['status'] != null
+          ? MovementStatus.values.firstWhere((e) => e.name == json['status'])
+          : MovementStatus.active,
       // Sync
       synced: json['synced'] ?? false,
       createdAt: json['created_at'] != null
