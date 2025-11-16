@@ -25,6 +25,7 @@ import '../settings/farm_settings_screen.dart';
 import '../settings/app_settings_screen.dart';
 import '../alert/alerts_screen.dart';
 import '../services/export_registry_screen.dart'; // 🆕 PART3
+import '../movement/movement_list_screen.dart';
 
 /// Écran d'accueil simplifié
 ///
@@ -320,6 +321,26 @@ class _HomeScreenState extends State<HomeScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => const ExportRegistryScreen(),
+                          ),
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: AppConstants.spacingMedium),
+
+                    // CARTE 4 : MOUVEMENTS
+                    _buildMainActionCard(
+                      context: context,
+                      icon: Icons.sync_alt,
+                      iconColor: Colors.teal,
+                      title: AppLocalizations.of(context)
+                          .translate(AppStrings.movements),
+                      subtitle: 'Naissances, achats, ventes, décès',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MovementListScreen(),
                           ),
                         );
                       },

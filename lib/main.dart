@@ -29,6 +29,7 @@ import 'providers/farm_provider.dart';
 import 'providers/farm_preferences_provider.dart';
 import 'providers/alert_configuration_provider.dart';
 import 'providers/rfid_scanner_provider.dart';
+import 'providers/movement_provider.dart';
 import 'i18n/app_localizations.dart';
 //import 'i18n/app_strings.dart';
 import 'utils/constants.dart';
@@ -53,6 +54,7 @@ import 'repositories/document_repository.dart';
 import 'repositories/alert_configuration_repository.dart';
 import 'repositories/farm_repository.dart';
 import 'repositories/farm_preferences_repository.dart';
+import 'repositories/movement_repository.dart';
 import 'database_initializer.dart';
 
 AppDatabase? _appDatabase;
@@ -115,6 +117,7 @@ void main() async {
   final alertConfigurationRepository = AlertConfigurationRepository(database);
   final farmRepository = FarmRepository(database);
   final farmPreferencesRepository = FarmPreferencesRepository(database);
+  final movementRepository = MovementRepository(database);
 
   runApp(MyApp(
     database: database,
@@ -132,6 +135,7 @@ void main() async {
     alertConfigurationRepository: alertConfigurationRepository,
     farmRepository: farmRepository,
     farmPreferencesRepository: farmPreferencesRepository,
+    movementRepository: movementRepository,
   ));
 }
 
@@ -151,6 +155,7 @@ class MyApp extends StatelessWidget {
   final AlertConfigurationRepository alertConfigurationRepository;
   final FarmRepository farmRepository;
   final FarmPreferencesRepository farmPreferencesRepository;
+  final MovementRepository movementRepository;
 
   const MyApp({
     super.key,
@@ -169,6 +174,7 @@ class MyApp extends StatelessWidget {
     required this.alertConfigurationRepository,
     required this.farmRepository,
     required this.farmPreferencesRepository,
+    required this.movementRepository,
   });
 
   @override
@@ -193,6 +199,7 @@ class MyApp extends StatelessWidget {
         Provider<FarmRepository>.value(value: farmRepository),
         Provider<FarmPreferencesRepository>.value(
             value: farmPreferencesRepository),
+        Provider<MovementRepository>.value(value: movementRepository),
 
         // === AuthProvider EN PREMIER ===
         ChangeNotifierProvider(create: (_) => AuthProvider()),
@@ -289,6 +296,15 @@ class MyApp extends StatelessWidget {
           update: (context, auth, previous) =>
               previous ??
               WeightProvider(auth, context.read<WeightRepository>()),
+        ),
+
+        // === MovementProvider (charge depuis DB) ===
+        ChangeNotifierProxyProvider<AuthProvider, MovementProvider>(
+          create: (context) => MovementProvider(
+              context.read<AuthProvider>(), context.read<MovementRepository>()),
+          update: (context, auth, previous) =>
+              previous ??
+              MovementProvider(auth, context.read<MovementRepository>()),
         ),
 
         // === VaccinationReferenceProvider (charge depuis DB) ===

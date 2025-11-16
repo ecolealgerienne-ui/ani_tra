@@ -1111,4 +1111,36 @@ class AppStrings {
   static const String alertEnabled = 'alertEnabled';
   static const String alertDisabled = 'alertDisabled';
 
+  // ============ MOVEMENTS ============
+  static const String movements = 'movements';
+  static const String movementDetails = 'movementDetails';
+  static const String movementNotFound = 'movementNotFound';
+  static const String noMovements = 'noMovements';
+  static const String noMovementsSubtitle = 'noMovementsSubtitle';
+  static const String filterByType = 'filterByType';
+  static const String all = 'all';
+  static const String filter = 'filter';
+  static const String clear = 'clear';
+  static const String births = 'births';
+  static const String purchases = 'purchases';
+  static const String sales = 'sales';
+  static const String deaths = 'deaths';
+  static const String slaughters = 'slaughters';
+  static const String generalInfo = 'generalInfo';
+  static const String financialInfo = 'financialInfo';
+  static const String syncInfo = 'syncInfo';
+  static const String fromFarm = 'fromFarm';
+  static const String toFarm = 'toFarm';
+  static const String price = 'price';
+  static const String currency = 'currency';
+  static const String syncStatus = 'syncStatus';
+  static const String synced = 'synced';
+  static const String notSynced = 'notSynced';
+  static const String createdAt = 'createdAt';
+  static const String updatedAt = 'updatedAt';
+  static const String lastSyncedAt = 'lastSyncedAt';
+  static const String back = 'back';
+  static const String officialNumber = 'officialNumber';
+  static const String status = 'status';
+
 }
