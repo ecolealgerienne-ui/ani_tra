@@ -232,7 +232,7 @@ class _MovementListScreenState extends State<MovementListScreen> {
         onPressed: () {
           // TODO: Implémenter le formulaire de création de sortie temporaire
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text('Création de sortie temporaire à implémenter'),
               backgroundColor: Colors.orange,
             ),

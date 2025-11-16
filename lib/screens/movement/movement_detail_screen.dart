@@ -73,16 +73,16 @@ class MovementDetailScreen extends StatelessWidget {
                   onPressed: () {
                     // TODO: Implémenter le retour d'animal
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
+                      const SnackBar(
                         content: Text('Fonction "Marquer le retour" à implémenter'),
                         backgroundColor: Colors.orange,
                       ),
                     );
                   },
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  label: Text(
+                  label: const Text(
                     'Retour',
-                    style: const TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ]
@@ -684,7 +684,7 @@ class _BatchInfoSection extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.workspaces,
                 color: Colors.blue,
                 size: AppConstants.iconSizeMedium,
@@ -703,7 +703,7 @@ class _BatchInfoSection extends StatelessWidget {
           ),
           const SizedBox(height: AppConstants.spacingSmall),
           Text(
-            '${l10n.translate(AppStrings.purpose)}: ${batch.purpose}',
+            'Objectif: ${batch.purpose}',
             style: TextStyle(
               fontSize: AppConstants.fontSizeBody,
               color: Colors.grey[700],
@@ -734,7 +734,7 @@ class _UnknownBatchSection extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(
+          const Icon(
             Icons.warning_amber_rounded,
             color: Colors.orange,
             size: AppConstants.iconSizeMedium,
@@ -744,9 +744,9 @@ class _UnknownBatchSection extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Lot introuvable',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: AppConstants.fontSizeLarge,
                     fontWeight: FontWeight.bold,
                   ),
