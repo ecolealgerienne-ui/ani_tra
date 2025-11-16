@@ -479,8 +479,18 @@ class LotProvider extends ChangeNotifier {
     }).toList();
   }
 
+  /// PHASE 3: Utilise les champs structurés de Movement (buyerName, buyerFarmId, buyerType)
+  /// au lieu de stocker les données dans notes (deprecated)
   List<Movement> expandLotToSaleMovements(Lot lot) {
     if (lot.type != LotType.sale) return [];
+
+    // Détermine le type d'acheteur : 'farm' si buyerFarmId existe, sinon 'individual'
+    String? buyerType;
+    if (lot.buyerFarmId != null && lot.buyerFarmId!.isNotEmpty) {
+      buyerType = 'farm'; // BuyerTypeConstants.farm
+    } else if (lot.buyerName != null && lot.buyerName!.isNotEmpty) {
+      buyerType = 'individual'; // BuyerTypeConstants.individual
+    }
 
     return lot.animalIds.map((animalId) {
       return Movement(
@@ -490,7 +500,12 @@ class LotProvider extends ChangeNotifier {
         movementDate: lot.saleDate ?? DateTime.now(),
         toFarmId: lot.buyerFarmId,
         price: lot.pricePerAnimal,
-        notes: '$_buyerLabel ${lot.buyerName ?? AppConstants.notAvailable}',
+        // PHASE 3: Utilise les champs structurés au lieu de notes
+        buyerName: lot.buyerName,
+        buyerFarmId: lot.buyerFarmId,
+        buyerType: buyerType,
+        // Notes peuvent rester pour infos supplémentaires, mais pas pour données structurées
+        notes: null,
         synced: false,
         createdAt: DateTime.now(),
         farmId: lot.farmId,
@@ -498,6 +513,8 @@ class LotProvider extends ChangeNotifier {
     }).toList();
   }
 
+  /// PHASE 3: Utilise les champs structurés de Movement (slaughterhouseName, slaughterhouseId)
+  /// au lieu de stocker les données dans notes (deprecated)
   List<Movement> expandLotToSlaughterMovements(Lot lot) {
     if (lot.type != LotType.slaughter) return [];
 
@@ -507,8 +524,11 @@ class LotProvider extends ChangeNotifier {
         animalId: animalId,
         type: MovementType.slaughter,
         movementDate: lot.slaughterDate ?? DateTime.now(),
-        notes:
-            '$_slaughterhouseLabel ${lot.slaughterhouseName ?? AppConstants.notAvailable}',
+        // PHASE 3: Utilise les champs structurés au lieu de notes
+        slaughterhouseName: lot.slaughterhouseName,
+        slaughterhouseId: lot.slaughterhouseId,
+        // Notes peuvent rester pour infos supplémentaires, mais pas pour données structurées
+        notes: null,
         synced: false,
         createdAt: DateTime.now(),
         farmId: lot.farmId,
