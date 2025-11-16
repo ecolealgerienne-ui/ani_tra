@@ -22,6 +22,11 @@ class MovementsTable extends Table {
   // === Foreign Key ===
   TextColumn get animalId => text().named('animal_id')();
 
+  /// ID du lot source (si mouvement créé via finalisation de lot)
+  /// NULL = mouvement individuel
+  /// NON-NULL = mouvement issu d'un lot
+  TextColumn get lotId => text().nullable().named('lot_id')();
+
   // === Données métier ===
   /// Type: "birth", "purchase", "sale", "death", "slaughter" (MovementType enum)
   TextColumn get type => text()();

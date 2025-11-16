@@ -22,6 +22,7 @@ class Movement implements SyncableEntity {
 
   // === Données métier ===
   final String animalId;
+  final String? lotId; // ID du lot source (null = individuel)
   final MovementType type;
   final DateTime movementDate;
   final String? fromFarmId;
@@ -59,6 +60,7 @@ class Movement implements SyncableEntity {
     String? id,
     this.farmId = 'farm_default', // Valeur par défaut pour compatibilité mock
     required this.animalId,
+    this.lotId,
     required this.type,
     required this.movementDate,
     this.fromFarmId,
@@ -92,6 +94,7 @@ class Movement implements SyncableEntity {
   Movement copyWith({
     String? farmId,
     String? animalId,
+    String? lotId,
     MovementType? type,
     DateTime? movementDate,
     String? fromFarmId,
@@ -120,6 +123,7 @@ class Movement implements SyncableEntity {
       id: id,
       farmId: farmId ?? this.farmId,
       animalId: animalId ?? this.animalId,
+      lotId: lotId ?? this.lotId,
       type: type ?? this.type,
       movementDate: movementDate ?? this.movementDate,
       fromFarmId: fromFarmId ?? this.fromFarmId,
@@ -188,6 +192,7 @@ class Movement implements SyncableEntity {
       'id': id,
       'farm_id': farmId,
       'animal_id': animalId,
+      'lot_id': lotId,
       'type': type.name,
       'movement_date': movementDate.toIso8601String(),
       'from_farm_id': fromFarmId,
@@ -220,6 +225,7 @@ class Movement implements SyncableEntity {
       id: json['id'],
       farmId: json['farm_id'] as String? ?? 'farm_default',
       animalId: json['animal_id'],
+      lotId: json['lot_id'],
       type: MovementType.values.firstWhere((e) => e.name == json['type']),
       movementDate: DateTime.parse(json['movement_date']),
       fromFarmId: json['from_farm_id'],
