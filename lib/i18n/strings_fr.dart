@@ -1134,4 +1134,9 @@ const Map<String, String> stringsFr = {
   'synced': 'Synchronisé',
   'notSynced': 'Non synchronisé',
   'lastSyncedAt': 'Dernière synchronisation',
+  'draft': 'Brouillon',
+  'price': 'Prix',
+  'currency': 'DZD',
+  'createdAt': 'Créé le',
+  'updatedAt': 'Modifié le',
 };

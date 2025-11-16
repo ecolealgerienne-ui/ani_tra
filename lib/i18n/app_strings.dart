@@ -1132,5 +1132,10 @@ class AppStrings {
   static const String synced = 'synced';
   static const String notSynced = 'notSynced';
   static const String lastSyncedAt = 'lastSyncedAt';
+  static const String draft = 'draft';
+  static const String price = 'price';
+  static const String currency = 'currency';
+  static const String createdAt = 'createdAt';
+  static const String updatedAt = 'updatedAt';
 
 }
