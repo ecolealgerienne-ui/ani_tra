@@ -7,7 +7,6 @@ import 'package:intl/intl.dart';
 import '../../providers/movement_provider.dart';
 import '../../providers/animal_provider.dart';
 import '../../models/movement.dart';
-import '../../models/animal.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
@@ -244,6 +243,8 @@ class _MovementListScreenState extends State<MovementListScreen> {
         return Colors.red;
       case MovementType.slaughter:
         return Colors.purple;
+      default:
+        return Colors.grey;
     }
   }
 
@@ -260,6 +261,8 @@ class _MovementListScreenState extends State<MovementListScreen> {
         return Icons.dangerous;
       case MovementType.slaughter:
         return Icons.content_cut;
+      default:
+        return Icons.sync_alt;
     }
   }
 
@@ -277,6 +280,8 @@ class _MovementListScreenState extends State<MovementListScreen> {
         return l10n.translate(AppStrings.death);
       case MovementType.slaughter:
         return l10n.translate(AppStrings.slaughter);
+      default:
+        return 'Mouvement';
     }
   }
 }
@@ -468,6 +473,8 @@ class _MovementCard extends StatelessWidget {
         return Colors.red;
       case MovementType.slaughter:
         return Colors.purple;
+      default:
+        return Colors.grey;
     }
   }
 
@@ -484,6 +491,8 @@ class _MovementCard extends StatelessWidget {
         return Icons.dangerous;
       case MovementType.slaughter:
         return Icons.content_cut;
+      default:
+        return Icons.sync_alt;
     }
   }
 
@@ -501,6 +510,8 @@ class _MovementCard extends StatelessWidget {
         return l10n.translate(AppStrings.death);
       case MovementType.slaughter:
         return l10n.translate(AppStrings.slaughter);
+      default:
+        return 'Mouvement';
     }
   }
 }
