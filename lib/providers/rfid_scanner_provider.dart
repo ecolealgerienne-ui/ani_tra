@@ -31,19 +31,21 @@ class RFIDScannerProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void stopScanning() {
+  void stopScanning({bool notify = true}) {
     _isScanning = false;
     _scanTimer?.cancel();
     _eidStreamController?.close();
     _eidStreamController = null;
-    notifyListeners();
+    if (notify) {
+      notifyListeners();
+    }
   }
 
   Stream<String>? get eidStream => _eidStreamController?.stream;
 
   @override
   void dispose() {
-    stopScanning();
+    stopScanning(notify: false);
     super.dispose();
   }
 }
