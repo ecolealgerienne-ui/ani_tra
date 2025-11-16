@@ -61,15 +61,15 @@ class MovementDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.translate(AppStrings.movementDetails)),
-        actions: [
-          // TODO: Ajouter bouton d'édition si nécessaire
-          // IconButton(
-          //   icon: const Icon(Icons.edit),
-          //   onPressed: () {
-          //     // Navigation vers écran d'édition
-          //   },
-          // ),
-        ],
+        // TODO: Ajouter bouton d'édition si nécessaire
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.edit),
+        //     onPressed: () {
+        //       // Navigation vers écran d'édition
+        //     },
+        //   ),
+        // ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppConstants.spacingMedium),
