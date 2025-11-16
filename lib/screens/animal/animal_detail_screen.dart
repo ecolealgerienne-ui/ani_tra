@@ -24,6 +24,7 @@ import '../../widgets/eid_history_card.dart';
 import '../movement/death_screen.dart';
 import '../movement/slaughter_screen.dart';
 import '../movement/sale_screen.dart';
+import 'weight_history_screen.dart';
 //import '../treatment/0_treatment_screen.dart';
 import '../vaccination/vaccination_detail_screen.dart';
 import '../treatment/treatment_detail_screen.dart';
@@ -310,59 +311,6 @@ class _InfosTab extends StatelessWidget {
 
   const _InfosTab({required this.animal});
 
-  void _showAddWeightDialog(BuildContext context) {
-    final weightController = TextEditingController();
-    final uuid = const Uuid();
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-            AppLocalizations.of(context).translate(AppStrings.animalDetail)),
-        content: TextField(
-          controller: weightController,
-          keyboardType: TextInputType.number,
-          autofocus: true,
-          decoration: InputDecoration(
-            labelText:
-                AppLocalizations.of(context).translate(AppStrings.weightInKg),
-            suffixText: AppLocalizations.of(context).translate(AppStrings.kg),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child:
-                Text(AppLocalizations.of(context).translate(AppStrings.cancel)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final weight = double.tryParse(weightController.text);
-              if (weight != null && weight > 0) {
-                final record = WeightRecord(
-                  id: uuid.v4(),
-                  animalId: animal.id,
-                  weight: weight,
-                  recordedAt: DateTime.now(),
-                  source: WeightSource.manual,
-                  synced: false,
-                  createdAt: DateTime.now(),
-                );
-                context.read<WeightProvider>().addWeight(record);
-                context.read<SyncProvider>().incrementPendingData();
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(AppLocalizations.of(context).translate(AppStrings.weightAddedMessage))),
-                );
-              }
-            },
-            child: Text(AppLocalizations.of(context).translate(AppStrings.save)),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _showChangeEidDialog(BuildContext context, Animal animal) {
     showDialog(
       context: context,
@@ -638,11 +586,19 @@ class _InfosTab extends StatelessWidget {
             title: AppLocalizations.of(context).translate(AppStrings.weight),
             trailing: IconButton(
               icon: Icon(
-                Icons.add_circle,
+                Icons.history,
                 color: currentAnimal.status == AnimalStatus.alive ? null : Colors.grey,
               ),
+              tooltip: AppLocalizations.of(context).translate(AppStrings.weightHistory),
               onPressed: currentAnimal.status == AnimalStatus.alive
-                  ? () => _showAddWeightDialog(context)
+                  ? () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => WeightHistoryScreen(animal: currentAnimal),
+                        ),
+                      );
+                    }
                   : null,
             ),
             children: [

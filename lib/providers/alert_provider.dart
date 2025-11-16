@@ -243,6 +243,10 @@ class AlertProvider extends ChangeNotifier {
               final batchAlerts = await _checkAndBuildBatchToFinalize(config);
               newAlerts.addAll(batchAlerts);
               break;
+            case AlertEvaluationType.weightDrop:
+              final weightDropAlerts = await _checkAndBuildWeightDrop(config);
+              newAlerts.addAll(weightDropAlerts);
+              break;
             case AlertEvaluationType.draftAnimals:
               // SKIP: draftAnimals handled by legacy _checkAndBuildDraftAlerts below
               break;
@@ -490,6 +494,67 @@ class AlertProvider extends ChangeNotifier {
           messageParams: {
             'animalName': _getAnimalDisplayName(animal),
             'daysSinceWeight': daysSinceWeight.toString(),
+          },
+        );
+        alerts.add(alert);
+      }
+    }
+
+    return alerts;
+  }
+
+  /// Évaluation WEIGHT DROP (Perte de poids importante)
+  /// Détecte les pertes de poids significatives en comparant les deux derniers poids
+  Future<List<Alert>> _checkAndBuildWeightDrop(
+    AlertConfiguration config,
+  ) async {
+    final alerts = <Alert>[];
+    final animals = _animalProvider.animals
+        .where((a) => a.status == AnimalStatus.alive)
+        .toList();
+
+    // Seuil par défaut: 10% (TODO: lire depuis FarmPreferences)
+    const double weightDropThreshold = 10.0;
+
+    for (final animal in animals) {
+      // Récupérer tous les poids de cet animal, triés par date
+      final animalWeights = _weightProvider.weights
+          .where((w) => w.animalId == animal.id)
+          .toList()
+        ..sort((a, b) => b.recordedAt.compareTo(a.recordedAt)); // Plus récent d'abord
+
+      // Il faut au moins 2 poids pour comparer
+      if (animalWeights.length < 2) continue;
+
+      final currentWeight = animalWeights[0];
+      final previousWeight = animalWeights[1];
+
+      // Calculer le pourcentage de perte
+      final weightDiff = previousWeight.weight - currentWeight.weight;
+      if (weightDiff <= 0) continue; // Pas de perte, ou gain de poids
+
+      final percentDrop = (weightDiff / previousWeight.weight) * 100;
+
+      // Créer une alerte si la perte dépasse le seuil
+      if (percentDrop > weightDropThreshold) {
+        final alert = Alert(
+          id: 'weight_drop_${animal.id}',
+          type: AlertType.urgent,
+          category: AlertCategory.weighing,
+          title: '',
+          message: '',
+          entityId: animal.id,
+          entityType: 'animal',
+          entityName: _getAnimalDisplayName(animal),
+          actionLabel: 'Voir l\'historique',
+          animalIds: [animal.id],
+          titleKey: config.titleKey,
+          messageKey: config.messageKey,
+          messageParams: {
+            'animalName': _getAnimalDisplayName(animal),
+            'percentDrop': percentDrop.toStringAsFixed(1),
+            'previousWeight': previousWeight.weight.toStringAsFixed(1),
+            'currentWeight': currentWeight.weight.toStringAsFixed(1),
           },
         );
         alerts.add(alert);
