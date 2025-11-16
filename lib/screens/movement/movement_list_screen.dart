@@ -253,6 +253,8 @@ class _MovementListScreenState extends State<MovementListScreen> {
   /// Retourne la couleur associée au type de mouvement
   Color _getMovementTypeColor(MovementType type) {
     switch (type) {
+      case MovementType.birth:
+        return Colors.green;
       case MovementType.purchase:
         return Colors.blue;
       case MovementType.sale:
@@ -263,12 +265,16 @@ class _MovementListScreenState extends State<MovementListScreen> {
         return Colors.purple;
       case MovementType.temporaryOut:
         return Colors.teal;
+      case MovementType.temporaryReturn:
+        return Colors.cyan;
     }
   }
 
   /// Retourne l'icône associée au type de mouvement
   IconData _getMovementTypeIcon(MovementType type) {
     switch (type) {
+      case MovementType.birth:
+        return Icons.child_care;
       case MovementType.purchase:
         return Icons.shopping_cart;
       case MovementType.sale:
@@ -279,6 +285,8 @@ class _MovementListScreenState extends State<MovementListScreen> {
         return Icons.content_cut;
       case MovementType.temporaryOut:
         return Icons.exit_to_app;
+      case MovementType.temporaryReturn:
+        return Icons.keyboard_return;
     }
   }
 
@@ -286,6 +294,8 @@ class _MovementListScreenState extends State<MovementListScreen> {
   String _getMovementTypeLabel(BuildContext context, MovementType type) {
     final l10n = AppLocalizations.of(context);
     switch (type) {
+      case MovementType.birth:
+        return l10n.translate(AppStrings.birth);
       case MovementType.purchase:
         return l10n.translate(AppStrings.purchase);
       case MovementType.sale:
@@ -296,6 +306,8 @@ class _MovementListScreenState extends State<MovementListScreen> {
         return l10n.translate(AppStrings.slaughter);
       case MovementType.temporaryOut:
         return l10n.translate(AppStrings.temporaryOut);
+      case MovementType.temporaryReturn:
+        return l10n.translate(AppStrings.temporaryOut); // Utilise la même traduction pour l'instant
     }
   }
 }
@@ -483,6 +495,8 @@ class _MovementCard extends StatelessWidget {
   /// Retourne la couleur associée au type de mouvement
   Color _getMovementTypeColor(MovementType type) {
     switch (type) {
+      case MovementType.birth:
+        return Colors.green;
       case MovementType.purchase:
         return Colors.blue;
       case MovementType.sale:
@@ -493,12 +507,16 @@ class _MovementCard extends StatelessWidget {
         return Colors.purple;
       case MovementType.temporaryOut:
         return Colors.teal;
+      case MovementType.temporaryReturn:
+        return Colors.cyan;
     }
   }
 
   /// Retourne l'icône associée au type de mouvement
   IconData _getMovementTypeIcon(MovementType type) {
     switch (type) {
+      case MovementType.birth:
+        return Icons.child_care;
       case MovementType.purchase:
         return Icons.shopping_cart;
       case MovementType.sale:
@@ -509,6 +527,8 @@ class _MovementCard extends StatelessWidget {
         return Icons.content_cut;
       case MovementType.temporaryOut:
         return Icons.exit_to_app;
+      case MovementType.temporaryReturn:
+        return Icons.keyboard_return;
     }
   }
 
@@ -516,6 +536,8 @@ class _MovementCard extends StatelessWidget {
   String _getMovementTypeLabel(BuildContext context, MovementType type) {
     final l10n = AppLocalizations.of(context);
     switch (type) {
+      case MovementType.birth:
+        return l10n.translate(AppStrings.birth);
       case MovementType.purchase:
         return l10n.translate(AppStrings.purchase);
       case MovementType.sale:
@@ -526,6 +548,8 @@ class _MovementCard extends StatelessWidget {
         return l10n.translate(AppStrings.slaughter);
       case MovementType.temporaryOut:
         return l10n.translate(AppStrings.temporaryOut);
+      case MovementType.temporaryReturn:
+        return l10n.translate(AppStrings.temporaryOut); // Utilise la même traduction pour l'instant
     }
   }
 }

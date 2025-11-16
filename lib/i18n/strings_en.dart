@@ -888,6 +888,7 @@ const Map<String, String> stringsEn = {
   'soldStatus': 'Sold',
   'slaughteredStatus': 'Slaughtered',
   'statusOnTemporaryMovement': 'On temporary movement',
+  'onTemporaryMovement': 'On temporary movement',
 
   // ============ FARM SETTINGS & ALERT STATS ============
   'enabled': 'Enabled',

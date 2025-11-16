@@ -885,6 +885,7 @@ const Map<String, String> stringsAr = {
   'soldStatus': 'مُباع',
   'slaughteredStatus': 'مذبوح',
   'statusOnTemporaryMovement': 'في حركة مؤقتة',
+  'onTemporaryMovement': 'في حركة مؤقتة',
 
   // ============ إعدادات المزرعة وإحصائيات التنبيهات ============
   'enabled': 'مُفعّلة',
