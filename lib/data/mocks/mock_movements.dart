@@ -8,31 +8,38 @@ class MockMovements {
     final now = DateTime.now();
 
     return [
-      // ==================== NAISSANCES ====================
+      // ==================== ACHATS ====================
       Movement(
         id: 'movement_001',
         animalId: 'animal_009',
-        type: MovementType.birth,
+        type: MovementType.purchase,
         movementDate: DateTime(2024, 2, 15),
         farmId: 'farm_default',
+        price: 250.00,
+        notes: 'Achat agneau de race',
         synced: true,
         createdAt: now.subtract(const Duration(days: 250)),
       ),
       Movement(
         id: 'movement_002',
         animalId: 'animal_010',
-        type: MovementType.birth,
+        type: MovementType.purchase,
         movementDate: DateTime(2024, 2, 16),
         farmId: 'farm_default',
+        price: 240.00,
+        notes: 'Achat brebis reproductrice',
         synced: true,
         createdAt: now.subtract(const Duration(days: 249)),
       ),
+
+      // ==================== SORTIE TEMPORAIRE ====================
       Movement(
         id: 'movement_003',
         animalId: 'animal_014',
-        type: MovementType.birth,
+        type: MovementType.temporaryOut,
         movementDate: DateTime(2025, 1, 10),
         farmId: 'farm_default',
+        notes: 'Transhumance saisonnière',
         synced: true,
         createdAt: now.subtract(const Duration(days: 30)),
       ),

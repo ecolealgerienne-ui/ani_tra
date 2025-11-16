@@ -265,7 +265,7 @@ class MovementRepository {
   MovementType _parseMovementType(String type) {
     return MovementType.values.firstWhere(
       (e) => e.name == type,
-      orElse: () => MovementType.birth,
+      orElse: () => MovementType.purchase,
     );
   }
 }

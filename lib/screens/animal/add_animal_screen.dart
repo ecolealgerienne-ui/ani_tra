@@ -352,20 +352,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
       // 2. CrÃƒÂ©er le mouvement correspondant
       Movement? movement;
 
+      // Note: Les naissances ne créent pas de mouvement car ce ne sont pas des mouvements
       if (_selectedOrigin ==
-          AppLocalizations.of(context).translate(AppStrings.birth)) {
-        movement = Movement(
-          id: _generateId(),
-          type: MovementType.birth,
-          animalId: animal.id,
-          movementDate: _selectedBirthDate!,
-          notes: _notesController.text.trim().isNotEmpty
-              ? _notesController.text.trim()
-              : null,
-          synced: false,
-          createdAt: DateTime.now(),
-        );
-      } else if (_selectedOrigin ==
           AppLocalizations.of(context).translate(AppStrings.purchase)) {
         movement = Movement(
           id: _generateId(),
