@@ -28,6 +28,7 @@ import '../vaccination/vaccination_detail_screen.dart';
 import '../treatment/treatment_detail_screen.dart';
 import '../medical/medical_act_screen.dart';
 import 'add_animal_screen.dart';
+import 'animal_finder_screen.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
@@ -1155,11 +1156,16 @@ class _TreatmentCard extends StatelessWidget {
   }
 }
 
-class _GenealogieTab extends StatelessWidget {
+class _GenealogieTab extends StatefulWidget {
   final Animal animal;
 
   const _GenealogieTab({required this.animal});
 
+  @override
+  State<_GenealogieTab> createState() => _GenealogieTabState();
+}
+
+class _GenealogieTabState extends State<_GenealogieTab> {
   String _getAgeFormatted(Animal animal, BuildContext context) {
     final ageMonths = animal.ageInMonths;
     if (ageMonths < 12) {
@@ -1172,25 +1178,120 @@ class _GenealogieTab extends StatelessWidget {
     return months > 0 ? '$years $yearsLabel $months $monthsLabel' : '$years $yearsLabel';
   }
 
+  Future<void> _selectMother() async {
+    final animalProvider = context.read<AnimalProvider>();
+
+    final selectedMother = await Navigator.push<Animal>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AnimalFinderScreen(
+          mode: AnimalFinderMode.single,
+          title: AppLocalizations.of(context).translate(AppStrings.scanMother),
+          allowedStatuses: const [AnimalStatus.alive],
+        ),
+      ),
+    );
+
+    if (selectedMother != null) {
+      // Vérifier que c'est une femelle
+      if (selectedMother.sex != AnimalSex.female) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(AppLocalizations.of(context)
+                  .translate(AppStrings.motherMustBeFemale)),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+
+      // Vérifier qu'on ne sélectionne pas l'animal lui-même
+      if (selectedMother.id == widget.animal.id) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Un animal ne peut pas être sa propre mère'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+
+      // Mettre à jour l'animal avec la nouvelle mère
+      final updatedAnimal = widget.animal.copyWith(
+        motherId: selectedMother.id,
+        updatedAt: DateTime.now(),
+      );
+
+      try {
+        await animalProvider.updateAnimal(updatedAnimal);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(AppLocalizations.of(context)
+                  .translate(AppStrings.motherSelected)
+                  .replaceAll('{name}', selectedMother.displayName)),
+              backgroundColor: AppConstants.successGreen,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Erreur lors de la mise à jour: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final animalProvider = context.watch<AnimalProvider>();
-    final mother = animal.motherId != null
-        ? animalProvider.getAnimalById(animal.motherId!)
+    final currentAnimal = animalProvider.getAnimalById(widget.animal.id) ?? widget.animal;
+    final mother = currentAnimal.motherId != null
+        ? animalProvider.getAnimalById(currentAnimal.motherId!)
         : null;
 
     // Obtenir les enfants (seulement via motherId car fatherId n'existe pas dans le modèle)
     final children =
-        animalProvider.animals.where((a) => a.motherId == animal.id).toList();
+        animalProvider.animals.where((a) => a.motherId == currentAnimal.id).toList();
+
+    // Vérifier si on peut modifier la mère
+    final canEditMother = currentAnimal.status == AnimalStatus.alive ||
+                          currentAnimal.status == AnimalStatus.draft;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppConstants.spacingMedium),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppLocalizations.of(context).translate(AppStrings.mother),
-              style:
-                  const TextStyle(fontSize: AppConstants.fontSizeImportant, fontWeight: FontWeight.bold)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(AppLocalizations.of(context).translate(AppStrings.mother),
+                  style: const TextStyle(fontSize: AppConstants.fontSizeImportant, fontWeight: FontWeight.bold)),
+              if (canEditMother)
+                ElevatedButton.icon(
+                  onPressed: _selectMother,
+                  icon: Icon(mother != null ? Icons.edit : Icons.add, size: 18),
+                  label: Text(mother != null
+                    ? AppLocalizations.of(context).translate(AppStrings.modify)
+                    : AppLocalizations.of(context).translate(AppStrings.add)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.pink[100],
+                    foregroundColor: Colors.pink[900],
+                  ),
+                ),
+            ],
+          ),
           const SizedBox(height: AppConstants.spacingExtraSmall),
           if (mother != null)
             ListTile(
