@@ -39,7 +39,7 @@ class _CreateTemporaryMovementScreenState
   }
 
   Future<void> _scanAnimal() async {
-    final result = await Navigator.push<List<Animal>>(
+    final result = await Navigator.push<Animal>(
       context,
       MaterialPageRoute(
         builder: (context) => const AnimalFinderScreen(
@@ -50,9 +50,9 @@ class _CreateTemporaryMovementScreenState
       ),
     );
 
-    if (result != null && result.isNotEmpty && mounted) {
+    if (result != null && mounted) {
       setState(() {
-        _selectedAnimal = result.first;
+        _selectedAnimal = result;
       });
     }
   }
