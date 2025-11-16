@@ -9,7 +9,6 @@ import '../../providers/sync_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/animal.dart';
 import '../../models/movement.dart';
-import '../../i18n/app_localizations.dart';
 import '../../utils/constants.dart';
 import '../animal/animal_detail_screen.dart';
 import '../animal/animal_finder_screen.dart';
