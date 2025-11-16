@@ -97,7 +97,6 @@ class MockData {
         'animals': animals.length,
         'products': products.length,
         'treatments': treatments.length,
-        'movements': movements.length,
         'batches': batches.length,
         'weights': weights.length,
         'veterinarians': veterinarians.length,
