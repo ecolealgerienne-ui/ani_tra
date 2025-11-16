@@ -212,6 +212,8 @@ class MovementRepository {
       price: data.price,
       notes: data.notes,
       buyerQrSignature: data.buyerQrSignature,
+      returnDate: data.returnDate,
+      returnNotes: data.returnNotes,
       synced: data.synced,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
@@ -245,6 +247,12 @@ class MovementRepository {
           : const Value.absent(),
       buyerQrSignature: movement.buyerQrSignature != null
           ? Value(movement.buyerQrSignature!)
+          : const Value.absent(),
+      returnDate: movement.returnDate != null
+          ? Value(movement.returnDate!)
+          : const Value.absent(),
+      returnNotes: movement.returnNotes != null
+          ? Value(movement.returnNotes!)
           : const Value.absent(),
       synced: Value(movement.synced),
       lastSyncedAt: movement.lastSyncedAt != null
