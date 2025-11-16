@@ -4,14 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
-import '../../providers/animal_provider.dart';
 import '../../providers/movement_provider.dart';
 import '../../providers/sync_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/animal.dart';
 import '../../models/movement.dart';
 import '../../i18n/app_localizations.dart';
-import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
 import '../animal/animal_detail_screen.dart';
 import '../animal/animal_finder_screen.dart';
@@ -44,10 +42,10 @@ class _CreateTemporaryMovementScreenState
     final result = await Navigator.push<List<Animal>>(
       context,
       MaterialPageRoute(
-        builder: (context) => AnimalFinderScreen(
+        builder: (context) => const AnimalFinderScreen(
           mode: AnimalFinderMode.single,
           title: 'Scanner l\'animal',
-          allowedStatuses: const [AnimalStatus.alive],
+          allowedStatuses: [AnimalStatus.alive],
         ),
       ),
     );
@@ -159,8 +157,6 @@ class _CreateTemporaryMovementScreenState
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Sortie temporaire'),
