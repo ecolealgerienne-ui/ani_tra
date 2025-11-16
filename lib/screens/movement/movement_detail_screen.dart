@@ -13,7 +13,7 @@ import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
 import '../animal/animal_detail_screen.dart';
 
-class MovementDetailScreen extends StatelessWidget {
+class MovementDetailScreen extends StatefulWidget {
   final String movementId;
 
   const MovementDetailScreen({
@@ -22,10 +22,17 @@ class MovementDetailScreen extends StatelessWidget {
   });
 
   @override
+  State<MovementDetailScreen> createState() => _MovementDetailScreenState();
+}
+
+class _MovementDetailScreenState extends State<MovementDetailScreen> {
+  bool _isRecordingReturn = false;
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final movementProvider = context.watch<MovementProvider>();
-    final movement = movementProvider.getMovementById(movementId);
+    final movement = movementProvider.getMovementById(widget.movementId);
 
     if (movement == null) {
       return Scaffold(
@@ -132,7 +139,44 @@ class MovementDetailScreen extends StatelessWidget {
               child: _SyncInfoSection(movement: movement),
             ),
 
+            // Section Mouvement Temporaire (si applicable)
+            if (movement.isTemporaryOut) ...[
+              const SizedBox(height: AppConstants.spacingMedium),
+              _SectionCard(
+                title: 'Mouvement temporaire',
+                icon: Icons.exit_to_app,
+                color: Colors.teal,
+                child: _TemporaryMovementSection(movement: movement),
+              ),
+            ],
+
             const SizedBox(height: AppConstants.spacingLarge),
+
+            // Bouton "Enregistrer le retour" (si mouvement temporaire non retourné)
+            if (movement.isTemporaryOut && !movement.isReturned) ...[
+              ElevatedButton.icon(
+                onPressed: _isRecordingReturn ? null : () => _recordReturn(context, movement),
+                icon: _isRecordingReturn
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : const Icon(Icons.keyboard_return),
+                label: Text(_isRecordingReturn ? 'Enregistrement...' : 'Enregistrer le retour'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppConstants.spacingMedium,
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppConstants.spacingMedium),
+            ],
 
             // Bouton retour (optionnel, car déjà présent dans l'AppBar)
             // Mais peut être utile pour une meilleure UX
@@ -150,6 +194,67 @@ class MovementDetailScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// Enregistre le retour d'un mouvement temporaire
+  Future<void> _recordReturn(BuildContext context, Movement outMovement) async {
+    setState(() => _isRecordingReturn = true);
+
+    try {
+      final movementProvider = context.read<MovementProvider>();
+      final animalProvider = context.read<AnimalProvider>();
+
+      // Créer le mouvement de retour
+      final returnMovement = Movement(
+        farmId: outMovement.farmId,
+        animalId: outMovement.animalId,
+        type: MovementType.temporaryReturn,
+        movementDate: DateTime.now(),
+        fromFarmId: outMovement.toFarmId,
+        toFarmId: outMovement.fromFarmId,
+        notes: 'Retour du mouvement temporaire du ${DateFormat('dd/MM/yyyy').format(outMovement.movementDate)}',
+        relatedMovementId: outMovement.id,
+      );
+
+      // Sauvegarder le mouvement de retour
+      await movementProvider.addMovement(returnMovement);
+
+      // Mettre à jour le mouvement sortant avec le lien vers le retour
+      final updatedOutMovement = outMovement.copyWith(
+        relatedMovementId: returnMovement.id,
+      );
+      await movementProvider.updateMovement(updatedOutMovement);
+
+      // Mettre à jour le statut de l'animal (retour à "alive")
+      final animal = animalProvider.getAnimalById(outMovement.animalId);
+      if (animal != null) {
+        final updatedAnimal = animal.copyWith(status: AnimalStatus.alive);
+        await animalProvider.updateAnimal(updatedAnimal);
+      }
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✅ Retour enregistré avec succès'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('❌ Erreur: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isRecordingReturn = false);
+      }
+    }
   }
 }
 
@@ -220,8 +325,10 @@ class _MovementTypeHeader extends StatelessWidget {
         return Colors.red;
       case MovementType.slaughter:
         return Colors.purple;
-      default:
-        return Colors.grey;
+      case MovementType.temporaryOut:
+        return Colors.teal;
+      case MovementType.temporaryReturn:
+        return Colors.cyan;
     }
   }
 
@@ -237,8 +344,10 @@ class _MovementTypeHeader extends StatelessWidget {
         return Icons.dangerous;
       case MovementType.slaughter:
         return Icons.content_cut;
-      default:
-        return Icons.sync_alt;
+      case MovementType.temporaryOut:
+        return Icons.exit_to_app;
+      case MovementType.temporaryReturn:
+        return Icons.keyboard_return;
     }
   }
 
@@ -255,8 +364,10 @@ class _MovementTypeHeader extends StatelessWidget {
         return l10n.translate(AppStrings.death);
       case MovementType.slaughter:
         return l10n.translate(AppStrings.slaughter);
-      default:
-        return 'Mouvement';
+      case MovementType.temporaryOut:
+        return l10n.translate(AppStrings.temporaryOut);
+      case MovementType.temporaryReturn:
+        return 'Retour temporaire';
     }
   }
 }
@@ -363,6 +474,17 @@ class _AnimalInfoSection extends StatelessWidget {
         ),
         child: Row(
           children: [
+            // Avatar de l'animal
+            CircleAvatar(
+              radius: 30,
+              backgroundColor: Colors.blue,
+              child: Icon(
+                animal.sex == 'M' ? Icons.male : Icons.female,
+                color: Colors.white,
+                size: 32,
+              ),
+            ),
+            const SizedBox(width: AppConstants.spacingMedium),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -583,6 +705,86 @@ class _SyncInfoSection extends StatelessWidget {
         ],
       ],
     );
+  }
+}
+
+/// Widget : Section d'informations du mouvement temporaire
+class _TemporaryMovementSection extends StatelessWidget {
+  final Movement movement;
+
+  const _TemporaryMovementSection({required this.movement});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (movement.temporaryMovementType != null) ...[
+          _InfoRow(
+            label: 'Type',
+            value: _getTemporaryTypeLabel(movement.temporaryMovementType!),
+            icon: Icons.info_outline,
+          ),
+          const Divider(),
+        ],
+        if (movement.expectedReturnDate != null) ...[
+          _InfoRow(
+            label: 'Date de retour prévue',
+            value: DateFormat('dd/MM/yyyy').format(movement.expectedReturnDate!),
+            icon: Icons.event_available,
+            valueColor: movement.isOverdue ? Colors.red : null,
+          ),
+          if (movement.isOverdue) ...[
+            const SizedBox(height: AppConstants.spacingSmall),
+            Container(
+              padding: const EdgeInsets.all(AppConstants.spacingSmall),
+              decoration: BoxDecoration(
+                color: Colors.red.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
+                border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.warning, color: Colors.red, size: 20),
+                  SizedBox(width: AppConstants.spacingSmall),
+                  Expanded(
+                    child: Text(
+                      '⚠️ Retour en retard',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          const Divider(),
+        ],
+        _InfoRow(
+          label: 'Statut',
+          value: movement.isReturned ? '✅ Retourné' : '⏳ En cours',
+          icon: movement.isReturned ? Icons.check_circle : Icons.pending,
+          valueColor: movement.isReturned ? Colors.green : Colors.orange,
+        ),
+      ],
+    );
+  }
+
+  String _getTemporaryTypeLabel(String type) {
+    switch (type) {
+      case 'loan':
+        return 'Prêt';
+      case 'transhumance':
+        return 'Transhumance';
+      case 'boarding':
+        return 'Pension';
+      case 'exhibition':
+        return 'Exposition';
+      default:
+        return type;
+    }
   }
 }
 
