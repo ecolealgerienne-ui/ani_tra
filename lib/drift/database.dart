@@ -183,7 +183,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   // ═══════════════════════════════════════════════════════════
   // MIGRATION STRATEGY
@@ -250,6 +250,13 @@ class AppDatabase extends _$AppDatabase {
           // ───────────────────────────────────────────────────
           if (from < 2) {
             await _migrateToV2AddUniqueConstraints();
+          }
+
+          // ───────────────────────────────────────────────────
+          // MIGRATION v2 → v3: Add status column to movements table
+          // ───────────────────────────────────────────────────
+          if (from < 3) {
+            await _migrateToV3AddMovementStatus();
           }
         },
       );
@@ -1206,6 +1213,35 @@ class AppDatabase extends _$AppDatabase {
 
     // Étape 9: Réactiver les contraintes de clés étrangères
     await customStatement('PRAGMA foreign_keys = ON;');
+  }
+
+  /// Migration v2 → v3: Ajouter une colonne status à la table movements
+  ///
+  /// Cette migration ajoute une colonne status avec une valeur par défaut basée sur le type de mouvement:
+  /// - birth, death, slaughter, temporaryReturn → 'closed'
+  /// - sale, purchase, temporaryOut → 'ongoing'
+  Future<void> _migrateToV3AddMovementStatus() async {
+    // Étape 1: Ajouter la colonne status avec une valeur par défaut temporaire
+    await customStatement(
+      'ALTER TABLE movements ADD COLUMN status TEXT NOT NULL DEFAULT "ongoing";',
+    );
+
+    // Étape 2: Mettre à jour les statuts en fonction du type de mouvement
+    // Les événements ponctuels (birth, death, slaughter, temporaryReturn) sont immédiatement clos
+    await customStatement('''
+      UPDATE movements
+      SET status = 'closed'
+      WHERE type IN ('birth', 'death', 'slaughter', 'temporaryReturn');
+    ''');
+
+    // Les mouvements temporaires sortants qui ont un retour associé sont clos
+    await customStatement('''
+      UPDATE movements
+      SET status = 'closed'
+      WHERE type = 'temporaryOut' AND related_movement_id IS NOT NULL;
+    ''');
+
+    // Note: Les sales, purchases et temporaryOut sans retour restent 'ongoing' (valeur par défaut)
   }
 
   // ═══════════════════════════════════════════════════════════

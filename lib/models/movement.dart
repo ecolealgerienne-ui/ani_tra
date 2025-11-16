@@ -13,6 +13,31 @@ enum MovementType {
   temporaryReturn // Retour de mouvement temporaire
 }
 
+enum MovementStatus {
+  ongoing, // En cours (mouvement actif, pas encore finalisé)
+  closed, // Clos (mouvement complété et validé)
+  archived // Archivé (mouvement ancien pour historique)
+}
+
+extension MovementStatusExtension on MovementStatus {
+  /// Retourne le statut par défaut pour un type de mouvement donné
+  static MovementStatus getDefaultForType(MovementType type) {
+    switch (type) {
+      case MovementType.death:
+      case MovementType.slaughter:
+      case MovementType.birth:
+      case MovementType.temporaryReturn:
+        // Événements ponctuels qui sont immédiatement clos
+        return MovementStatus.closed;
+      case MovementType.sale:
+      case MovementType.purchase:
+      case MovementType.temporaryOut:
+        // Mouvements nécessitant validation ou suivi
+        return MovementStatus.ongoing;
+    }
+  }
+}
+
 class Movement implements SyncableEntity {
   // === Identification ===
   @override
@@ -43,6 +68,9 @@ class Movement implements SyncableEntity {
   final String? temporaryMovementType; // 'loan', 'transhumance', 'boarding', etc.
   final DateTime? expectedReturnDate;
   final String? relatedMovementId; // Lien bidirectionnel (out ↔ return)
+
+  // === Status ===
+  final MovementStatus status; // ongoing, closed, archived
 
   // === Synchronisation ===
   @override
@@ -79,6 +107,8 @@ class Movement implements SyncableEntity {
     this.temporaryMovementType,
     this.expectedReturnDate,
     this.relatedMovementId,
+    // Status
+    MovementStatus? status,
     // Synchronisation
     this.synced = false,
     DateTime? createdAt,
@@ -86,6 +116,7 @@ class Movement implements SyncableEntity {
     this.lastSyncedAt,
     this.serverVersion,
   })  : id = id ?? const Uuid().v4(),
+        status = status ?? MovementStatusExtension.getDefaultForType(type),
         createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now();
 
@@ -113,6 +144,8 @@ class Movement implements SyncableEntity {
     String? temporaryMovementType,
     DateTime? expectedReturnDate,
     String? relatedMovementId,
+    // Status
+    MovementStatus? status,
     // Sync
     bool? synced,
     DateTime? updatedAt,
@@ -143,6 +176,8 @@ class Movement implements SyncableEntity {
           temporaryMovementType ?? this.temporaryMovementType,
       expectedReturnDate: expectedReturnDate ?? this.expectedReturnDate,
       relatedMovementId: relatedMovementId ?? this.relatedMovementId,
+      // Status
+      status: status ?? this.status,
       // Sync
       synced: synced ?? this.synced,
       createdAt: createdAt,
@@ -211,6 +246,8 @@ class Movement implements SyncableEntity {
       'temporary_movement_type': temporaryMovementType,
       'expected_return_date': expectedReturnDate?.toIso8601String(),
       'related_movement_id': relatedMovementId,
+      // Status
+      'status': status.name,
       // Sync
       'synced': synced,
       'created_at': createdAt.toIso8601String(),
@@ -246,6 +283,11 @@ class Movement implements SyncableEntity {
           ? DateTime.parse(json['expected_return_date'] as String)
           : null,
       relatedMovementId: json['related_movement_id'],
+      // Status - handle legacy values and default to type-specific status
+      status: json['status'] != null
+          ? _parseStatus(json['status'])
+          : MovementStatusExtension.getDefaultForType(
+              MovementType.values.firstWhere((e) => e.name == json['type'])),
       // Sync
       synced: json['synced'] ?? false,
       createdAt: json['created_at'] != null
@@ -259,5 +301,23 @@ class Movement implements SyncableEntity {
           : null,
       serverVersion: json['server_version'] as String?,
     );
+  }
+
+  /// Parse status from JSON, handling legacy values
+  static MovementStatus _parseStatus(String statusStr) {
+    // Handle legacy status values
+    switch (statusStr) {
+      case 'draft':
+      case 'active':
+        return MovementStatus.ongoing;
+      case 'closed':
+        return MovementStatus.closed;
+      case 'archived':
+        return MovementStatus.archived;
+      case 'ongoing':
+        return MovementStatus.ongoing;
+      default:
+        return MovementStatus.ongoing;
+    }
   }
 }

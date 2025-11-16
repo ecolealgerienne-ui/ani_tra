@@ -134,6 +134,50 @@ class MovementDetailScreen extends StatelessWidget {
 
             const SizedBox(height: AppConstants.spacingLarge),
 
+            // Bouton "Enregistrer le retour" (si mouvement temporaire non retourné)
+            if (movement.isTemporaryOut && !movement.isReturned) ...[
+              ElevatedButton.icon(
+                onPressed: _isRecordingReturn ? null : () => _recordReturn(context, movement),
+                icon: _isRecordingReturn
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : const Icon(Icons.keyboard_return),
+                label: Text(_isRecordingReturn ? 'Enregistrement...' : 'Enregistrer le retour'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppConstants.spacingMedium,
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppConstants.spacingMedium),
+            ],
+
+            // Bouton "Valider le mouvement" (pour ventes et achats en cours)
+            if ((movement.isSale || movement.type == MovementType.purchase) &&
+                movement.status == MovementStatus.ongoing) ...[
+              ElevatedButton.icon(
+                onPressed: () => _validateMovement(context, movement),
+                icon: const Icon(Icons.check_circle),
+                label: const Text('Valider le mouvement'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppConstants.spacingMedium,
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppConstants.spacingMedium),
+            ],
+
             // Bouton retour (optionnel, car déjà présent dans l'AppBar)
             // Mais peut être utile pour une meilleure UX
             OutlinedButton.icon(
@@ -150,6 +194,144 @@ class MovementDetailScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// Enregistre le retour d'un mouvement temporaire
+  Future<void> _recordReturn(BuildContext context, Movement outMovement) async {
+    final l10n = AppLocalizations.of(context);
+
+    // Ouvrir le dialog pour saisir la date et les notes
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (context) => _ReturnDateDialog(
+        outMovement: outMovement,
+      ),
+    );
+
+    if (result == null) return; // Utilisateur a annulé
+
+    setState(() => _isRecordingReturn = true);
+
+    try {
+      final movementProvider = context.read<MovementProvider>();
+      final animalProvider = context.read<AnimalProvider>();
+
+      final DateTime returnDate = result['returnDate'];
+      final String? notes = result['notes'];
+
+      // Créer le mouvement de retour
+      final returnMovement = Movement(
+        farmId: outMovement.farmId,
+        animalId: outMovement.animalId,
+        type: MovementType.temporaryReturn,
+        movementDate: returnDate,
+        fromFarmId: outMovement.toFarmId,
+        toFarmId: outMovement.fromFarmId,
+        notes: notes ?? 'Retour du mouvement temporaire du ${DateFormat('dd/MM/yyyy').format(outMovement.movementDate)}',
+        relatedMovementId: outMovement.id,
+      );
+
+      // Sauvegarder le mouvement de retour
+      await movementProvider.addMovement(returnMovement);
+
+      // Mettre à jour le mouvement sortant avec le lien vers le retour ET le statut "closed"
+      final updatedOutMovement = outMovement.copyWith(
+        relatedMovementId: returnMovement.id,
+        status: MovementStatus.closed,
+      );
+      await movementProvider.updateMovement(updatedOutMovement);
+
+      // Mettre à jour le statut de l'animal (retour à "alive")
+      final animal = animalProvider.getAnimalById(outMovement.animalId);
+      if (animal != null) {
+        final updatedAnimal = animal.copyWith(status: AnimalStatus.alive);
+        await animalProvider.updateAnimal(updatedAnimal);
+      }
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✅ Retour enregistré avec succès'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('❌ Erreur: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isRecordingReturn = false);
+      }
+    }
+  }
+
+  /// Valide un mouvement (passe de ongoing à closed)
+  Future<void> _validateMovement(BuildContext context, Movement movement) async {
+    // Demander confirmation
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirmer la validation'),
+        content: Text(
+          movement.isSale
+              ? 'Confirmer la validation de cette vente ?\nLe mouvement sera marqué comme clos et ne pourra plus être modifié facilement.'
+              : 'Confirmer la validation de cet achat ?\nLe mouvement sera marqué comme clos et ne pourra plus être modifié facilement.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Annuler'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Valider'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    try {
+      final movementProvider = context.read<MovementProvider>();
+
+      // Mettre à jour le statut du mouvement
+      final updatedMovement = movement.copyWith(
+        status: MovementStatus.closed,
+      );
+      await movementProvider.updateMovement(updatedMovement);
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✅ Mouvement validé avec succès'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('❌ Erreur: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }
 

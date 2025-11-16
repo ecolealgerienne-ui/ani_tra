@@ -98,6 +98,15 @@ class MovementsTable extends Table {
   TextColumn get relatedMovementId =>
       text().nullable().named('related_movement_id')();
 
+  // === Status ===
+
+  /// Statut du mouvement
+  /// Valeurs: "ongoing", "closed", "archived" (MovementStatus enum)
+  /// - ongoing: Mouvement actif, pas encore finalisé (ventes/achats en attente, départs temporaires)
+  /// - closed: Mouvement complété et validé (ventes/achats validés, retours effectués, événements ponctuels)
+  /// - archived: Mouvement ancien pour historique
+  TextColumn get status => text()();
+
   // === Sync fields (Phase 2 ready) ===
   BoolColumn get synced => boolean().withDefault(const Constant(false))();
   DateTimeColumn get lastSyncedAt =>
