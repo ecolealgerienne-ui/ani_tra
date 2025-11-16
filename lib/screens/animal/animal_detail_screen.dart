@@ -6,12 +6,10 @@ import 'package:uuid/uuid.dart';
 import 'dart:math';
 import '../../models/animal.dart';
 import '../../models/treatment.dart';
-import '../../models/weight_record.dart';
 import '../../models/animal_extensions.dart';
 
 import '../../providers/animal_provider.dart';
 import '../../providers/weight_provider.dart';
-import '../../providers/sync_provider.dart';
 import '../../providers/alert_provider.dart';
 import '../../providers/vaccination_provider.dart';
 import '../../providers/treatment_provider.dart';
