@@ -261,6 +261,177 @@ class DatabaseInitializer {
         // Silent fail
       }
 
+      // Animaux supplémentaires pour les lots
+      try {
+        await db.animalDao.insertItem(AnimalsTableCompanion.insert(
+          id: 'anim_006',
+          farmId: 'farm_default',
+          currentEid: const Value('FR222333444'),
+          birthDate: now.subtract(const Duration(days: 400)),
+          sex: AnimalSex.female.name,
+          status: AnimalStatus.alive.name,
+          speciesId: const Value('sheep'),
+          synced: const Value(false),
+          createdAt: now,
+          updatedAt: now,
+        ));
+      } catch (e) {
+        // Silent fail
+      }
+
+      try {
+        await db.animalDao.insertItem(AnimalsTableCompanion.insert(
+          id: 'anim_007',
+          farmId: 'farm_default',
+          currentEid: const Value('FR333444555'),
+          birthDate: now.subtract(const Duration(days: 380)),
+          sex: AnimalSex.male.name,
+          status: AnimalStatus.alive.name,
+          speciesId: const Value('sheep'),
+          synced: const Value(false),
+          createdAt: now,
+          updatedAt: now,
+        ));
+      } catch (e) {
+        // Silent fail
+      }
+
+      try {
+        await db.animalDao.insertItem(AnimalsTableCompanion.insert(
+          id: 'anim_008',
+          farmId: 'farm_default',
+          currentEid: const Value('FR444555666'),
+          birthDate: now.subtract(const Duration(days: 350)),
+          sex: AnimalSex.female.name,
+          status: AnimalStatus.alive.name,
+          speciesId: const Value('sheep'),
+          synced: const Value(false),
+          createdAt: now,
+          updatedAt: now,
+        ));
+      } catch (e) {
+        // Silent fail
+      }
+
+      try {
+        await db.animalDao.insertItem(AnimalsTableCompanion.insert(
+          id: 'anim_009',
+          farmId: 'farm_default',
+          currentEid: const Value('FR555666777'),
+          birthDate: now.subtract(const Duration(days: 320)),
+          sex: AnimalSex.male.name,
+          status: AnimalStatus.alive.name,
+          speciesId: const Value('sheep'),
+          synced: const Value(false),
+          createdAt: now,
+          updatedAt: now,
+        ));
+      } catch (e) {
+        // Silent fail
+      }
+
+      try {
+        await db.animalDao.insertItem(AnimalsTableCompanion.insert(
+          id: 'anim_010',
+          farmId: 'farm_default',
+          currentEid: const Value('FR666777888'),
+          birthDate: now.subtract(const Duration(days: 290)),
+          sex: AnimalSex.female.name,
+          status: AnimalStatus.alive.name,
+          speciesId: const Value('sheep'),
+          synced: const Value(false),
+          createdAt: now,
+          updatedAt: now,
+        ));
+      } catch (e) {
+        // Silent fail
+      }
+
+      try {
+        await db.animalDao.insertItem(AnimalsTableCompanion.insert(
+          id: 'anim_011',
+          farmId: 'farm_default',
+          currentEid: const Value('FR777888999'),
+          birthDate: now.subtract(const Duration(days: 260)),
+          sex: AnimalSex.male.name,
+          status: AnimalStatus.alive.name,
+          speciesId: const Value('sheep'),
+          synced: const Value(false),
+          createdAt: now,
+          updatedAt: now,
+        ));
+      } catch (e) {
+        // Silent fail
+      }
+
+      try {
+        await db.animalDao.insertItem(AnimalsTableCompanion.insert(
+          id: 'anim_012',
+          farmId: 'farm_default',
+          currentEid: const Value('FR888999000'),
+          birthDate: now.subtract(const Duration(days: 230)),
+          sex: AnimalSex.female.name,
+          status: AnimalStatus.alive.name,
+          speciesId: const Value('sheep'),
+          synced: const Value(false),
+          createdAt: now,
+          updatedAt: now,
+        ));
+      } catch (e) {
+        // Silent fail
+      }
+
+      try {
+        await db.animalDao.insertItem(AnimalsTableCompanion.insert(
+          id: 'anim_013',
+          farmId: 'farm_default',
+          currentEid: const Value('FR999000111'),
+          birthDate: now.subtract(const Duration(days: 200)),
+          sex: AnimalSex.male.name,
+          status: AnimalStatus.alive.name,
+          speciesId: const Value('sheep'),
+          synced: const Value(false),
+          createdAt: now,
+          updatedAt: now,
+        ));
+      } catch (e) {
+        // Silent fail
+      }
+
+      try {
+        await db.animalDao.insertItem(AnimalsTableCompanion.insert(
+          id: 'anim_014',
+          farmId: 'farm_default',
+          currentEid: const Value('FR000111222'),
+          birthDate: now.subtract(const Duration(days: 170)),
+          sex: AnimalSex.female.name,
+          status: AnimalStatus.alive.name,
+          speciesId: const Value('sheep'),
+          synced: const Value(false),
+          createdAt: now,
+          updatedAt: now,
+        ));
+      } catch (e) {
+        // Silent fail
+      }
+
+      try {
+        await db.animalDao.insertItem(AnimalsTableCompanion.insert(
+          id: 'anim_015',
+          farmId: 'farm_default',
+          currentEid: const Value('FR111222333'),
+          birthDate: now.subtract(const Duration(days: 140)),
+          sex: AnimalSex.male.name,
+          status: AnimalStatus.alive.name,
+          speciesId: const Value('sheep'),
+          synced: const Value(false),
+          createdAt: now,
+          updatedAt: now,
+        ));
+      } catch (e) {
+        // Silent fail
+      }
+
       // Treatments (utilise dose)
       try {
         await db.treatmentDao.insertItem(TreatmentsTableCompanion.insert(
@@ -329,7 +500,7 @@ class DatabaseInitializer {
           type: 'purchase',
           fromFarmId: const Value('farm_supplier_01'),
           price: const Value(1250.00),
-          notes: const Value('Achat lot de 5 agneaux'),
+          notes: const Value('Achat lot de 3 agneaux pour traitement'),
           synced: const Value(true),
           createdAt: now.subtract(const Duration(days: 180)),
           updatedAt: now.subtract(const Duration(days: 180)),
@@ -368,7 +539,7 @@ class DatabaseInitializer {
           type: 'sale',
           toFarmId: const Value('farm_buyer_02'),
           price: const Value(1850.00),
-          notes: const Value('Vente lot de 8 moutons engraissés'),
+          notes: const Value('Vente lot de 5 moutons engraissés au marché'),
           synced: const Value(false),
           createdAt: now.subtract(const Duration(days: 30)),
           updatedAt: now.subtract(const Duration(days: 30)),
@@ -422,7 +593,7 @@ class DatabaseInitializer {
           movementDate: now.subtract(const Duration(days: 7)),
           type: 'slaughter',
           toFarmId: const Value('slaughterhouse_001'),
-          notes: const Value('Lot de 12 agneaux pour abattoir'),
+          notes: const Value('Lot de 3 agneaux pour abattage Aïd'),
           synced: const Value(false),
           createdAt: now.subtract(const Duration(days: 7)),
           updatedAt: now.subtract(const Duration(days: 7)),
@@ -456,7 +627,7 @@ class DatabaseInitializer {
           farmId: 'farm_default',
           purpose: 'treatment',
           name: 'Traitement Antiparasitaire',
-          animalIdsJson: '["anim_001"]',
+          animalIdsJson: '["anim_001", "anim_006", "anim_007"]',
           synced: const Value(false),
           createdAt: now,
           updatedAt: now,
@@ -471,7 +642,7 @@ class DatabaseInitializer {
           farmId: 'farm_default',
           purpose: 'sale',
           name: 'Lot vente marché',
-          animalIdsJson: '["anim_001", "anim_002"]',
+          animalIdsJson: '["anim_008", "anim_009", "anim_010", "anim_011", "anim_012"]',
           synced: const Value(false),
           createdAt: now,
           updatedAt: now,
@@ -486,7 +657,7 @@ class DatabaseInitializer {
           farmId: 'farm_default',
           purpose: 'slaughter',
           name: 'Lot abattage Aïd',
-          animalIdsJson: '["anim_003"]',
+          animalIdsJson: '["anim_013", "anim_014", "anim_015"]',
           synced: const Value(false),
           createdAt: now,
           updatedAt: now,
