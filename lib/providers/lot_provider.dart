@@ -54,17 +54,17 @@ class LotProvider extends ChangeNotifier {
   List<Lot> get lots => List.unmodifiable(
       _allLots.where((l) => l.farmId == _authProvider.currentFarmId));
 
-  /// PHASE 1: MODIFY - Use status instead of completed
+  /// PHASE 1: MODIFY - Use status with backward-compat via Lot.isOpen
   List<Lot> get openLots =>
-      lots.where((l) => l.status == LotStatus.open).toList();
+      lots.where((l) => l.isOpen).toList();
 
-  /// PHASE 1: MODIFY - Use status instead of completed
+  /// PHASE 1: MODIFY - Use status with backward-compat via Lot.isClosed
   List<Lot> get closedLots =>
-      lots.where((l) => l.status == LotStatus.closed).toList();
+      lots.where((l) => l.isClosed).toList();
 
-  /// PHASE 1: ADD - Get archived lots
+  /// PHASE 1: ADD - Get archived lots via Lot.isArchived
   List<Lot> get archivedLots =>
-      lots.where((l) => l.status == LotStatus.archived).toList();
+      lots.where((l) => l.isArchived).toList();
 
   Lot? get activeLot => _activeLot;
   bool get isLoading => _isLoading;
