@@ -1,0 +1,207 @@
+1. OVERVIEW
+Objectif
+Permettre aux fermiers de consulter l'historique des pesées d'un animal (10 dernières) avec détection automatique d'une baisse de poids suspecte via un seuil configurable par ferme.
+Principes
+
+✅ Light & Fast: 10 pesées max (mobile perf)
+✅ Offline: SQLite natif, zéro serveur
+✅ Configurable: Seuil alerte par ferme
+✅ Visibilité: Alertes dans 4 endroits clés
+❌ Pas de graphs/GMQ: Réservé Phase 2 serveur
+
+
+2. DESIGN UI/UX
+2.1 DetailScreen Animal (Modification)
+Section Poids - AVANT:
+📊 POIDS
+─────────────────────
+  23.0 kg | Le 15/11/2025
+  [+]  [Ajouter pesée]
+Section Poids - APRÈS:
+📊 POIDS
+─────────────────────
+  23.0 kg | Le 15/11/2025
+  [📋 Historique]
+Action: Click → WeightHistoryScreen
+
+2.2 WeightHistoryScreen (Nouvel écran)
+┌──────────────────────────────────┐
+│ ← Historique des Pesées          │
+├──────────────────────────────────┤
+│                                  │
+│ 📊 BREBIS-042                    │
+│                                  │
+│ 23.0 kg  |  15/11/2025          │
+│ 22.5 kg  |  13/11/2025          │
+│ 21.8 kg  |  10/11/2025          │
+│ 20.5 kg  |  08/11/2025          │
+│ ...                              │
+│ (max 10 entrées)                 │
+│                                  │
+│ [+ Ajouter une pesée]            │
+│                                  │
+└──────────────────────────────────┘
+Specs:
+
+Liste triée DESC (plus récent en haut)
+Affichage: {weight} kg | {date}
+Max 10 entrées (LIMIT 10 SQL)
+Bouton [+] en bas pour ajouter rapidement
+Titre: clé i18n 'weightHistory' (existante)
+
+
+3. ALERTE BAISSE POIDS
+3.1 Configuration Ferme
+Nouveau field dans FarmPreferences:
+dartweightDropThresholdPercent: double  // ex: 10.0
+```
+
+**Interface Settings**:
+```
+⚙️ Paramètres Ferme
+├─ Seuil baisse poids: [10 %] ← input configurable
+├─ Type animal défaut: [Brebis]
+└─ Race défaut: [Mérinos]
+Valeur par défaut: 10.0% (constante globale)
+
+3.2 Constantes & I18N
+constants.dart (nouveau):
+dartstatic const double DEFAULT_WEIGHT_DROP_THRESHOLD = 10.0; // %
+app_strings.dart (ajouter):
+dartstatic const String weightDropThreshold = 'weightDropThreshold';
+static const String weightDropAlert = 'weightDropAlert';
+static const String percentLoss = 'percentLoss';
+strings_fr.dart (ajouter):
+dart'weightDropThreshold': 'Seuil baisse poids (%)',
+'weightDropAlert': '⚠️ Baisse de poids',
+'percentLoss': '{percent}% (de {before}kg à {after}kg)',
+
+3.3 Logique Alerte (Repository)
+Où: WeightRepository.addWeight()
+dartFuture<void> addWeight(WeightRecord weight, String farmId) async {
+  // 1. Récupérer dernière pesée
+  final previous = await _dao.getPreviousByAnimal(
+    weight.animalId, 
+    farmId
+  );
+  
+  // 2. Vérifier baisse si existe
+  if (previous != null) {
+    final farmConfig = await _farmRepository.getConfig(farmId);
+    final threshold = farmConfig.weightDropThresholdPercent ?? 
+                     DEFAULT_WEIGHT_DROP_THRESHOLD;
+    
+    final percentDrop = ((previous.weight - weight.weight) / 
+                        previous.weight) * 100;
+    
+    // 3. Créer alerte si dépassé
+    if (percentDrop > threshold) {
+      await _alertRepository.create(
+        Alert(
+          type: AlertType.WEIGHT_DROP,
+          severity: AlertSeverity.URGENT,
+          animalId: weight.animalId,
+          farmId: farmId,
+          message: '${percentDrop.toStringAsFixed(1)}% '
+                  '(${previous.weight}kg → ${weight.weight}kg)',
+        ),
+        farmId,
+      );
+    }
+  }
+  
+  // 4. Insérer pesée
+  await _dao.insert(weight);
+}
+```
+
+**Condition**: `percentDrop > farmConfig.threshold` → Alerte créée
+
+---
+
+## 4. AFFICHAGE ALERTE (4 ENDROITS)
+
+### Écran 1: Alertes (Global)
+```
+🚨 ALERTES
+──────────────────────
+🔴 URGENT (2)
+  ⚠️ Baisse de poids
+  BREBIS-042: -12% (45kg → 39.5kg)
+```
+**Condition**: Alert type = `WEIGHT_DROP`
+
+---
+
+### Écran 2: DetailScreen Animal
+```
+┌─ BREBIS-042 ─────────────────┐
+│ ⚠️ BAISSE DE POIDS DÉTECTÉE  │  ← Strip rouge/orange
+│ -12% (45kg → 39.5kg)         │
+├──────────────────────────────┤
+│ 📊 Poids: 39.5kg             │
+└──────────────────────────────┘
+```
+**Affichage**: Strip inline si alerte active
+
+---
+
+### Écran 3: Liste Animaux
+```
+🐑 BREBIS-042        ⚠️
+   Né: 15/01/2024 | 39.5kg
+```
+**Affichage**: Icône ⚠️ si animal a alerte WEIGHT_DROP active
+
+---
+
+### Écran 4: WeightHistoryScreen
+```
+23.0 kg  |  15/11/2025
+22.5 kg  |  13/11/2025
+⚠️ 20.0 kg  |  10/11/2025  ← Marker alerte
+21.5 kg  |  08/11/2025
+```
+**Affichage**: Marker (⚠️) sur la pesée qui a déclenché l'alerte
+
+---
+
+## 5. FLUX UTILISATEUR
+
+### Scénario: Détection baisse poids
+```
+1. Fermier pesée animal: 39.5kg (avant: 45kg)
+   └─ App envoie à WeightRepository
+
+2. Repository:
+   ├─ Vérifie: (45-39.5)/45 = 12%
+   ├─ Seuil ferme: 10%
+   └─ 12% > 10% → Alerte créée ✓
+
+3. Alerte s'affiche:
+   ├─ Écran Alertes (global)
+   ├─ DetailScreen animal (strip)
+   ├─ Liste animaux (icône)
+   └─ Historique (marker)
+
+4. Fermier clique → Voit historique + peut consulter
+
+6. REQUÊTES DAO
+getLatest10ByAnimal()
+sqlSELECT * FROM weight_records 
+WHERE animal_id = :animalId 
+  AND farm_id = :farmId 
+  AND deleted_at IS NULL
+ORDER BY recorded_at DESC 
+LIMIT 10;
+Index: idx_weight_records_animal_date (farm_id, animal_id, recorded_at DESC)
+getPreviousByAnimal()
+sqlSELECT * FROM weight_records 
+WHERE animal_id = :animalId 
+  AND farm_id = :farmId 
+  AND deleted_at IS NULL
+ORDER BY recorded_at DESC 
+LIMIT 1;
+
+7. FICHIERS À MODIFIER
+FichierTypeActionconstants.dartConstAjouter DEFAULT_WEIGHT_DROP_THRESHOLDapp_strings.dartI18N+3 clés (threshold, alert, percent)strings_fr.dartI18N+3 traductions FRweight_repository.dartRepoLogique alerte baisse poidsweight_dao.dartDAOgetLatest10ByAnimal() + getPreviousByAnimal()weight_history_screen.dartScreenCRÉERweight_history_provider.dartProviderCRÉER si besoinanimal_detail_screen.dartScreenRemplacer [+] par [📋 Historique]animal_list_item.dartComponentAjouter icône ⚠️ si alertefarm_preferences.dartModelAjouter weightDropThresholdPercentfarm_config_screen.dartScreenInput config seuil
