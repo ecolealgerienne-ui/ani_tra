@@ -4,7 +4,6 @@
 import '../models/animal.dart';
 import '../models/product.dart';
 import '../models/treatment.dart';
-import '../models/movement.dart';
 import '../models/batch.dart';
 import '../models/weight_record.dart';
 import '../models/veterinarian.dart';
@@ -14,7 +13,6 @@ import '../models/vaccination.dart';
 import 'mocks/mock_animals.dart';
 import 'mocks/mock_products.dart';
 import 'mocks/mock_treatments.dart';
-import 'mocks/mock_movements.dart';
 import 'mocks/mock_batches.dart';
 import 'mocks/mock_weights.dart';
 import 'mocks/mock_veterinarians.dart';
@@ -55,15 +53,6 @@ class MockData {
   /// MÃ©thode pour gÃ©nÃ©rer les traitements (alias pour compatibilitÃ©)
   static List<Treatment> generateTreatments() =>
       MockTreatments.generateTreatments();
-
-  // ==================== MOUVEMENTS ====================
-
-  /// Liste des mouvements d'animaux (6 mouvements)
-  static List<Movement> get movements => MockMovements.generateMovements();
-
-  /// MÃ©thode pour gÃ©nÃ©rer les mouvements (alias pour compatibilitÃ©)
-  static List<Movement> generateMovements() =>
-      MockMovements.generateMovements();
 
   // ==================== LOTS ====================
 
