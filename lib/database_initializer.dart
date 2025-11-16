@@ -193,6 +193,74 @@ class DatabaseInitializer {
         // Silent fail
       }
 
+      try {
+        await db.animalDao.insertItem(AnimalsTableCompanion.insert(
+          id: 'anim_002',
+          farmId: 'farm_default',
+          currentEid: const Value('FR987654321'),
+          birthDate: now.subtract(const Duration(days: 450)),
+          sex: AnimalSex.male.name,
+          status: AnimalStatus.dead.name,
+          speciesId: const Value('sheep'),
+          synced: const Value(false),
+          createdAt: now,
+          updatedAt: now,
+        ));
+      } catch (e) {
+        // Silent fail
+      }
+
+      try {
+        await db.animalDao.insertItem(AnimalsTableCompanion.insert(
+          id: 'anim_003',
+          farmId: 'farm_default',
+          currentEid: const Value('FR555444333'),
+          birthDate: now.subtract(const Duration(days: 200)),
+          sex: AnimalSex.male.name,
+          status: AnimalStatus.slaughtered.name,
+          speciesId: const Value('sheep'),
+          synced: const Value(false),
+          createdAt: now,
+          updatedAt: now,
+        ));
+      } catch (e) {
+        // Silent fail
+      }
+
+      try {
+        await db.animalDao.insertItem(AnimalsTableCompanion.insert(
+          id: 'anim_004',
+          farmId: 'farm_default',
+          currentEid: const Value('FR111222333'),
+          birthDate: now.subtract(const Duration(days: 300)),
+          sex: AnimalSex.female.name,
+          status: AnimalStatus.alive.name,
+          speciesId: const Value('sheep'),
+          synced: const Value(false),
+          createdAt: now,
+          updatedAt: now,
+        ));
+      } catch (e) {
+        // Silent fail
+      }
+
+      try {
+        await db.animalDao.insertItem(AnimalsTableCompanion.insert(
+          id: 'anim_005',
+          farmId: 'farm_default',
+          currentEid: const Value('FR666777888'),
+          birthDate: now.subtract(const Duration(days: 250)),
+          sex: AnimalSex.male.name,
+          status: AnimalStatus.sold.name,
+          speciesId: const Value('sheep'),
+          synced: const Value(false),
+          createdAt: now,
+          updatedAt: now,
+        ));
+      } catch (e) {
+        // Silent fail
+      }
+
       // Treatments (utilise dose)
       try {
         await db.treatmentDao.insertItem(TreatmentsTableCompanion.insert(
@@ -276,7 +344,7 @@ class DatabaseInitializer {
         await db.movementDao.insertItem(MovementsTableCompanion.insert(
           id: 'mov_002',
           farmId: 'farm_default',
-          animalId: 'anim_001',
+          animalId: 'anim_005',
           movementDate: now.subtract(const Duration(days: 45)),
           type: 'sale',
           toFarmId: const Value('farm_buyer_01'),
@@ -389,6 +457,36 @@ class DatabaseInitializer {
           purpose: 'treatment',
           name: 'Traitement Antiparasitaire',
           animalIdsJson: '["anim_001"]',
+          synced: const Value(false),
+          createdAt: now,
+          updatedAt: now,
+        ));
+      } catch (e) {
+        // Silent fail
+      }
+
+      try {
+        await db.batchDao.insertBatch(BatchesTableCompanion.insert(
+          id: 'batch_002',
+          farmId: 'farm_default',
+          purpose: 'sale',
+          name: 'Lot vente marché',
+          animalIdsJson: '["anim_001", "anim_002"]',
+          synced: const Value(false),
+          createdAt: now,
+          updatedAt: now,
+        ));
+      } catch (e) {
+        // Silent fail
+      }
+
+      try {
+        await db.batchDao.insertBatch(BatchesTableCompanion.insert(
+          id: 'batch_003',
+          farmId: 'farm_default',
+          purpose: 'slaughter',
+          name: 'Lot abattage Aïd',
+          animalIdsJson: '["anim_003"]',
           synced: const Value(false),
           createdAt: now,
           updatedAt: now,
