@@ -357,6 +357,14 @@ class _InfosTab extends StatelessWidget {
     allWeights.sort((a, b) => b.recordedAt.compareTo(a.recordedAt));
     final latestWeight = allWeights.isNotEmpty ? allWeights.first : null;
 
+    // Calculer le pourcentage de variation du poids
+    double? weightChangePercent;
+    if (allWeights.length >= 2) {
+      final previousWeight = allWeights[1];
+      final weightDiff = latestWeight!.weight - previousWeight.weight;
+      weightChangePercent = (weightDiff / previousWeight.weight) * 100;
+    }
+
     // ✅ Utiliser TreatmentProvider au lieu de AnimalProvider
     final treatments = treatmentProvider.getTreatmentsForAnimal(currentAnimal.id);
 
@@ -604,12 +612,30 @@ class _InfosTab extends StatelessWidget {
                 Center(
                   child: Column(
                     children: [
-                      Text(
-                        '${latestWeight.weight.toStringAsFixed(1)} kg',
-                        style: const TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
+                          Text(
+                            '${latestWeight.weight.toStringAsFixed(1)} kg',
+                            style: const TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue),
+                          ),
+                          if (weightChangePercent != null) ...[
+                            const SizedBox(width: 8),
+                            Text(
+                              '(${weightChangePercent >= 0 ? '+' : ''}${weightChangePercent.toStringAsFixed(1)}%)',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: weightChangePercent >= 0 ? Colors.green : Colors.red,
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                       Text(
                         '${AppLocalizations.of(context).translate(AppStrings.on)} ${_formatDate(latestWeight.recordedAt)}',
