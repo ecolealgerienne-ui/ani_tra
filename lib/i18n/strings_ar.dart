@@ -45,8 +45,6 @@ const Map<String, String> stringsAr = {
   'selectAnimal': 'اختر الحيوان',
   'weightSource': 'مصدر القياس',
   'notes': 'ملاحظات',
-  'weightHistory': 'سجل الوزن',
-  'addWeight': 'إضافة وزن',
   'noWeightsRecorded': 'لم يتم تسجيل أي وزن',
   'previousWeight': 'الوزن السابق',
   'currentWeight': 'الوزن الحالي',

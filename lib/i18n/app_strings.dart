@@ -51,8 +51,6 @@ class AppStrings {
   static const String weightSourceEstimated = 'weightSourceEstimated';
   static const String weightSourceVeterinary = 'weightSourceVeterinary';
   static const String notes = 'notes';
-  static const String weightHistory = 'weightHistory';
-  static const String addWeight = 'addWeight';
   static const String noWeightsRecorded = 'noWeightsRecorded';
   static const String previousWeight = 'previousWeight';
   static const String currentWeight = 'currentWeight';
