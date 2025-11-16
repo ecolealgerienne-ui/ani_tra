@@ -743,7 +743,7 @@ const Map<String, String> stringsEn = {
   'noAnimalAvailable': '⚠️ No animal available',
   'searchEidOfficialVisual': 'Search EID, official No., visual ID...',
   'stop': 'STOP',
-  'scanRfid': 'RFID SCAN',
+  'scanRfid': 'SCAN',
   'camera': 'CAMERA',
   'done': 'DONE',
   'scanOrSearchAnimals': 'Scan or search\nanimals',

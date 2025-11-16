@@ -741,7 +741,7 @@ const Map<String, String> stringsAr = {
   'noAnimalAvailable': '⚠️ لا يوجد حيوانات متاحة',
   'searchEidOfficialVisual': 'ابحث عن EID أو الرقم الرسمي أو المعرّف المرئي...',
   'stop': 'إيقاف',
-  'scanRfid': 'مسح RFID',
+  'scanRfid': 'مسح',
   'camera': 'الكاميرا',
   'done': 'تم',
   'scanOrSearchAnimals': 'امسح أو ابحث\nعن الحيوانات',

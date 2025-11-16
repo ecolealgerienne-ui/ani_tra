@@ -56,6 +56,9 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
   void dispose() {
     _searchController.dispose();
     _rfidSubscription?.cancel();
+    // Arrêter le scanner RFID quand on quitte l'écran
+    final rfidProvider = context.read<RFIDScannerProvider>();
+    rfidProvider.stopScanning();
     super.dispose();
   }
 
