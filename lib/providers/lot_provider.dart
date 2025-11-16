@@ -481,13 +481,17 @@ class LotProvider extends ChangeNotifier {
 
   /// PHASE 3: Utilise les champs structurés de Movement (buyerName, buyerFarmId, buyerType)
   /// au lieu de stocker les données dans notes (deprecated)
+  ///
+  /// NOTE: Lecture légitime des champs Lot dépréciés pour migration vers Movement
   List<Movement> expandLotToSaleMovements(Lot lot) {
     if (lot.type != LotType.sale) return [];
 
     // Détermine le type d'acheteur : 'farm' si buyerFarmId existe, sinon 'individual'
     String? buyerType;
+    // ignore: deprecated_member_use
     if (lot.buyerFarmId != null && lot.buyerFarmId!.isNotEmpty) {
       buyerType = 'farm'; // BuyerTypeConstants.farm
+      // ignore: deprecated_member_use
     } else if (lot.buyerName != null && lot.buyerName!.isNotEmpty) {
       buyerType = 'individual'; // BuyerTypeConstants.individual
     }
@@ -498,10 +502,13 @@ class LotProvider extends ChangeNotifier {
         animalId: animalId,
         type: MovementType.sale,
         movementDate: lot.saleDate ?? DateTime.now(),
+        // ignore: deprecated_member_use
         toFarmId: lot.buyerFarmId,
         price: lot.pricePerAnimal,
         // PHASE 3: Utilise les champs structurés au lieu de notes
+        // ignore: deprecated_member_use
         buyerName: lot.buyerName,
+        // ignore: deprecated_member_use
         buyerFarmId: lot.buyerFarmId,
         buyerType: buyerType,
         // Notes peuvent rester pour infos supplémentaires, mais pas pour données structurées
@@ -515,6 +522,8 @@ class LotProvider extends ChangeNotifier {
 
   /// PHASE 3: Utilise les champs structurés de Movement (slaughterhouseName, slaughterhouseId)
   /// au lieu de stocker les données dans notes (deprecated)
+  ///
+  /// NOTE: Lecture légitime des champs Lot dépréciés pour migration vers Movement
   List<Movement> expandLotToSlaughterMovements(Lot lot) {
     if (lot.type != LotType.slaughter) return [];
 
@@ -525,7 +534,9 @@ class LotProvider extends ChangeNotifier {
         type: MovementType.slaughter,
         movementDate: lot.slaughterDate ?? DateTime.now(),
         // PHASE 3: Utilise les champs structurés au lieu de notes
+        // ignore: deprecated_member_use
         slaughterhouseName: lot.slaughterhouseName,
+        // ignore: deprecated_member_use
         slaughterhouseId: lot.slaughterhouseId,
         // Notes peuvent rester pour infos supplémentaires, mais pas pour données structurées
         notes: null,

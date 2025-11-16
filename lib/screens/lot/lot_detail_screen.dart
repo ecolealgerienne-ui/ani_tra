@@ -345,7 +345,9 @@ class LotDetailScreen extends StatelessWidget {
 
               // Vente
               if (lot.type == LotType.sale) ...[
+                // ignore: deprecated_member_use
                 if (lot.buyerName != null)
+                  // ignore: deprecated_member_use
                   _buildInfoRow(
                       AppLocalizations.of(context).translate(AppStrings.buyer),
                       lot.buyerName!,
@@ -371,8 +373,10 @@ class LotDetailScreen extends StatelessWidget {
               ],
 
               // Abattage
+              // ignore: deprecated_member_use
               if (lot.type == LotType.slaughter &&
                   lot.slaughterhouseName != null) ...[
+                // ignore: deprecated_member_use
                 _buildInfoRow(
                     AppLocalizations.of(context)
                         .translate(AppStrings.slaughterhouse),
