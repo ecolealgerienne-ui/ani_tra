@@ -333,6 +333,7 @@ const Map<String, String> stringsEn = {
   'sold': 'Sold',
   'dead': 'Dead',
   'slaughtered': 'Slaughtered',
+  'onTemporaryMovement': 'On temporary movement',
 
   // ============ SCANNER SCREEN (5) ============
   'scanner': 'Scanner',

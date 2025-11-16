@@ -13,7 +13,7 @@ import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
 import '../animal/animal_detail_screen.dart';
 
-class MovementDetailScreen extends StatelessWidget {
+class MovementDetailScreen extends StatefulWidget {
   final String movementId;
 
   const MovementDetailScreen({
@@ -22,10 +22,17 @@ class MovementDetailScreen extends StatelessWidget {
   });
 
   @override
+  State<MovementDetailScreen> createState() => _MovementDetailScreenState();
+}
+
+class _MovementDetailScreenState extends State<MovementDetailScreen> {
+  bool _isRecordingReturn = false;
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final movementProvider = context.watch<MovementProvider>();
-    final movement = movementProvider.getMovementById(movementId);
+    final movement = movementProvider.getMovementById(widget.movementId);
 
     if (movement == null) {
       return Scaffold(
@@ -823,6 +830,141 @@ class _InfoRow extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Dialog pour saisir la date de retour et les notes
+class _ReturnDateDialog extends StatefulWidget {
+  final Movement outMovement;
+
+  const _ReturnDateDialog({required this.outMovement});
+
+  @override
+  State<_ReturnDateDialog> createState() => _ReturnDateDialogState();
+}
+
+class _ReturnDateDialogState extends State<_ReturnDateDialog> {
+  late DateTime _returnDate;
+  final _notesController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _returnDate = DateTime.now();
+  }
+
+  @override
+  void dispose() {
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _selectDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _returnDate,
+      firstDate: widget.outMovement.movementDate,
+      lastDate: DateTime.now().add(const Duration(days: 1)),
+      locale: const Locale('fr', 'FR'),
+    );
+    if (picked != null) {
+      setState(() => _returnDate = picked);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return AlertDialog(
+      title: const Text('Enregistrer le retour'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Date de retour
+            Text(
+              'Date de retour *',
+              style: TextStyle(
+                fontSize: AppConstants.fontSizeSmall,
+                color: Colors.grey[700],
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: AppConstants.spacingSmall),
+            InkWell(
+              onTap: _selectDate,
+              child: Container(
+                padding: const EdgeInsets.all(AppConstants.spacingMedium),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey[300]!),
+                  borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.calendar_today, size: 20),
+                    const SizedBox(width: AppConstants.spacingSmall),
+                    Text(
+                      DateFormat('dd/MM/yyyy').format(_returnDate),
+                      style: const TextStyle(fontSize: AppConstants.fontSizeBody),
+                    ),
+                    const Spacer(),
+                    Icon(Icons.arrow_drop_down, color: Colors.grey[600]),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: AppConstants.spacingMediumLarge),
+
+            // Notes (optionnel)
+            Text(
+              'Notes (optionnel)',
+              style: TextStyle(
+                fontSize: AppConstants.fontSizeSmall,
+                color: Colors.grey[700],
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: AppConstants.spacingSmall),
+            TextField(
+              controller: _notesController,
+              maxLines: 3,
+              maxLength: 500,
+              decoration: InputDecoration(
+                hintText: 'Ex: Animal en bonne santé, aucun problème constaté',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
+                ),
+                contentPadding: const EdgeInsets.all(AppConstants.spacingMedium),
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.translate(AppStrings.cancel)),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.pop(context, {
+              'returnDate': _returnDate,
+              'notes': _notesController.text.trim().isEmpty
+                  ? null
+                  : _notesController.text.trim(),
+            });
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.teal,
+            foregroundColor: Colors.white,
+          ),
+          child: const Text('Valider'),
+        ),
+      ],
     );
   }
 }

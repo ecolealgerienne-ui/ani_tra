@@ -509,6 +509,7 @@ class DatabaseInitializer {
             animalId: 'newborn_${i <= 5 ? i.toString().padLeft(3, '0') : 'young_${(i - 5).toString().padLeft(3, '0')}'}',
             movementDate: now.subtract(Duration(days: i * 5)),
             type: 'birth',
+            status: 'closed', // Birth events are immediately closed
             synced: const Value(false),
             createdAt: now,
             updatedAt: now,
@@ -523,6 +524,7 @@ class DatabaseInitializer {
             animalId: 'adult_${i.toString().padLeft(3, '0')}',
             movementDate: now.subtract(Duration(days: 365 + (i * 50))),
             type: 'purchase',
+            status: 'ongoing', // Purchases start as ongoing, need validation
             fromFarmId: const Value('farm_002'),
             price: Value(150.0 + (i * 20)),
             notes: Value('Achat lors de la foire agricole'),
@@ -540,6 +542,7 @@ class DatabaseInitializer {
             animalId: 'sold_${i.toString().padLeft(3, '0')}',
             movementDate: now.subtract(const Duration(days: 30)),
             type: 'sale',
+            status: 'ongoing', // Sales start as ongoing, need validation
             toFarmId: Value(i % 2 == 0 ? 'farm_002' : null),
             price: Value(200.0 + (i * 25)),
             // Phase 3: Données structurées pour ventes
@@ -562,6 +565,7 @@ class DatabaseInitializer {
             animalId: 'slaughtered_${i.toString().padLeft(3, '0')}',
             movementDate: now.subtract(const Duration(days: 60)),
             type: 'slaughter',
+            status: 'closed', // Slaughter events are immediately closed
             // Phase 3: Données structurées pour abattages
             slaughterhouseName: const Value('Abattoir de Montagne'),
             slaughterhouseId: const Value('farm_slaughterhouse'),
@@ -587,6 +591,7 @@ class DatabaseInitializer {
             animalId: 'temp_mov_${i.toString().padLeft(3, '0')}',
             movementDate: now.subtract(Duration(days: 20 + (i * 10))),
             type: 'temporaryOut',
+            status: 'ongoing', // Temporary out movements start as ongoing
             toFarmId: Value(['farm_002', 'farm_003'][i % 2]),
             // Phase 3: Données mouvements temporaires
             isTemporary: const Value(true),
@@ -608,6 +613,7 @@ class DatabaseInitializer {
             animalId: 'temp_mov_${i.toString().padLeft(3, '0')}',
             movementDate: now.subtract(Duration(days: 5 + i)),
             type: 'temporaryReturn',
+            status: 'closed', // Temporary returns are immediately closed
             fromFarmId: Value(['farm_002', 'farm_003'][i % 2]),
             // Phase 3: Lien bidirectionnel
             isTemporary: const Value(true),
@@ -629,6 +635,7 @@ class DatabaseInitializer {
             animalId: 'dead_${i.toString().padLeft(3, '0')}',
             movementDate: now.subtract(const Duration(days: 90)),
             type: 'death',
+            status: 'closed', // Death events are immediately closed
             notes: Value(i == 1 ? 'Mort naturelle - vieillesse' : 'Accident'),
             synced: const Value(false),
             createdAt: now,

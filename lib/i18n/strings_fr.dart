@@ -366,6 +366,7 @@ const Map<String, String> stringsFr = {
   'sold': 'Vendu',
   'dead': 'Mort',
   'slaughtered': 'Abattu',
+  'onTemporaryMovement': 'En mouvement temporaire',
 
   // ============ SCANNER SCREEN (5) ============
   'scanner': 'Scanner',
