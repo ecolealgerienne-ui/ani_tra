@@ -834,7 +834,6 @@ class _ReturnInfoSection extends StatelessWidget {
             icon: Icons.notes,
             label: 'Notes de retour',
             value: movement.returnNotes!,
-            maxLines: null,
           ),
         ],
       ],

@@ -8,6 +8,7 @@ import '../../utils/constants.dart';
 import '../../models/animal.dart';
 import '../../models/movement.dart';
 import '../../providers/animal_provider.dart';
+import '../../providers/movement_provider.dart';
 import '../../providers/sync_provider.dart';
 
 class SaleScreen extends StatefulWidget {
@@ -53,6 +54,7 @@ class _SaleScreenState extends State<SaleScreen> {
     setState(() => _isConfirming = true);
 
     final animalProvider = context.read<AnimalProvider>();
+    final movementProvider = context.read<MovementProvider>();
     final syncProvider = context.read<SyncProvider>();
 
     try {
@@ -82,7 +84,7 @@ class _SaleScreenState extends State<SaleScreen> {
         createdAt: DateTime.now(),
       );
 
-      animalProvider.addMovement(movement);
+      await movementProvider.addMovement(movement);
 
       // Update animal status to sold
       final updatedAnimal = animal.copyWith(status: AnimalStatus.sold);

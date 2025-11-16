@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import '../../providers/movement_provider.dart';
 import '../../providers/animal_provider.dart';
 import '../../providers/sync_provider.dart';
+import '../../models/animal.dart';
 import '../../models/movement.dart';
 import '../../utils/constants.dart';
 
