@@ -29,16 +29,18 @@ L'utilitaire `LotToMovementMigration` crée les Movement records manquants pour 
 import 'package:provider/provider.dart';
 import '../migrations/lot_to_movement_migration.dart';
 import '../providers/lot_provider.dart';
-import '../providers/movement_provider.dart';
+import '../repositories/movement_repository.dart';
+import '../drift/database.dart';
 
 // Dans un bouton admin ou une page de settings
 Future<void> runMigration(BuildContext context, String farmId) async {
   final lotProvider = context.read<LotProvider>();
-  final movementProvider = context.read<MovementProvider>();
+  final db = context.read<AppDatabase>();
+  final movementRepository = MovementRepository(db);
 
   final migrator = LotToMovementMigration(
     lotProvider: lotProvider,
-    movementProvider: movementProvider,
+    movementRepository: movementRepository,
   );
 
   final result = await migrator.migrateOrphanedLots(farmId);
@@ -75,15 +77,15 @@ Pour une migration en dehors de l'app :
 import 'package:ani_tra/drift/database.dart';
 import 'package:ani_tra/migrations/lot_to_movement_migration.dart';
 import 'package:ani_tra/providers/lot_provider.dart';
-import 'package:ani_tra/providers/movement_provider.dart';
+import 'package:ani_tra/repositories/movement_repository.dart';
 
 void main() async {
   // Initialiser la database
   final db = AppDatabase();
 
-  // Créer les providers
+  // Créer les providers/repositories
   final lotProvider = LotProvider(db);
-  final movementProvider = MovementProvider(db);
+  final movementRepository = MovementRepository(db);
 
   // Charger les lots
   await lotProvider.loadLots('farm_id_here');
@@ -91,7 +93,7 @@ void main() async {
   // Run migration
   final migrator = LotToMovementMigration(
     lotProvider: lotProvider,
-    movementProvider: movementProvider,
+    movementRepository: movementRepository,
   );
 
   final result = await migrator.migrateOrphanedLots('farm_id_here');

@@ -4,7 +4,39 @@ import 'package:uuid/uuid.dart';
 import '../models/lot.dart';
 import '../models/movement.dart';
 import '../providers/lot_provider.dart';
-import '../providers/movement_provider.dart';
+import '../repositories/movement_repository.dart';
+
+/// Résultat de la migration
+class MigrationResult {
+  final int totalClosedLots;
+  final int lotsWithMovements;
+  final int orphanedLots;
+  final int migratedCount;
+  final int failedCount;
+  final List<String> errors;
+
+  MigrationResult({
+    required this.totalClosedLots,
+    required this.lotsWithMovements,
+    required this.orphanedLots,
+    required this.migratedCount,
+    required this.failedCount,
+    required this.errors,
+  });
+
+  @override
+  String toString() {
+    return '''
+Migration Result:
+- Total closed/archived lots: $totalClosedLots
+- Lots with existing movements: $lotsWithMovements
+- Orphaned lots (no movements): $orphanedLots
+- Successfully migrated: $migratedCount
+- Failed: $failedCount
+${errors.isNotEmpty ? '- Errors:\n  ${errors.join('\n  ')}' : ''}
+''';
+  }
+}
 
 /// Migration utility pour créer les Movement records manquants
 /// pour les lots finalisés avant la Phase 3 (Movement enrichment)
@@ -18,52 +50,20 @@ import '../providers/movement_provider.dart';
 /// ```dart
 /// final migrator = LotToMovementMigration(
 ///   lotProvider: lotProvider,
-///   movementProvider: movementProvider,
+///   movementRepository: movementRepository,
 /// );
 /// final result = await migrator.migrateOrphanedLots(farmId);
 /// print('Migrated ${result.migratedCount} lots');
 /// ```
 class LotToMovementMigration {
   final LotProvider lotProvider;
-  final MovementProvider movementProvider;
+  final MovementRepository movementRepository;
   final Uuid uuid = const Uuid();
 
   LotToMovementMigration({
     required this.lotProvider,
-    required this.movementProvider,
+    required this.movementRepository,
   });
-
-  /// Résultat de la migration
-  class MigrationResult {
-    final int totalClosedLots;
-    final int lotsWithMovements;
-    final int orphanedLots;
-    final int migratedCount;
-    final int failedCount;
-    final List<String> errors;
-
-    MigrationResult({
-      required this.totalClosedLots,
-      required this.lotsWithMovements,
-      required this.orphanedLots,
-      required this.migratedCount,
-      required this.failedCount,
-      required this.errors,
-    });
-
-    @override
-    String toString() {
-      return '''
-Migration Result:
-- Total closed/archived lots: $totalClosedLots
-- Lots with existing movements: $lotsWithMovements
-- Orphaned lots (no movements): $orphanedLots
-- Successfully migrated: $migratedCount
-- Failed: $failedCount
-${errors.isNotEmpty ? '- Errors:\n  ${errors.join('\n  ')}' : ''}
-''';
-    }
-  }
 
   /// Migre tous les lots orphelins (fermés mais sans movements)
   ///
@@ -95,24 +95,27 @@ ${errors.isNotEmpty ? '- Errors:\n  ${errors.join('\n  ')}' : ''}
           }
 
           // Vérifier s'il existe déjà des movements pour ce lot
-          final hasMovements = await _hasExistingMovements(lot);
+          final hasMovements = await _hasExistingMovements(lot, farmId);
 
           if (hasMovements) {
             lotsWithMovements++;
-            print('[Migration] Lot ${lot.id} (${lot.name}) already has movements');
+            print(
+                '[Migration] Lot ${lot.id} (${lot.name}) already has movements');
             continue;
           }
 
           // Lot orphelin détecté
           orphanedLots++;
-          print('[Migration] ⚠️  Orphaned lot detected: ${lot.id} (${lot.name})');
+          print(
+              '[Migration] ⚠️  Orphaned lot detected: ${lot.id} (${lot.name})');
 
           // 3. Créer les movements manquants
           final success = await _createMovementsForLot(lot, farmId);
 
           if (success) {
             migratedCount++;
-            print('[Migration] ✅ Successfully migrated lot ${lot.id} (${lot.name})');
+            print(
+                '[Migration] ✅ Successfully migrated lot ${lot.id} (${lot.name})');
           } else {
             failedCount++;
             errors.add('Failed to migrate lot ${lot.id} (${lot.name})');
@@ -147,7 +150,7 @@ ${errors.isNotEmpty ? '- Errors:\n  ${errors.join('\n  ')}' : ''}
   ///
   /// Recherche des movements dont l'animalId est dans lot.animalIds
   /// et dont la date correspond approximativement à la date du lot
-  Future<bool> _hasExistingMovements(Lot lot) async {
+  Future<bool> _hasExistingMovements(Lot lot, String farmId) async {
     if (lot.animalIds.isEmpty) return false;
 
     // Prendre le premier animal du lot comme échantillon
@@ -155,7 +158,7 @@ ${errors.isNotEmpty ? '- Errors:\n  ${errors.join('\n  ')}' : ''}
 
     // Récupérer tous les movements de cet animal
     final movements =
-        await movementProvider.getMovementsByAnimalId(sampleAnimalId);
+        await movementRepository.getByAnimalId(farmId, sampleAnimalId);
 
     if (movements.isEmpty) return false;
 
@@ -214,10 +217,11 @@ ${errors.isNotEmpty ? '- Errors:\n  ${errors.join('\n  ')}' : ''}
 
       // Sauvegarder chaque movement
       for (final movement in movements) {
-        await movementProvider.createMovement(movement);
+        await movementRepository.create(movement, farmId);
       }
 
-      print('[Migration] Created ${movements.length} movements for lot ${lot.id}');
+      print(
+          '[Migration] Created ${movements.length} movements for lot ${lot.id}');
       return true;
     } catch (e) {
       print('[Migration] ❌ Failed to create movements for lot ${lot.id}: $e');
