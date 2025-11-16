@@ -6,8 +6,10 @@ import 'package:intl/intl.dart';
 
 import '../../providers/movement_provider.dart';
 import '../../providers/animal_provider.dart';
+import '../../providers/batch_provider.dart';
 import '../../models/movement.dart';
 import '../../models/animal.dart';
+import '../../models/batch.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
@@ -55,21 +57,36 @@ class MovementDetailScreen extends StatelessWidget {
       );
     }
 
+    // Déterminer s'il s'agit d'un lot ou d'un animal individuel
+    final isBatch = movement.animalId.startsWith('batch_');
     final animalProvider = context.watch<AnimalProvider>();
-    final animal = animalProvider.getAnimalById(movement.animalId);
+    final batchProvider = context.watch<BatchProvider>();
+    final animal = !isBatch ? animalProvider.getAnimalById(movement.animalId) : null;
+    final batch = isBatch ? batchProvider.getBatchById(movement.animalId) : null;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.translate(AppStrings.movementDetails)),
-        // TODO: Ajouter bouton d'édition si nécessaire
-        // actions: [
-        //   IconButton(
-        //     icon: const Icon(Icons.edit),
-        //     onPressed: () {
-        //       // Navigation vers écran d'édition
-        //     },
-        //   ),
-        // ],
+        actions: movement.type == MovementType.temporaryOut
+            ? [
+                TextButton.icon(
+                  onPressed: () {
+                    // TODO: Implémenter le retour d'animal
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Fonction "Marquer le retour" à implémenter'),
+                        backgroundColor: Colors.orange,
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  label: Text(
+                    'Retour',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+              ]
+            : null,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppConstants.spacingMedium),
@@ -81,14 +98,20 @@ class MovementDetailScreen extends StatelessWidget {
 
             const SizedBox(height: AppConstants.spacingMediumLarge),
 
-            // Section Animal
+            // Section Animal ou Lot
             _SectionCard(
-              title: l10n.translate(AppStrings.animal),
-              icon: Icons.pets,
+              title: isBatch
+                  ? l10n.translate(AppStrings.batch)
+                  : l10n.translate(AppStrings.animal),
+              icon: isBatch ? Icons.workspaces : Icons.pets,
               color: Colors.blue,
-              child: animal != null
-                  ? _AnimalInfoSection(animal: animal)
-                  : _UnknownAnimalSection(animalId: movement.animalId),
+              child: isBatch
+                  ? (batch != null
+                      ? _BatchInfoSection(batch: batch)
+                      : _UnknownBatchSection(batchId: movement.animalId))
+                  : (animal != null
+                      ? _AnimalInfoSection(animal: animal)
+                      : _UnknownAnimalSection(animalId: movement.animalId)),
             ),
 
             const SizedBox(height: AppConstants.spacingMedium),
@@ -627,6 +650,114 @@ class _InfoRow extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                         color: valueColor,
                       ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Widget : Section pour afficher les informations d'un lot
+class _BatchInfoSection extends StatelessWidget {
+  final Batch batch;
+
+  const _BatchInfoSection({required this.batch});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return Container(
+      padding: const EdgeInsets.all(AppConstants.spacingSmall),
+      decoration: BoxDecoration(
+        color: Colors.blue.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
+        border: Border.all(
+          color: Colors.blue.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.workspaces,
+                color: Colors.blue,
+                size: AppConstants.iconSizeMedium,
+              ),
+              const SizedBox(width: AppConstants.spacingSmall),
+              Expanded(
+                child: Text(
+                  batch.name,
+                  style: const TextStyle(
+                    fontSize: AppConstants.fontSizeLarge,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppConstants.spacingSmall),
+          Text(
+            '${l10n.translate(AppStrings.purpose)}: ${batch.purpose}',
+            style: TextStyle(
+              fontSize: AppConstants.fontSizeBody,
+              color: Colors.grey[700],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Widget : Section pour lot inconnu
+class _UnknownBatchSection extends StatelessWidget {
+  final String batchId;
+
+  const _UnknownBatchSection({required this.batchId});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppConstants.spacingMedium),
+      decoration: BoxDecoration(
+        color: Colors.grey.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
+        border: Border.all(
+          color: Colors.grey.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.warning_amber_rounded,
+            color: Colors.orange,
+            size: AppConstants.iconSizeMedium,
+          ),
+          const SizedBox(width: AppConstants.spacingSmall),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Lot introuvable',
+                  style: const TextStyle(
+                    fontSize: AppConstants.fontSizeLarge,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: AppConstants.spacingTiny),
+                Text(
+                  'ID: $batchId',
+                  style: TextStyle(
+                    fontSize: AppConstants.fontSizeSmall,
+                    color: Colors.grey[600],
+                  ),
                 ),
               ],
             ),

@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../../providers/movement_provider.dart';
 import '../../providers/animal_provider.dart';
+import '../../providers/batch_provider.dart';
 import '../../models/movement.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
@@ -227,6 +228,20 @@ class _MovementListScreenState extends State<MovementListScreen> {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          // TODO: Implémenter le formulaire de création de sortie temporaire
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Création de sortie temporaire à implémenter'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        },
+        icon: const Icon(Icons.exit_to_app),
+        label: Text(l10n.translate(AppStrings.temporaryOut)),
+        backgroundColor: Colors.teal,
+      ),
     );
   }
 
@@ -293,7 +308,11 @@ class _MovementCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final animal = context.read<AnimalProvider>().getAnimalById(movement.animalId);
+
+    // Déterminer s'il s'agit d'un lot ou d'un animal individuel
+    final isBatch = movement.animalId.startsWith('batch_');
+    final animal = !isBatch ? context.read<AnimalProvider>().getAnimalById(movement.animalId) : null;
+    final batch = isBatch ? context.read<BatchProvider>().getBatchById(movement.animalId) : null;
 
     return InkWell(
       onTap: onTap,
@@ -350,18 +369,20 @@ class _MovementCard extends StatelessWidget {
                     ),
                     const SizedBox(height: AppConstants.spacingTiny),
 
-                    // Animal
+                    // Animal ou Lot
                     Row(
                       children: [
-                        const Icon(
-                          Icons.pets,
+                        Icon(
+                          isBatch ? Icons.workspaces : Icons.pets,
                           size: AppConstants.iconSizeXSmall,
                           color: Colors.grey,
                         ),
                         const SizedBox(width: AppConstants.spacingTiny),
                         Flexible(
                           child: Text(
-                            animal?.currentEid ?? animal?.officialNumber ?? movement.animalId,
+                            isBatch
+                                ? (batch?.name ?? movement.animalId)
+                                : (animal?.currentEid ?? animal?.officialNumber ?? movement.animalId),
                             style: const TextStyle(
                               fontSize: AppConstants.fontSizeBody,
                               fontWeight: FontWeight.w500,
