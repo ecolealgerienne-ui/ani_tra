@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../providers/lot_provider.dart';
 import '../../providers/animal_provider.dart';
+import '../../providers/movement_provider.dart';
 import '../../providers/sync_provider.dart';
 import '../../models/lot.dart';
 import '../../i18n/app_localizations.dart';
@@ -245,12 +246,13 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
               final movements = lotProvider.expandLotToSaleMovements(
                 lotProvider.getLotById(widget.lotId)!,
               );
+              final movementProvider = context.read<MovementProvider>();
+              final animalProvider = context.read<AnimalProvider>();
+
               for (final movement in movements) {
-                context.read<AnimalProvider>().addMovement(movement);
+                await movementProvider.addMovement(movement);
                 // Mettre à jour le statut de l'animal
-                context
-                    .read<AnimalProvider>()
-                    .updateAnimalStatus(movement.animalId, AnimalStatus.sold);
+                animalProvider.updateAnimalStatus(movement.animalId, AnimalStatus.sold);
               }
               syncProvider.addPendingData(movements.length + 1);
 
@@ -321,10 +323,13 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
               final movements = lotProvider.expandLotToSlaughterMovements(
                 lotProvider.getLotById(widget.lotId)!,
               );
+              final movementProvider = context.read<MovementProvider>();
+              final animalProvider = context.read<AnimalProvider>();
+
               for (final movement in movements) {
-                context.read<AnimalProvider>().addMovement(movement);
+                await movementProvider.addMovement(movement);
                 // Mettre à jour le statut de l'animal
-                context.read<AnimalProvider>().updateAnimalStatus(
+                animalProvider.updateAnimalStatus(
                     movement.animalId, AnimalStatus.slaughtered);
               }
               syncProvider.addPendingData(movements.length + 1);
