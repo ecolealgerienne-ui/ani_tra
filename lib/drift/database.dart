@@ -183,7 +183,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   // ═══════════════════════════════════════════════════════════
   // MIGRATION STRATEGY
@@ -250,6 +250,13 @@ class AppDatabase extends _$AppDatabase {
           // ───────────────────────────────────────────────────
           if (from < 2) {
             await _migrateToV2AddUniqueConstraints();
+          }
+
+          // ───────────────────────────────────────────────────────
+          // MIGRATION v2 → v3: Add return fields to movements table
+          // ───────────────────────────────────────────────────────
+          if (from < 3) {
+            await _migrateToV3AddReturnFields();
           }
         },
       );
@@ -1206,6 +1213,20 @@ class AppDatabase extends _$AppDatabase {
 
     // Étape 9: Réactiver les contraintes de clés étrangères
     await customStatement('PRAGMA foreign_keys = ON;');
+  }
+
+  /// Migration v2 → v3: Ajouter les champs de retour à la table movements
+  ///
+  /// Cette migration ajoute deux nouveaux champs à la table movements :
+  /// - return_date: Date de retour pour les mouvements temporaires
+  /// - return_notes: Notes sur le retour de l'animal
+  Future<void> _migrateToV3AddReturnFields() async {
+    await customStatement(
+      'ALTER TABLE movements ADD COLUMN return_date INTEGER;',
+    );
+    await customStatement(
+      'ALTER TABLE movements ADD COLUMN return_notes TEXT;',
+    );
   }
 
   // ═══════════════════════════════════════════════════════════

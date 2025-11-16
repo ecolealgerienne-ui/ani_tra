@@ -14,6 +14,7 @@ import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
 import '../animal/animal_detail_screen.dart';
+import 'return_animal_form_screen.dart';
 
 class MovementDetailScreen extends StatelessWidget {
   final String movementId;
@@ -67,17 +68,22 @@ class MovementDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.translate(AppStrings.movementDetails)),
-        actions: movement.type == MovementType.temporaryOut
+        actions: movement.type == MovementType.temporaryOut && !movement.isCompleted
             ? [
                 IconButton(
-                  onPressed: () {
-                    // TODO: Implémenter le retour d'animal à la ferme
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Fonction "Retour à la ferme" à implémenter'),
-                        backgroundColor: Colors.orange,
+                  onPressed: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ReturnAnimalFormScreen(
+                          movement: movement,
+                        ),
                       ),
                     );
+                    // Rafraîchir les données si le retour a été enregistré
+                    if (result == true) {
+                      movementProvider.refresh();
+                    }
                   },
                   icon: const Icon(Icons.home_filled),
                   tooltip: 'Retour à la ferme',
@@ -140,6 +146,17 @@ class MovementDetailScreen extends StatelessWidget {
                 icon: Icons.note,
                 color: Colors.orange,
                 child: _NotesSection(notes: movement.notes!),
+              ),
+            ],
+
+            // Section Retour (si mouvement temporaire complété)
+            if (movement.type == MovementType.temporaryOut && movement.isCompleted) ...[
+              const SizedBox(height: AppConstants.spacingMedium),
+              _SectionCard(
+                title: 'Retour à la ferme',
+                icon: Icons.home,
+                color: Colors.green,
+                child: _ReturnInfoSection(movement: movement),
               ),
             ],
 
@@ -223,6 +240,34 @@ class _MovementTypeHeader extends StatelessWidget {
               color: Colors.white.withValues(alpha: 0.9),
             ),
           ),
+          // Badge de statut pour les mouvements temporaires
+          if (movement.type == MovementType.temporaryOut) ...[
+            const SizedBox(height: AppConstants.spacingSmall),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 6,
+              ),
+              decoration: BoxDecoration(
+                color: movement.isCompleted
+                    ? Colors.white.withValues(alpha: 0.3)
+                    : Colors.orange.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: Colors.white,
+                  width: 2,
+                ),
+              ),
+              child: Text(
+                movement.isCompleted ? 'Complété' : 'En cours',
+                style: const TextStyle(
+                  fontSize: AppConstants.fontSizeSmall,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -759,6 +804,40 @@ class _UnknownBatchSection extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Widget : Section d'informations de retour
+class _ReturnInfoSection extends StatelessWidget {
+  final Movement movement;
+
+  const _ReturnInfoSection({required this.movement});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _InfoRow(
+          icon: Icons.event,
+          label: 'Date de retour',
+          value: movement.returnDate != null
+              ? DateFormat('dd/MM/yyyy').format(movement.returnDate!)
+              : 'N/A',
+        ),
+        if (movement.returnNotes != null && movement.returnNotes!.isNotEmpty) ...[
+          const SizedBox(height: AppConstants.spacingSmall),
+          const Divider(),
+          const SizedBox(height: AppConstants.spacingSmall),
+          _InfoRow(
+            icon: Icons.notes,
+            label: 'Notes de retour',
+            value: movement.returnNotes!,
+            maxLines: null,
+          ),
+        ],
+      ],
     );
   }
 }

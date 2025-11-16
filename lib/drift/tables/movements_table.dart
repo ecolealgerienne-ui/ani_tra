@@ -45,6 +45,12 @@ class MovementsTable extends Table {
   TextColumn get buyerQrSignature =>
       text().nullable().named('buyer_qr_signature')();
 
+  /// Date de retour (pour temporaryOut)
+  DateTimeColumn get returnDate => dateTime().nullable().named('return_date')();
+
+  /// Notes de retour (pour temporaryOut)
+  TextColumn get returnNotes => text().nullable().named('return_notes')();
+
   // === Sync fields (Phase 2 ready) ===
   BoolColumn get synced => boolean().withDefault(const Constant(false))();
   DateTimeColumn get lastSyncedAt =>

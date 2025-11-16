@@ -21,6 +21,11 @@ class Movement implements SyncableEntity {
   final double? price;
   final String? notes;
   final String? buyerQrSignature;
+  final DateTime? returnDate;
+  final String? returnNotes;
+
+  // === Propriétés calculées ===
+  bool get isCompleted => returnDate != null;
 
   // === Synchronisation ===
   @override
@@ -45,6 +50,8 @@ class Movement implements SyncableEntity {
     this.price,
     this.notes,
     this.buyerQrSignature,
+    this.returnDate,
+    this.returnNotes,
     this.synced = false,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -66,6 +73,8 @@ class Movement implements SyncableEntity {
     double? price,
     String? notes,
     String? buyerQrSignature,
+    DateTime? returnDate,
+    String? returnNotes,
     bool? synced,
     DateTime? updatedAt,
     DateTime? lastSyncedAt,
@@ -82,6 +91,8 @@ class Movement implements SyncableEntity {
       price: price ?? this.price,
       notes: notes ?? this.notes,
       buyerQrSignature: buyerQrSignature ?? this.buyerQrSignature,
+      returnDate: returnDate ?? this.returnDate,
+      returnNotes: returnNotes ?? this.returnNotes,
       synced: synced ?? this.synced,
       createdAt: createdAt,
       updatedAt: updatedAt ?? DateTime.now(),
@@ -121,6 +132,8 @@ class Movement implements SyncableEntity {
       'price': price,
       'notes': notes,
       'buyer_qr_signature': buyerQrSignature,
+      'return_date': returnDate?.toIso8601String(),
+      'return_notes': returnNotes,
       'synced': synced,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
@@ -141,6 +154,10 @@ class Movement implements SyncableEntity {
       price: json['price']?.toDouble(),
       notes: json['notes'],
       buyerQrSignature: json['buyer_qr_signature'],
+      returnDate: json['return_date'] != null
+          ? DateTime.parse(json['return_date'] as String)
+          : null,
+      returnNotes: json['return_notes'],
       synced: json['synced'] ?? false,
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'] as String)
