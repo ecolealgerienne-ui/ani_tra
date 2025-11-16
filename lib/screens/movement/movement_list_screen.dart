@@ -12,6 +12,7 @@ import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
 import 'movement_detail_screen.dart';
+import 'create_temporary_movement_screen.dart';
 
 class MovementListScreen extends StatefulWidget {
   const MovementListScreen({super.key});
@@ -229,14 +230,18 @@ class _MovementListScreenState extends State<MovementListScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          // TODO: Implémenter le formulaire de création de sortie temporaire
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Création de sortie temporaire à implémenter'),
-              backgroundColor: Colors.orange,
+        onPressed: () async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const CreateTemporaryMovementScreen(),
             ),
           );
+
+          if (result != null && mounted) {
+            // Rafraîchir la liste des mouvements
+            context.read<MovementProvider>().refresh();
+          }
         },
         icon: const Icon(Icons.exit_to_app),
         label: Text(l10n.translate(AppStrings.temporaryOut)),

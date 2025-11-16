@@ -69,21 +69,18 @@ class MovementDetailScreen extends StatelessWidget {
         title: Text(l10n.translate(AppStrings.movementDetails)),
         actions: movement.type == MovementType.temporaryOut
             ? [
-                TextButton.icon(
+                IconButton(
                   onPressed: () {
-                    // TODO: Implémenter le retour d'animal
+                    // TODO: Implémenter le retour d'animal à la ferme
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Fonction "Marquer le retour" à implémenter'),
+                        content: Text('Fonction "Retour à la ferme" à implémenter'),
                         backgroundColor: Colors.orange,
                       ),
                     );
                   },
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  label: const Text(
-                    'Retour',
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  icon: const Icon(Icons.home_filled),
+                  tooltip: 'Retour à la ferme',
                 ),
               ]
             : null,
