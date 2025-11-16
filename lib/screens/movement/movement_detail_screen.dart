@@ -416,8 +416,8 @@ class _AnimalInfoSection extends StatelessWidget {
         return l10n.translate(AppStrings.deadStatus);
       case AnimalStatus.slaughtered:
         return l10n.translate(AppStrings.slaughteredStatus);
-      default:
-        return status.name;
+      case AnimalStatus.onTemporaryMovement:
+        return l10n.translate(AppStrings.onTemporaryMovement);
     }
   }
 }
