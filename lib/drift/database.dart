@@ -704,6 +704,13 @@ class AppDatabase extends _$AppDatabase {
       'CREATE INDEX IF NOT EXISTS idx_weights_animal_date '
       'ON weights(animal_id, recorded_at);',
     );
+
+    // Index composite: farmId + animalId + recordedAt DESC (historique poids optimisé)
+    // Pour la fonctionnalité Weight History: récupération des 10 derniers poids
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_weights_history '
+      'ON weights(farm_id, animal_id, recorded_at DESC);',
+    );
     await customStatement(
         'CREATE INDEX IF NOT EXISTS idx_weights_deleted_at ON weights(deleted_at);');
   }

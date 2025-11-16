@@ -137,6 +137,49 @@ class WeightDao extends DatabaseAccessor<AppDatabase> with _$WeightDaoMixin {
         .getSingleOrNull();
   }
 
+  /// Récupère les 10 dernières pesées d'un animal (pour Weight History)
+  ///
+  /// Retourne un Stream pour réactivité temps réel
+  /// Tri: plus récentes d'abord (DESC)
+  /// Limite: 10 entrées
+  Stream<List<WeightsTableData>> getLatest10ByAnimal(
+    String farmId,
+    String animalId,
+  ) {
+    return (select(weightsTable)
+          ..where((t) => t.farmId.equals(farmId))
+          ..where((t) => t.animalId.equals(animalId))
+          ..where((t) => t.deletedAt.isNull())
+          ..orderBy([
+            (t) =>
+                OrderingTerm(expression: t.recordedAt, mode: OrderingMode.desc),
+          ])
+          ..limit(10))
+        .watch();
+  }
+
+  /// Récupère le poids précédent avant une date donnée
+  ///
+  /// Utilisé pour calculer la perte de poids lors de l'ajout d'un nouveau poids
+  /// Retourne le poids immédiatement antérieur à la date spécifiée
+  Future<WeightsTableData?> getPreviousWeight(
+    String farmId,
+    String animalId,
+    DateTime beforeDate,
+  ) {
+    return (select(weightsTable)
+          ..where((t) => t.farmId.equals(farmId))
+          ..where((t) => t.animalId.equals(animalId))
+          ..where((t) => t.recordedAt.isSmallerThanValue(beforeDate))
+          ..where((t) => t.deletedAt.isNull())
+          ..orderBy([
+            (t) =>
+                OrderingTerm(expression: t.recordedAt, mode: OrderingMode.desc),
+          ])
+          ..limit(1))
+        .getSingleOrNull();
+  }
+
   /// Récupère les pesées dans une période
   Future<List<WeightsTableData>> findByDateRange(
     String farmId,
