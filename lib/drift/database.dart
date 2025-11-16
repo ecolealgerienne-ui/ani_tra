@@ -39,8 +39,8 @@ import 'tables/campaigns_table.dart';
 // Alert Configuration Table (Phase 1B)
 import 'tables/alert_configurations_table.dart';
 
-// Sync Table (Phase 2)
-// import 'tables/sync_queue_table.dart';
+// Sync Table (Phase 2 / STEP 4)
+import 'tables/sync_queue_table.dart';
 
 // ═══════════════════════════════════════════════════════════
 // IMPORTS - DAOs
@@ -74,8 +74,8 @@ import 'daos/campaign_dao.dart';
 // Alert Configuration DAO (Phase 1B)
 import 'daos/alert_configuration_dao.dart';
 
-// Sync DAO (Phase 2)
-// import 'daos/sync_queue_dao.dart';
+// Sync DAO (Phase 2 / STEP 4)
+import 'daos/sync_queue_dao.dart';
 
 // ═══════════════════════════════════════════════════════════
 // GENERATED FILE
@@ -128,9 +128,9 @@ part 'database.g.dart';
     AlertConfigurationsTable,
 
     // ────────────────────────────────────────────────────────
-    // SYNC TABLE (Phase 2)
+    // SYNC TABLE (Phase 2 / STEP 4)
     // ────────────────────────────────────────────────────────
-    // SyncQueueTable,
+    SyncQueueTable,
   ],
   daos: [
     // ────────────────────────────────────────────────────────
@@ -174,9 +174,9 @@ part 'database.g.dart';
     AlertConfigurationDao,
 
     // ────────────────────────────────────────────────────────
-    // SYNC DAO (Phase 2)
+    // SYNC DAO (Phase 2 / STEP 4)
     // ────────────────────────────────────────────────────────
-    // SyncQueueDao,
+    SyncQueueDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -240,9 +240,9 @@ class AppDatabase extends _$AppDatabase {
           await _createAlertConfigurationsIndexes();
 
           // ───────────────────────────────────────────────────
-          // INDEXES - SYNC TABLE (Phase 2)
+          // INDEXES - SYNC TABLE (Phase 2 / STEP 4)
           // ───────────────────────────────────────────────────
-          // await _createSyncQueueIndexes();
+          await _createSyncQueueIndexes();
         },
         onUpgrade: (Migrator m, int from, int to) async {
           // ───────────────────────────────────────────────────
@@ -1098,6 +1098,58 @@ class AppDatabase extends _$AppDatabase {
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_alert_config_deleted_at '
       'ON alert_configurations_table(deleted_at);',
+    );
+  }
+
+  // ───────────────────────────────────────────────────────────
+  // SYNC QUEUE INDEXES (STEP 4)
+  // ───────────────────────────────────────────────────────────
+  Future<void> _createSyncQueueIndexes() async {
+    // Index 1: farmId (CRITIQUE - multi-tenancy + filtrage principal)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_sync_queue_farm_id '
+      'ON sync_queue(farm_id);',
+    );
+
+    // Index 2: syncedAt (distinguer pending vs synced)
+    // NULL = pending, NOT NULL = déjà synchronisé
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_sync_queue_synced_at '
+      'ON sync_queue(synced_at);',
+    );
+
+    // Index 3: retryCount (identifier items en échec)
+    // retryCount >= 3 = stalled (nécessite intervention)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_sync_queue_retry_count '
+      'ON sync_queue(retry_count);',
+    );
+
+    // Index 4: createdAt (ordre FIFO pour sync)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_sync_queue_created_at '
+      'ON sync_queue(created_at);',
+    );
+
+    // Index composite 1: farmId + syncedAt (getPending query principale)
+    // WHERE farmId = ? AND syncedAt IS NULL
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_sync_queue_farm_synced '
+      'ON sync_queue(farm_id, synced_at);',
+    );
+
+    // Index composite 2: farmId + retryCount (findStalled query)
+    // WHERE farmId = ? AND retryCount >= 3
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_sync_queue_farm_retry '
+      'ON sync_queue(farm_id, retry_count);',
+    );
+
+    // Index composite 3: syncedAt + createdAt (cleanup query)
+    // WHERE syncedAt < cutoffDate (pour DELETE des items anciens)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_sync_queue_synced_created '
+      'ON sync_queue(synced_at, created_at);',
     );
   }
 

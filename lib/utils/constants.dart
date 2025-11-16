@@ -531,8 +531,43 @@ class DatabaseConstants {
   static const int schemaVersion = 1;
 }
 
-// ==================== SYNC ====================
+// ==================== SYNC (STEP 4) ====================
 class SyncConstants {
   static const int maxRetries = 3;
   static const int retryDelaySeconds = 60;
+}
+
+/// Actions de synchronisation (STEP 4)
+class SyncAction {
+  static const String insert = 'insert';
+  static const String update = 'update';
+  static const String delete = 'delete';
+}
+
+/// Types d'entités synchronisables (STEP 4)
+class SyncEntityType {
+  static const String animal = 'animal';
+  static const String treatment = 'treatment';
+  static const String vaccination = 'vaccination';
+  static const String weight = 'weight';
+  static const String movement = 'movement';
+  static const String batch = 'batch';
+  static const String lot = 'lot';
+  static const String campaign = 'campaign';
+  static const String medicalProduct = 'medical_product';
+  static const String breed = 'breed';
+  static const String veterinarian = 'veterinarian';
+  static const String vaccine = 'vaccine';
+  static const String document = 'document';
+  static const String breeding = 'breeding';
+  static const String alertConfiguration = 'alert_configuration';
+  static const String farmPreference = 'farm_preference';
+}
+
+/// Politique de retry (STEP 4)
+class SyncRetryPolicy {
+  static const int maxRetries = 3;
+  static const int initialDelayMs = 5000;
+  static const int backoffMultiplier = 2;
+  static const int maxDelayMs = 60000;
 }
