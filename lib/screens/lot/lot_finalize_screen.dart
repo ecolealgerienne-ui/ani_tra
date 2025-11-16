@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 
 import '../../providers/lot_provider.dart';
 import '../../providers/animal_provider.dart';
-import '../../providers/movement_provider.dart';
 import '../../providers/sync_provider.dart';
 import '../../models/lot.dart';
 import '../../i18n/app_localizations.dart';
@@ -242,19 +241,8 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
             );
 
             if (success) {
-              // Créer les mouvements de vente
-              final movements = lotProvider.expandLotToSaleMovements(
-                lotProvider.getLotById(widget.lotId)!,
-              );
-              final movementProvider = context.read<MovementProvider>();
-              final animalProvider = context.read<AnimalProvider>();
-
-              for (final movement in movements) {
-                await movementProvider.addMovement(movement);
-                // Mettre à jour le statut de l'animal
-                animalProvider.updateAnimalStatus(movement.animalId, AnimalStatus.sold);
-              }
-              syncProvider.addPendingData(movements.length + 1);
+              // Les mouvements ont déjà été créés par SaleScreen
+              syncProvider.incrementPendingData();
 
               if (mounted) {
                 Navigator.pop(context);
@@ -319,20 +307,8 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
             );
 
             if (success) {
-              // Créer les mouvements d'abattage
-              final movements = lotProvider.expandLotToSlaughterMovements(
-                lotProvider.getLotById(widget.lotId)!,
-              );
-              final movementProvider = context.read<MovementProvider>();
-              final animalProvider = context.read<AnimalProvider>();
-
-              for (final movement in movements) {
-                await movementProvider.addMovement(movement);
-                // Mettre à jour le statut de l'animal
-                animalProvider.updateAnimalStatus(
-                    movement.animalId, AnimalStatus.slaughtered);
-              }
-              syncProvider.addPendingData(movements.length + 1);
+              // Les mouvements ont déjà été créés par SlaughterScreen
+              syncProvider.incrementPendingData();
 
               if (mounted) {
                 Navigator.pop(context);

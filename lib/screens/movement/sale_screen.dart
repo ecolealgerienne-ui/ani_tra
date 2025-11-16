@@ -48,9 +48,6 @@ class _SaleScreenState extends State<SaleScreen> {
   Future<void> _confirmSale() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final animal = widget.animal;
-    if (animal == null) return;
-
     setState(() => _isConfirming = true);
 
     final animalProvider = context.read<AnimalProvider>();
@@ -73,24 +70,54 @@ class _SaleScreenState extends State<SaleScreen> {
         notesText += ' - Prix: ${price.toStringAsFixed(2)}€';
       }
 
-      // Create sale movement
-      final movement = Movement(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        animalId: animal.id,
-        type: MovementType.sale,
-        movementDate: _saleDate,
-        price: price,
-        notes: notesText,
-        createdAt: DateTime.now(),
-      );
+      // Déterminer si c'est un animal individuel ou un lot
+      List<Animal> animalsToSell = [];
 
-      await movementProvider.addMovement(movement);
+      if (widget.animal != null) {
+        // Cas individuel
+        animalsToSell = [widget.animal!];
+      } else if (widget.animalIds != null) {
+        // Cas lot : récupérer tous les animaux vivants du lot
+        for (final animalId in widget.animalIds!) {
+          final animal = animalProvider.getAnimalById(animalId);
+          if (animal != null && animal.status == AnimalStatus.alive) {
+            animalsToSell.add(animal);
+          }
+        }
+      }
 
-      // Update animal status to sold
-      final updatedAnimal = animal.copyWith(status: AnimalStatus.sold);
-      await animalProvider.updateAnimal(updatedAnimal);
+      if (animalsToSell.isEmpty) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Aucun animal à vendre'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        setState(() => _isConfirming = false);
+        return;
+      }
 
-      syncProvider.incrementPendingData();
+      // Créer un mouvement de vente pour chaque animal
+      for (final animal in animalsToSell) {
+        final movement = Movement(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          animalId: animal.id,
+          type: MovementType.sale,
+          movementDate: _saleDate,
+          price: price,
+          notes: notesText,
+          createdAt: DateTime.now(),
+        );
+
+        await movementProvider.addMovement(movement);
+
+        // Update animal status to sold
+        final updatedAnimal = animal.copyWith(status: AnimalStatus.sold);
+        await animalProvider.updateAnimal(updatedAnimal);
+      }
+
+      syncProvider.addPendingData(animalsToSell.length);
 
       if (!mounted) return;
 
