@@ -48,8 +48,6 @@ const Map<String, String> stringsAr = {
   'noWeightsRecorded': 'لم يتم تسجيل أي وزن',
   'previousWeight': 'الوزن السابق',
   'currentWeight': 'الوزن الحالي',
-  'weightDrop': 'فقدان الوزن',
-  'weightDropThreshold': 'عتبة فقدان الوزن',
 
   // ============ الإعدادات ============
   'deleteCache': 'مسح الذاكرة المؤقتة',
@@ -888,9 +886,4 @@ const Map<String, String> stringsAr = {
   'creatingDefaultConfigs': 'جاري إنشاء الإعدادات الافتراضية',
   'alertEnabled': 'التنبيه مُفعّل: {title}',
   'alertDisabled': 'التنبيه مُعطّل: {title}',
-
-  // ============ مفاتيح تكوين التنبيهات ============
-  'alertWeightDropTitle': 'فقدان كبير في الوزن',
-  'alertWeightDropMsg':
-      '{animalName}: فقدان {percentDrop}% ({previousWeight}كغ → {currentWeight}كغ)',
 };

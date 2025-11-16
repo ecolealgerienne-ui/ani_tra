@@ -436,25 +436,6 @@ class DatabaseInitializer {
           createdAt: now,
           updatedAt: now,
         ));
-
-        // Weight Drop Alert Config (Phase Weight History Feature)
-        await db.alertConfigurationDao
-            .insertItem(AlertConfigurationsTableCompanion.insert(
-          id: 'config_weight_drop_1',
-          farmId: 'farm_default',
-          evaluationType: 'weightDrop',
-          type: 'urgent',
-          category: 'weighing',
-          titleKey: 'alertWeightDropTitle',
-          messageKey: 'alertWeightDropMsg',
-          severity: 3,
-          iconName: 'trending_down',
-          colorHex: '#D32F2F',
-          enabled: const Value(true),
-          synced: const Value(false),
-          createdAt: now,
-          updatedAt: now,
-        ));
       } catch (e) {
         // Silent fail
       }

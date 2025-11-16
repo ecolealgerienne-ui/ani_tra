@@ -54,8 +54,6 @@ class AppStrings {
   static const String noWeightsRecorded = 'noWeightsRecorded';
   static const String previousWeight = 'previousWeight';
   static const String currentWeight = 'currentWeight';
-  static const String weightDrop = 'weightDrop';
-  static const String weightDropThreshold = 'weightDropThreshold';
 
   // ============ SETTINGS SCREEN ============
   static const String deleteCache = 'deleteCache';
@@ -1029,9 +1027,6 @@ class AppStrings {
 
   static const String alertDraftTitle = 'alertDraftTitle';
   static const String alertDraftMsg = 'alertDraftMsg';
-
-  static const String alertWeightDropTitle = 'alertWeightDropTitle';
-  static const String alertWeightDropMsg = 'alertWeightDropMsg';
 
   // ============ BREEDING NOTES ============
   static const String breedingFailedNote = 'breedingFailedNote';

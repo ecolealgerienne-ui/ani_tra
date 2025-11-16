@@ -47,8 +47,6 @@ const Map<String, String> stringsEn = {
   'noWeightsRecorded': 'No weighings recorded',
   'previousWeight': 'Previous weight',
   'currentWeight': 'Current weight',
-  'weightDrop': 'Weight loss',
-  'weightDropThreshold': 'Weight loss threshold',
 
   // ============ SETTINGS SCREEN ============
   'deleteCache': 'Clear cache',
@@ -891,9 +889,4 @@ const Map<String, String> stringsEn = {
   'creatingDefaultConfigs': 'Default configurations are being created',
   'alertEnabled': 'Alert enabled: {title}',
   'alertDisabled': 'Alert disabled: {title}',
-
-  // ============ ALERT CONFIGURATION KEYS ============
-  'alertWeightDropTitle': 'Significant weight loss',
-  'alertWeightDropMsg':
-      '{animalName}: {percentDrop}% loss ({previousWeight}kg → {currentWeight}kg)',
 };

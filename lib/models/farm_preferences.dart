@@ -31,10 +31,6 @@ class FarmPreferences implements SyncableEntity {
   /// Race par défaut (Ex: 'merinos', 'charolaise', nullable)
   final String? defaultBreedId;
 
-  /// Seuil de perte de poids en pourcentage pour déclencher une alerte (défaut: 10%)
-  /// Exemple: 10.0 signifie qu'une alerte sera créée si perte > 10%
-  final double weightDropThresholdPercent;
-
   // ═══════════════════════════════════════════════════════════
   // SYNC FIELDS (Phase 2)
   // ═══════════════════════════════════════════════════════════
@@ -71,7 +67,6 @@ class FarmPreferences implements SyncableEntity {
     this.defaultVeterinarianId,
     required this.defaultSpeciesId,
     this.defaultBreedId,
-    this.weightDropThresholdPercent = 10.0,
     this.synced = false,
     this.lastSyncedAt,
     this.serverVersion,
@@ -106,7 +101,6 @@ class FarmPreferences implements SyncableEntity {
     String? defaultVeterinarianId,
     String? defaultSpeciesId,
     String? defaultBreedId,
-    double? weightDropThresholdPercent,
     bool? synced,
     DateTime? lastSyncedAt,
     String? serverVersion,
@@ -121,8 +115,6 @@ class FarmPreferences implements SyncableEntity {
           defaultVeterinarianId ?? this.defaultVeterinarianId,
       defaultSpeciesId: defaultSpeciesId ?? this.defaultSpeciesId,
       defaultBreedId: defaultBreedId ?? this.defaultBreedId,
-      weightDropThresholdPercent:
-          weightDropThresholdPercent ?? this.weightDropThresholdPercent,
       synced: synced ?? this.synced,
       lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
       serverVersion: serverVersion ?? this.serverVersion,
@@ -163,7 +155,6 @@ class FarmPreferences implements SyncableEntity {
         'default_veterinarian_id': defaultVeterinarianId,
         'default_species_id': defaultSpeciesId,
         'default_breed_id': defaultBreedId,
-        'weight_drop_threshold_percent': weightDropThresholdPercent,
         'synced': synced,
         'last_synced_at': lastSyncedAt?.toIso8601String(),
         'server_version': serverVersion,
@@ -179,8 +170,6 @@ class FarmPreferences implements SyncableEntity {
         defaultVeterinarianId: json['default_veterinarian_id'] as String?,
         defaultSpeciesId: json['default_species_id'] as String,
         defaultBreedId: json['default_breed_id'] as String?,
-        weightDropThresholdPercent:
-            (json['weight_drop_threshold_percent'] as num?)?.toDouble() ?? 10.0,
         synced: json['synced'] as bool? ?? false,
         lastSyncedAt: json['last_synced_at'] != null
             ? DateTime.parse(json['last_synced_at'] as String)

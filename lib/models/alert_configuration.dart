@@ -11,7 +11,6 @@ enum AlertEvaluationType {
   treatmentRenewal, // Traitement à renouveler
   batchToFinalize,  // Lot à finaliser
   draftAnimals,     // Animaux en brouillon à valider
-  weightDrop,       // Perte de poids importante
 }
 
 extension AlertEvaluationTypeExtension on AlertEvaluationType {

@@ -51,8 +51,6 @@ const Map<String, String> stringsFr = {
   'noWeightsRecorded': 'Aucune pesée enregistrée',
   'previousWeight': 'Poids précédent',
   'currentWeight': 'Poids actuel',
-  'weightDrop': 'Perte de poids',
-  'weightDropThreshold': 'Seuil de perte de poids',
 
   // ============ SETTINGS SCREEN ============
   'deleteCache': 'Vider le cache',
@@ -1031,9 +1029,6 @@ const Map<String, String> stringsFr = {
 
   'alertDraftTitle': 'Animaux en brouillon',
   'alertDraftMsg': 'Animaux non validés à finaliser',
-
-  'alertWeightDropTitle': 'Perte de poids importante',
-  'alertWeightDropMsg': '{animalName}: perte de {percentDrop}% ({previousWeight}kg → {currentWeight}kg)',
 
   // ========== BREEDING NOTES ==========
   'breedingFailedNote': 'Échec:',

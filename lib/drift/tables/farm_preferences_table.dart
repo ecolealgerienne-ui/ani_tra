@@ -41,13 +41,6 @@ class FarmPreferencesTable extends Table {
   TextColumn get defaultBreedId =>
       text().nullable().named('default_breed_id')();
 
-  /// Seuil de perte de poids en pourcentage pour déclencher une alerte (défaut: 10%)
-  /// Exemple: 10.0 signifie qu'une alerte sera créée si perte > 10%
-  RealColumn get weightDropThresholdPercent =>
-      real()
-          .withDefault(const Constant(10.0))
-          .named('weight_drop_threshold_percent')();
-
   // ═══════════════════════════════════════════════════════════
   // SYNC FIELDS (Phase 2)
   // ═══════════════════════════════════════════════════════════
