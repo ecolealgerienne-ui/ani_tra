@@ -9,7 +9,6 @@ import '../../providers/animal_provider.dart';
 import '../../providers/sync_provider.dart';
 import '../../models/animal.dart';
 import '../../models/movement.dart';
-import '../../utils/constants.dart';
 
 class ReturnAnimalFormScreen extends StatefulWidget {
   final Movement movement;
@@ -74,7 +73,6 @@ class _ReturnAnimalFormScreenState extends State<ReturnAnimalFormScreen> {
 
     try {
       final movementProvider = context.read<MovementProvider>();
-      final animalProvider = context.read<AnimalProvider>();
       final syncProvider = context.read<SyncProvider>();
 
       // Mettre à jour le mouvement avec les informations de retour
@@ -86,13 +84,6 @@ class _ReturnAnimalFormScreenState extends State<ReturnAnimalFormScreen> {
       );
 
       await movementProvider.updateMovement(updatedMovement);
-
-      // Mettre à jour le statut de l'animal : onTemporaryMovement → alive
-      final animal = animalProvider.getAnimalById(widget.movement.animalId);
-      if (animal != null && animal.status == AnimalStatus.onTemporaryMovement) {
-        final updatedAnimal = animal.copyWith(status: AnimalStatus.alive);
-        await animalProvider.updateAnimal(updatedAnimal);
-      }
 
       syncProvider.incrementPendingData();
 
