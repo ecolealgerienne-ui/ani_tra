@@ -310,6 +310,9 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
             case AnimalStatus.slaughtered:
               key = '🔪 ${AppLocalizations.of(context).translate(AppStrings.slaughteredGroup)}';
               break;
+            case AnimalStatus.onTemporaryMovement:
+              key = '🔄 ${AppLocalizations.of(context).translate(AppStrings.statusOnTemporaryMovement)}';
+              break;
           }
           groups.putIfAbsent(key, () => []).add(animal);
         }
@@ -1533,6 +1536,9 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
       case AnimalStatus.slaughtered:
         return AppLocalizations.of(context)
             .translate(AppStrings.statusSlaughtered);
+      case AnimalStatus.onTemporaryMovement:
+        return AppLocalizations.of(context)
+            .translate(AppStrings.statusOnTemporaryMovement);
     }
   }
 }

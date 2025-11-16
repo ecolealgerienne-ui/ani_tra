@@ -274,6 +274,9 @@ class MotherHistoryScreen extends StatelessWidget {
         return AppLocalizations.of(context).translate(AppStrings.dead);
       case AnimalStatus.slaughtered:
         return AppLocalizations.of(context).translate(AppStrings.slaughtered);
+      case AnimalStatus.onTemporaryMovement:
+        return AppLocalizations.of(context)
+            .translate(AppStrings.statusOnTemporaryMovement);
     }
   }
 }

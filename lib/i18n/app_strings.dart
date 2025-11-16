@@ -987,6 +987,7 @@ class AppStrings {
   static const String deadStatus = 'deadStatus';
   static const String soldStatus = 'soldStatus';
   static const String slaughteredStatus = 'slaughteredStatus';
+  static const String statusOnTemporaryMovement = 'statusOnTemporaryMovement';
   
   // ============ DRAFT ALERTS & ACTIONS ============
   static const String draftAlertWarning = 'draftAlertWarning';

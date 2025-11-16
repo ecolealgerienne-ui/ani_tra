@@ -985,6 +985,7 @@ const Map<String, String> stringsFr = {
   'deadStatus': 'Mort',
   'soldStatus': 'Vendu',
   'slaughteredStatus': 'Abattu',
+  'statusOnTemporaryMovement': 'En mouvement temporaire',
 
   // ============ DRAFT ALERTS & ACTIONS ============
   'draftAlertWarning': 'Brouillon depuis {hours}h - À valider ou supprimer',
