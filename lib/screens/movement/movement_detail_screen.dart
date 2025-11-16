@@ -161,8 +161,6 @@ class _MovementTypeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-
     return Container(
       padding: const EdgeInsets.all(AppConstants.spacingMediumLarge),
       decoration: BoxDecoration(
@@ -222,6 +220,8 @@ class _MovementTypeHeader extends StatelessWidget {
         return Colors.red;
       case MovementType.slaughter:
         return Colors.purple;
+      default:
+        return Colors.grey;
     }
   }
 
@@ -237,6 +237,8 @@ class _MovementTypeHeader extends StatelessWidget {
         return Icons.dangerous;
       case MovementType.slaughter:
         return Icons.content_cut;
+      default:
+        return Icons.sync_alt;
     }
   }
 
@@ -253,6 +255,8 @@ class _MovementTypeHeader extends StatelessWidget {
         return l10n.translate(AppStrings.death);
       case MovementType.slaughter:
         return l10n.translate(AppStrings.slaughter);
+      default:
+        return 'Mouvement';
     }
   }
 }
@@ -402,6 +406,8 @@ class _AnimalInfoSection extends StatelessWidget {
   String _getStatusLabel(BuildContext context, AnimalStatus status) {
     final l10n = AppLocalizations.of(context);
     switch (status) {
+      case AnimalStatus.draft:
+        return l10n.translate(AppStrings.draft);
       case AnimalStatus.alive:
         return l10n.translate(AppStrings.aliveStatus);
       case AnimalStatus.sold:
