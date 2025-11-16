@@ -210,8 +210,6 @@ class _MovementTypeHeader extends StatelessWidget {
 
   Color _getMovementTypeColor(MovementType type) {
     switch (type) {
-      case MovementType.birth:
-        return Colors.green;
       case MovementType.purchase:
         return Colors.blue;
       case MovementType.sale:
@@ -220,15 +218,13 @@ class _MovementTypeHeader extends StatelessWidget {
         return Colors.red;
       case MovementType.slaughter:
         return Colors.purple;
-      default:
-        return Colors.grey;
+      case MovementType.temporaryOut:
+        return Colors.teal;
     }
   }
 
   IconData _getMovementTypeIcon(MovementType type) {
     switch (type) {
-      case MovementType.birth:
-        return Icons.child_care;
       case MovementType.purchase:
         return Icons.shopping_cart;
       case MovementType.sale:
@@ -237,16 +233,14 @@ class _MovementTypeHeader extends StatelessWidget {
         return Icons.dangerous;
       case MovementType.slaughter:
         return Icons.content_cut;
-      default:
-        return Icons.sync_alt;
+      case MovementType.temporaryOut:
+        return Icons.exit_to_app;
     }
   }
 
   String _getMovementTypeLabel(BuildContext context, MovementType type) {
     final l10n = AppLocalizations.of(context);
     switch (type) {
-      case MovementType.birth:
-        return l10n.translate(AppStrings.birth);
       case MovementType.purchase:
         return l10n.translate(AppStrings.purchase);
       case MovementType.sale:
@@ -255,8 +249,8 @@ class _MovementTypeHeader extends StatelessWidget {
         return l10n.translate(AppStrings.death);
       case MovementType.slaughter:
         return l10n.translate(AppStrings.slaughter);
-      default:
-        return 'Mouvement';
+      case MovementType.temporaryOut:
+        return l10n.translate(AppStrings.temporaryOut);
     }
   }
 }

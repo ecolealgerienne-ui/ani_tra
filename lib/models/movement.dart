@@ -3,7 +3,7 @@
 import 'package:uuid/uuid.dart';
 import 'syncable_entity.dart';
 
-enum MovementType { birth, purchase, sale, death, slaughter }
+enum MovementType { purchase, sale, death, slaughter, temporaryOut }
 
 class Movement implements SyncableEntity {
   // === Identification ===

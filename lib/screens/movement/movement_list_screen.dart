@@ -53,16 +53,6 @@ class _MovementListScreenState extends State<MovementListScreen> {
               ),
               const PopupMenuDivider(),
               PopupMenuItem<MovementType>(
-                value: MovementType.birth,
-                child: Row(
-                  children: [
-                    const Icon(Icons.child_care, color: Colors.green),
-                    const SizedBox(width: AppConstants.spacingSmall),
-                    Text(l10n.translate(AppStrings.births)),
-                  ],
-                ),
-              ),
-              PopupMenuItem<MovementType>(
                 value: MovementType.purchase,
                 child: Row(
                   children: [
@@ -99,6 +89,16 @@ class _MovementListScreenState extends State<MovementListScreen> {
                     const Icon(Icons.content_cut, color: Colors.purple),
                     const SizedBox(width: AppConstants.spacingSmall),
                     Text(l10n.translate(AppStrings.slaughters)),
+                  ],
+                ),
+              ),
+              PopupMenuItem<MovementType>(
+                value: MovementType.temporaryOut,
+                child: Row(
+                  children: [
+                    const Icon(Icons.exit_to_app, color: Colors.teal),
+                    const SizedBox(width: AppConstants.spacingSmall),
+                    Text(l10n.translate(AppStrings.temporaryOuts)),
                   ],
                 ),
               ),
@@ -233,8 +233,6 @@ class _MovementListScreenState extends State<MovementListScreen> {
   /// Retourne la couleur associée au type de mouvement
   Color _getMovementTypeColor(MovementType type) {
     switch (type) {
-      case MovementType.birth:
-        return Colors.green;
       case MovementType.purchase:
         return Colors.blue;
       case MovementType.sale:
@@ -243,16 +241,14 @@ class _MovementListScreenState extends State<MovementListScreen> {
         return Colors.red;
       case MovementType.slaughter:
         return Colors.purple;
-      default:
-        return Colors.grey;
+      case MovementType.temporaryOut:
+        return Colors.teal;
     }
   }
 
   /// Retourne l'icône associée au type de mouvement
   IconData _getMovementTypeIcon(MovementType type) {
     switch (type) {
-      case MovementType.birth:
-        return Icons.child_care;
       case MovementType.purchase:
         return Icons.shopping_cart;
       case MovementType.sale:
@@ -261,8 +257,8 @@ class _MovementListScreenState extends State<MovementListScreen> {
         return Icons.dangerous;
       case MovementType.slaughter:
         return Icons.content_cut;
-      default:
-        return Icons.sync_alt;
+      case MovementType.temporaryOut:
+        return Icons.exit_to_app;
     }
   }
 
@@ -270,8 +266,6 @@ class _MovementListScreenState extends State<MovementListScreen> {
   String _getMovementTypeLabel(BuildContext context, MovementType type) {
     final l10n = AppLocalizations.of(context);
     switch (type) {
-      case MovementType.birth:
-        return l10n.translate(AppStrings.birth);
       case MovementType.purchase:
         return l10n.translate(AppStrings.purchase);
       case MovementType.sale:
@@ -280,8 +274,8 @@ class _MovementListScreenState extends State<MovementListScreen> {
         return l10n.translate(AppStrings.death);
       case MovementType.slaughter:
         return l10n.translate(AppStrings.slaughter);
-      default:
-        return 'Mouvement';
+      case MovementType.temporaryOut:
+        return l10n.translate(AppStrings.temporaryOut);
     }
   }
 }
@@ -463,8 +457,6 @@ class _MovementCard extends StatelessWidget {
   /// Retourne la couleur associée au type de mouvement
   Color _getMovementTypeColor(MovementType type) {
     switch (type) {
-      case MovementType.birth:
-        return Colors.green;
       case MovementType.purchase:
         return Colors.blue;
       case MovementType.sale:
@@ -473,16 +465,14 @@ class _MovementCard extends StatelessWidget {
         return Colors.red;
       case MovementType.slaughter:
         return Colors.purple;
-      default:
-        return Colors.grey;
+      case MovementType.temporaryOut:
+        return Colors.teal;
     }
   }
 
   /// Retourne l'icône associée au type de mouvement
   IconData _getMovementTypeIcon(MovementType type) {
     switch (type) {
-      case MovementType.birth:
-        return Icons.child_care;
       case MovementType.purchase:
         return Icons.shopping_cart;
       case MovementType.sale:
@@ -491,8 +481,8 @@ class _MovementCard extends StatelessWidget {
         return Icons.dangerous;
       case MovementType.slaughter:
         return Icons.content_cut;
-      default:
-        return Icons.sync_alt;
+      case MovementType.temporaryOut:
+        return Icons.exit_to_app;
     }
   }
 
@@ -500,8 +490,6 @@ class _MovementCard extends StatelessWidget {
   String _getMovementTypeLabel(BuildContext context, MovementType type) {
     final l10n = AppLocalizations.of(context);
     switch (type) {
-      case MovementType.birth:
-        return l10n.translate(AppStrings.birth);
       case MovementType.purchase:
         return l10n.translate(AppStrings.purchase);
       case MovementType.sale:
@@ -510,8 +498,8 @@ class _MovementCard extends StatelessWidget {
         return l10n.translate(AppStrings.death);
       case MovementType.slaughter:
         return l10n.translate(AppStrings.slaughter);
-      default:
-        return 'Mouvement';
+      case MovementType.temporaryOut:
+        return l10n.translate(AppStrings.temporaryOut);
     }
   }
 }

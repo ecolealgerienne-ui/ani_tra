@@ -251,16 +251,131 @@ class DatabaseInitializer {
       }
 
       // Movements (utilise type, movementDate, fromFarmId, toFarmId)
+      // ==================== ACHATS (LOT) ====================
       try {
         await db.movementDao.insertItem(MovementsTableCompanion.insert(
           id: 'mov_001',
           farmId: 'farm_default',
+          animalId: 'batch_001',
+          movementDate: now.subtract(const Duration(days: 180)),
+          type: 'purchase',
+          fromFarmId: const Value('farm_supplier_01'),
+          price: const Value(1250.00),
+          notes: const Value('Achat lot de 5 agneaux'),
+          synced: const Value(true),
+          createdAt: now.subtract(const Duration(days: 180)),
+          updatedAt: now.subtract(const Duration(days: 180)),
+        ));
+      } catch (e) {
+        // Silent fail
+      }
+
+      // ==================== VENTES ====================
+      try {
+        // Vente individuelle
+        await db.movementDao.insertItem(MovementsTableCompanion.insert(
+          id: 'mov_002',
+          farmId: 'farm_default',
           animalId: 'anim_001',
-          movementDate: now,
-          type: 'birth',
+          movementDate: now.subtract(const Duration(days: 45)),
+          type: 'sale',
+          toFarmId: const Value('farm_buyer_01'),
+          price: const Value(285.00),
+          notes: const Value('Vente marché local - mâle adulte'),
+          synced: const Value(true),
+          createdAt: now.subtract(const Duration(days: 45)),
+          updatedAt: now.subtract(const Duration(days: 45)),
+        ));
+      } catch (e) {
+        // Silent fail
+      }
+
+      try {
+        // Vente lot
+        await db.movementDao.insertItem(MovementsTableCompanion.insert(
+          id: 'mov_003',
+          farmId: 'farm_default',
+          animalId: 'batch_002',
+          movementDate: now.subtract(const Duration(days: 30)),
+          type: 'sale',
+          toFarmId: const Value('farm_buyer_02'),
+          price: const Value(1850.00),
+          notes: const Value('Vente lot de 8 moutons engraissés'),
           synced: const Value(false),
-          createdAt: now,
-          updatedAt: now,
+          createdAt: now.subtract(const Duration(days: 30)),
+          updatedAt: now.subtract(const Duration(days: 30)),
+        ));
+      } catch (e) {
+        // Silent fail
+      }
+
+      // ==================== MORT (INDIVIDUEL) ====================
+      try {
+        await db.movementDao.insertItem(MovementsTableCompanion.insert(
+          id: 'mov_004',
+          farmId: 'farm_default',
+          animalId: 'anim_002',
+          movementDate: now.subtract(const Duration(days: 90)),
+          type: 'death',
+          notes: const Value('Maladie respiratoire - traitement tardif'),
+          synced: const Value(true),
+          createdAt: now.subtract(const Duration(days: 90)),
+          updatedAt: now.subtract(const Duration(days: 90)),
+        ));
+      } catch (e) {
+        // Silent fail
+      }
+
+      // ==================== ABATTAGE ====================
+      try {
+        // Abattage individuel
+        await db.movementDao.insertItem(MovementsTableCompanion.insert(
+          id: 'mov_005',
+          farmId: 'farm_default',
+          animalId: 'anim_003',
+          movementDate: now.subtract(const Duration(days: 15)),
+          type: 'slaughter',
+          toFarmId: const Value('slaughterhouse_001'),
+          notes: const Value('Abattoir municipal - mouton Aïd'),
+          synced: const Value(false),
+          createdAt: now.subtract(const Duration(days: 15)),
+          updatedAt: now.subtract(const Duration(days: 15)),
+        ));
+      } catch (e) {
+        // Silent fail
+      }
+
+      try {
+        // Abattage lot
+        await db.movementDao.insertItem(MovementsTableCompanion.insert(
+          id: 'mov_006',
+          farmId: 'farm_default',
+          animalId: 'batch_003',
+          movementDate: now.subtract(const Duration(days: 7)),
+          type: 'slaughter',
+          toFarmId: const Value('slaughterhouse_001'),
+          notes: const Value('Lot de 12 agneaux pour abattoir'),
+          synced: const Value(false),
+          createdAt: now.subtract(const Duration(days: 7)),
+          updatedAt: now.subtract(const Duration(days: 7)),
+        ));
+      } catch (e) {
+        // Silent fail
+      }
+
+      // ==================== SORTIE TEMPORAIRE (INDIVIDUEL) ====================
+      try {
+        await db.movementDao.insertItem(MovementsTableCompanion.insert(
+          id: 'mov_007',
+          farmId: 'farm_default',
+          animalId: 'anim_004',
+          movementDate: now.subtract(const Duration(days: 3)),
+          type: 'temporaryOut',
+          toFarmId: const Value('farm_pasture_01'),
+          notes: const Value('Transhumance saisonnière - pâturage montagne'),
+          synced: const Value(false),
+          createdAt: now.subtract(const Duration(days: 3)),
+          updatedAt: now.subtract(const Duration(days: 3)),
         ));
       } catch (e) {
         // Silent fail
