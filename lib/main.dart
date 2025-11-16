@@ -28,6 +28,7 @@ import 'providers/veterinarian_provider.dart';
 import 'providers/farm_provider.dart';
 import 'providers/farm_preferences_provider.dart';
 import 'providers/alert_configuration_provider.dart';
+import 'providers/rfid_scanner_provider.dart';
 import 'i18n/app_localizations.dart';
 //import 'i18n/app_strings.dart';
 import 'utils/constants.dart';
@@ -380,6 +381,9 @@ class MyApp extends StatelessWidget {
                 alertConfigRepository: alertConfig,
               ),
         ),
+
+        // === RFIDScannerProvider (gestion du scan RFID) ===
+        ChangeNotifierProvider(create: (_) => RFIDScannerProvider()),
       ],
       child: Consumer<LocaleProvider>(
         builder: (context, localeProvider, child) {
