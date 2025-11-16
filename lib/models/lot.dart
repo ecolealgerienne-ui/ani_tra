@@ -113,29 +113,53 @@ class Lot implements SyncableEntity {
   // ==================== DONNÉES VENTE ====================
 
   /// Nom de l'acheteur
+  /// @deprecated Utiliser Movement.buyerName à la place (v2.0+)
+  /// Conservé pour compatibilité ascendante pendant phase transition
+  @Deprecated('Use Movement.buyerName instead')
   final String? buyerName;
 
   /// ID de la ferme de l'acheteur
+  /// @deprecated Utiliser Movement.buyerFarmId à la place (v2.0+)
+  /// Conservé pour compatibilité ascendante pendant phase transition
+  @Deprecated('Use Movement.buyerFarmId instead')
   final String? buyerFarmId;
 
   /// Prix total de la vente
+  /// @deprecated Calculer depuis Movement.price (v2.0+)
+  /// Conservé pour compatibilité ascendante pendant phase transition
+  @Deprecated('Calculate from Movement.price instead')
   final double? totalPrice;
 
   /// Prix par animal
+  /// @deprecated Utiliser Movement.price à la place (v2.0+)
+  /// Conservé pour compatibilité ascendante pendant phase transition
+  @Deprecated('Use Movement.price instead')
   final double? pricePerAnimal;
 
   /// Date de la vente
+  /// @deprecated Utiliser Movement.movementDate à la place (v2.0+)
+  /// Conservé pour compatibilité ascendante pendant phase transition
+  @Deprecated('Use Movement.movementDate instead')
   final DateTime? saleDate;
 
   // ==================== DONNÉES ABATTAGE ====================
 
   /// Nom de l'abattoir
+  /// @deprecated Utiliser Movement.slaughterhouseName à la place (v2.0+)
+  /// Conservé pour compatibilité ascendante pendant phase transition
+  @Deprecated('Use Movement.slaughterhouseName instead')
   final String? slaughterhouseName;
 
   /// ID de l'abattoir
+  /// @deprecated Utiliser Movement.slaughterhouseId à la place (v2.0+)
+  /// Conservé pour compatibilité ascendante pendant phase transition
+  @Deprecated('Use Movement.slaughterhouseId instead')
   final String? slaughterhouseId;
 
   /// Date d'abattage
+  /// @deprecated Utiliser Movement.movementDate à la place (v2.0+)
+  /// Conservé pour compatibilité ascendante pendant phase transition
+  @Deprecated('Use Movement.movementDate instead')
   final DateTime? slaughterDate;
 
   // ==================== NOTES ====================

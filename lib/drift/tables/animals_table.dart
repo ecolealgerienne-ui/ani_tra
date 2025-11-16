@@ -11,6 +11,13 @@ class AnimalsTable extends Table {
   // Multi-tenancy
   TextColumn get farmId => text().named('farm_id')();
 
+  // Localisation physique
+  /// Localisation physique actuelle de l'animal (peut différer de farmId)
+  /// NULL = animal chez son propriétaire (farmId)
+  /// Non-NULL = animal en mouvement temporaire (prêt, transhumance, etc.)
+  TextColumn get currentLocationFarmId =>
+      text().nullable().named('current_location_farm_id')();
+
   // Identifications
   TextColumn get currentEid => text().nullable().named('current_eid')();
   TextColumn get officialNumber => text().nullable().named('official_number')();
