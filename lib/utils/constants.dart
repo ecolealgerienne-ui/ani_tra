@@ -459,6 +459,72 @@ class AppConstants {
   static const double farmSettingsSectionSubtitleSize = 13.0;
 }
 
+// ==================== MOVEMENT TYPES ====================
+class MovementConstants {
+  // Types de mouvement principaux
+  static const String birth = 'birth';
+  static const String purchase = 'purchase';
+  static const String sale = 'sale';
+  static const String death = 'death';
+  static const String slaughter = 'slaughter';
+
+  // Nouveaux types - Mouvements temporaires (v2.0+)
+  static const String temporaryOut = 'temporaryOut';
+  static const String temporaryReturn = 'temporaryReturn';
+}
+
+// ==================== TEMPORARY MOVEMENT TYPES ====================
+class TemporaryMovementConstants {
+  /// Prêt d'animal (ex: bélier pour reproduction)
+  static const String loan = 'loan';
+
+  /// Transhumance (déplacement saisonnier vers pâturages)
+  static const String transhumance = 'transhumance';
+
+  /// Pension/Garde (animal confié temporairement)
+  static const String boarding = 'boarding';
+
+  /// Quarantaine (isolement sanitaire)
+  static const String quarantine = 'quarantine';
+
+  /// Exposition/Salon agricole
+  static const String exhibition = 'exhibition';
+
+  /// Vente à l'essai (période d'évaluation)
+  static const String trialSale = 'trial_sale';
+
+  /// Soins vétérinaires (animal chez le vétérinaire)
+  static const String veterinary = 'veterinary';
+}
+
+// ==================== BUYER TYPES ====================
+class BuyerTypeConstants {
+  /// Particulier/Individu
+  static const String individual = 'individual';
+
+  /// Ferme/Exploitation agricole
+  static const String farm = 'farm';
+
+  /// Commerçant/Négociant
+  static const String trader = 'trader';
+
+  /// Coopérative agricole
+  static const String cooperative = 'cooperative';
+}
+
+// ==================== ANIMAL STATUS (extended) ====================
+class AnimalStatusConstants {
+  // Statuts existants
+  static const String draft = 'draft';
+  static const String alive = 'alive';
+  static const String sold = 'sold';
+  static const String dead = 'dead';
+  static const String slaughtered = 'slaughtered';
+
+  // Nouveau statut (v2.0+)
+  static const String onTemporaryMovement = 'onTemporaryMovement';
+}
+
 // ==================== DATABASE ====================
 class DatabaseConstants {
   static const String dbName = 'animal_trace.db';

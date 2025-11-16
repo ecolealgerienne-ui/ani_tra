@@ -54,17 +54,17 @@ class LotProvider extends ChangeNotifier {
   List<Lot> get lots => List.unmodifiable(
       _allLots.where((l) => l.farmId == _authProvider.currentFarmId));
 
-  /// PHASE 1: MODIFY - Use status instead of completed
+  /// PHASE 1: MODIFY - Use status with backward-compat via Lot.isOpen
   List<Lot> get openLots =>
-      lots.where((l) => l.status == LotStatus.open).toList();
+      lots.where((l) => l.isOpen).toList();
 
-  /// PHASE 1: MODIFY - Use status instead of completed
+  /// PHASE 1: MODIFY - Use status with backward-compat via Lot.isClosed
   List<Lot> get closedLots =>
-      lots.where((l) => l.status == LotStatus.closed).toList();
+      lots.where((l) => l.isClosed).toList();
 
-  /// PHASE 1: ADD - Get archived lots
+  /// PHASE 1: ADD - Get archived lots via Lot.isArchived
   List<Lot> get archivedLots =>
-      lots.where((l) => l.status == LotStatus.archived).toList();
+      lots.where((l) => l.isArchived).toList();
 
   Lot? get activeLot => _activeLot;
   bool get isLoading => _isLoading;
@@ -479,8 +479,22 @@ class LotProvider extends ChangeNotifier {
     }).toList();
   }
 
+  /// PHASE 3: Utilise les champs structurés de Movement (buyerName, buyerFarmId, buyerType)
+  /// au lieu de stocker les données dans notes (deprecated)
+  ///
+  /// NOTE: Lecture légitime des champs Lot dépréciés pour migration vers Movement
   List<Movement> expandLotToSaleMovements(Lot lot) {
     if (lot.type != LotType.sale) return [];
+
+    // Détermine le type d'acheteur : 'farm' si buyerFarmId existe, sinon 'individual'
+    String? buyerType;
+    // ignore: deprecated_member_use
+    if (lot.buyerFarmId != null && lot.buyerFarmId!.isNotEmpty) {
+      buyerType = 'farm'; // BuyerTypeConstants.farm
+      // ignore: deprecated_member_use
+    } else if (lot.buyerName != null && lot.buyerName!.isNotEmpty) {
+      buyerType = 'individual'; // BuyerTypeConstants.individual
+    }
 
     return lot.animalIds.map((animalId) {
       return Movement(
@@ -488,9 +502,17 @@ class LotProvider extends ChangeNotifier {
         animalId: animalId,
         type: MovementType.sale,
         movementDate: lot.saleDate ?? DateTime.now(),
+        // ignore: deprecated_member_use
         toFarmId: lot.buyerFarmId,
         price: lot.pricePerAnimal,
-        notes: '$_buyerLabel ${lot.buyerName ?? AppConstants.notAvailable}',
+        // PHASE 3: Utilise les champs structurés au lieu de notes
+        // ignore: deprecated_member_use
+        buyerName: lot.buyerName,
+        // ignore: deprecated_member_use
+        buyerFarmId: lot.buyerFarmId,
+        buyerType: buyerType,
+        // Notes peuvent rester pour infos supplémentaires, mais pas pour données structurées
+        notes: null,
         synced: false,
         createdAt: DateTime.now(),
         farmId: lot.farmId,
@@ -498,6 +520,10 @@ class LotProvider extends ChangeNotifier {
     }).toList();
   }
 
+  /// PHASE 3: Utilise les champs structurés de Movement (slaughterhouseName, slaughterhouseId)
+  /// au lieu de stocker les données dans notes (deprecated)
+  ///
+  /// NOTE: Lecture légitime des champs Lot dépréciés pour migration vers Movement
   List<Movement> expandLotToSlaughterMovements(Lot lot) {
     if (lot.type != LotType.slaughter) return [];
 
@@ -507,8 +533,13 @@ class LotProvider extends ChangeNotifier {
         animalId: animalId,
         type: MovementType.slaughter,
         movementDate: lot.slaughterDate ?? DateTime.now(),
-        notes:
-            '$_slaughterhouseLabel ${lot.slaughterhouseName ?? AppConstants.notAvailable}',
+        // PHASE 3: Utilise les champs structurés au lieu de notes
+        // ignore: deprecated_member_use
+        slaughterhouseName: lot.slaughterhouseName,
+        // ignore: deprecated_member_use
+        slaughterhouseId: lot.slaughterhouseId,
+        // Notes peuvent rester pour infos supplémentaires, mais pas pour données structurées
+        notes: null,
         synced: false,
         createdAt: DateTime.now(),
         farmId: lot.farmId,

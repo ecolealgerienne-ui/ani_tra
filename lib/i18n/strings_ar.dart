@@ -878,6 +878,14 @@ const Map<String, String> stringsAr = {
   'scan': 'مسح',
   'home': 'الرئيسية',
 
+  // ============ حالة الحيوان ونظام المسودة ============
+  'draftStatus': 'مسودة',
+  'validatedStatus': 'مُصادق عليه',
+  'deadStatus': 'ميت',
+  'soldStatus': 'مُباع',
+  'slaughteredStatus': 'مذبوح',
+  'statusOnTemporaryMovement': 'في حركة مؤقتة',
+
   // ============ إعدادات المزرعة وإحصائيات التنبيهات ============
   'enabled': 'مُفعّلة',
   'disabled': 'مُعطّلة',

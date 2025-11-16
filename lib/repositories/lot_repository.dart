@@ -355,14 +355,18 @@ class LotRepository {
       withdrawalEndDate: drift.Value(lot.withdrawalEndDate),
       veterinarianId: drift.Value(lot.veterinarianId),
       veterinarianName: drift.Value(lot.veterinarianName),
-      // Sale fields
+      // Sale fields (deprecated fields maintained during transition period)
+      // ignore: deprecated_member_use
       buyerName: drift.Value(lot.buyerName),
+      // ignore: deprecated_member_use
       buyerFarmId: drift.Value(lot.buyerFarmId),
       totalPrice: drift.Value(lot.totalPrice),
       pricePerAnimal: drift.Value(lot.pricePerAnimal),
       saleDate: drift.Value(lot.saleDate),
-      // Slaughter fields
+      // Slaughter fields (deprecated fields maintained during transition period)
+      // ignore: deprecated_member_use
       slaughterhouseName: drift.Value(lot.slaughterhouseName),
+      // ignore: deprecated_member_use
       slaughterhouseId: drift.Value(lot.slaughterhouseId),
       slaughterDate: drift.Value(lot.slaughterDate),
       // Notes

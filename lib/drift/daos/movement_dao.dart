@@ -255,4 +255,177 @@ class MovementDao extends DatabaseAccessor<AppDatabase> with _$MovementDaoMixin 
         .getSingle();
     return result.read(movementsTable.price.sum()) ?? 0.0;
   }
+
+  // === PHASE 2: STRUCTURED SALE/SLAUGHTER QUERIES ===
+
+  /// Récupère les ventes par nom d'acheteur
+  ///
+  /// Utilise les nouveaux champs structurés (buyerName)
+  /// Recherche insensible à la casse
+  Future<List<MovementsTableData>> findSalesByBuyer(
+    String farmId,
+    String buyerName,
+  ) {
+    return (select(movementsTable)
+          ..where((t) => t.farmId.equals(farmId))
+          ..where((t) => t.type.equals('sale'))
+          ..where((t) => t.buyerName.like('%$buyerName%'))
+          ..where((t) => t.deletedAt.isNull())
+          ..orderBy([
+            (t) => OrderingTerm(
+                expression: t.movementDate, mode: OrderingMode.desc),
+          ]))
+        .get();
+  }
+
+  /// Récupère les ventes à une ferme spécifique
+  ///
+  /// Filtre par buyerFarmId (ventes B2B entre fermes)
+  Future<List<MovementsTableData>> findSalesByBuyerFarmId(
+    String farmId,
+    String buyerFarmId,
+  ) {
+    return (select(movementsTable)
+          ..where((t) => t.farmId.equals(farmId))
+          ..where((t) => t.type.equals('sale'))
+          ..where((t) => t.buyerFarmId.equals(buyerFarmId))
+          ..where((t) => t.deletedAt.isNull())
+          ..orderBy([
+            (t) => OrderingTerm(
+                expression: t.movementDate, mode: OrderingMode.desc),
+          ]))
+        .get();
+  }
+
+  /// Récupère les abattages par établissement
+  ///
+  /// Filtre par slaughterhouseId pour traçabilité
+  Future<List<MovementsTableData>> findSlaughtersByFacility(
+    String farmId,
+    String slaughterhouseId,
+  ) {
+    return (select(movementsTable)
+          ..where((t) => t.farmId.equals(farmId))
+          ..where((t) => t.type.equals('slaughter'))
+          ..where((t) => t.slaughterhouseId.equals(slaughterhouseId))
+          ..where((t) => t.deletedAt.isNull())
+          ..orderBy([
+            (t) => OrderingTerm(
+                expression: t.movementDate, mode: OrderingMode.desc),
+          ]))
+        .get();
+  }
+
+  /// Calcule le total des ventes à un acheteur sur une période
+  ///
+  /// Agrégation par buyerFarmId pour reporting B2B
+  Future<double> calculateTotalSalesByBuyer(
+    String farmId,
+    String buyerFarmId,
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
+    final result = await (selectOnly(movementsTable)
+          ..addColumns([movementsTable.price.sum()])
+          ..where(movementsTable.farmId.equals(farmId))
+          ..where(movementsTable.type.equals('sale'))
+          ..where(movementsTable.buyerFarmId.equals(buyerFarmId))
+          ..where(movementsTable.movementDate.isBiggerOrEqualValue(startDate))
+          ..where(movementsTable.movementDate.isSmallerOrEqualValue(endDate))
+          ..where(movementsTable.deletedAt.isNull()))
+        .getSingle();
+    return result.read(movementsTable.price.sum()) ?? 0.0;
+  }
+
+  // === PHASE 2: TEMPORARY MOVEMENT QUERIES ===
+
+  /// Récupère les mouvements temporaires actifs (non retournés)
+  ///
+  /// Filtre:
+  /// - type = 'temporaryOut'
+  /// - relatedMovementId IS NULL (pas encore de retour)
+  /// Tri par date de retour prévue (les plus urgents d'abord)
+  Future<List<MovementsTableData>> findActiveTemporaryMovements(
+    String farmId,
+  ) {
+    return (select(movementsTable)
+          ..where((t) => t.farmId.equals(farmId))
+          ..where((t) => t.type.equals('temporaryOut'))
+          ..where((t) => t.relatedMovementId.isNull())
+          ..where((t) => t.deletedAt.isNull())
+          ..orderBy([
+            (t) => OrderingTerm(
+                expression: t.expectedReturnDate, mode: OrderingMode.asc),
+          ]))
+        .get();
+  }
+
+  /// Récupère les mouvements temporaires en retard
+  ///
+  /// Filtre:
+  /// - type = 'temporaryOut'
+  /// - relatedMovementId IS NULL (pas encore retourné)
+  /// - expectedReturnDate < NOW (en retard)
+  /// Tri par urgence (plus ancien retard d'abord)
+  Future<List<MovementsTableData>> findOverdueTemporaryMovements(
+    String farmId,
+  ) {
+    final now = DateTime.now();
+    return (select(movementsTable)
+          ..where((t) => t.farmId.equals(farmId))
+          ..where((t) => t.type.equals('temporaryOut'))
+          ..where((t) => t.relatedMovementId.isNull())
+          ..where((t) => t.expectedReturnDate.isSmallerThanValue(now))
+          ..where((t) => t.deletedAt.isNull())
+          ..orderBy([
+            (t) => OrderingTerm(
+                expression: t.expectedReturnDate, mode: OrderingMode.asc),
+          ]))
+        .get();
+  }
+
+  /// Récupère les mouvements temporaires par type (loan, transhumance, etc.)
+  ///
+  /// Permet de filtrer par sous-type de mouvement temporaire
+  Future<List<MovementsTableData>> findTemporaryMovementsByType(
+    String farmId,
+    String temporaryMovementType,
+  ) {
+    return (select(movementsTable)
+          ..where((t) => t.farmId.equals(farmId))
+          ..where((t) => t.type.equals('temporaryOut'))
+          ..where((t) => t.temporaryMovementType.equals(temporaryMovementType))
+          ..where((t) => t.deletedAt.isNull())
+          ..orderBy([
+            (t) => OrderingTerm(
+                expression: t.movementDate, mode: OrderingMode.desc),
+          ]))
+        .get();
+  }
+
+  /// Compte les mouvements temporaires actifs
+  Future<int> countActiveTemporaryMovements(String farmId) async {
+    final result = await (selectOnly(movementsTable)
+          ..addColumns([movementsTable.id.count()])
+          ..where(movementsTable.farmId.equals(farmId))
+          ..where(movementsTable.type.equals('temporaryOut'))
+          ..where(movementsTable.relatedMovementId.isNull())
+          ..where(movementsTable.deletedAt.isNull()))
+        .getSingle();
+    return result.read(movementsTable.id.count()) ?? 0;
+  }
+
+  /// Compte les mouvements temporaires en retard
+  Future<int> countOverdueTemporaryMovements(String farmId) async {
+    final now = DateTime.now();
+    final result = await (selectOnly(movementsTable)
+          ..addColumns([movementsTable.id.count()])
+          ..where(movementsTable.farmId.equals(farmId))
+          ..where(movementsTable.type.equals('temporaryOut'))
+          ..where(movementsTable.relatedMovementId.isNull())
+          ..where(movementsTable.expectedReturnDate.isSmallerThanValue(now))
+          ..where(movementsTable.deletedAt.isNull()))
+        .getSingle();
+    return result.read(movementsTable.id.count()) ?? 0;
+  }
 }

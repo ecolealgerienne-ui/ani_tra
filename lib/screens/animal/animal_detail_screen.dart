@@ -289,6 +289,11 @@ class _StatusBadge extends StatelessWidget {
         label = AppLocalizations.of(context)
             .translate(AppStrings.statusSlaughtered);
         break;
+      case AnimalStatus.onTemporaryMovement:
+        color = Colors.blue;
+        label = AppLocalizations.of(context)
+            .translate(AppStrings.statusOnTemporaryMovement);
+        break;
     }
 
     return Container(
@@ -452,6 +457,9 @@ class _InfosTab extends StatelessWidget {
                       case AnimalStatus.slaughtered:
                         return AppLocalizations.of(context)
                             .translate(AppStrings.statusSlaughtered);
+                      case AnimalStatus.onTemporaryMovement:
+                        return AppLocalizations.of(context)
+                            .translate(AppStrings.statusOnTemporaryMovement);
                     }
                   }()),
               _InfoRow(

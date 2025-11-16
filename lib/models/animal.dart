@@ -7,7 +7,14 @@ import 'eid_change.dart';
 enum AnimalSex { male, female }
 
 /// Statut de l'animal
-enum AnimalStatus { draft, alive, sold, dead, slaughtered }
+enum AnimalStatus {
+  draft,
+  alive,
+  sold,
+  dead,
+  slaughtered,
+  onTemporaryMovement // Prêt, transhumance, pension, etc.
+}
 
 /// ModÃ¨le Animal avec traÃ§abilitÃ© EID complÃ¨te et support multi-espÃ¨ces
 ///
@@ -24,6 +31,11 @@ class Animal implements SyncableEntity {
   /// ID de la ferme (multi-tenancy)
   @override
   final String farmId;
+
+  /// Localisation physique actuelle de l'animal (peut différer de farmId)
+  /// NULL = animal chez son propriétaire (farmId)
+  /// Non-NULL = animal en mouvement temporaire (prêt, transhumance, etc.)
+  final String? currentLocationFarmId;
 
   /// EID actuel (Electronic IDentification) - Code RFID de la puce
   /// âœ… MODIFIABLE - Peut Ãªtre changÃ© si la puce est perdue/cassÃ©e
@@ -102,6 +114,7 @@ class Animal implements SyncableEntity {
   Animal({
     String? id,
     this.farmId = 'farm_default', // Valeur par dÃ©faut pour compatibilitÃ© mock
+    this.currentLocationFarmId,
     this.currentEid,
     this.eidHistory,
     this.officialNumber,
@@ -175,6 +188,21 @@ class Animal implements SyncableEntity {
 
   /// L'animal a-t-il des notes ?
   bool get hasNotes => notes != null && notes!.isNotEmpty;
+
+  // ==================== LOCALISATION (Mouvements Temporaires) ====================
+
+  /// ID du propriétaire légal
+  String get ownerId => farmId;
+
+  /// ID de la localisation physique actuelle
+  String get physicalLocationId => currentLocationFarmId ?? farmId;
+
+  /// Vérifie si l'animal est chez son propriétaire
+  bool get isAtOwnerLocation =>
+      currentLocationFarmId == null || currentLocationFarmId == farmId;
+
+  /// Vérifie si l'animal est en mouvement temporaire
+  bool get isOnTemporaryMovement => !isAtOwnerLocation;
 
   /// ðŸ†• PART3 - VALIDATION MÃˆRE
   /// Peut-elle Ãªtre mÃ¨re ?
@@ -282,6 +310,7 @@ class Animal implements SyncableEntity {
   Animal copyWith({
     String? id,
     String? farmId,
+    String? currentLocationFarmId,
     String? currentEid,
     List<EidChange>? eidHistory,
     String? officialNumber,
@@ -305,6 +334,8 @@ class Animal implements SyncableEntity {
     return Animal(
       id: id ?? this.id,
       farmId: farmId ?? this.farmId,
+      currentLocationFarmId:
+          currentLocationFarmId ?? this.currentLocationFarmId,
       currentEid: currentEid ?? this.currentEid,
       eidHistory: eidHistory ?? this.eidHistory,
       officialNumber: officialNumber ?? this.officialNumber,
@@ -351,6 +382,7 @@ class Animal implements SyncableEntity {
     return {
       'id': id,
       'farmId': farmId,
+      'current_location_farm_id': currentLocationFarmId,
       'current_eid': currentEid,
       'eid_history': eidHistory?.map((e) => e.toJson()).toList(),
       'official_number': officialNumber,
@@ -380,6 +412,8 @@ class Animal implements SyncableEntity {
       farmId: json['farmId'] as String? ??
           json['farm_id'] as String? ??
           'farm_default',
+      currentLocationFarmId: json['current_location_farm_id'] ??
+          json['currentLocationFarmId'],
       currentEid: json['current_eid'] ??
           json['currentEid'] ??
           json['eid'], // RÃ©trocompatibilitÃ©

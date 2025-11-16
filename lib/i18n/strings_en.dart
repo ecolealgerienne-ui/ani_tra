@@ -881,6 +881,14 @@ const Map<String, String> stringsEn = {
   'scan': 'Scan',
   'home': 'Home',
 
+  // ============ ANIMAL STATUS & DRAFT SYSTEM ============
+  'draftStatus': 'Draft',
+  'validatedStatus': 'Validated',
+  'deadStatus': 'Dead',
+  'soldStatus': 'Sold',
+  'slaughteredStatus': 'Slaughtered',
+  'statusOnTemporaryMovement': 'On temporary movement',
+
   // ============ FARM SETTINGS & ALERT STATS ============
   'enabled': 'Enabled',
   'disabled': 'Disabled',

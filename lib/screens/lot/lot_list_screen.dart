@@ -671,6 +671,7 @@ class _LotCard extends StatelessWidget {
               ),
             ],
 
+            // ignore: deprecated_member_use
             if (lot.type == LotType.sale && lot.buyerName != null) ...[
               const SizedBox(height: AppConstants.spacingSmall),
               Row(
@@ -679,6 +680,7 @@ class _LotCard extends StatelessWidget {
                       size: AppConstants.iconSizeSmall,
                       color: AppConstants.successGreen),
                   const SizedBox(width: AppConstants.spacingTiny),
+                  // ignore: deprecated_member_use
                   Text(
                     lot.buyerName!,
                     style: const TextStyle(
@@ -698,6 +700,7 @@ class _LotCard extends StatelessWidget {
               ),
             ],
 
+            // ignore: deprecated_member_use
             if (lot.type == LotType.slaughter &&
                 lot.slaughterhouseName != null) ...[
               const SizedBox(height: AppConstants.spacingSmall),
@@ -706,6 +709,7 @@ class _LotCard extends StatelessWidget {
                   const Icon(Icons.factory,
                       size: AppConstants.iconSizeSmall, color: Colors.grey),
                   const SizedBox(width: AppConstants.spacingTiny),
+                  // ignore: deprecated_member_use
                   Text(
                     lot.slaughterhouseName!,
                     style: const TextStyle(
