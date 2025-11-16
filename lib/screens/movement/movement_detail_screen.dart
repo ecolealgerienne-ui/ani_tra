@@ -606,7 +606,7 @@ class _AnimalInfoSection extends StatelessWidget {
       case AnimalStatus.slaughtered:
         return l10n.translate(AppStrings.slaughteredStatus);
       case AnimalStatus.onTemporaryMovement:
-        return l10n.translate(AppStrings.onTemporaryMovement);
+        return l10n.translate(AppStrings.statusOnTemporaryMovement);
     }
   }
 }

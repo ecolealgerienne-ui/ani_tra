@@ -334,7 +334,6 @@ const Map<String, String> stringsAr = {
   'sold': 'مباع',
   'dead': 'ميت',
   'slaughtered': 'مذبوح',
-  'onTemporaryMovement': 'في حركة مؤقتة',
 
   // الماسح
   'scanner': 'الماسح',
