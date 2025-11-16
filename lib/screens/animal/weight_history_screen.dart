@@ -102,7 +102,7 @@ class _WeightHistoryScreenState extends State<WeightHistoryScreen> {
 
                   // Source de mesure
                   DropdownButtonFormField<String>(
-                    value: _source,
+                    initialValue: _source,
                     decoration: InputDecoration(
                       labelText: AppLocalizations.of(context).translate(AppStrings.weightSource),
                       border: const OutlineInputBorder(),
@@ -189,13 +189,32 @@ class _WeightHistoryScreenState extends State<WeightHistoryScreen> {
     final farmId = context.read<AuthProvider>().currentFarmId;
 
     try {
+      // Parse source string to WeightSource enum
+      WeightSource weightSource;
+      switch (_source) {
+        case 'scale':
+          weightSource = WeightSource.scale;
+          break;
+        case 'manual':
+          weightSource = WeightSource.manual;
+          break;
+        case 'estimated':
+          weightSource = WeightSource.estimated;
+          break;
+        case 'veterinary':
+          weightSource = WeightSource.veterinary;
+          break;
+        default:
+          weightSource = WeightSource.manual;
+      }
+
       final weightRecord = WeightRecord(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         farmId: farmId,
         animalId: widget.animal.id,
         weight: weightValue,
         recordedAt: _recordedAt,
-        source: _source,
+        source: weightSource,
         notes: _notesController.text.isNotEmpty ? _notesController.text : null,
         createdAt: DateTime.now(),
       );

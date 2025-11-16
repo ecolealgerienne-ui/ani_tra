@@ -44,8 +44,6 @@ const Map<String, String> stringsEn = {
   'selectAnimal': 'Select animal',
   'weightSource': 'Measurement source',
   'notes': 'Notes',
-  'weightHistory': 'Weight history',
-  'addWeight': 'Add weight',
   'noWeightsRecorded': 'No weighings recorded',
   'previousWeight': 'Previous weight',
   'currentWeight': 'Current weight',

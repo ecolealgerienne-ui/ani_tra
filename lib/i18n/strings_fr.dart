@@ -48,8 +48,6 @@ const Map<String, String> stringsFr = {
   'weightSourceEstimated': 'Estimé',
   'weightSourceVeterinary': 'Vétérinaire',
   'notes': 'Notes',
-  'weightHistory': 'Historique des poids',
-  'addWeight': 'Ajouter un poids',
   'noWeightsRecorded': 'Aucune pesée enregistrée',
   'previousWeight': 'Poids précédent',
   'currentWeight': 'Poids actuel',
