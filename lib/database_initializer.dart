@@ -642,12 +642,12 @@ class DatabaseInitializer {
       }
 
       // ════════════════════════════════════════════════════════════
-      // LOTS (Open, Closed, Archived for Migration Testing)
+      // LOTS (Open)
       // ════════════════════════════════════════════════════════════
 
-      print('$_tag   📦 Creating varied lots...');
+      print('$_tag   📦 Creating lots...');
       try {
-        // 1. OPEN LOTS (actifs) - 3 lots
+        // OPEN LOTS (actifs) - 3 lots
         await db.lotDao.insertLot(LotsTableCompanion.insert(
           id: 'lot_open_treatment_001',
           farmId: 'farm_default',
@@ -684,106 +684,7 @@ class DatabaseInitializer {
           updatedAt: now,
         ));
 
-        // 2. CLOSED LOTS (fermés, pour test migration) - 4 lots
-        // Ces lots sont fermés MAIS n'ont PAS de Movement records
-        // Phase 5 migration utility va les détecter comme "orphelins"
-        await db.lotDao.insertLot(LotsTableCompanion.insert(
-          id: 'lot_closed_sale_orphan_001',
-          farmId: 'farm_default',
-          name: 'Vente Juillet 2024 (ORPHELIN)',
-          animalIdsJson: '["adult_007","adult_008"]',
-          status: const Value('closed'),
-          completed: const Value(true),
-          completedAt: Value(now.subtract(const Duration(days: 120))),
-          // Champs deprecated (Phase 4) - utilisés pour migration
-          buyerName: const Value('Coopérative Agricole du Midi'),
-          buyerFarmId: const Value.absent(),
-          pricePerAnimal: const Value(180.0),
-          synced: const Value(false),
-          createdAt: now.subtract(const Duration(days: 125)),
-          updatedAt: now.subtract(const Duration(days: 120)),
-        ));
-
-        await db.lotDao.insertLot(LotsTableCompanion.insert(
-          id: 'lot_closed_sale_orphan_002',
-          farmId: 'farm_default',
-          name: 'Vente Particulier Août (ORPHELIN)',
-          animalIdsJson: '["adult_009"]',
-          status: const Value('closed'),
-          completed: const Value(true),
-          completedAt: Value(now.subtract(const Duration(days: 90))),
-          // Champs deprecated
-          buyerName: const Value('M. Jean Petit'),
-          pricePerAnimal: const Value(210.0),
-          synced: const Value(false),
-          createdAt: now.subtract(const Duration(days: 95)),
-          updatedAt: now.subtract(const Duration(days: 90)),
-        ));
-
-        await db.lotDao.insertLot(LotsTableCompanion.insert(
-          id: 'lot_closed_slaughter_orphan_001',
-          farmId: 'farm_default',
-          name: 'Abattage Septembre 2024 (ORPHELIN)',
-          animalIdsJson: '["adult_010","adult_011"]',
-          status: const Value('closed'),
-          completed: const Value(true),
-          completedAt: Value(now.subtract(const Duration(days: 75))),
-          // Champs deprecated
-          slaughterhouseName: const Value('Abattoir de Montagne'),
-          slaughterhouseId: const Value('farm_slaughterhouse'),
-          synced: const Value(false),
-          createdAt: now.subtract(const Duration(days: 80)),
-          updatedAt: now.subtract(const Duration(days: 75)),
-        ));
-
-        await db.lotDao.insertLot(LotsTableCompanion.insert(
-          id: 'lot_closed_treatment_001',
-          farmId: 'farm_default',
-          name: 'Traitement Vaccinal Juin (Fermé)',
-          animalIdsJson: '["elderly_001","elderly_002","elderly_003"]',
-          status: const Value('closed'),
-          completed: const Value(true),
-          completedAt: Value(now.subtract(const Duration(days: 150))),
-          synced: const Value(false),
-          createdAt: now.subtract(const Duration(days: 155)),
-          updatedAt: now.subtract(const Duration(days: 150)),
-        ));
-
-        // 3. ARCHIVED LOTS (archivés, pour test migration) - 2 lots
-        await db.lotDao.insertLot(LotsTableCompanion.insert(
-          id: 'lot_archived_sale_orphan_001',
-          farmId: 'farm_default',
-          name: 'Vente Printemps 2024 (ARCHIVÉ ORPHELIN)',
-          animalIdsJson: '["adult_012","adult_013","adult_014"]',
-          status: const Value('archived'),
-          completed: const Value(true),
-          completedAt: Value(now.subtract(const Duration(days: 200))),
-          // Champs deprecated
-          buyerName: const Value('Ferme Bio Roussillon'),
-          buyerFarmId: const Value('farm_003'),
-          pricePerAnimal: const Value(195.0),
-          synced: const Value(false),
-          createdAt: now.subtract(const Duration(days: 210)),
-          updatedAt: now.subtract(const Duration(days: 200)),
-        ));
-
-        await db.lotDao.insertLot(LotsTableCompanion.insert(
-          id: 'lot_archived_slaughter_orphan_001',
-          farmId: 'farm_default',
-          name: 'Abattage Hiver 2023 (ARCHIVÉ ORPHELIN)',
-          animalIdsJson: '["adult_015"]',
-          status: const Value('archived'),
-          completed: const Value(true),
-          completedAt: Value(now.subtract(const Duration(days: 300))),
-          // Champs deprecated
-          slaughterhouseName: const Value('Abattoir de Montagne'),
-          slaughterhouseId: const Value('farm_slaughterhouse'),
-          synced: const Value(false),
-          createdAt: now.subtract(const Duration(days: 310)),
-          updatedAt: now.subtract(const Duration(days: 300)),
-        ));
-
-        print('$_tag   ✅ Created ${3 + 4 + 2} varied lots (3 open, 6 orphaned for migration)');
+        print('$_tag   ✅ Created 3 lots');
       } catch (e) {
         print('$_tag   ❌ Error creating lots: $e');
       }
@@ -1244,7 +1145,7 @@ class DatabaseInitializer {
       print('$_tag   - 5 Medical Products');
       print('$_tag   - 65 Animals (varied ages, statuses, species)');
       print('$_tag   - 31 Movements (all types with enriched data)');
-      print('$_tag   - 9 Lots (3 open, 6 orphaned for migration)');
+      print('$_tag   - 3 Lots (open)');
       print('$_tag   - 15 Treatments (active/expired withdrawal)');
       print('$_tag   - 11 Vaccinations (recent/batch/old)');
       print('$_tag   - 35 Weight Records (growth tracking)');
