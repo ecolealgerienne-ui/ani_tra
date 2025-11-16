@@ -7,13 +7,14 @@ import 'package:intl/intl.dart';
 import '../../providers/animal_provider.dart';
 import '../../providers/movement_provider.dart';
 import '../../providers/sync_provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../models/animal.dart';
 import '../../models/movement.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
 import '../animal/animal_detail_screen.dart';
-import '../scanner/scanner_screen.dart';
+import '../animal/animal_finder_screen.dart';
 
 class CreateTemporaryMovementScreen extends StatefulWidget {
   const CreateTemporaryMovementScreen({super.key});
@@ -40,32 +41,25 @@ class _CreateTemporaryMovementScreenState
   }
 
   Future<void> _scanAnimal() async {
-    final result = await Navigator.push<String>(
+    final result = await Navigator.push<List<Animal>>(
       context,
       MaterialPageRoute(
-        builder: (context) => const ScannerScreen(
+        builder: (context) => AnimalFinderScreen(
+          mode: AnimalFinderMode.single,
           title: 'Scanner l\'animal',
-          showManualInput: true,
+          allowedStatuses: const [AnimalStatus.alive],
         ),
       ),
     );
 
-    if (result != null && mounted) {
-      final animalProvider = context.read<AnimalProvider>();
-      final animal = animalProvider.findByEIDOrNumber(result);
-
-      if (animal != null) {
-        setState(() {
-          _selectedAnimal = animal;
-        });
-      } else {
-        _showError('Animal non trouvé avec l\'EID ou numéro: $result');
-      }
+    if (result != null && result.isNotEmpty && mounted) {
+      setState(() {
+        _selectedAnimal = result.first;
+      });
     }
   }
 
   Future<void> _selectDepartureDate() async {
-    final l10n = AppLocalizations.of(context);
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -118,12 +112,13 @@ class _CreateTemporaryMovementScreenState
     }
 
     try {
+      final authProvider = context.read<AuthProvider>();
       final movementProvider = context.read<MovementProvider>();
       final syncProvider = context.read<SyncProvider>();
 
       final movement = Movement(
         id: _generateId(),
-        farmId: context.read<AnimalProvider>().farmId,
+        farmId: authProvider.currentFarmId,
         animalId: _selectedAnimal!.id,
         type: MovementType.temporaryOut,
         movementDate: _selectedDepartureDate!,
@@ -137,7 +132,7 @@ class _CreateTemporaryMovementScreenState
         createdAt: DateTime.now(),
       );
 
-      await movementProvider.createMovement(movement);
+      await movementProvider.addMovement(movement);
       syncProvider.incrementPendingData();
 
       if (!mounted) return;
