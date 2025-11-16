@@ -63,8 +63,8 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
   void dispose() {
     _searchController.dispose();
     _rfidSubscription?.cancel();
-    // Arrêter le scanner RFID quand on quitte l'écran
-    _rfidProvider?.stopScanning();
+    // Arrêter le scanner RFID sans notifier (car le widget tree est verrouillé)
+    _rfidProvider?.stopScanning(notify: false);
     super.dispose();
   }
 
