@@ -10,7 +10,7 @@ import '../../providers/alert_configuration_provider.dart';
 import '../../models/farm.dart';
 import '../../models/veterinarian.dart';
 import '../../models/alert_configuration.dart';
-import '../../data/animal_config.dart';
+import '../../providers/species_provider.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
@@ -496,9 +496,10 @@ class _BreedingPreferencesSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final breedProvider = context.watch<BreedProvider>();
+    final speciesProvider = context.watch<SpeciesProvider>();
 
-    // ✅ Use real species data from AnimalConfig
-    final speciesOptions = AnimalConfig.availableSpecies
+    // ✅ Use real species data from SpeciesProvider
+    final speciesOptions = speciesProvider.availableSpecies
         .map((species) => {
               'id': species.id,
               'name': species.nameFr,

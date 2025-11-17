@@ -15,7 +15,7 @@ import '../../models/alert.dart';
 import '../../models/alert_type.dart';
 import '../../models/alert_category.dart';
 import '../../models/breed.dart';
-import '../../data/animal_config.dart';
+import '../../providers/species_provider.dart';
 
 import 'animal_detail_screen.dart';
 import 'add_animal_screen.dart';
@@ -1359,7 +1359,7 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                         AppLocalizations.of(context)
                             .translate(AppStrings.animalType),
                         style: const TextStyle(fontWeight: FontWeight.w600)),
-                    ...AnimalConfig.availableSpecies.map((species) {
+                    ...context.read<SpeciesProvider>().availableSpecies.map((species) {
                       return CheckboxListTile(
                         title: Text('${species.icon} ${species.nameFr}'),
                         value: _species.contains(species.id),

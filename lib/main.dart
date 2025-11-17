@@ -23,6 +23,7 @@ import 'providers/vaccination_reference_provider.dart';
 import 'providers/document_provider.dart';
 import 'providers/breeding_provider.dart';
 import 'providers/breed_provider.dart';
+import 'providers/species_provider.dart';
 import 'providers/auth_provider.dart';
 import 'providers/reminder_provider.dart';
 import 'providers/veterinarian_provider.dart';
@@ -48,6 +49,7 @@ import 'repositories/medical_product_repository.dart';
 import 'repositories/vaccination_repository.dart';
 import 'repositories/veterinarian_repository.dart';
 import 'repositories/breed_repository.dart';
+import 'repositories/species_repository.dart';
 import 'repositories/batch_repository.dart';
 import 'repositories/lot_repository.dart';
 import 'repositories/campaign_repository.dart';
@@ -110,6 +112,7 @@ void main() async {
   final vaccinationRepository = VaccinationRepository(database);
   final veterinarianRepository = VeterinarianRepository(database);
   final breedRepository = BreedRepository(database);
+  final speciesRepository = SpeciesRepository(database);
   final batchRepository = BatchRepository(database);
   final lotRepository = LotRepository(database);
   final campaignRepository = CampaignRepository(database);
@@ -129,6 +132,7 @@ void main() async {
     vaccinationRepository: vaccinationRepository,
     veterinarianRepository: veterinarianRepository,
     breedRepository: breedRepository,
+    speciesRepository: speciesRepository,
     batchRepository: batchRepository,
     lotRepository: lotRepository,
     campaignRepository: campaignRepository,
@@ -150,6 +154,7 @@ class MyApp extends StatelessWidget {
   final VaccinationRepository vaccinationRepository;
   final VeterinarianRepository veterinarianRepository;
   final BreedRepository breedRepository;
+  final SpeciesRepository speciesRepository;
   final BatchRepository batchRepository;
   final LotRepository lotRepository;
   final CampaignRepository campaignRepository;
@@ -170,6 +175,7 @@ class MyApp extends StatelessWidget {
     required this.vaccinationRepository,
     required this.veterinarianRepository,
     required this.breedRepository,
+    required this.speciesRepository,
     required this.batchRepository,
     required this.lotRepository,
     required this.campaignRepository,
@@ -194,6 +200,7 @@ class MyApp extends StatelessWidget {
         Provider<VaccinationRepository>.value(value: vaccinationRepository),
         Provider<VeterinarianRepository>.value(value: veterinarianRepository),
         Provider<BreedRepository>.value(value: breedRepository),
+        Provider<SpeciesRepository>.value(value: speciesRepository),
         Provider<BatchRepository>.value(value: batchRepository),
         Provider<LotRepository>.value(value: lotRepository),
         Provider<CampaignRepository>.value(value: campaignRepository),
@@ -231,6 +238,12 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProxyProvider<BreedRepository, BreedProvider>(
           create: (context) => BreedProvider(context.read<BreedRepository>()),
           update: (context, repo, previous) => previous ?? BreedProvider(repo),
+        ),
+
+        // === SpeciesProvider (lookup table, lecture seule) ===
+        ChangeNotifierProxyProvider<SpeciesRepository, SpeciesProvider>(
+          create: (context) => SpeciesProvider(context.read<SpeciesRepository>()),
+          update: (context, repo, previous) => previous ?? SpeciesProvider(repo),
         ),
 
         // === FarmProvider (Phase 1 - Farm Settings) ===

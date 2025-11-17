@@ -1,7 +1,7 @@
 // lib/models/animal_extensions.dart
 
 import 'animal.dart';
-import '../data/animal_config.dart';
+import '../providers/species_provider.dart';
 
 /// Extensions pour le modèle Animal
 ///
@@ -11,24 +11,27 @@ extension AnimalDisplayExtensions on Animal {
   // ==================== TYPE (SPECIES) ====================
 
   /// Obtenir le nom du type d'animal selon la locale
-  String getSpeciesName(String locale) {
+  /// Nécessite un SpeciesProvider pour charger les données depuis la DB
+  String getSpeciesName(String locale, SpeciesProvider? speciesProvider) {
     if (speciesId == null) return '';
-    return AnimalConfig.getSpeciesName(speciesId!, locale);
+    if (speciesProvider == null) return speciesId!;
+    return speciesProvider.getSpeciesName(speciesId!, locale);
   }
 
   /// Obtenir le nom du type en français
-  String get speciesNameFr => getSpeciesName('fr');
+  String speciesNameFr(SpeciesProvider? speciesProvider) => getSpeciesName('fr', speciesProvider);
 
   /// Obtenir le nom du type en anglais
-  String get speciesNameEn => getSpeciesName('en');
+  String speciesNameEn(SpeciesProvider? speciesProvider) => getSpeciesName('en', speciesProvider);
 
   /// Obtenir le nom du type en arabe
-  String get speciesNameAr => getSpeciesName('ar');
+  String speciesNameAr(SpeciesProvider? speciesProvider) => getSpeciesName('ar', speciesProvider);
 
   /// Obtenir l'icône du type
-  String get speciesIcon {
+  String speciesIcon(SpeciesProvider? speciesProvider) {
     if (speciesId == null) return '🐾';
-    return AnimalConfig.getSpeciesIcon(speciesId!);
+    if (speciesProvider == null) return '🐾';
+    return speciesProvider.getSpeciesIcon(speciesId!);
   }
 
   /// Vérifier si l'animal a un type défini
@@ -43,35 +46,35 @@ extension AnimalDisplayExtensions on Animal {
 
   /// Obtenir le texte du type (species only, breed requires BreedProvider)
   /// Pour afficher la race, utiliser BreedProvider.getById(animal.breedId)
-  String getSpeciesBreedDisplay(String locale) {
+  String getSpeciesBreedDisplay(String locale, SpeciesProvider? speciesProvider) {
     if (!hasSpecies) return '';
-    return getSpeciesName(locale);
+    return getSpeciesName(locale, speciesProvider);
   }
 
   /// Obtenir le type en français (species only)
-  String get speciesBreedDisplayFr => getSpeciesBreedDisplay('fr');
+  String speciesBreedDisplayFr(SpeciesProvider? speciesProvider) => getSpeciesBreedDisplay('fr', speciesProvider);
 
   /// Obtenir le type en anglais (species only)
-  String get speciesBreedDisplayEn => getSpeciesBreedDisplay('en');
+  String speciesBreedDisplayEn(SpeciesProvider? speciesProvider) => getSpeciesBreedDisplay('en', speciesProvider);
 
   /// Obtenir le type en arabe (species only)
-  String get speciesBreedDisplayAr => getSpeciesBreedDisplay('ar');
+  String speciesBreedDisplayAr(SpeciesProvider? speciesProvider) => getSpeciesBreedDisplay('ar', speciesProvider);
 
   /// Obtenir l'affichage avec icône : "🐑 Ovin"
   /// Pour inclure la race, utiliser BreedProvider.getById(animal.breedId)
-  String getFullDisplay(String locale) {
+  String getFullDisplay(String locale, SpeciesProvider? speciesProvider) {
     if (!hasSpecies) return '';
-    return '$speciesIcon ${getSpeciesName(locale)}';
+    return '${speciesIcon(speciesProvider)} ${getSpeciesName(locale, speciesProvider)}';
   }
 
   /// Obtenir l'affichage complet en français avec icône
-  String get fullDisplayFr => getFullDisplay('fr');
+  String fullDisplayFr(SpeciesProvider? speciesProvider) => getFullDisplay('fr', speciesProvider);
 
   /// Obtenir l'affichage complet en anglais avec icône
-  String get fullDisplayEn => getFullDisplay('en');
+  String fullDisplayEn(SpeciesProvider? speciesProvider) => getFullDisplay('en', speciesProvider);
 
   /// Obtenir l'affichage complet en arabe avec icône
-  String get fullDisplayAr => getFullDisplay('ar');
+  String fullDisplayAr(SpeciesProvider? speciesProvider) => getFullDisplay('ar', speciesProvider);
 
   // ==================== FORMATAGE POUR L'ÂGE ====================
 

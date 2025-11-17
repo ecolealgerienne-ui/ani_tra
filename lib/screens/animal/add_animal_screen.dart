@@ -16,7 +16,7 @@ import '../../providers/movement_provider.dart';
 import '../../providers/sync_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../providers/farm_preferences_provider.dart';
-import '../../data/animal_config.dart';
+import '../../providers/species_provider.dart';
 //import 'universal_scanner_screen.dart';
 import 'animal_finder_screen.dart';
 import '../../i18n/app_localizations.dart';
@@ -556,8 +556,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
             const SizedBox(height: AppConstants.spacingMedium),
 
             // Dropdown Type d'animal
-            Consumer<SettingsProvider>(
-              builder: (context, settingsProvider, child) {
+            Consumer2<SpeciesProvider, SettingsProvider>(
+              builder: (context, speciesProvider, settingsProvider, child) {
                 final locale = settingsProvider.locale;
 
                 return DropdownButtonFormField<String>(
@@ -570,7 +570,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                       color: Theme.of(context).primaryColor,
                     ),
                   ),
-                  items: AnimalConfig.availableSpecies.map((species) {
+                  items: speciesProvider.availableSpecies.map((species) {
                     return DropdownMenuItem(
                       value: species.id,
                       child: Text('${species.icon} ${species.getName(locale)}'),
