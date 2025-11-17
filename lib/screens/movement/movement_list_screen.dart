@@ -859,6 +859,119 @@ class _LotMovementCard extends StatelessWidget {
                 ],
               ),
 
+              // Informations spécifiques selon le type de lot
+              // VENTE : Acheteur
+              if (lot?.type == LotType.sale && lot?.buyerName != null) ...[
+                const SizedBox(height: AppConstants.spacingSmall),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.person,
+                      size: AppConstants.iconSizeSmall,
+                      color: Colors.grey[600],
+                    ),
+                    const SizedBox(width: AppConstants.spacingSmall),
+                    Expanded(
+                      child: Text(
+                        lot!.buyerName!,
+                        style: TextStyle(
+                          fontSize: AppConstants.fontSizeBody,
+                          color: Colors.grey[700],
+                          fontWeight: FontWeight.w500,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    // Type d'acheteur
+                    if (movements.isNotEmpty && movements.first.buyerType != null)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          _getBuyerTypeLabel(movements.first.buyerType!),
+                          style: const TextStyle(
+                            fontSize: AppConstants.fontSizeSmall,
+                            color: Colors.blue,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+
+              // ABATTAGE : Abattoir
+              if (lot?.type == LotType.slaughter &&
+                  movements.isNotEmpty &&
+                  movements.first.slaughterhouseName != null) ...[
+                const SizedBox(height: AppConstants.spacingSmall),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.business,
+                      size: AppConstants.iconSizeSmall,
+                      color: Colors.grey[600],
+                    ),
+                    const SizedBox(width: AppConstants.spacingSmall),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            movements.first.slaughterhouseName!,
+                            style: TextStyle(
+                              fontSize: AppConstants.fontSizeBody,
+                              color: Colors.grey[700],
+                              fontWeight: FontWeight.w500,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          if (movements.first.slaughterhouseId != null)
+                            Text(
+                              'Agrément: ${movements.first.slaughterhouseId}',
+                              style: TextStyle(
+                                fontSize: AppConstants.fontSizeSmall,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+
+              // ACHAT : Vendeur
+              if (lot?.type == LotType.purchase && lot?.sellerName != null) ...[
+                const SizedBox(height: AppConstants.spacingSmall),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.person_outline,
+                      size: AppConstants.iconSizeSmall,
+                      color: Colors.grey[600],
+                    ),
+                    const SizedBox(width: AppConstants.spacingSmall),
+                    Expanded(
+                      child: Text(
+                        'Vendeur: ${lot!.sellerName}',
+                        style: TextStyle(
+                          fontSize: AppConstants.fontSizeBody,
+                          color: Colors.grey[700],
+                          fontWeight: FontWeight.w500,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+
               // Date
               if (lot?.completedAt != null) ...[
                 const SizedBox(height: AppConstants.spacingSmall),
@@ -923,6 +1036,21 @@ class _LotMovementCard extends StatelessWidget {
         return Colors.green;
       case MovementStatus.archived:
         return Colors.grey;
+    }
+  }
+
+  String _getBuyerTypeLabel(String buyerType) {
+    switch (buyerType) {
+      case 'individual':
+        return 'Particulier';
+      case 'farm':
+        return 'Ferme';
+      case 'trader':
+        return 'Négociant';
+      case 'cooperative':
+        return 'Coopérative';
+      default:
+        return buyerType;
     }
   }
 }
