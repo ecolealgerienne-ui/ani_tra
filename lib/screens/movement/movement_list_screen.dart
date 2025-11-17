@@ -356,39 +356,21 @@ class _MovementListScreenState extends State<MovementListScreen> {
   /// Vue regroupée: Mouvements groupés par lot
   Widget _buildGroupedView(
       List<Movement> movements, LotProvider lotProvider, AppLocalizations l10n) {
-    // DEBUG: Log movements and lots
-    print('🔍 [GroupedView] Total movements: ${movements.length}');
-    print('🔍 [GroupedView] Available lots in provider: ${lotProvider.lots.length}');
-    for (final lot in lotProvider.lots) {
-      print('🔍 [GroupedView] Lot available: ${lot.id} - ${lot.name} (status: ${lot.status})');
-    }
-    print('🔍 [GroupedView] Movement details:');
-    for (final m in movements) {
-      print('  - Movement ${m.id}: animalId=${m.animalId}, lotId=${m.lotId}, type=${m.type}');
-    }
-
     // Séparer mouvements de lot vs individuels
     final lotMovements =
         movements.where((m) => m.lotId != null).toList();
     final individualMovements =
         movements.where((m) => m.lotId == null).toList();
 
-    print('🔍 [GroupedView] Movements with lotId: ${lotMovements.length}');
-    print('🔍 [GroupedView] Individual movements: ${individualMovements.length}');
-
     // Grouper par lotId
     final Map<String, List<Movement>> groupedByLot = {};
     for (final movement in lotMovements) {
       final lotId = movement.lotId!;
-      print('🔍 [GroupedView] Found movement with lotId: $lotId');
       if (!groupedByLot.containsKey(lotId)) {
         groupedByLot[lotId] = [];
       }
       groupedByLot[lotId]!.add(movement);
     }
-
-    print('🔍 [GroupedView] Number of lot groups: ${groupedByLot.length}');
-    print('🔍 [GroupedView] Lot IDs found: ${groupedByLot.keys.toList()}');
 
     return ListView(
       padding: const EdgeInsets.all(AppConstants.spacingMedium),
@@ -408,10 +390,6 @@ class _MovementListScreenState extends State<MovementListScreen> {
             final lotId = entry.key;
             final lotMovementsList = entry.value;
             final lot = lotProvider.getLotById(lotId);
-
-            print('🔍 [GroupedView] Creating card for lotId: $lotId');
-            print('🔍 [GroupedView] Lot found: ${lot != null ? lot.name : "NULL"}');
-            print('🔍 [GroupedView] Number of movements: ${lotMovementsList.length}');
 
             return _LotMovementCard(
               lot: lot,
