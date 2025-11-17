@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'dart:math';
 import '../../providers/animal_provider.dart';
+import '../../providers/movement_provider.dart';
 import '../../providers/sync_provider.dart';
 import '../../models/animal.dart';
 import '../../models/movement.dart';
@@ -93,6 +94,7 @@ class _DeathScreenState extends State<DeathScreen> {
     setState(() => _isConfirming = true);
 
     final animalProvider = context.read<AnimalProvider>();
+    final movementProvider = context.read<MovementProvider>();
     final syncProvider = context.read<SyncProvider>();
 
     try {
@@ -109,7 +111,7 @@ class _DeathScreenState extends State<DeathScreen> {
         createdAt: DateTime.now(),
       );
 
-      animalProvider.addMovement(movement);
+      await movementProvider.addMovement(movement);
 
       // ✅ Mettre à jour le statut de l'animal à "mort"
       // IMPORTANT: Attendre l'update (await) pour que le provider notifie les listeners

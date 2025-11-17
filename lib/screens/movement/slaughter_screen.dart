@@ -8,6 +8,7 @@ import '../../utils/constants.dart';
 import '../../models/animal.dart';
 import '../../models/movement.dart';
 import '../../providers/animal_provider.dart';
+import '../../providers/movement_provider.dart';
 import '../../providers/sync_provider.dart';
 
 class SlaughterScreen extends StatefulWidget {
@@ -51,6 +52,7 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
     setState(() => _isConfirming = true);
 
     final animalProvider = context.read<AnimalProvider>();
+    final movementProvider = context.read<MovementProvider>();
     final syncProvider = context.read<SyncProvider>();
 
     try {
@@ -67,7 +69,7 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
         createdAt: DateTime.now(),
       );
 
-      animalProvider.addMovement(movement);
+      await movementProvider.addMovement(movement);
 
       // Update animal status to slaughtered
       final updatedAnimal = animal.copyWith(status: AnimalStatus.slaughtered);
