@@ -1,5 +1,4 @@
 // lib/drift/daos/batch_dao.dart
-import 'dart:convert';
 import 'package:drift/drift.dart';
 import '../database.dart';
 import '../tables/batches_table.dart';
@@ -56,16 +55,7 @@ class BatchDao extends DatabaseAccessor<AppDatabase> with _$BatchDaoMixin {
         .get();
   }
 
-  // 6. Get batches containing a specific animal
-  Future<List<BatchesTableData>> findByAnimalId(
-      String animalId, String farmId) async {
-    final allBatches = await findAllByFarm(farmId);
-
-    return allBatches.where((batch) {
-      final animalIds = _decodeAnimalIds(batch.animalIdsJson);
-      return animalIds.contains(animalId);
-    }).toList();
-  }
+  // 6. [REMOVED] Get batches containing a specific animal - Use BatchAnimalDao instead
 
   // 7. Insert batch
   Future<int> insertBatch(BatchesTableCompanion batch) {
@@ -106,49 +96,9 @@ class BatchDao extends DatabaseAccessor<AppDatabase> with _$BatchDaoMixin {
     );
   }
 
-  // 11. Add animal to batch
-  Future<void> addAnimalToBatch(String batchId, String animalId, String farmId) async {
-    final batch = await findById(batchId, farmId);
-    if (batch == null) return;
+  // 11. [REMOVED] Add animal to batch - Use BatchAnimalDao.addAnimalToBatch() instead
 
-    final animalIds = _decodeAnimalIds(batch.animalIdsJson);
-    if (!animalIds.contains(animalId)) {
-      animalIds.add(animalId);
-
-      await (update(batchesTable)
-            ..where((t) => t.id.equals(batchId))
-            ..where((t) => t.farmId.equals(farmId)))
-          .write(
-        BatchesTableCompanion(
-          animalIdsJson: Value(_encodeAnimalIds(animalIds)),
-          synced: const Value(false),
-          updatedAt: Value(DateTime.now()),
-        ),
-      );
-    }
-  }
-
-  // 12. Remove animal from batch
-  Future<void> removeAnimalFromBatch(String batchId, String animalId, String farmId) async {
-    final batch = await findById(batchId, farmId);
-    if (batch == null) return;
-
-    final animalIds = _decodeAnimalIds(batch.animalIdsJson);
-    if (animalIds.contains(animalId)) {
-      animalIds.remove(animalId);
-
-      await (update(batchesTable)
-            ..where((t) => t.id.equals(batchId))
-            ..where((t) => t.farmId.equals(farmId)))
-          .write(
-        BatchesTableCompanion(
-          animalIdsJson: Value(_encodeAnimalIds(animalIds)),
-          synced: const Value(false),
-          updatedAt: Value(DateTime.now()),
-        ),
-      );
-    }
-  }
+  // 12. [REMOVED] Remove animal from batch - Use BatchAnimalDao.removeAnimalFromBatch() instead
 
   // 13. Count batches by farm
   Future<int> countByFarm(String farmId) async {
@@ -183,22 +133,6 @@ class BatchDao extends DatabaseAccessor<AppDatabase> with _$BatchDaoMixin {
   }
 
   // ==================== Helper Methods ====================
-
-  /// Encode List String to JSON string
-  String _encodeAnimalIds(List<String> animalIds) {
-    return jsonEncode(animalIds);
-  }
-
-  /// Decode JSON string to List String
-  List<String> _decodeAnimalIds(String jsonString) {
-    try {
-      final decoded = jsonDecode(jsonString);
-      if (decoded is List) {
-        return decoded.cast<String>();
-      }
-      return [];
-    } catch (e) {
-      return [];
-    }
-  }
+  // [REMOVED] _encodeAnimalIds and _decodeAnimalIds
+  // Use BatchAnimalDao for managing animals in batches
 }

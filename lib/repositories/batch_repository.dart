@@ -1,23 +1,27 @@
 // lib/repositories/batch_repository.dart
-import 'dart:convert';
 import '../models/batch.dart';
 import '../drift/database.dart';
 import '../drift/daos/batch_dao.dart';
+import '../drift/daos/batch_animal_dao.dart';
 import 'package:drift/drift.dart' as drift;
 
 /// Repository pour gérer la persistance des batches
 /// Phase 1C: Avec security checks farmId
+/// Phase 1D: Utilise batch_animals table de liaison
 class BatchRepository {
   final BatchDao _dao;
+  final BatchAnimalDao _batchAnimalDao;
 
-  BatchRepository(AppDatabase database) : _dao = database.batchDao;
+  BatchRepository(AppDatabase database)
+      : _dao = database.batchDao,
+        _batchAnimalDao = database.batchAnimalDao;
 
   // ==================== CRUD Operations ====================
 
   /// Récupérer tous les batches d'une ferme
   Future<List<Batch>> findAllByFarm(String farmId) async {
     final data = await _dao.findAllByFarm(farmId);
-    return data.map(_toBatch).toList();
+    return _toBatchesWithAnimals(data);
   }
 
   /// Récupérer un batch par son ID (avec vérification farmId)
@@ -30,19 +34,19 @@ class BatchRepository {
       throw Exception('Farm ID mismatch - Security violation');
     }
 
-    return _toBatch(data);
+    return _toBatchWithAnimals(data);
   }
 
   /// Récupérer les batches actifs (non complétés) d'une ferme
   Future<List<Batch>> findActiveByFarm(String farmId) async {
     final data = await _dao.findActiveByFarm(farmId);
-    return data.map(_toBatch).toList();
+    return _toBatchesWithAnimals(data);
   }
 
   /// Récupérer les batches complétés d'une ferme
   Future<List<Batch>> findCompletedByFarm(String farmId) async {
     final data = await _dao.findCompletedByFarm(farmId);
-    return data.map(_toBatch).toList();
+    return _toBatchesWithAnimals(data);
   }
 
   /// Récupérer les batches par objectif pour une ferme
@@ -50,13 +54,21 @@ class BatchRepository {
       BatchPurpose purpose, String farmId) async {
     final purposeString = purpose.name;
     final data = await _dao.findByPurposeAndFarm(purposeString, farmId);
-    return data.map(_toBatch).toList();
+    return _toBatchesWithAnimals(data);
   }
 
   /// Récupérer les batches contenant un animal spécifique
   Future<List<Batch>> findByAnimalId(String animalId, String farmId) async {
-    final data = await _dao.findByAnimalId(animalId, farmId);
-    return data.map(_toBatch).toList();
+    // Utiliser batch_animal_dao pour trouver les batches
+    final batchIds = await _batchAnimalDao.getBatchIdsForAnimal(animalId);
+    final batches = <Batch>[];
+    for (final batchId in batchIds) {
+      final batch = await findById(batchId, farmId);
+      if (batch != null) {
+        batches.add(batch);
+      }
+    }
+    return batches;
   }
 
   /// Créer un nouveau batch avec validation farmId
@@ -68,6 +80,12 @@ class BatchRepository {
 
     final companion = _toCompanion(batch, isUpdate: false);
     await _dao.insertBatch(companion);
+
+    // Sauvegarder les animalIds dans batch_animals
+    if (batch.animalIds.isNotEmpty) {
+      await _batchAnimalDao.addAnimalsToBatch(batch.id, batch.animalIds);
+    }
+
     return batch;
   }
 
@@ -86,6 +104,10 @@ class BatchRepository {
 
     final companion = _toCompanion(batch, isUpdate: true);
     await _dao.updateBatch(companion, farmId);
+
+    // Mettre à jour les animalIds dans batch_animals (remplacer tous)
+    await _batchAnimalDao.replaceAnimalsInBatch(batch.id, batch.animalIds);
+
     return batch;
   }
 
@@ -122,7 +144,7 @@ class BatchRepository {
       throw Exception('Batch not found or farm mismatch - Security violation');
     }
 
-    await _dao.addAnimalToBatch(batchId, animalId, farmId);
+    await _batchAnimalDao.addAnimalToBatch(batchId, animalId);
   }
 
   /// Retirer un animal du batch avec security check
@@ -134,7 +156,7 @@ class BatchRepository {
       throw Exception('Batch not found or farm mismatch - Security violation');
     }
 
-    await _dao.removeAnimalFromBatch(batchId, animalId, farmId);
+    await _batchAnimalDao.removeAnimalFromBatch(batchId, animalId);
   }
 
   /// Compter les batches d'une ferme
@@ -150,7 +172,7 @@ class BatchRepository {
   /// Récupérer les batches non synchronisés d'une ferme
   Future<List<Batch>> findUnsyncedByFarm(String farmId) async {
     final data = await _dao.findUnsyncedByFarm(farmId);
-    return data.map(_toBatch).toList();
+    return _toBatchesWithAnimals(data);
   }
 
   // ==================== Migration Support ====================
@@ -177,19 +199,27 @@ class BatchRepository {
 
   // ==================== Conversion Methods ====================
 
-  /// Convertir BatchesTableData en Batch
-  Batch _toBatch(BatchesTableData data) {
-    // Décoder le JSON des animal_ids
-    List<String> animalIds = [];
-    try {
-      final decoded = jsonDecode(data.animalIdsJson);
-      if (decoded is List) {
-        animalIds = decoded.cast<String>();
-      }
-    } catch (e) {
-      animalIds = [];
+  /// Helper: Convertir une liste de batches avec chargement des animaux
+  Future<List<Batch>> _toBatchesWithAnimals(
+      List<BatchesTableData> dataList) async {
+    final batches = <Batch>[];
+    for (final data in dataList) {
+      batches.add(await _toBatchWithAnimals(data));
     }
+    return batches;
+  }
 
+  /// Helper: Convertir un batch avec chargement des animaux depuis batch_animals
+  Future<Batch> _toBatchWithAnimals(BatchesTableData data) async {
+    // Charger les IDs des animaux depuis la table batch_animals
+    final animalIds = await _batchAnimalDao.getAnimalIdsForBatch(data.id);
+
+    return _toBatch(data, animalIds);
+  }
+
+  /// Phase 1D: Convertir BatchesTableData en Batch
+  /// NOTE: animalIds fournis en paramètre (chargés depuis batch_animals)
+  Batch _toBatch(BatchesTableData data, List<String> animalIds) {
     // Convertir le purpose string en enum
     BatchPurpose purpose;
     try {
@@ -215,17 +245,14 @@ class BatchRepository {
     );
   }
 
-  /// Convertir Batch en BatchesTableCompanion
+  /// Phase 1D: Convertir Batch en BatchesTableCompanion
+  /// NOTE: Les animalIds ne sont PAS stockés ici (gérés via batch_animals)
   BatchesTableCompanion _toCompanion(Batch batch, {required bool isUpdate}) {
-    // Encoder animal_ids en JSON
-    final animalIdsJson = jsonEncode(batch.animalIds);
-
     return BatchesTableCompanion(
       id: drift.Value(batch.id),
       farmId: drift.Value(batch.farmId),
       name: drift.Value(batch.name),
       purpose: drift.Value(batch.purpose.name),
-      animalIdsJson: drift.Value(animalIdsJson),
       usedAt: drift.Value(batch.usedAt),
       completed: drift.Value(batch.completed),
       notes: drift.Value(batch.notes),

@@ -15,10 +15,6 @@ class BatchesTable extends Table {
   TextColumn get name => text()();
   TextColumn get purpose => text()(); // sale, slaughter, treatment, other
 
-  // ⚠️ IMPORTANT: animal_ids stocké en JSON
-  // Exemple: '["animal-1", "animal-2", "animal-3"]'
-  TextColumn get animalIdsJson => text().named('animal_ids_json')();
-
   DateTimeColumn get usedAt => dateTime().nullable().named('used_at')();
   BoolColumn get completed => boolean().withDefault(const Constant(false))();
   TextColumn get notes => text().nullable()();

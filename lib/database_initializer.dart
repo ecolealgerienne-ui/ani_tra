@@ -1107,34 +1107,42 @@ class DatabaseInitializer {
           farmId: 'farm_default',
           purpose: 'treatment',
           name: 'Traitement Antiparasitaire Octobre',
-          animalIdsJson:
-              '["young_001","young_002","young_003","young_004","young_005"]',
           synced: const Value(false),
           createdAt: now.subtract(const Duration(days: 10)),
           updatedAt: now,
         ));
+        await db.batchAnimalDao.addAnimalsToBatch(
+          'batch_001',
+          ['young_001', 'young_002', 'young_003', 'young_004', 'young_005'],
+        );
 
         await db.batchDao.insertBatch(BatchesTableCompanion.insert(
           id: 'batch_002',
           farmId: 'farm_default',
           purpose: 'vaccination',
           name: 'Vaccination Ectima Printemps',
-          animalIdsJson: '["adult_001","adult_002","adult_003"]',
           synced: const Value(false),
           createdAt: now.subtract(const Duration(days: 60)),
           updatedAt: now.subtract(const Duration(days: 60)),
         ));
+        await db.batchAnimalDao.addAnimalsToBatch(
+          'batch_002',
+          ['adult_001', 'adult_002', 'adult_003'],
+        );
 
         await db.batchDao.insertBatch(BatchesTableCompanion.insert(
           id: 'batch_003',
           farmId: 'farm_default',
           purpose: 'weighing',
           name: 'Pesée Mensuelle Novembre',
-          animalIdsJson: '["newborn_001","newborn_002","newborn_003"]',
           synced: const Value(false),
           createdAt: now.subtract(const Duration(days: 2)),
           updatedAt: now,
         ));
+        await db.batchAnimalDao.addAnimalsToBatch(
+          'batch_003',
+          ['newborn_001', 'newborn_002', 'newborn_003'],
+        );
 
         print('$_tag   ✅ Created 3 batches');
       } catch (e) {
