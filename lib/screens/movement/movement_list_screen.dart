@@ -6,7 +6,9 @@ import 'package:intl/intl.dart';
 
 import '../../providers/movement_provider.dart';
 import '../../providers/animal_provider.dart';
+import '../../providers/lot_provider.dart';
 import '../../models/movement.dart';
+import '../../models/lot.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
@@ -22,6 +24,7 @@ class MovementListScreen extends StatefulWidget {
 
 class _MovementListScreenState extends State<MovementListScreen> {
   MovementType? _selectedTypeFilter;
+  bool _isGroupedByLot = false; // Toggle entre vue individuelle et regroupée
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +34,18 @@ class _MovementListScreenState extends State<MovementListScreen> {
       appBar: AppBar(
         title: Text(l10n.translate(AppStrings.movements)),
         actions: [
+          // Toggle vue individuelle / regroupée
+          IconButton(
+            icon: Icon(_isGroupedByLot ? Icons.list : Icons.group_work),
+            tooltip: _isGroupedByLot
+                ? 'Vue individuelle'
+                : 'Regrouper par lot',
+            onPressed: () {
+              setState(() {
+                _isGroupedByLot = !_isGroupedByLot;
+              });
+            },
+          ),
           // Bouton de filtrage par type
           PopupMenuButton<MovementType?>(
             icon: const Icon(Icons.filter_list),
@@ -176,14 +191,14 @@ class _MovementListScreenState extends State<MovementListScreen> {
 
           // Liste des mouvements
           Expanded(
-            child: Consumer<MovementProvider>(
-              builder: (context, provider, child) {
-                if (provider.isLoading) {
+            child: Consumer2<MovementProvider, LotProvider>(
+              builder: (context, movementProvider, lotProvider, child) {
+                if (movementProvider.isLoading) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
                 // Filtrer pour exclure les naissances (ce ne sont pas de vrais mouvements)
-                final movements = provider.filteredMovements
+                final movements = movementProvider.filteredMovements
                     .where((m) => m.type != MovementType.birth)
                     .toList();
 
@@ -219,29 +234,12 @@ class _MovementListScreenState extends State<MovementListScreen> {
                   );
                 }
 
+                // Vue conditionnelle: individuelle ou regroupée
                 return RefreshIndicator(
-                  onRefresh: () => provider.refresh(),
-                  child: ListView.separated(
-                    padding: const EdgeInsets.all(AppConstants.spacingMedium),
-                    itemCount: movements.length,
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: AppConstants.spacingSmall),
-                    itemBuilder: (context, index) {
-                      final movement = movements[index];
-                      return _MovementCard(
-                        movement: movement,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  MovementDetailScreen(movementId: movement.id),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  ),
+                  onRefresh: () => movementProvider.refresh(),
+                  child: _isGroupedByLot
+                      ? _buildGroupedView(movements, lotProvider, l10n)
+                      : _buildIndividualView(movements, l10n),
                 );
               },
             ),
@@ -328,6 +326,114 @@ class _MovementListScreenState extends State<MovementListScreen> {
       case MovementType.temporaryReturn:
         return l10n.translate(AppStrings.temporaryReturn);
     }
+  }
+
+  /// Vue individuelle: Liste de tous les mouvements
+  Widget _buildIndividualView(List<Movement> movements, AppLocalizations l10n) {
+    return ListView.separated(
+      padding: const EdgeInsets.all(AppConstants.spacingMedium),
+      itemCount: movements.length,
+      separatorBuilder: (context, index) =>
+          const SizedBox(height: AppConstants.spacingSmall),
+      itemBuilder: (context, index) {
+        final movement = movements[index];
+        return _MovementCard(
+          movement: movement,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    MovementDetailScreen(movementId: movement.id),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  /// Vue regroupée: Mouvements groupés par lot
+  Widget _buildGroupedView(
+      List<Movement> movements, LotProvider lotProvider, AppLocalizations l10n) {
+    // Séparer mouvements de lot vs individuels
+    final lotMovements =
+        movements.where((m) => m.lotId != null).toList();
+    final individualMovements =
+        movements.where((m) => m.lotId == null).toList();
+
+    // Grouper par lotId
+    final Map<String, List<Movement>> groupedByLot = {};
+    for (final movement in lotMovements) {
+      final lotId = movement.lotId!;
+      if (!groupedByLot.containsKey(lotId)) {
+        groupedByLot[lotId] = [];
+      }
+      groupedByLot[lotId]!.add(movement);
+    }
+
+    return ListView(
+      padding: const EdgeInsets.all(AppConstants.spacingMedium),
+      children: [
+        // Section 1: Mouvements de lots
+        if (groupedByLot.isNotEmpty) ...[
+          Text(
+            'Mouvements de lots',
+            style: TextStyle(
+              fontSize: AppConstants.fontSizeLarge,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[700],
+            ),
+          ),
+          const SizedBox(height: AppConstants.spacingMedium),
+          ...groupedByLot.entries.map((entry) {
+            final lotId = entry.key;
+            final lotMovementsList = entry.value;
+            final lot = lotProvider.getLotById(lotId);
+
+            return _LotMovementCard(
+              lot: lot,
+              lotId: lotId,
+              movements: lotMovementsList,
+              onTap: () {
+                // TODO: Naviguer vers détails du lot
+              },
+            );
+          }).toList(),
+          const SizedBox(height: AppConstants.spacingLarge),
+        ],
+
+        // Section 2: Mouvements individuels
+        if (individualMovements.isNotEmpty) ...[
+          Text(
+            'Mouvements individuels',
+            style: TextStyle(
+              fontSize: AppConstants.fontSizeLarge,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[700],
+            ),
+          ),
+          const SizedBox(height: AppConstants.spacingMedium),
+          ...individualMovements.map((movement) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: AppConstants.spacingSmall),
+              child: _MovementCard(
+                movement: movement,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          MovementDetailScreen(movementId: movement.id),
+                    ),
+                  );
+                },
+              ),
+            );
+          }).toList(),
+        ],
+      ],
+    );
   }
 }
 
@@ -563,6 +669,197 @@ class _MovementCard extends StatelessWidget {
         return l10n.translate(AppStrings.temporaryOuts);
       case MovementType.temporaryReturn:
         return l10n.translate(AppStrings.temporaryReturn);
+    }
+  }
+}
+
+/// Widget : Carte d'affichage d'un lot avec ses mouvements
+class _LotMovementCard extends StatelessWidget {
+  final Lot? lot;
+  final String lotId;
+  final List<Movement> movements;
+  final VoidCallback onTap;
+
+  const _LotMovementCard({
+    required this.lot,
+    required this.lotId,
+    required this.movements,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final movementType = movements.isNotEmpty ? movements.first.type : null;
+    final movementStatus = movements.isNotEmpty ? movements.first.status : null;
+
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
+        child: Padding(
+          padding: const EdgeInsets.all(AppConstants.spacingMedium),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header: Nom du lot + type
+              Row(
+                children: [
+                  Icon(
+                    _getTypeIcon(lot?.type),
+                    color: _getTypeColor(lot?.type),
+                    size: AppConstants.iconSizeLarge,
+                  ),
+                  const SizedBox(width: AppConstants.spacingSmall),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          lot?.name ?? 'Lot inconnu',
+                          style: const TextStyle(
+                            fontSize: AppConstants.fontSizeLarge,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        if (lot?.type != null)
+                          Text(
+                            lot!.type!.label,
+                            style: TextStyle(
+                              fontSize: AppConstants.fontSizeBody,
+                              color: _getTypeColor(lot?.type),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  // Badge statut
+                  if (movementStatus != null)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppConstants.spacingSmall,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _getStatusColor(movementStatus).withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
+                      ),
+                      child: Text(
+                        movementStatus.name,
+                        style: TextStyle(
+                          color: _getStatusColor(movementStatus),
+                          fontSize: AppConstants.fontSizeSmall,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: AppConstants.spacingMedium),
+
+              // Infos: nombre d'animaux + prix total
+              Row(
+                children: [
+                  Icon(
+                    Icons.pets,
+                    size: AppConstants.iconSizeRegular,
+                    color: Colors.grey[600],
+                  ),
+                  const SizedBox(width: AppConstants.spacingXSmall),
+                  Text(
+                    '${movements.length} animaux',
+                    style: TextStyle(
+                      fontSize: AppConstants.fontSizeBody,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                  if (lot?.priceTotal != null) ...[
+                    const SizedBox(width: AppConstants.spacingMedium),
+                    Icon(
+                      Icons.euro,
+                      size: AppConstants.iconSizeRegular,
+                      color: Colors.green[700],
+                    ),
+                    const SizedBox(width: AppConstants.spacingXSmall),
+                    Text(
+                      '${lot!.priceTotal!.toStringAsFixed(2)}€',
+                      style: TextStyle(
+                        fontSize: AppConstants.fontSizeBody,
+                        color: Colors.green[700],
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+
+              // Date
+              if (lot?.completedAt != null) ...[
+                const SizedBox(height: AppConstants.spacingSmall),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_today,
+                      size: AppConstants.iconSizeSmall,
+                      color: Colors.grey[600],
+                    ),
+                    const SizedBox(width: AppConstants.spacingXSmall),
+                    Text(
+                      DateFormat('dd/MM/yyyy').format(lot!.completedAt!),
+                      style: TextStyle(
+                        fontSize: AppConstants.fontSizeSmall,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  IconData _getTypeIcon(LotType? type) {
+    if (type == null) return Icons.help_outline;
+    switch (type) {
+      case LotType.treatment:
+        return Icons.medical_services;
+      case LotType.purchase:
+        return Icons.shopping_cart;
+      case LotType.sale:
+        return Icons.sell;
+      case LotType.slaughter:
+        return Icons.content_cut;
+    }
+  }
+
+  Color _getTypeColor(LotType? type) {
+    if (type == null) return Colors.grey;
+    switch (type) {
+      case LotType.treatment:
+        return AppConstants.primaryBlue;
+      case LotType.purchase:
+        return Colors.blue;
+      case LotType.sale:
+        return AppConstants.successGreen;
+      case LotType.slaughter:
+        return Colors.purple;
+    }
+  }
+
+  Color _getStatusColor(MovementStatus status) {
+    switch (status) {
+      case MovementStatus.ongoing:
+        return Colors.orange;
+      case MovementStatus.closed:
+        return Colors.green;
+      case MovementStatus.archived:
+        return Colors.grey;
     }
   }
 }
