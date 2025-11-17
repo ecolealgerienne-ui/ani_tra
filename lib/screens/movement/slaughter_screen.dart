@@ -46,9 +46,6 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
   Future<void> _confirmSlaughter() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final animal = widget.animal;
-    if (animal == null) return;
-
     setState(() => _isConfirming = true);
 
     final animalProvider = context.read<AnimalProvider>();
@@ -59,23 +56,58 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
       // Build notes with slaughterhouse info
       final notesText = 'Abattoir: ${_slaughterhouseNameController.text}${_slaughterhouseIdController.text.isNotEmpty ? ' (N°${_slaughterhouseIdController.text})' : ''}';
 
-      // Create slaughter movement
-      final movement = Movement(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        animalId: animal.id,
-        type: MovementType.slaughter,
-        movementDate: _slaughterDate,
-        notes: notesText,
-        createdAt: DateTime.now(),
-      );
+      // Cas 1 : Un seul animal passé directement
+      if (widget.animal != null) {
+        final animal = widget.animal!;
 
-      await movementProvider.addMovement(movement);
+        // Create slaughter movement
+        final movement = Movement(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          animalId: animal.id,
+          type: MovementType.slaughter,
+          movementDate: _slaughterDate,
+          notes: notesText,
+          createdAt: DateTime.now(),
+        );
 
-      // Update animal status to slaughtered
-      final updatedAnimal = animal.copyWith(status: AnimalStatus.slaughtered);
-      await animalProvider.updateAnimal(updatedAnimal);
+        await movementProvider.addMovement(movement);
 
-      syncProvider.incrementPendingData();
+        // Update animal status to slaughtered
+        final updatedAnimal = animal.copyWith(status: AnimalStatus.slaughtered);
+        await animalProvider.updateAnimal(updatedAnimal);
+
+        syncProvider.incrementPendingData();
+      }
+      // Cas 2 : Plusieurs animaux depuis un lot
+      else if (widget.animalIds != null && widget.animalIds!.isNotEmpty) {
+        for (final animalId in widget.animalIds!) {
+          final animal = animalProvider.getAnimalById(animalId);
+          if (animal == null) continue;
+
+          // Create slaughter movement for each animal
+          final movement = Movement(
+            id: '${DateTime.now().millisecondsSinceEpoch}_$animalId',
+            animalId: animal.id,
+            type: MovementType.slaughter,
+            movementDate: _slaughterDate,
+            notes: notesText,
+            createdAt: DateTime.now(),
+          );
+
+          await movementProvider.addMovement(movement);
+
+          // Update animal status to slaughtered
+          final updatedAnimal = animal.copyWith(status: AnimalStatus.slaughtered);
+          await animalProvider.updateAnimal(updatedAnimal);
+
+          syncProvider.incrementPendingData();
+        }
+      } else {
+        // Aucun animal à traiter
+        if (!mounted) return;
+        setState(() => _isConfirming = false);
+        return;
+      }
 
       if (!mounted) return;
 
