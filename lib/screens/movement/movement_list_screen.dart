@@ -54,16 +54,6 @@ class _MovementListScreenState extends State<MovementListScreen> {
               ),
               const PopupMenuDivider(),
               PopupMenuItem<MovementType>(
-                value: MovementType.birth,
-                child: Row(
-                  children: [
-                    const Icon(Icons.child_care, color: Colors.green),
-                    const SizedBox(width: AppConstants.spacingSmall),
-                    Text(l10n.translate(AppStrings.births)),
-                  ],
-                ),
-              ),
-              PopupMenuItem<MovementType>(
                 value: MovementType.purchase,
                 child: Row(
                   children: [
@@ -175,7 +165,10 @@ class _MovementListScreenState extends State<MovementListScreen> {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                final movements = provider.filteredMovements;
+                // Filtrer pour exclure les naissances (ce ne sont pas de vrais mouvements)
+                final movements = provider.filteredMovements
+                    .where((m) => m.type != MovementType.birth)
+                    .toList();
 
                 if (movements.isEmpty) {
                   return Center(
