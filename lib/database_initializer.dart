@@ -759,29 +759,7 @@ class DatabaseInitializer {
           ));
         }
 
-        // 6. TEMPORARY RETURN (retours) - 2 mouvements (les 2 premiers sont revenus)
-        for (int i = 1; i <= 2; i++) {
-          await db.movementDao.insertItem(MovementsTableCompanion.insert(
-            id: 'mov_temp_return_${i.toString().padLeft(3, '0')}',
-            farmId: 'farm_default',
-            animalId: 'temp_mov_${i.toString().padLeft(3, '0')}',
-            movementDate: now.subtract(Duration(days: 5 + i)),
-            type: 'temporaryReturn',
-            status: 'closed', // Temporary returns are immediately closed
-            fromFarmId: Value(['farm_002', 'farm_003'][i % 2]),
-            // Phase 3: Lien bidirectionnel
-            isTemporary: const Value(true),
-            temporaryMovementType: const Value('return'),
-            relatedMovementId:
-                Value('mov_temp_out_${i.toString().padLeft(3, '0')}'),
-            notes: const Value('Retour de mouvement temporaire'),
-            synced: const Value(false),
-            createdAt: now,
-            updatedAt: now,
-          ));
-        }
-
-        // 7. DEATH MOVEMENTS (morts naturelles) - 2 mouvements
+        // 6. DEATH MOVEMENTS (morts naturelles) - 2 mouvements
         for (int i = 1; i <= 2; i++) {
           await db.movementDao.insertItem(MovementsTableCompanion.insert(
             id: 'mov_death_${i.toString().padLeft(3, '0')}',
@@ -797,7 +775,7 @@ class DatabaseInitializer {
           ));
         }
 
-        print('$_tag   ✅ Created ${5 + 5 + 3 + 4 + 2 + 2} comprehensive movements (births excluded)');
+        print('$_tag   ✅ Created ${5 + 5 + 3 + 4 + 2} comprehensive movements (births excluded)');
       } catch (e) {
         print('$_tag   ❌ Error creating movements: $e');
       }
@@ -1303,7 +1281,7 @@ class DatabaseInitializer {
       print('$_tag   - 3 Veterinarians');
       print('$_tag   - 5 Medical Products');
       print('$_tag   - 65 Animals (varied ages, statuses, species)');
-      print('$_tag   - 31 Movements (all types with enriched data)');
+      print('$_tag   - 29 Movements (all types with enriched data)');
       print('$_tag   - 3 Lots (open)');
       print('$_tag   - 15 Treatments (active/expired withdrawal)');
       print('$_tag   - 11 Vaccinations (recent/batch/old)');
