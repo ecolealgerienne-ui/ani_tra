@@ -1,5 +1,4 @@
 // lib/drift/daos/lot_dao.dart
-import 'dart:convert';
 import 'package:drift/drift.dart';
 import '../database.dart';
 import '../tables/lots_table.dart';
@@ -84,16 +83,7 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
         .get();
   }
 
-  // 7. Get lots containing a specific animal
-  Future<List<LotsTableData>> findByAnimalId(
-      String animalId, String farmId) async {
-    final allLots = await findAllByFarm(farmId);
-
-    return allLots.where((lot) {
-      final animalIds = _decodeAnimalIds(lot.animalIdsJson);
-      return animalIds.contains(animalId);
-    }).toList();
-  }
+  // 7. [REMOVED] Get lots containing a specific animal - Use LotAnimalDao instead
 
   // 8. Get treatment lots by product for a farm
   Future<List<LotsTableData>> findByProductId(String productId, String farmId) {
@@ -178,51 +168,9 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
     );
   }
 
-  // 14. Add animal to lot
-  Future<void> addAnimalToLot(
-      String lotId, String animalId, String farmId) async {
-    final lot = await findById(lotId, farmId);
-    if (lot == null) return;
+  // 14. [REMOVED] Add animal to lot - Use LotAnimalDao.addAnimalToLot() instead
 
-    final animalIds = _decodeAnimalIds(lot.animalIdsJson);
-    if (!animalIds.contains(animalId)) {
-      animalIds.add(animalId);
-
-      await (update(lotsTable)
-            ..where((t) => t.id.equals(lotId))
-            ..where((t) => t.farmId.equals(farmId)))
-          .write(
-        LotsTableCompanion(
-          animalIdsJson: Value(_encodeAnimalIds(animalIds)),
-          synced: const Value(false),
-          updatedAt: Value(DateTime.now()),
-        ),
-      );
-    }
-  }
-
-  // 15. Remove animal from lot
-  Future<void> removeAnimalFromLot(
-      String lotId, String animalId, String farmId) async {
-    final lot = await findById(lotId, farmId);
-    if (lot == null) return;
-
-    final animalIds = _decodeAnimalIds(lot.animalIdsJson);
-    if (animalIds.contains(animalId)) {
-      animalIds.remove(animalId);
-
-      await (update(lotsTable)
-            ..where((t) => t.id.equals(lotId))
-            ..where((t) => t.farmId.equals(farmId)))
-          .write(
-        LotsTableCompanion(
-          animalIdsJson: Value(_encodeAnimalIds(animalIds)),
-          synced: const Value(false),
-          updatedAt: Value(DateTime.now()),
-        ),
-      );
-    }
-  }
+  // 15. [REMOVED] Remove animal from lot - Use LotAnimalDao.removeAnimalFromLot() instead
 
   // 16. Set lot type
   Future<int> setLotType(String id, String type, String farmId) {
@@ -307,22 +255,6 @@ class LotDao extends DatabaseAccessor<AppDatabase> with _$LotDaoMixin {
   }
 
   // ==================== Helper Methods ====================
-
-  /// Encode List String to JSON string
-  String _encodeAnimalIds(List<String> animalIds) {
-    return jsonEncode(animalIds);
-  }
-
-  /// Decode JSON string to List String
-  List<String> _decodeAnimalIds(String jsonString) {
-    try {
-      final decoded = jsonDecode(jsonString);
-      if (decoded is List) {
-        return decoded.cast<String>();
-      }
-      return [];
-    } catch (e) {
-      return [];
-    }
-  }
+  // [REMOVED] _encodeAnimalIds and _decodeAnimalIds
+  // Use LotAnimalDao for managing animals in lots
 }

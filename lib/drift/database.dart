@@ -34,6 +34,7 @@ import 'tables/veterinarians_table.dart';
 // Complex Tables
 import 'tables/batches_table.dart';
 import 'tables/lots_table.dart';
+import 'tables/lot_animals_table.dart';
 import 'tables/campaigns_table.dart';
 
 // Alert Configuration Table (Phase 1B)
@@ -70,6 +71,7 @@ import 'daos/veterinarian_dao.dart';
 // Complex DAOs
 import 'daos/batch_dao.dart';
 import 'daos/lot_dao.dart';
+import 'daos/lot_animal_dao.dart';
 import 'daos/campaign_dao.dart';
 // Alert Configuration DAO (Phase 1B)
 import 'daos/alert_configuration_dao.dart';
@@ -122,6 +124,7 @@ part 'database.g.dart';
     // ────────────────────────────────────────────────────────
     BatchesTable,
     LotsTable,
+    LotAnimalsTable,
     CampaignsTable,
 
     // Alert Configuration (Phase 1B)
@@ -168,6 +171,7 @@ part 'database.g.dart';
     // ────────────────────────────────────────────────────────
     BatchDao,
     LotDao,
+    LotAnimalDao,
     CampaignDao,
 
     // Alert Configuration (Phase 1B)
@@ -183,7 +187,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   // ═══════════════════════════════════════════════════════════
   // MIGRATION STRATEGY
@@ -232,6 +236,7 @@ class AppDatabase extends _$AppDatabase {
           // ───────────────────────────────────────────────────
           await _createBatchesIndexes();
           await _createLotsIndexes();
+          await _createLotAnimalsIndexes();
           await _createCampaignsIndexes();
 
           // ───────────────────────────────────────────────────
@@ -257,6 +262,13 @@ class AppDatabase extends _$AppDatabase {
           // ───────────────────────────────────────────────────
           if (from < 3) {
             await _migrateToV3AddMovementStatus();
+          }
+
+          // ───────────────────────────────────────────────────
+          // MIGRATION v3 → v4: Lots refactoring (liaison table + new fields)
+          // ───────────────────────────────────────────────────
+          if (from < 4) {
+            await _migrateToV4LotsRefactoring();
           }
         },
       );
@@ -859,6 +871,25 @@ class AppDatabase extends _$AppDatabase {
     //     'CREATE INDEX IF NOT EXISTS idx_lots_deleted_at ON lots(deleted_at);');
   }
 
+  /// Créer les indexes pour la table lot_animals (liaison table)
+  Future<void> _createLotAnimalsIndexes() async {
+    // Index sur lot_id (recherche animaux d'un lot)
+    await customStatement(
+        'CREATE INDEX idx_lot_animals_lot_id ON lot_animals(lot_id);');
+
+    // Index sur animal_id (recherche lots contenant un animal)
+    await customStatement(
+        'CREATE INDEX idx_lot_animals_animal_id ON lot_animals(animal_id);');
+
+    // Index sur added_at (tri chronologique d'ajout)
+    await customStatement(
+        'CREATE INDEX idx_lot_animals_added_at ON lot_animals(added_at);');
+
+    // Index composite lot_id + added_at (listing animaux d'un lot par ordre d'ajout)
+    await customStatement(
+        'CREATE INDEX idx_lot_animals_lot_added ON lot_animals(lot_id, added_at);');
+  }
+
   /// Créer les indexes pour la table campaigns
   Future<void> _createCampaignsIndexes() async {
     // Index sur farm_id (multi-tenancy - CRITIQUE)
@@ -1244,6 +1275,101 @@ class AppDatabase extends _$AppDatabase {
     // Note: Les sales, purchases et temporaryOut sans retour restent 'ongoing' (valeur par défaut)
   }
 
+  /// Migration v3 → v4: Lots refactoring
+  ///
+  /// Cette migration:
+  /// 1. Crée la table lot_animals (liaison many-to-many)
+  /// 2. Ajoute les colonnes price_total, buyer_name, seller_name à lots
+  /// 3. Supprime la colonne animal_ids_json de lots (MVP - pas de migration de données)
+  Future<void> _migrateToV4LotsRefactoring() async {
+    // Étape 1: Créer la table lot_animals
+    await customStatement('''
+      CREATE TABLE lot_animals (
+        lot_id TEXT NOT NULL,
+        animal_id TEXT NOT NULL,
+        added_at INTEGER NOT NULL,
+        PRIMARY KEY (lot_id, animal_id),
+        FOREIGN KEY (lot_id) REFERENCES lots(id) ON DELETE CASCADE,
+        FOREIGN KEY (animal_id) REFERENCES animals(id) ON DELETE CASCADE
+      );
+    ''');
+
+    // Étape 2: Créer les indexes pour lot_animals
+    await _createLotAnimalsIndexes();
+
+    // Étape 3: Ajouter les nouvelles colonnes à lots
+    await customStatement(
+      'ALTER TABLE lots ADD COLUMN price_total REAL;',
+    );
+    await customStatement(
+      'ALTER TABLE lots ADD COLUMN buyer_name TEXT;',
+    );
+    await customStatement(
+      'ALTER TABLE lots ADD COLUMN seller_name TEXT;',
+    );
+
+    // Étape 4: Supprimer la colonne animal_ids_json (SQLite ne supporte pas DROP COLUMN en v3.35.5)
+    // On doit recréer la table sans cette colonne
+    await customStatement('PRAGMA foreign_keys = OFF;');
+
+    // Créer nouvelle table lots sans animal_ids_json
+    await customStatement('''
+      CREATE TABLE lots_new (
+        id TEXT NOT NULL PRIMARY KEY,
+        farm_id TEXT NOT NULL,
+        name TEXT NOT NULL,
+        type TEXT,
+        status TEXT,
+        completed INTEGER NOT NULL DEFAULT 0,
+        completed_at INTEGER,
+        product_id TEXT,
+        product_name TEXT,
+        treatment_date INTEGER,
+        withdrawal_end_date INTEGER,
+        veterinarian_id TEXT,
+        veterinarian_name TEXT,
+        price_total REAL,
+        buyer_name TEXT,
+        seller_name TEXT,
+        notes TEXT,
+        synced INTEGER NOT NULL DEFAULT 0,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        last_synced_at INTEGER,
+        server_version TEXT,
+        FOREIGN KEY (farm_id) REFERENCES farms(id) ON DELETE CASCADE
+      );
+    ''');
+
+    // Copier les données (sans animal_ids_json)
+    await customStatement('''
+      INSERT INTO lots_new (
+        id, farm_id, name, type, status, completed, completed_at,
+        product_id, product_name, treatment_date, withdrawal_end_date,
+        veterinarian_id, veterinarian_name,
+        price_total, buyer_name, seller_name, notes,
+        synced, created_at, updated_at, last_synced_at, server_version
+      )
+      SELECT
+        id, farm_id, name, type, status, completed, completed_at,
+        product_id, product_name, treatment_date, withdrawal_end_date,
+        veterinarian_id, veterinarian_name,
+        NULL, NULL, NULL, notes,
+        synced, created_at, updated_at, last_synced_at, server_version
+      FROM lots;
+    ''');
+
+    // Supprimer l'ancienne table et renommer
+    await customStatement('DROP TABLE lots;');
+    await customStatement('ALTER TABLE lots_new RENAME TO lots;');
+
+    // Recréer les indexes
+    await _createLotsIndexes();
+
+    // Réactiver les foreign keys
+    await customStatement('PRAGMA foreign_keys = ON;');
+  }
+
   // ═══════════════════════════════════════════════════════════
   // DAO GETTERS
   // ═══════════════════════════════════════════════════════════
@@ -1299,6 +1425,8 @@ class AppDatabase extends _$AppDatabase {
   BatchDao get batchDao => BatchDao(this);
   @override
   LotDao get lotDao => LotDao(this);
+  @override
+  LotAnimalDao get lotAnimalDao => LotAnimalDao(this);
   @override
   CampaignDao get campaignDao => CampaignDao(this);
 

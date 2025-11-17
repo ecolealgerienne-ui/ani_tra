@@ -14,12 +14,8 @@ class LotsTable extends Table {
   // Core lot data
   TextColumn get name => text()();
 
-  // Type nullable: 'treatment', 'sale', 'slaughter', ou NULL
+  // Type nullable: 'treatment', 'sale', 'slaughter', 'purchase', ou NULL
   TextColumn get type => text().nullable()();
-
-  // ⚠️ IMPORTANT: animal_ids stocké en JSON
-  // Exemple: '["animal-1", "animal-2", "animal-3"]'
-  TextColumn get animalIdsJson => text().named('animal_ids_json')();
 
   // PHASE 1: ADD - Status nullable: 'open', 'closed', 'archived'
   TextColumn get status => text().nullable().named('status')();
@@ -39,6 +35,17 @@ class LotsTable extends Table {
   TextColumn get veterinarianId => text().nullable().named('veterinarian_id')();
   TextColumn get veterinarianName =>
       text().nullable().named('veterinarian_name')();
+
+  // ==================== SALE/PURCHASE FIELDS ====================
+
+  /// Prix total du lot (pour ventes et achats)
+  RealColumn get priceTotal => real().nullable().named('price_total')();
+
+  /// Nom de l'acheteur (pour ventes)
+  TextColumn get buyerName => text().nullable().named('buyer_name')();
+
+  /// Nom du vendeur (pour achats)
+  TextColumn get sellerName => text().nullable().named('seller_name')();
 
   // ==================== NOTES ====================
   TextColumn get notes => text().nullable()();

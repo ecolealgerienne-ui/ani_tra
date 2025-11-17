@@ -7,6 +7,9 @@ enum LotType {
   /// Traitement sanitaire (ancienne campagne)
   treatment,
 
+  /// Achat d'animaux
+  purchase,
+
   /// Vente d'animaux
   sale,
 
@@ -25,6 +28,8 @@ extension LotTypeExt on LotType {
     switch (this) {
       case LotType.treatment:
         return 'Traitement';
+      case LotType.purchase:
+        return 'Achat';
       case LotType.sale:
         return 'Vente';
       case LotType.slaughter:
@@ -37,6 +42,8 @@ extension LotTypeExt on LotType {
     switch (this) {
       case LotType.treatment:
         return '💊';
+      case LotType.purchase:
+        return '🛒';
       case LotType.sale:
         return '💰';
       case LotType.slaughter:
@@ -110,6 +117,17 @@ class Lot implements SyncableEntity {
   /// Nom du vétérinaire
   final String? veterinarianName;
 
+  // ==================== DONNÉES VENTE/ACHAT ====================
+
+  /// Prix total du lot (pour ventes et achats)
+  final double? priceTotal;
+
+  /// Nom de l'acheteur (pour ventes)
+  final String? buyerName;
+
+  /// Nom du vendeur (pour achats)
+  final String? sellerName;
+
   // ==================== NOTES ====================
 
   /// Notes additionnelles
@@ -155,6 +173,10 @@ class Lot implements SyncableEntity {
     this.withdrawalEndDate,
     this.veterinarianId,
     this.veterinarianName,
+    // Sale/Purchase
+    this.priceTotal,
+    this.buyerName,
+    this.sellerName,
     // Notes
     this.notes,
     // Sync
@@ -208,6 +230,10 @@ class Lot implements SyncableEntity {
     DateTime? withdrawalEndDate,
     String? veterinarianId,
     String? veterinarianName,
+    // Sale/Purchase
+    double? priceTotal,
+    String? buyerName,
+    String? sellerName,
     // Notes
     String? notes,
     // Sync
@@ -233,6 +259,10 @@ class Lot implements SyncableEntity {
       withdrawalEndDate: withdrawalEndDate ?? this.withdrawalEndDate,
       veterinarianId: veterinarianId ?? this.veterinarianId,
       veterinarianName: veterinarianName ?? this.veterinarianName,
+      // Sale/Purchase
+      priceTotal: priceTotal ?? this.priceTotal,
+      buyerName: buyerName ?? this.buyerName,
+      sellerName: sellerName ?? this.sellerName,
       // Notes
       notes: notes ?? this.notes,
       // Sync
@@ -295,13 +325,13 @@ class Lot implements SyncableEntity {
   // ==================== Sérialisation ====================
 
   /// Convertir en JSON
+  /// NOTE: animalIds n'est PAS inclus car géré via table lot_animals
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'farmId': farmId,
       'name': name,
       'type': type?.name,
-      'animalIds': animalIds,
       'status': status?.name,
       'completed': completed,
       'completedAt': completedAt?.toIso8601String(),
@@ -312,6 +342,10 @@ class Lot implements SyncableEntity {
       'withdrawalEndDate': withdrawalEndDate?.toIso8601String(),
       'veterinarianId': veterinarianId,
       'veterinarianName': veterinarianName,
+      // Sale/Purchase
+      'priceTotal': priceTotal,
+      'buyerName': buyerName,
+      'sellerName': sellerName,
       // Notes
       'notes': notes,
       // Sync
@@ -334,8 +368,7 @@ class Lot implements SyncableEntity {
       type: json['type'] != null
           ? LotType.values.firstWhere((e) => e.name == json['type'])
           : null,
-      animalIds:
-          List<String>.from(json['animalIds'] ?? json['animal_ids'] ?? []),
+      animalIds: const [], // NOTE: Chargé séparément via LotRepository depuis lot_animals
       status: json['status'] != null
           ? LotStatus.values.firstWhere((e) => e.name == json['status'],
               orElse: () => (json['completed'] ?? false)
@@ -360,6 +393,12 @@ class Lot implements SyncableEntity {
           : null,
       veterinarianId: json['veterinarianId'] ?? json['veterinarian_id'],
       veterinarianName: json['veterinarianName'] ?? json['veterinarian_name'],
+      // Sale/Purchase
+      priceTotal: json['priceTotal'] != null || json['price_total'] != null
+          ? (json['priceTotal'] ?? json['price_total']).toDouble()
+          : null,
+      buyerName: json['buyerName'] ?? json['buyer_name'],
+      sellerName: json['sellerName'] ?? json['seller_name'],
       // Notes
       notes: json['notes'],
       // Sync

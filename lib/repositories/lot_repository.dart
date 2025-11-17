@@ -1,23 +1,27 @@
 // lib/repositories/lot_repository.dart
-import 'dart:convert';
 import '../models/lot.dart';
 import '../drift/database.dart';
 import '../drift/daos/lot_dao.dart';
+import '../drift/daos/lot_animal_dao.dart';
 import 'package:drift/drift.dart' as drift;
 
 /// Repository pour gérer la persistance des lots
 /// Phase 1C: Avec security checks farmId + Phase 1B: LotStatus support
+/// Phase 1D: Utilise lot_animals table de liaison
 class LotRepository {
   final LotDao _dao;
+  final LotAnimalDao _lotAnimalDao;
 
-  LotRepository(AppDatabase database) : _dao = database.lotDao;
+  LotRepository(AppDatabase database)
+      : _dao = database.lotDao,
+        _lotAnimalDao = database.lotAnimalDao;
 
   // ==================== CRUD Operations ====================
 
   /// Récupérer tous les lots d'une ferme
   Future<List<Lot>> findAllByFarm(String farmId) async {
     final data = await _dao.findAllByFarm(farmId);
-    return data.map(_toLot).toList();
+    return _toLotsWithAnimals(data);
   }
 
   /// Récupérer un lot par son ID (avec vérification farmId)
@@ -30,63 +34,71 @@ class LotRepository {
       throw Exception('Farm ID mismatch - Security violation');
     }
 
-    return _toLot(data);
+    return _toLotWithAnimals(data);
   }
 
   /// Récupérer les lots ouverts (non complétés) d'une ferme
   Future<List<Lot>> findOpenByFarm(String farmId) async {
     final data = await _dao.findOpenByFarm(farmId);
-    return data.map(_toLot).toList();
+    return _toLotsWithAnimals(data);
   }
 
   /// Récupérer les lots fermés d'une ferme
   Future<List<Lot>> findClosedByFarm(String farmId) async {
     final data = await _dao.findClosedByFarm(farmId);
-    return data.map(_toLot).toList();
+    return _toLotsWithAnimals(data);
   }
 
   /// PHASE 1: ADD - Récupérer les lots archivés d'une ferme
   Future<List<Lot>> findArchivedByFarm(String farmId) async {
     final data = await _dao.findArchivedByFarm(farmId);
-    return data.map(_toLot).toList();
+    return _toLotsWithAnimals(data);
   }
 
   /// Récupérer les lots complétés d'une ferme (closed + archived)
   Future<List<Lot>> findCompletedByFarm(String farmId) async {
     final data = await _dao.findCompletedByFarm(farmId);
-    return data.map(_toLot).toList();
+    return _toLotsWithAnimals(data);
   }
 
   /// Récupérer les lots par type pour une ferme
   Future<List<Lot>> findByTypeAndFarm(LotType type, String farmId) async {
     final typeString = type.name;
     final data = await _dao.findByTypeAndFarm(typeString, farmId);
-    return data.map(_toLot).toList();
+    return _toLotsWithAnimals(data);
   }
 
   /// Récupérer les lots sans type défini pour une ferme
   Future<List<Lot>> findWithoutTypeByFarm(String farmId) async {
     final data = await _dao.findWithoutTypeByFarm(farmId);
-    return data.map(_toLot).toList();
+    return _toLotsWithAnimals(data);
   }
 
   /// Récupérer les lots contenant un animal spécifique
   Future<List<Lot>> findByAnimalId(String animalId, String farmId) async {
-    final data = await _dao.findByAnimalId(animalId, farmId);
-    return data.map(_toLot).toList();
+    // Utiliser lot_animal_dao pour trouver les lots
+    final lotIds = await _lotAnimalDao.getLotIdsForAnimal(animalId);
+    final lots = <Lot>[];
+    for (final lotId in lotIds) {
+      final lot = await findById(lotId, farmId);
+      if (lot != null) {
+        lots.add(lot);
+      }
+    }
+    return lots;
   }
 
   /// Récupérer les lots de traitement par produit
   Future<List<Lot>> findByProductId(String productId, String farmId) async {
     final data = await _dao.findByProductId(productId, farmId);
-    return data.map(_toLot).toList();
+    return _toLotsWithAnimals(data);
   }
 
   /// Récupérer les lots de traitement par vétérinaire
   Future<List<Lot>> findByVeterinarianId(
       String veterinarianId, String farmId) async {
     final data = await _dao.findByVeterinarianId(veterinarianId, farmId);
-    return data.map(_toLot).toList();
+    return _toLotsWithAnimals(data);
   }
 
   /// Créer un nouveau lot avec validation farmId
@@ -98,6 +110,12 @@ class LotRepository {
 
     final companion = _toCompanion(lot, isUpdate: false);
     await _dao.insertLot(companion);
+
+    // Sauvegarder les animalIds dans lot_animals
+    if (lot.animalIds.isNotEmpty) {
+      await _lotAnimalDao.addAnimalsToLot(lot.id, lot.animalIds);
+    }
+
     return lot;
   }
 
@@ -116,6 +134,10 @@ class LotRepository {
 
     final companion = _toCompanion(lot, isUpdate: true);
     await _dao.updateLot(companion, farmId);
+
+    // Mettre à jour les animalIds dans lot_animals (remplacer tous)
+    await _lotAnimalDao.replaceAnimalsInLot(lot.id, lot.animalIds);
+
     return lot;
   }
 
@@ -174,7 +196,7 @@ class LotRepository {
       throw Exception('Lot not found or farm mismatch - Security violation');
     }
 
-    await _dao.addAnimalToLot(lotId, animalId, farmId);
+    await _lotAnimalDao.addAnimalToLot(lotId, animalId);
   }
 
   /// Retirer un animal du lot avec security check
@@ -186,7 +208,7 @@ class LotRepository {
       throw Exception('Lot not found or farm mismatch - Security violation');
     }
 
-    await _dao.removeAnimalFromLot(lotId, animalId, farmId);
+    await _lotAnimalDao.removeAnimalFromLot(lotId, animalId);
   }
 
   /// Définir le type du lot avec security check
@@ -218,14 +240,14 @@ class LotRepository {
   /// Récupérer les lots non synchronisés d'une ferme
   Future<List<Lot>> findUnsyncedByFarm(String farmId) async {
     final data = await _dao.findUnsyncedByFarm(farmId);
-    return data.map(_toLot).toList();
+    return _toLotsWithAnimals(data);
   }
 
   /// Récupérer les lots avec dates de rémanence proches
   Future<List<Lot>> findWithUpcomingWithdrawal(
       String farmId, DateTime beforeDate) async {
     final data = await _dao.findWithUpcomingWithdrawal(farmId, beforeDate);
-    return data.map(_toLot).toList();
+    return _toLotsWithAnimals(data);
   }
 
   // ==================== Migration Support ====================
@@ -257,19 +279,26 @@ class LotRepository {
 
   // ==================== Conversion Methods ====================
 
-  /// PHASE 1: MODIFY - Convertir LotsTableData en Lot avec status fallback
-  Lot _toLot(LotsTableData data) {
-    // Décoder le JSON des animal_ids
-    List<String> animalIds = [];
-    try {
-      final decoded = jsonDecode(data.animalIdsJson);
-      if (decoded is List) {
-        animalIds = decoded.cast<String>();
-      }
-    } catch (e) {
-      animalIds = [];
+  /// Helper: Convertir une liste de lots avec chargement des animaux
+  Future<List<Lot>> _toLotsWithAnimals(List<LotsTableData> dataList) async {
+    final lots = <Lot>[];
+    for (final data in dataList) {
+      lots.add(await _toLotWithAnimals(data));
     }
+    return lots;
+  }
 
+  /// Helper: Convertir un lot avec chargement des animaux depuis lot_animals
+  Future<Lot> _toLotWithAnimals(LotsTableData data) async {
+    // Charger les IDs des animaux depuis la table lot_animals
+    final animalIds = await _lotAnimalDao.getAnimalIdsForLot(data.id);
+
+    return _toLot(data, animalIds);
+  }
+
+  /// PHASE 1D: Convertir LotsTableData en Lot avec status fallback
+  /// NOTE: animalIds fournis en paramètre (chargés depuis lot_animals)
+  Lot _toLot(LotsTableData data, List<String> animalIds) {
     // Convertir le type string en enum (nullable)
     LotType? type;
     if (data.type != null) {
@@ -310,6 +339,10 @@ class LotRepository {
       withdrawalEndDate: data.withdrawalEndDate,
       veterinarianId: data.veterinarianId,
       veterinarianName: data.veterinarianName,
+      // Sale/Purchase fields
+      priceTotal: data.priceTotal,
+      buyerName: data.buyerName,
+      sellerName: data.sellerName,
       // Notes
       notes: data.notes,
       // Sync fields
@@ -321,17 +354,14 @@ class LotRepository {
     );
   }
 
-  /// PHASE 1: MODIFY - Convertir Lot en LotsTableCompanion avec status
+  /// PHASE 1D: Convertir Lot en LotsTableCompanion avec status
+  /// NOTE: Les animalIds ne sont PAS stockés ici (gérés via lot_animals)
   LotsTableCompanion _toCompanion(Lot lot, {required bool isUpdate}) {
-    // Encoder animal_ids en JSON
-    final animalIdsJson = jsonEncode(lot.animalIds);
-
     return LotsTableCompanion(
       id: drift.Value(lot.id),
       farmId: drift.Value(lot.farmId),
       name: drift.Value(lot.name),
       type: drift.Value(lot.type?.name),
-      animalIdsJson: drift.Value(animalIdsJson),
       // PHASE 1: ADD - Encoder status
       status: lot.status != null
           ? drift.Value(lot.status!.name)
@@ -345,6 +375,10 @@ class LotRepository {
       withdrawalEndDate: drift.Value(lot.withdrawalEndDate),
       veterinarianId: drift.Value(lot.veterinarianId),
       veterinarianName: drift.Value(lot.veterinarianName),
+      // Sale/Purchase fields
+      priceTotal: drift.Value(lot.priceTotal),
+      buyerName: drift.Value(lot.buyerName),
+      sellerName: drift.Value(lot.sellerName),
       // Notes
       notes: drift.Value(lot.notes),
       // Sync fields
