@@ -313,6 +313,8 @@ class MovementRepository {
       temporaryMovementType: data.temporaryMovementType,
       expectedReturnDate: data.expectedReturnDate,
       relatedMovementId: data.relatedMovementId,
+      // Status
+      status: _parseMovementStatus(data.status),
       // Sync
       synced: data.synced,
       createdAt: data.createdAt,
@@ -375,6 +377,8 @@ class MovementRepository {
       relatedMovementId: movement.relatedMovementId != null
           ? Value(movement.relatedMovementId!)
           : const Value.absent(),
+      // Status (required field)
+      status: Value(movement.status.name),
       // Sync
       synced: Value(movement.synced),
       lastSyncedAt: movement.lastSyncedAt != null
@@ -396,6 +400,14 @@ class MovementRepository {
     return MovementType.values.firstWhere(
       (e) => e.name == type,
       orElse: () => MovementType.birth,
+    );
+  }
+
+  /// Parse une string en MovementStatus enum
+  MovementStatus _parseMovementStatus(String status) {
+    return MovementStatus.values.firstWhere(
+      (e) => e.name == status,
+      orElse: () => MovementStatus.ongoing,
     );
   }
 }
