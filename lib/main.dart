@@ -18,6 +18,7 @@ import 'providers/weight_provider.dart';
 import 'providers/alert_provider.dart';
 import 'providers/vaccination_provider.dart';
 import 'providers/treatment_provider.dart';
+import 'providers/medical_product_provider.dart';
 import 'providers/vaccination_reference_provider.dart';
 import 'providers/document_provider.dart';
 import 'providers/breeding_provider.dart';
@@ -367,6 +368,17 @@ class MyApp extends StatelessWidget {
           update: (context, auth, previous) =>
               previous ??
               TreatmentProvider(auth, context.read<TreatmentRepository>()),
+        ),
+
+        // === MedicalProductProvider (charge depuis DB) ===
+        ChangeNotifierProxyProvider<AuthProvider, MedicalProductProvider>(
+          create: (context) => MedicalProductProvider(
+              context.read<AuthProvider>(),
+              context.read<MedicalProductRepository>()),
+          update: (context, auth, previous) =>
+              previous ??
+              MedicalProductProvider(
+                  auth, context.read<MedicalProductRepository>()),
         ),
 
         // ═══════════════════════════════════════════════════════════
