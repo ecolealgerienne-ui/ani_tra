@@ -13,6 +13,7 @@ import '../../providers/weight_provider.dart';
 import '../../providers/alert_provider.dart';
 import '../../providers/vaccination_provider.dart';
 import '../../providers/treatment_provider.dart';
+import '../../providers/breed_provider.dart';
 import '../../models/alert.dart';
 import '../../models/alert_type.dart';
 import '../../models/alert_category.dart';
@@ -495,7 +496,7 @@ class _InfosTab extends StatelessWidget {
                   _InfoRow(
                     label: AppLocalizations.of(context)
                         .translate(AppStrings.breed),
-                    value: currentAnimal.breedNameFr,
+                    value: context.read<BreedProvider>().getById(currentAnimal.breedId!)?.nameFr ?? currentAnimal.breedId!,
                   )
                 else
                   _InfoRow(

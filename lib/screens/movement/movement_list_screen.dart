@@ -324,7 +324,7 @@ class _MovementListScreenState extends State<MovementListScreen> {
       case MovementType.slaughter:
         return l10n.translate(AppStrings.slaughter);
       case MovementType.temporaryOut:
-        return l10n.translate(AppStrings.temporaryOut);
+        return l10n.translate(AppStrings.temporaryOuts);
       case MovementType.temporaryReturn:
         return l10n.translate(AppStrings.temporaryReturn);
     }
@@ -560,7 +560,7 @@ class _MovementCard extends StatelessWidget {
       case MovementType.slaughter:
         return l10n.translate(AppStrings.slaughter);
       case MovementType.temporaryOut:
-        return l10n.translate(AppStrings.temporaryOut);
+        return l10n.translate(AppStrings.temporaryOuts);
       case MovementType.temporaryReturn:
         return l10n.translate(AppStrings.temporaryReturn);
     }

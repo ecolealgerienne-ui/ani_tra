@@ -67,6 +67,8 @@ class Movement implements SyncableEntity {
   final bool isTemporary;
   final String? temporaryMovementType; // 'loan', 'transhumance', 'boarding', etc.
   final DateTime? expectedReturnDate;
+  final DateTime? returnDate; // Actual return date when animal returned
+  final String? returnNotes; // Notes about the return
   final String? relatedMovementId; // Lien bidirectionnel (out ↔ return)
 
   // === Status ===
@@ -106,6 +108,8 @@ class Movement implements SyncableEntity {
     this.isTemporary = false,
     this.temporaryMovementType,
     this.expectedReturnDate,
+    this.returnDate,
+    this.returnNotes,
     this.relatedMovementId,
     // Status
     MovementStatus? status,
@@ -143,6 +147,8 @@ class Movement implements SyncableEntity {
     bool? isTemporary,
     String? temporaryMovementType,
     DateTime? expectedReturnDate,
+    DateTime? returnDate,
+    String? returnNotes,
     String? relatedMovementId,
     // Status
     MovementStatus? status,
@@ -175,6 +181,8 @@ class Movement implements SyncableEntity {
       temporaryMovementType:
           temporaryMovementType ?? this.temporaryMovementType,
       expectedReturnDate: expectedReturnDate ?? this.expectedReturnDate,
+      returnDate: returnDate ?? this.returnDate,
+      returnNotes: returnNotes ?? this.returnNotes,
       relatedMovementId: relatedMovementId ?? this.relatedMovementId,
       // Status
       status: status ?? this.status,
@@ -245,6 +253,8 @@ class Movement implements SyncableEntity {
       'is_temporary': isTemporary,
       'temporary_movement_type': temporaryMovementType,
       'expected_return_date': expectedReturnDate?.toIso8601String(),
+      'return_date': returnDate?.toIso8601String(),
+      'return_notes': returnNotes,
       'related_movement_id': relatedMovementId,
       // Status
       'status': status.name,
@@ -282,6 +292,10 @@ class Movement implements SyncableEntity {
       expectedReturnDate: json['expected_return_date'] != null
           ? DateTime.parse(json['expected_return_date'] as String)
           : null,
+      returnDate: json['return_date'] != null
+          ? DateTime.parse(json['return_date'] as String)
+          : null,
+      returnNotes: json['return_notes'],
       relatedMovementId: json['related_movement_id'],
       // Status - handle legacy values and default to type-specific status
       status: json['status'] != null
