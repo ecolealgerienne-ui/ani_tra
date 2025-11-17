@@ -1097,59 +1097,6 @@ class DatabaseInitializer {
       }
 
       // ════════════════════════════════════════════════════════════
-      // BATCHES (Varied Purposes)
-      // ════════════════════════════════════════════════════════════
-
-      print('$_tag   📋 Creating batches...');
-      try {
-        await db.batchDao.insertBatch(BatchesTableCompanion.insert(
-          id: 'batch_001',
-          farmId: 'farm_default',
-          purpose: 'treatment',
-          name: 'Traitement Antiparasitaire Octobre',
-          synced: const Value(false),
-          createdAt: now.subtract(const Duration(days: 10)),
-          updatedAt: now,
-        ));
-        await db.batchAnimalDao.addAnimalsToBatch(
-          'batch_001',
-          ['young_001', 'young_002', 'young_003', 'young_004', 'young_005'],
-        );
-
-        await db.batchDao.insertBatch(BatchesTableCompanion.insert(
-          id: 'batch_002',
-          farmId: 'farm_default',
-          purpose: 'vaccination',
-          name: 'Vaccination Ectima Printemps',
-          synced: const Value(false),
-          createdAt: now.subtract(const Duration(days: 60)),
-          updatedAt: now.subtract(const Duration(days: 60)),
-        ));
-        await db.batchAnimalDao.addAnimalsToBatch(
-          'batch_002',
-          ['adult_001', 'adult_002', 'adult_003'],
-        );
-
-        await db.batchDao.insertBatch(BatchesTableCompanion.insert(
-          id: 'batch_003',
-          farmId: 'farm_default',
-          purpose: 'weighing',
-          name: 'Pesée Mensuelle Novembre',
-          synced: const Value(false),
-          createdAt: now.subtract(const Duration(days: 2)),
-          updatedAt: now,
-        ));
-        await db.batchAnimalDao.addAnimalsToBatch(
-          'batch_003',
-          ['newborn_001', 'newborn_002', 'newborn_003'],
-        );
-
-        print('$_tag   ✅ Created 3 batches');
-      } catch (e) {
-        print('$_tag   ❌ Error creating batches: $e');
-      }
-
-      // ════════════════════════════════════════════════════════════
       // ALERT CONFIGURATIONS (Keep existing)
       // ════════════════════════════════════════════════════════════
 

@@ -32,8 +32,6 @@ import 'tables/vaccines_table.dart';
 import 'tables/veterinarians_table.dart';
 
 // Complex Tables
-import 'tables/batches_table.dart';
-import 'tables/batch_animals_table.dart';
 import 'tables/lots_table.dart';
 import 'tables/lot_animals_table.dart';
 import 'tables/campaigns_table.dart';
@@ -70,8 +68,6 @@ import 'daos/vaccine_dao.dart';
 import 'daos/veterinarian_dao.dart';
 
 // Complex DAOs
-import 'daos/batch_dao.dart';
-import 'daos/batch_animal_dao.dart';
 import 'daos/lot_dao.dart';
 import 'daos/lot_animal_dao.dart';
 import 'daos/campaign_dao.dart';
@@ -124,8 +120,6 @@ part 'database.g.dart';
     // ────────────────────────────────────────────────────────
     // COMPLEX TABLES
     // ────────────────────────────────────────────────────────
-    BatchesTable,
-    BatchAnimalsTable,
     LotsTable,
     LotAnimalsTable,
     CampaignsTable,
@@ -172,8 +166,6 @@ part 'database.g.dart';
     // ────────────────────────────────────────────────────────
     // COMPLEX DAOs
     // ────────────────────────────────────────────────────────
-    BatchDao,
-    BatchAnimalDao,
     LotDao,
     LotAnimalDao,
     CampaignDao,
@@ -191,7 +183,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 4;
 
   // ═══════════════════════════════════════════════════════════
   // MIGRATION STRATEGY
@@ -238,8 +230,6 @@ class AppDatabase extends _$AppDatabase {
           // ───────────────────────────────────────────────────
           // INDEXES - COMPLEX TABLES
           // ───────────────────────────────────────────────────
-          await _createBatchesIndexes();
-          await _createBatchAnimalsIndexes();
           await _createLotsIndexes();
           await _createLotAnimalsIndexes();
           await _createCampaignsIndexes();
@@ -274,13 +264,6 @@ class AppDatabase extends _$AppDatabase {
           // ───────────────────────────────────────────────────
           if (from < 4) {
             await _migrateToV4LotsRefactoring();
-          }
-
-          // ───────────────────────────────────────────────────
-          // MIGRATION v4 → v5: Batches refactoring (liaison table)
-          // ───────────────────────────────────────────────────
-          if (from < 5) {
-            await _migrateToV5BatchesRefactoring();
           }
         },
       );
@@ -816,50 +799,6 @@ class AppDatabase extends _$AppDatabase {
     );
     await customStatement(
         'CREATE INDEX IF NOT EXISTS idx_movements_deleted_at ON movements(deleted_at);');
-  }
-
-  /// Créer les indexes pour la table batches
-  Future<void> _createBatchesIndexes() async {
-    // Index sur farm_id (multi-tenancy - CRITIQUE)
-    await customStatement(
-        'CREATE INDEX idx_batches_farm_id ON batches(farm_id);');
-
-    // Index sur completed (filtrage actifs/complétés)
-    await customStatement(
-        'CREATE INDEX idx_batches_completed ON batches(completed);');
-
-    // Index sur purpose (filtrage par objectif)
-    await customStatement(
-        'CREATE INDEX idx_batches_purpose ON batches(purpose);');
-
-    // Index sur created_at (tri chronologique)
-    await customStatement(
-        'CREATE INDEX idx_batches_created_at ON batches(created_at);');
-
-    // Index composite farm_id + completed (query la plus fréquente)
-    await customStatement(
-        'CREATE INDEX idx_batches_farm_completed ON batches(farm_id, completed);');
-    await customStatement(
-        'CREATE INDEX IF NOT EXISTS idx_batches_deleted_at ON batches(deleted_at);');
-  }
-
-  /// Créer les indexes pour la table batch_animals (liaison table)
-  Future<void> _createBatchAnimalsIndexes() async {
-    // Index sur batch_id (recherche animaux d'un batch)
-    await customStatement(
-        'CREATE INDEX idx_batch_animals_batch_id ON batch_animals(batch_id);');
-
-    // Index sur animal_id (recherche batches contenant un animal)
-    await customStatement(
-        'CREATE INDEX idx_batch_animals_animal_id ON batch_animals(animal_id);');
-
-    // Index sur added_at (tri chronologique d'ajout)
-    await customStatement(
-        'CREATE INDEX idx_batch_animals_added_at ON batch_animals(added_at);');
-
-    // Index composite batch_id + added_at (listing animaux d'un batch par ordre d'ajout)
-    await customStatement(
-        'CREATE INDEX idx_batch_animals_batch_added ON batch_animals(batch_id, added_at);');
   }
 
   /// Créer les indexes pour la table lots
@@ -1401,74 +1340,6 @@ class AppDatabase extends _$AppDatabase {
     await customStatement('PRAGMA foreign_keys = ON;');
   }
 
-  /// Migration v4 → v5: Batches refactoring
-  ///
-  /// Cette migration:
-  /// 1. Crée la table batch_animals (liaison many-to-many)
-  /// 2. Supprime la colonne animal_ids_json de batches (MVP - pas de migration de données)
-  Future<void> _migrateToV5BatchesRefactoring() async {
-    // Étape 1: Créer la table batch_animals
-    await customStatement('''
-      CREATE TABLE batch_animals (
-        batch_id TEXT NOT NULL,
-        animal_id TEXT NOT NULL,
-        added_at INTEGER NOT NULL,
-        PRIMARY KEY (batch_id, animal_id),
-        FOREIGN KEY (batch_id) REFERENCES batches(id) ON DELETE CASCADE,
-        FOREIGN KEY (animal_id) REFERENCES animals(id) ON DELETE CASCADE
-      );
-    ''');
-
-    // Étape 2: Créer les indexes pour batch_animals
-    await _createBatchAnimalsIndexes();
-
-    // Étape 3: Supprimer la colonne animal_ids_json (SQLite ne supporte pas DROP COLUMN en v3.35.5)
-    // On doit recréer la table sans cette colonne
-    await customStatement('PRAGMA foreign_keys = OFF;');
-
-    // Créer nouvelle table batches sans animal_ids_json
-    await customStatement('''
-      CREATE TABLE batches_new (
-        id TEXT NOT NULL PRIMARY KEY,
-        farm_id TEXT NOT NULL,
-        name TEXT NOT NULL,
-        purpose TEXT NOT NULL,
-        used_at INTEGER,
-        completed INTEGER NOT NULL DEFAULT 0,
-        notes TEXT,
-        synced INTEGER NOT NULL DEFAULT 0,
-        created_at INTEGER NOT NULL,
-        updated_at INTEGER NOT NULL,
-        last_synced_at INTEGER,
-        server_version TEXT,
-        deleted_at INTEGER,
-        FOREIGN KEY (farm_id) REFERENCES farms(id) ON DELETE CASCADE
-      );
-    ''');
-
-    // Copier les données (sans animal_ids_json)
-    await customStatement('''
-      INSERT INTO batches_new (
-        id, farm_id, name, purpose, used_at, completed, notes,
-        synced, created_at, updated_at, last_synced_at, server_version, deleted_at
-      )
-      SELECT
-        id, farm_id, name, purpose, used_at, completed, notes,
-        synced, created_at, updated_at, last_synced_at, server_version, deleted_at
-      FROM batches;
-    ''');
-
-    // Supprimer l'ancienne table et renommer
-    await customStatement('DROP TABLE batches;');
-    await customStatement('ALTER TABLE batches_new RENAME TO batches;');
-
-    // Recréer les indexes
-    await _createBatchesIndexes();
-
-    // Réactiver les foreign keys
-    await customStatement('PRAGMA foreign_keys = ON;');
-  }
-
   // ═══════════════════════════════════════════════════════════
   // DAO GETTERS
   // ═══════════════════════════════════════════════════════════
@@ -1520,10 +1391,6 @@ class AppDatabase extends _$AppDatabase {
   // ───────────────────────────────────────────────────────────
   // COMPLEX DAOs
   // ───────────────────────────────────────────────────────────
-  @override
-  BatchDao get batchDao => BatchDao(this);
-  @override
-  BatchAnimalDao get batchAnimalDao => BatchAnimalDao(this);
   @override
   LotDao get lotDao => LotDao(this);
   @override
