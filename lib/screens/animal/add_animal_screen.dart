@@ -349,23 +349,11 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
       // Mode création : ajouter l'animal
       await animalProvider.addAnimal(animal);
 
-      // 2. CrÃƒÂ©er le mouvement correspondant
+      // 2. Créer le mouvement correspondant (uniquement pour Achat)
       Movement? movement;
 
+      // NOTE: Birth is NOT a business movement - only Purchase creates a movement
       if (_selectedOrigin ==
-          AppLocalizations.of(context).translate(AppStrings.birth)) {
-        movement = Movement(
-          id: _generateId(),
-          type: MovementType.birth,
-          animalId: animal.id,
-          movementDate: _selectedBirthDate!,
-          notes: _notesController.text.trim().isNotEmpty
-              ? _notesController.text.trim()
-              : null,
-          synced: false,
-          createdAt: DateTime.now(),
-        );
-      } else if (_selectedOrigin ==
           AppLocalizations.of(context).translate(AppStrings.purchase)) {
         movement = Movement(
           id: _generateId(),

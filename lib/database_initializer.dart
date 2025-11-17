@@ -501,27 +501,10 @@ class DatabaseInitializer {
 
       print('$_tag   🚛 Creating comprehensive movements...');
       try {
-        // 1. BIRTH MOVEMENTS (naissances) - 10 mouvements
-        for (int i = 1; i <= 10; i++) {
-          // Générer l'ID correct : newborn_001 à newborn_005, puis young_001 à young_005
-          final animalId = i <= 5
-              ? 'newborn_${i.toString().padLeft(3, '0')}'
-              : 'young_${(i - 5).toString().padLeft(3, '0')}';
+        // NOTE: Birth movements are NOT created as they are not business movements
+        // Births are tracked as animal records, not movement transactions
 
-          await db.movementDao.insertItem(MovementsTableCompanion.insert(
-            id: 'mov_birth_${i.toString().padLeft(3, '0')}',
-            farmId: 'farm_default',
-            animalId: animalId,
-            movementDate: now.subtract(Duration(days: i * 5)),
-            type: 'birth',
-            status: 'closed', // Birth events are immediately closed
-            synced: const Value(false),
-            createdAt: now,
-            updatedAt: now,
-          ));
-        }
-
-        // 2. PURCHASE MOVEMENTS (achats) - 5 mouvements
+        // 1. PURCHASE MOVEMENTS (achats) - 5 mouvements
         for (int i = 1; i <= 5; i++) {
           await db.movementDao.insertItem(MovementsTableCompanion.insert(
             id: 'mov_purchase_${i.toString().padLeft(3, '0')}',
@@ -648,7 +631,7 @@ class DatabaseInitializer {
           ));
         }
 
-        print('$_tag   ✅ Created ${10 + 5 + 5 + 3 + 4 + 2 + 2} comprehensive movements');
+        print('$_tag   ✅ Created ${5 + 5 + 3 + 4 + 2 + 2} comprehensive movements (births excluded)');
       } catch (e) {
         print('$_tag   ❌ Error creating movements: $e');
       }

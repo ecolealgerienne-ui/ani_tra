@@ -8,34 +8,7 @@ class MockMovements {
     final now = DateTime.now();
 
     return [
-      // ==================== NAISSANCES ====================
-      Movement(
-        id: 'movement_001',
-        animalId: 'animal_009',
-        type: MovementType.birth,
-        movementDate: DateTime(2024, 2, 15),
-        farmId: 'farm_default',
-        synced: true,
-        createdAt: now.subtract(const Duration(days: 250)),
-      ),
-      Movement(
-        id: 'movement_002',
-        animalId: 'animal_010',
-        type: MovementType.birth,
-        movementDate: DateTime(2024, 2, 16),
-        farmId: 'farm_default',
-        synced: true,
-        createdAt: now.subtract(const Duration(days: 249)),
-      ),
-      Movement(
-        id: 'movement_003',
-        animalId: 'animal_014',
-        type: MovementType.birth,
-        movementDate: DateTime(2025, 1, 10),
-        farmId: 'farm_default',
-        synced: true,
-        createdAt: now.subtract(const Duration(days: 30)),
-      ),
+      // NOTE: Birth movements removed - births are NOT business movements
 
       // ==================== VENTES ====================
       Movement(
@@ -46,6 +19,7 @@ class MockMovements {
         farmId: 'farm_default',
         price: 85.50,
         notes: 'Vente marché local',
+        status: MovementStatus.closed,
         synced: true,
         createdAt: now.subtract(const Duration(days: 60)),
       ),
@@ -57,6 +31,7 @@ class MockMovements {
         farmId: 'farm_default',
         price: 92.00,
         notes: 'Vente éleveur voisin',
+        status: MovementStatus.closed,
         synced: true,
         createdAt: now.subtract(const Duration(days: 45)),
       ),
@@ -69,6 +44,7 @@ class MockMovements {
         movementDate: now.subtract(const Duration(days: 120)),
         farmId: 'farm_default',
         notes: 'Maladie respiratoire',
+        status: MovementStatus.closed,
         synced: true,
         createdAt: now.subtract(const Duration(days: 120)),
       ),
