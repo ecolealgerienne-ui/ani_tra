@@ -205,8 +205,6 @@ class _MovementDetailScreenState extends State<MovementDetailScreen> {
 
   /// Enregistre le retour d'un mouvement temporaire
   Future<void> _recordReturn(BuildContext context, Movement outMovement) async {
-    final l10n = AppLocalizations.of(context);
-
     // Ouvrir le dialog pour saisir la date et les notes
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
