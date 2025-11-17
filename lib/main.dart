@@ -43,6 +43,7 @@ import 'drift/database.dart';
 import 'repositories/animal_repository.dart';
 import 'repositories/weight_repository.dart';
 import 'repositories/treatment_repository.dart';
+import 'repositories/medical_product_repository.dart';
 import 'repositories/vaccination_repository.dart';
 import 'repositories/veterinarian_repository.dart';
 import 'repositories/breed_repository.dart';
@@ -171,6 +172,7 @@ class MyApp extends StatelessWidget {
     required this.breedingRepository,
     required this.documentRepository,
     required this.treatmentRepository,
+    required this.medicalProductRepository,
     required this.alertConfigurationRepository,
     required this.farmRepository,
     required this.farmPreferencesRepository,
@@ -194,6 +196,8 @@ class MyApp extends StatelessWidget {
         Provider<BreedingRepository>.value(value: breedingRepository),
         Provider<DocumentRepository>.value(value: documentRepository),
         Provider<TreatmentRepository>.value(value: treatmentRepository),
+        Provider<MedicalProductRepository>.value(
+            value: medicalProductRepository),
         Provider<AlertConfigurationRepository>.value(
             value: alertConfigurationRepository),
         Provider<FarmRepository>.value(value: farmRepository),
