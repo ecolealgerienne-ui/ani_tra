@@ -870,6 +870,7 @@ class DatabaseInitializer {
             createdAt: now.subtract(const Duration(days: 15)),
             updatedAt: now.subtract(const Duration(days: 15)),
           ));
+          print('🔍 [DB Init] Created sale movement mov_lot_sale_$animalId with lotId=lot_closed_sale_001');
         }
 
         await db.lotDao.insertLot(LotsTableCompanion.insert(
@@ -904,6 +905,7 @@ class DatabaseInitializer {
             createdAt: now.subtract(const Duration(days: 30)),
             updatedAt: now.subtract(const Duration(days: 30)),
           ));
+          print('🔍 [DB Init] Created slaughter movement mov_lot_slaughter_$animalId with lotId=lot_closed_slaughter_001');
         }
 
         print('$_tag   ✅ Created 5 lots (3 open, 2 closed with movements)');
