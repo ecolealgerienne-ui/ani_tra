@@ -242,13 +242,13 @@ class _MovementListScreenState extends State<MovementListScreen> {
           // TODO: Navigate to CreateTemporaryMovementScreen when ready
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(l10n.translate(AppStrings.temporaryOut)),
+              content: Text(l10n.translate(AppStrings.temporaryOuts)),
               backgroundColor: Colors.teal,
             ),
           );
         },
         icon: const Icon(Icons.exit_to_app),
-        label: Text(l10n.translate(AppStrings.temporaryOut)),
+        label: Text(l10n.translate(AppStrings.temporaryOuts)),
         backgroundColor: Colors.teal,
       ),
     );
