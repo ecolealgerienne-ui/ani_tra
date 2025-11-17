@@ -368,14 +368,11 @@ class _MovementListScreenState extends State<MovementListScreen> {
       print('  - Movement ${m.id}: animalId=${m.animalId}, lotId=${m.lotId ?? "NULL"}, type=${m.type}');
     }
 
-    // Séparer mouvements de lot vs individuels
+    // Filtrer uniquement les mouvements de lots
     final lotMovements =
         movements.where((m) => m.lotId != null).toList();
-    final individualMovements =
-        movements.where((m) => m.lotId == null).toList();
 
     print('🔍 [GroupedView] Movements with lotId: ${lotMovements.length}');
-    print('🔍 [GroupedView] Individual movements: ${individualMovements.length}');
 
     // Grouper par lotId
     final Map<String, List<Movement>> groupedByLot = {};
@@ -395,7 +392,7 @@ class _MovementListScreenState extends State<MovementListScreen> {
     return ListView(
       padding: const EdgeInsets.all(AppConstants.spacingMedium),
       children: [
-        // Section 1: Mouvements de lots
+        // Affichage des lots uniquement (pas de mouvements individuels)
         if (groupedByLot.isNotEmpty) ...[
           Text(
             'Mouvements de lots',
@@ -420,37 +417,43 @@ class _MovementListScreenState extends State<MovementListScreen> {
               },
             );
           }).toList(),
-          const SizedBox(height: AppConstants.spacingLarge),
         ],
 
-        // Section 2: Mouvements individuels
-        if (individualMovements.isNotEmpty) ...[
-          Text(
-            'Mouvements individuels',
-            style: TextStyle(
-              fontSize: AppConstants.fontSizeLarge,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey[700],
+        // Message si aucun lot
+        if (groupedByLot.isEmpty) ...[
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(AppConstants.spacingLarge),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.group_work,
+                    size: 80,
+                    color: Colors.grey[400],
+                  ),
+                  const SizedBox(height: AppConstants.spacingMedium),
+                  Text(
+                    'Aucun lot finalisé',
+                    style: TextStyle(
+                      fontSize: AppConstants.fontSizeLarge,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: AppConstants.spacingSmall),
+                  Text(
+                    'Les mouvements issus de lots finalisés\napparaîtront ici',
+                    style: TextStyle(
+                      fontSize: AppConstants.fontSizeBody,
+                      color: Colors.grey[500],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
             ),
           ),
-          const SizedBox(height: AppConstants.spacingMedium),
-          ...individualMovements.map((movement) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: AppConstants.spacingSmall),
-              child: _MovementCard(
-                movement: movement,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          MovementDetailScreen(movementId: movement.id),
-                    ),
-                  );
-                },
-              ),
-            );
-          }).toList(),
         ],
       ],
     );
