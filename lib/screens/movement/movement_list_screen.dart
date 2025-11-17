@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 
 import '../../providers/movement_provider.dart';
 import '../../providers/animal_provider.dart';
-import '../../providers/batch_provider.dart';
 import '../../models/movement.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
@@ -40,7 +39,12 @@ class _MovementListScreenState extends State<MovementListScreen> {
               setState(() {
                 _selectedTypeFilter = type;
               });
-              context.read<MovementProvider>().setTypeFilter(type);
+              // Si null (Tous), on efface tous les filtres
+              if (type == null) {
+                context.read<MovementProvider>().clearFilters();
+              } else {
+                context.read<MovementProvider>().setTypeFilter(type);
+              }
             },
             itemBuilder: (context) => [
               PopupMenuItem<MovementType?>(
@@ -49,7 +53,9 @@ class _MovementListScreenState extends State<MovementListScreen> {
                   children: [
                     const Icon(Icons.clear_all),
                     const SizedBox(width: AppConstants.spacingSmall),
-                    Text(l10n.translate(AppStrings.all)),
+                    Expanded(child: Text(l10n.translate(AppStrings.all))),
+                    if (_selectedTypeFilter == null)
+                      const Icon(Icons.check, color: Colors.green),
                   ],
                 ),
               ),
@@ -60,7 +66,9 @@ class _MovementListScreenState extends State<MovementListScreen> {
                   children: [
                     const Icon(Icons.shopping_cart, color: Colors.blue),
                     const SizedBox(width: AppConstants.spacingSmall),
-                    Text(l10n.translate(AppStrings.purchases)),
+                    Expanded(child: Text(l10n.translate(AppStrings.purchases))),
+                    if (_selectedTypeFilter == MovementType.purchase)
+                      const Icon(Icons.check, color: Colors.green),
                   ],
                 ),
               ),
@@ -70,7 +78,9 @@ class _MovementListScreenState extends State<MovementListScreen> {
                   children: [
                     const Icon(Icons.sell, color: Colors.orange),
                     const SizedBox(width: AppConstants.spacingSmall),
-                    Text(l10n.translate(AppStrings.sales)),
+                    Expanded(child: Text(l10n.translate(AppStrings.sales))),
+                    if (_selectedTypeFilter == MovementType.sale)
+                      const Icon(Icons.check, color: Colors.green),
                   ],
                 ),
               ),
@@ -80,7 +90,9 @@ class _MovementListScreenState extends State<MovementListScreen> {
                   children: [
                     const Icon(Icons.dangerous, color: Colors.red),
                     const SizedBox(width: AppConstants.spacingSmall),
-                    Text(l10n.translate(AppStrings.deaths)),
+                    Expanded(child: Text(l10n.translate(AppStrings.deaths))),
+                    if (_selectedTypeFilter == MovementType.death)
+                      const Icon(Icons.check, color: Colors.green),
                   ],
                 ),
               ),
@@ -90,7 +102,9 @@ class _MovementListScreenState extends State<MovementListScreen> {
                   children: [
                     const Icon(Icons.content_cut, color: Colors.purple),
                     const SizedBox(width: AppConstants.spacingSmall),
-                    Text(l10n.translate(AppStrings.slaughters)),
+                    Expanded(child: Text(l10n.translate(AppStrings.slaughters))),
+                    if (_selectedTypeFilter == MovementType.slaughter)
+                      const Icon(Icons.check, color: Colors.green),
                   ],
                 ),
               ),
@@ -100,7 +114,9 @@ class _MovementListScreenState extends State<MovementListScreen> {
                   children: [
                     const Icon(Icons.exit_to_app, color: Colors.teal),
                     const SizedBox(width: AppConstants.spacingSmall),
-                    Text(l10n.translate(AppStrings.temporaryOuts)),
+                    Expanded(child: Text(l10n.translate(AppStrings.temporaryOuts))),
+                    if (_selectedTypeFilter == MovementType.temporaryOut)
+                      const Icon(Icons.check, color: Colors.green),
                   ],
                 ),
               ),
@@ -166,7 +182,10 @@ class _MovementListScreenState extends State<MovementListScreen> {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                final movements = provider.filteredMovements;
+                // Filtrer pour exclure les naissances (ce ne sont pas de vrais mouvements)
+                final movements = provider.filteredMovements
+                    .where((m) => m.type != MovementType.birth)
+                    .toList();
 
                 if (movements.isEmpty) {
                   return Center(
@@ -244,7 +263,7 @@ class _MovementListScreenState extends State<MovementListScreen> {
           }
         },
         icon: const Icon(Icons.exit_to_app),
-        label: Text(l10n.translate(AppStrings.temporaryOut)),
+        label: Text(l10n.translate(AppStrings.temporaryOuts)),
         backgroundColor: Colors.teal,
       ),
     );
@@ -253,6 +272,8 @@ class _MovementListScreenState extends State<MovementListScreen> {
   /// Retourne la couleur associée au type de mouvement
   Color _getMovementTypeColor(MovementType type) {
     switch (type) {
+      case MovementType.birth:
+        return Colors.green;
       case MovementType.purchase:
         return Colors.blue;
       case MovementType.sale:
@@ -263,12 +284,16 @@ class _MovementListScreenState extends State<MovementListScreen> {
         return Colors.purple;
       case MovementType.temporaryOut:
         return Colors.teal;
+      case MovementType.temporaryReturn:
+        return Colors.cyan;
     }
   }
 
   /// Retourne l'icône associée au type de mouvement
   IconData _getMovementTypeIcon(MovementType type) {
     switch (type) {
+      case MovementType.birth:
+        return Icons.child_care;
       case MovementType.purchase:
         return Icons.shopping_cart;
       case MovementType.sale:
@@ -279,6 +304,8 @@ class _MovementListScreenState extends State<MovementListScreen> {
         return Icons.content_cut;
       case MovementType.temporaryOut:
         return Icons.exit_to_app;
+      case MovementType.temporaryReturn:
+        return Icons.keyboard_return;
     }
   }
 
@@ -286,6 +313,8 @@ class _MovementListScreenState extends State<MovementListScreen> {
   String _getMovementTypeLabel(BuildContext context, MovementType type) {
     final l10n = AppLocalizations.of(context);
     switch (type) {
+      case MovementType.birth:
+        return l10n.translate(AppStrings.birth);
       case MovementType.purchase:
         return l10n.translate(AppStrings.purchase);
       case MovementType.sale:
@@ -296,6 +325,8 @@ class _MovementListScreenState extends State<MovementListScreen> {
         return l10n.translate(AppStrings.slaughter);
       case MovementType.temporaryOut:
         return l10n.translate(AppStrings.temporaryOut);
+      case MovementType.temporaryReturn:
+        return l10n.translate(AppStrings.temporaryReturn);
     }
   }
 }
@@ -313,11 +344,7 @@ class _MovementCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-
-    // Déterminer s'il s'agit d'un lot ou d'un animal individuel
-    final isBatch = movement.animalId.startsWith('batch_');
-    final animal = !isBatch ? context.read<AnimalProvider>().getAnimalById(movement.animalId) : null;
-    final batch = isBatch ? context.read<BatchProvider>().getBatchById(movement.animalId) : null;
+    final animal = context.read<AnimalProvider>().getAnimalById(movement.animalId);
 
     return InkWell(
       onTap: onTap,
@@ -374,20 +401,18 @@ class _MovementCard extends StatelessWidget {
                     ),
                     const SizedBox(height: AppConstants.spacingTiny),
 
-                    // Animal ou Lot
+                    // Animal
                     Row(
                       children: [
-                        Icon(
-                          isBatch ? Icons.workspaces : Icons.pets,
+                        const Icon(
+                          Icons.pets,
                           size: AppConstants.iconSizeXSmall,
                           color: Colors.grey,
                         ),
                         const SizedBox(width: AppConstants.spacingTiny),
                         Flexible(
                           child: Text(
-                            isBatch
-                                ? (batch?.name ?? movement.animalId)
-                                : (animal?.currentEid ?? animal?.officialNumber ?? movement.animalId),
+                            animal?.currentEid ?? animal?.officialNumber ?? movement.animalId,
                             style: const TextStyle(
                               fontSize: AppConstants.fontSizeBody,
                               fontWeight: FontWeight.w500,
@@ -483,6 +508,8 @@ class _MovementCard extends StatelessWidget {
   /// Retourne la couleur associée au type de mouvement
   Color _getMovementTypeColor(MovementType type) {
     switch (type) {
+      case MovementType.birth:
+        return Colors.green;
       case MovementType.purchase:
         return Colors.blue;
       case MovementType.sale:
@@ -493,12 +520,16 @@ class _MovementCard extends StatelessWidget {
         return Colors.purple;
       case MovementType.temporaryOut:
         return Colors.teal;
+      case MovementType.temporaryReturn:
+        return Colors.cyan;
     }
   }
 
   /// Retourne l'icône associée au type de mouvement
   IconData _getMovementTypeIcon(MovementType type) {
     switch (type) {
+      case MovementType.birth:
+        return Icons.child_care;
       case MovementType.purchase:
         return Icons.shopping_cart;
       case MovementType.sale:
@@ -509,6 +540,8 @@ class _MovementCard extends StatelessWidget {
         return Icons.content_cut;
       case MovementType.temporaryOut:
         return Icons.exit_to_app;
+      case MovementType.temporaryReturn:
+        return Icons.keyboard_return;
     }
   }
 
@@ -516,6 +549,8 @@ class _MovementCard extends StatelessWidget {
   String _getMovementTypeLabel(BuildContext context, MovementType type) {
     final l10n = AppLocalizations.of(context);
     switch (type) {
+      case MovementType.birth:
+        return l10n.translate(AppStrings.birth);
       case MovementType.purchase:
         return l10n.translate(AppStrings.purchase);
       case MovementType.sale:
@@ -526,6 +561,8 @@ class _MovementCard extends StatelessWidget {
         return l10n.translate(AppStrings.slaughter);
       case MovementType.temporaryOut:
         return l10n.translate(AppStrings.temporaryOut);
+      case MovementType.temporaryReturn:
+        return l10n.translate(AppStrings.temporaryReturn);
     }
   }
 }
