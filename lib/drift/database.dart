@@ -183,7 +183,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 4;
 
   // ═══════════════════════════════════════════════════════════
   // MIGRATION STRATEGY
@@ -264,13 +264,6 @@ class AppDatabase extends _$AppDatabase {
           // ───────────────────────────────────────────────────
           if (from < 4) {
             await _migrateToV4LotsRefactoring();
-          }
-
-          // ───────────────────────────────────────────────────
-          // MIGRATION v4 → v5: Add lotId column to movements table
-          // ───────────────────────────────────────────────────
-          if (from < 5) {
-            await _migrateToV5AddLotIdToMovements();
           }
         },
       );
@@ -1352,29 +1345,6 @@ class AppDatabase extends _$AppDatabase {
 
     // Réactiver les foreign keys
     await customStatement('PRAGMA foreign_keys = ON;');
-  }
-
-  // ───────────────────────────────────────────────────────────
-  // MIGRATION v4 → v5: Add lotId column to movements table
-  // ───────────────────────────────────────────────────────────
-  /// Migration v4 → v5: Ajout de la colonne lot_id à la table movements
-  ///
-  /// Cette migration ajoute la colonne lot_id à la table movements pour
-  /// permettre la traçabilité des mouvements issus de la finalisation d'un lot.
-  ///
-  /// - lot_id NULL = mouvement individuel
-  /// - lot_id NON NULL = mouvement créé via finalisation de lot
-  Future<void> _migrateToV5AddLotIdToMovements() async {
-    // Ajouter la colonne lot_id
-    await customStatement(
-      'ALTER TABLE movements ADD COLUMN lot_id TEXT;',
-    );
-
-    // Créer l'index pour lot_id
-    await customStatement(
-      'CREATE INDEX IF NOT EXISTS idx_movements_lot_id '
-      'ON movements(lot_id);',
-    );
   }
 
   // ═══════════════════════════════════════════════════════════
