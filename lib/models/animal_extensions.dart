@@ -36,53 +36,32 @@ extension AnimalDisplayExtensions on Animal {
 
   // ==================== RACE (BREED) ====================
 
-  /// Obtenir le nom de la race selon la locale
-  String getBreedName(String locale) {
-    if (breedId == null) return '';
-    return AnimalConfig.getBreedName(breedId!, locale);
-  }
-
-  /// Obtenir le nom de la race en français
-  String get breedNameFr => getBreedName('fr');
-
-  /// Obtenir le nom de la race en anglais
-  String get breedNameEn => getBreedName('en');
-
-  /// Obtenir le nom de la race en arabe
-  String get breedNameAr => getBreedName('ar');
-
   /// Vérifier si l'animal a une race définie
   bool get hasBreed => breedId != null && breedId!.isNotEmpty;
 
   // ==================== AFFICHAGE COMBINÉ ====================
 
-  /// Obtenir le texte complet "Type - Race" selon la locale
+  /// Obtenir le texte du type (species only, breed requires BreedProvider)
+  /// Pour afficher la race, utiliser BreedProvider.getById(animal.breedId)
   String getSpeciesBreedDisplay(String locale) {
     if (!hasSpecies) return '';
-
-    final speciesName = getSpeciesName(locale);
-
-    if (!hasBreed) {
-      return speciesName;
-    }
-
-    final breedName = getBreedName(locale);
-    return '$speciesName - $breedName';
+    return getSpeciesName(locale);
   }
 
-  /// Obtenir "Type - Race" en français
+  /// Obtenir le type en français (species only)
   String get speciesBreedDisplayFr => getSpeciesBreedDisplay('fr');
 
-  /// Obtenir "Type - Race" en anglais
+  /// Obtenir le type en anglais (species only)
   String get speciesBreedDisplayEn => getSpeciesBreedDisplay('en');
 
-  /// Obtenir "Type - Race" en arabe
+  /// Obtenir le type en arabe (species only)
   String get speciesBreedDisplayAr => getSpeciesBreedDisplay('ar');
 
-  /// Obtenir l'affichage complet avec icône : "🐑 Ovin - Mérinos"
+  /// Obtenir l'affichage avec icône : "🐑 Ovin"
+  /// Pour inclure la race, utiliser BreedProvider.getById(animal.breedId)
   String getFullDisplay(String locale) {
     if (!hasSpecies) return '';
-    return '$speciesIcon ${getSpeciesBreedDisplay(locale)}';
+    return '$speciesIcon ${getSpeciesName(locale)}';
   }
 
   /// Obtenir l'affichage complet en français avec icône

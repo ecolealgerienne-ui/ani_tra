@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 
 import '../../providers/animal_provider.dart';
 import '../../providers/alert_provider.dart';
+import '../../providers/breed_provider.dart';
 import '../../models/animal.dart';
 import '../../models/animal_extensions.dart';
 import '../../models/alert.dart';
@@ -367,7 +368,8 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                     '❓ ${AppLocalizations.of(context).translate(AppStrings.undefinedBreed)}', () => [])
                 .add(animal);
           } else {
-            final key = animal.breedNameFr;
+            final breed = context.read<BreedProvider>().getById(animal.breedId!);
+            final key = breed?.nameFr ?? animal.breedId!;
             groups.putIfAbsent(key, () => []).add(animal);
           }
         }
@@ -1369,7 +1371,7 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                               _species.remove(species.id);
                               // Retirer les races de ce type
                               final breedsToRemove =
-                                  AnimalConfig.getBreedsBySpecies(species.id)
+                                  context.read<BreedProvider>().getBySpeciesId(species.id)
                                       .map((b) => b.id)
                                       .toSet();
                               _breeds.removeAll(breedsToRemove);
@@ -1400,11 +1402,11 @@ class _FiltersDrawerState extends State<_FiltersDrawer> {
                       )
                     else
                       ...() {
-                        // Obtenir toutes les races des types sÃƒÆ’Ã‚Â©lectionnÃƒÆ’Ã‚Â©s
+                        // Obtenir toutes les races des types sÃƒÆ'Ã‚Â©lectionnÃƒÆ'Ã‚Â©s
                         final availableBreeds = <Breed>[];
                         for (final speciesId in _species) {
                           availableBreeds.addAll(
-                              AnimalConfig.getBreedsBySpecies(speciesId));
+                              context.read<BreedProvider>().getBySpeciesId(speciesId));
                         }
                         return availableBreeds.map((breed) {
                           return CheckboxListTile(

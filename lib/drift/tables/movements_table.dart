@@ -92,6 +92,14 @@ class MovementsTable extends Table {
   DateTimeColumn get expectedReturnDate =>
       dateTime().nullable().named('expected_return_date')();
 
+  /// Date de retour réelle (remplie quand l'animal revient)
+  DateTimeColumn get returnDate =>
+      dateTime().nullable().named('return_date')();
+
+  /// Notes sur le retour
+  TextColumn get returnNotes =>
+      text().nullable().named('return_notes')();
+
   /// ID du mouvement associé (lien bidirectionnel)
   /// Pour temporary_out: rempli quand le retour est créé
   /// Pour temporary_return: pointe vers le temporary_out original

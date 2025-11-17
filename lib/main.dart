@@ -119,6 +119,7 @@ void main() async {
   final farmRepository = FarmRepository(database);
   final farmPreferencesRepository = FarmPreferencesRepository(database);
   final movementRepository = MovementRepository(database);
+  final medicalProductRepository = MedicalProductRepository(database);
 
   runApp(MyApp(
     database: database,
@@ -133,6 +134,7 @@ void main() async {
     breedingRepository: breedingRepository,
     documentRepository: documentRepository,
     treatmentRepository: treatmentRepository,
+    medicalProductRepository: medicalProductRepository,
     alertConfigurationRepository: alertConfigurationRepository,
     farmRepository: farmRepository,
     farmPreferencesRepository: farmPreferencesRepository,
@@ -153,6 +155,7 @@ class MyApp extends StatelessWidget {
   final BreedingRepository breedingRepository;
   final DocumentRepository documentRepository;
   final TreatmentRepository treatmentRepository;
+  final MedicalProductRepository medicalProductRepository;
   final AlertConfigurationRepository alertConfigurationRepository;
   final FarmRepository farmRepository;
   final FarmPreferencesRepository farmPreferencesRepository;
