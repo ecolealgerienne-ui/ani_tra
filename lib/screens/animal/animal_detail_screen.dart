@@ -14,6 +14,7 @@ import '../../providers/alert_provider.dart';
 import '../../providers/vaccination_provider.dart';
 import '../../providers/treatment_provider.dart';
 import '../../providers/breed_provider.dart';
+import '../../providers/species_provider.dart';
 import '../../models/alert.dart';
 import '../../models/alert_type.dart';
 import '../../models/alert_category.dart';
@@ -228,14 +229,16 @@ class _AnimalHeader extends StatelessWidget {
                 ),
                 // ÉTAPE 7 : Afficher Type et Race
                 if (animal.hasSpecies)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(
-                      animal.fullDisplayFr, // "🐑 Ovin - Mérinos"
-                      style: TextStyle(
-                        color: Colors.blue[700],
-                        fontWeight: FontWeight.w500,
-                        fontSize: AppConstants.fontSizeSubtitle,
+                  Consumer<SpeciesProvider>(
+                    builder: (context, speciesProvider, _) => Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        animal.fullDisplayFr(speciesProvider), // "🐑 Ovin - Mérinos"
+                        style: TextStyle(
+                          color: Colors.blue[700],
+                          fontWeight: FontWeight.w500,
+                          fontSize: AppConstants.fontSizeSubtitle,
+                        ),
                       ),
                     ),
                   ),
@@ -483,15 +486,16 @@ class _InfosTab extends StatelessWidget {
 
           // ÉTAPE 7 : Section Type et Race
           if (currentAnimal.hasSpecies)
-            _InfoCard(
-              title: AppLocalizations.of(context).translate(AppStrings.typeAndBreedSection),
-              children: [
-                _InfoRow(
-                  label: AppLocalizations.of(context)
-                      .translate(AppStrings.species),
-                  value: currentAnimal.speciesNameFr,
-                  icon: currentAnimal.speciesIcon,
-                ),
+            Consumer<SpeciesProvider>(
+              builder: (context, speciesProvider, _) => _InfoCard(
+                title: AppLocalizations.of(context).translate(AppStrings.typeAndBreedSection),
+                children: [
+                  _InfoRow(
+                    label: AppLocalizations.of(context)
+                        .translate(AppStrings.species),
+                    value: currentAnimal.speciesNameFr(speciesProvider),
+                    icon: currentAnimal.speciesIcon(speciesProvider),
+                  ),
                 if (currentAnimal.hasBreed)
                   _InfoRow(
                     label: AppLocalizations.of(context)
@@ -508,7 +512,8 @@ class _InfosTab extends StatelessWidget {
                       fontStyle: FontStyle.italic,
                     ),
                   ),
-              ],
+                ],
+              ),
             ),
 
           if (currentAnimal.hasSpecies) const SizedBox(height: AppConstants.spacingMedium),

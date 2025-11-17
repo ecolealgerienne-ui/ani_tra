@@ -348,13 +348,14 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
         break;
 
       case GroupByOption.species:
+        final speciesProvider = context.read<SpeciesProvider>();
         for (final animal in animals) {
           if (animal.speciesId == null) {
             groups
                 .putIfAbsent('❓ ${AppLocalizations.of(context).translate(AppStrings.undefinedType)}', () => [])
                 .add(animal);
           } else {
-            final key = animal.fullDisplayFr.split(' - ').first;
+            final key = animal.fullDisplayFr(speciesProvider).split(' - ').first;
             groups.putIfAbsent(key, () => []).add(animal);
           }
         }
@@ -873,6 +874,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     List<Alert> alerts,
     AnimalProvider animalProvider,
   ) {
+    final speciesProvider = context.read<SpeciesProvider>();
     return Card(
       margin: const EdgeInsets.only(bottom: AppConstants.spacingExtraSmall),
       child: InkWell(
@@ -889,7 +891,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
           padding: const EdgeInsets.all(AppConstants.spacingSmall),
           child: Row(
             children: [
-              // IcÃƒÆ’Ã‚Â´ne espÃƒÆ’Ã‚Â¨ce
+              // IcÃƒÆ'Ã‚Â´ne espÃƒÆ'Ã‚Â¨ce
               Container(
                 width: AppConstants.iconContainerSize,
                 height: AppConstants.iconContainerSize,
@@ -899,7 +901,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                 ),
                 child: Center(
                   child: Text(
-                    animal.speciesIcon,
+                    animal.speciesIcon(speciesProvider),
                     style: const TextStyle(fontSize: AppConstants.fontSizeExtraLarge),
                   ),
                 ),
