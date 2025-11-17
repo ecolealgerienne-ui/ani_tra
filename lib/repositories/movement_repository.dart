@@ -295,6 +295,7 @@ class MovementRepository {
       id: data.id,
       farmId: data.farmId,
       animalId: data.animalId,
+      lotId: data.lotId,
       type: _parseMovementType(data.type),
       movementDate: data.movementDate,
       fromFarmId: data.fromFarmId,
@@ -333,6 +334,9 @@ class MovementRepository {
       id: Value(movement.id),
       farmId: Value(farmId),
       animalId: Value(movement.animalId),
+      lotId: movement.lotId != null
+          ? Value(movement.lotId!)
+          : const Value.absent(),
       type: Value(movement.type.name),
       movementDate: Value(movement.movementDate),
       fromFarmId: movement.fromFarmId != null
