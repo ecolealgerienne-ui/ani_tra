@@ -64,7 +64,9 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
         final movement = Movement(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           animalId: animal.id,
+          lotId: widget.lotId, // Lien avec le lot (null si abattage individuel)
           type: MovementType.slaughter,
+          status: MovementStatus.closed,
           movementDate: _slaughterDate,
           notes: notesText,
           createdAt: DateTime.now(),
@@ -88,7 +90,9 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
           final movement = Movement(
             id: '${DateTime.now().millisecondsSinceEpoch}_$animalId',
             animalId: animal.id,
+            lotId: widget.lotId, // Lien avec le lot (null si abattage individuel)
             type: MovementType.slaughter,
+            status: MovementStatus.closed,
             movementDate: _slaughterDate,
             notes: notesText,
             createdAt: DateTime.now(),

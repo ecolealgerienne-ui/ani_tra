@@ -78,9 +78,11 @@ class _SaleScreenState extends State<SaleScreen> {
         final movement = Movement(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           animalId: animal.id,
+          lotId: widget.lotId, // Lien avec le lot (null si vente individuelle)
           type: MovementType.sale,
+          status: MovementStatus.ongoing,
           movementDate: _saleDate,
-          price: price,
+          price: widget.lotId != null ? null : price, // Prix null si lot (géré au niveau lot), sinon prix individuel
           notes: notesText,
           createdAt: DateTime.now(),
         );
@@ -103,9 +105,11 @@ class _SaleScreenState extends State<SaleScreen> {
           final movement = Movement(
             id: '${DateTime.now().millisecondsSinceEpoch}_$animalId',
             animalId: animal.id,
+            lotId: widget.lotId, // Lien avec le lot (null si vente individuelle)
             type: MovementType.sale,
+            status: MovementStatus.ongoing,
             movementDate: _saleDate,
-            price: price,
+            price: widget.lotId != null ? null : price, // Prix null si lot (géré au niveau lot), sinon prix individuel
             notes: notesText,
             createdAt: DateTime.now(),
           );

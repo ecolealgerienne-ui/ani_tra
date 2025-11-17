@@ -308,6 +308,7 @@ class LotProvider extends ChangeNotifier {
 
   /// PHASE 1: MODIFY - Use status=closed instead of completed=true
   /// PHASE 2: Removed deprecated sale/slaughter parameters (now stored in Movement)
+  /// PHASE 3: Added price_total, buyer_name, seller_name for sale/purchase lots
   Future<bool> finalizeLot(
     String lotId, {
     LotType? type,
@@ -317,10 +318,16 @@ class LotProvider extends ChangeNotifier {
     DateTime? withdrawalEndDate,
     String? veterinarianId,
     String? veterinarianName,
+    double? priceTotal,
+    String? buyerName,
+    String? sellerName,
     String? notes,
   }) async {
     final lot = getLotById(lotId);
     if (lot == null || lot.status != LotStatus.open) return false;
+
+    // PHASE 3: Empêcher la fermeture de lot vide
+    if (lot.animalIds.isEmpty) return false;
 
     final updated = lot.copyWith(
       type: type,
@@ -333,6 +340,9 @@ class LotProvider extends ChangeNotifier {
       withdrawalEndDate: withdrawalEndDate,
       veterinarianId: veterinarianId,
       veterinarianName: veterinarianName,
+      priceTotal: priceTotal,
+      buyerName: buyerName,
+      sellerName: sellerName,
       notes: notes,
     );
 
