@@ -252,11 +252,11 @@ class AppDatabase extends _$AppDatabase {
             await _migrateToV2AddUniqueConstraints();
           }
 
-          // ───────────────────────────────────────────────────────
-          // MIGRATION v2 → v3: Add return fields to movements table
-          // ───────────────────────────────────────────────────────
+          // ───────────────────────────────────────────────────
+          // MIGRATION v2 → v3: Add status column to movements table
+          // ───────────────────────────────────────────────────
           if (from < 3) {
-            await _migrateToV3AddReturnFields();
+            await _migrateToV3AddMovementStatus();
           }
         },
       );
@@ -1215,18 +1215,33 @@ class AppDatabase extends _$AppDatabase {
     await customStatement('PRAGMA foreign_keys = ON;');
   }
 
-  /// Migration v2 → v3: Ajouter les champs de retour à la table movements
+  /// Migration v2 → v3: Ajouter une colonne status à la table movements
   ///
-  /// Cette migration ajoute deux nouveaux champs à la table movements :
-  /// - return_date: Date de retour pour les mouvements temporaires
-  /// - return_notes: Notes sur le retour de l'animal
-  Future<void> _migrateToV3AddReturnFields() async {
+  /// Cette migration ajoute une colonne status avec une valeur par défaut basée sur le type de mouvement:
+  /// - birth, death, slaughter, temporaryReturn → 'closed'
+  /// - sale, purchase, temporaryOut → 'ongoing'
+  Future<void> _migrateToV3AddMovementStatus() async {
+    // Étape 1: Ajouter la colonne status avec une valeur par défaut temporaire
     await customStatement(
-      'ALTER TABLE movements ADD COLUMN return_date INTEGER;',
+      'ALTER TABLE movements ADD COLUMN status TEXT NOT NULL DEFAULT "ongoing";',
     );
-    await customStatement(
-      'ALTER TABLE movements ADD COLUMN return_notes TEXT;',
-    );
+
+    // Étape 2: Mettre à jour les statuts en fonction du type de mouvement
+    // Les événements ponctuels (birth, death, slaughter, temporaryReturn) sont immédiatement clos
+    await customStatement('''
+      UPDATE movements
+      SET status = 'closed'
+      WHERE type IN ('birth', 'death', 'slaughter', 'temporaryReturn');
+    ''');
+
+    // Les mouvements temporaires sortants qui ont un retour associé sont clos
+    await customStatement('''
+      UPDATE movements
+      SET status = 'closed'
+      WHERE type = 'temporaryOut' AND related_movement_id IS NOT NULL;
+    ''');
+
+    // Note: Les sales, purchases et temporaryOut sans retour restent 'ongoing' (valeur par défaut)
   }
 
   // ═══════════════════════════════════════════════════════════
