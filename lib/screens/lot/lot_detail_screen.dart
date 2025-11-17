@@ -5,8 +5,10 @@ import 'package:intl/intl.dart';
 
 import '../../providers/lot_provider.dart';
 import '../../providers/animal_provider.dart';
+import '../../providers/movement_provider.dart';
 import '../../models/lot.dart';
 import '../../models/animal.dart';
+import '../../models/movement.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
@@ -108,8 +110,8 @@ class LotDetailScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Consumer2<LotProvider, AnimalProvider>(
-        builder: (context, lotProvider, animalProvider, child) {
+      body: Consumer3<LotProvider, AnimalProvider, MovementProvider>(
+        builder: (context, lotProvider, animalProvider, movementProvider, child) {
           final lot = lotProvider.getLotById(lotId);
 
           if (lot == null) {
@@ -140,12 +142,16 @@ class LotDetailScreen extends StatelessWidget {
           }
 
           final animals = _getAnimalsInLot(lot, animalProvider);
+          // Récupérer les mouvements liés au lot
+          final lotMovements = movementProvider.movements
+              .where((m) => m.lotId == lotId)
+              .toList();
 
           return ListView(
             children: [
               _buildHeader(context, lot),
               _buildStatusSection(context, lot),
-              if (lot.type != null) _buildTypeSection(context, lot),
+              if (lot.type != null) _buildTypeSection(context, lot, lotMovements),
               _buildStatisticsSection(context, lot, animals),
               _buildAnimalsSection(context, lot, animals),
               if (lot.status == LotStatus.open)
@@ -293,7 +299,9 @@ class LotDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTypeSection(BuildContext context, Lot lot) {
+  Widget _buildTypeSection(BuildContext context, Lot lot, List<Movement> lotMovements) {
+    final firstMovement = lotMovements.isNotEmpty ? lotMovements.first : null;
+
     return Padding(
       padding:
           const EdgeInsets.symmetric(horizontal: AppConstants.spacingMedium),
@@ -318,7 +326,7 @@ class LotDetailScreen extends StatelessWidget {
               ),
               const SizedBox(height: AppConstants.spacingMedium),
 
-              // Traitement
+              // TRAITEMENT
               if (lot.type == LotType.treatment && lot.productName != null) ...[
                 _buildInfoRow(
                     AppLocalizations.of(context).translate(AppStrings.product),
@@ -343,10 +351,94 @@ class LotDetailScreen extends StatelessWidget {
                 ],
               ],
 
-              // TODO: Récupérer et afficher les informations de vente/abattage depuis Movement
-              // Les données de vente (acheteur, prix) et d'abattage (abattoir, date) sont maintenant
-              // stockées dans les objets Movement liés au lot via Movement.lotId == lot.id
-              // Implémenter la récupération et l'affichage de ces données
+              // VENTE
+              if (lot.type == LotType.sale) ...[
+                if (lot.buyerName != null) ...[
+                  _buildInfoRow(
+                    'Acheteur',
+                    lot.buyerName!,
+                    Icons.person,
+                  ),
+                ],
+                if (firstMovement?.buyerType != null) ...[
+                  const SizedBox(height: AppConstants.spacingSmall),
+                  _buildInfoRow(
+                    'Type',
+                    _getBuyerTypeLabel(firstMovement!.buyerType!),
+                    Icons.category,
+                  ),
+                ],
+                if (lot.priceTotal != null) ...[
+                  const SizedBox(height: AppConstants.spacingSmall),
+                  _buildInfoRow(
+                    'Prix total',
+                    '${lot.priceTotal!.toStringAsFixed(2)}€',
+                    Icons.euro,
+                  ),
+                ],
+                if (lot.completedAt != null) ...[
+                  const SizedBox(height: AppConstants.spacingSmall),
+                  _buildInfoRow(
+                    'Date de vente',
+                    DateFormat('dd/MM/yyyy').format(lot.completedAt!),
+                    Icons.calendar_today,
+                  ),
+                ],
+              ],
+
+              // ABATTAGE
+              if (lot.type == LotType.slaughter && firstMovement != null) ...[
+                if (firstMovement.slaughterhouseName != null) ...[
+                  _buildInfoRow(
+                    'Abattoir',
+                    firstMovement.slaughterhouseName!,
+                    Icons.business,
+                  ),
+                ],
+                if (firstMovement.slaughterhouseId != null) ...[
+                  const SizedBox(height: AppConstants.spacingSmall),
+                  _buildInfoRow(
+                    'Agrément',
+                    firstMovement.slaughterhouseId!,
+                    Icons.badge,
+                  ),
+                ],
+                if (lot.completedAt != null) ...[
+                  const SizedBox(height: AppConstants.spacingSmall),
+                  _buildInfoRow(
+                    'Date d\'abattage',
+                    DateFormat('dd/MM/yyyy').format(lot.completedAt!),
+                    Icons.calendar_today,
+                  ),
+                ],
+              ],
+
+              // ACHAT
+              if (lot.type == LotType.purchase) ...[
+                if (lot.sellerName != null) ...[
+                  _buildInfoRow(
+                    'Vendeur',
+                    lot.sellerName!,
+                    Icons.person_outline,
+                  ),
+                ],
+                if (lot.priceTotal != null) ...[
+                  const SizedBox(height: AppConstants.spacingSmall),
+                  _buildInfoRow(
+                    'Prix total',
+                    '${lot.priceTotal!.toStringAsFixed(2)}€',
+                    Icons.euro,
+                  ),
+                ],
+                if (lot.completedAt != null) ...[
+                  const SizedBox(height: AppConstants.spacingSmall),
+                  _buildInfoRow(
+                    'Date d\'achat',
+                    DateFormat('dd/MM/yyyy').format(lot.completedAt!),
+                    Icons.calendar_today,
+                  ),
+                ],
+              ],
 
               // Notes
               if (lot.notes != null && lot.notes!.isNotEmpty) ...[
@@ -367,6 +459,21 @@ class LotDetailScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _getBuyerTypeLabel(String buyerType) {
+    switch (buyerType) {
+      case 'individual':
+        return 'Particulier';
+      case 'farm':
+        return 'Ferme';
+      case 'trader':
+        return 'Négociant';
+      case 'cooperative':
+        return 'Coopérative';
+      default:
+        return buyerType;
+    }
   }
 
   Widget _buildStatisticsSection(
