@@ -12,6 +12,7 @@ import '../../models/breed.dart';
 
 import '../../providers/animal_provider.dart';
 import '../../providers/breed_provider.dart';
+import '../../providers/movement_provider.dart';
 import '../../providers/sync_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../providers/farm_preferences_provider.dart';
@@ -349,10 +350,10 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
       // Mode création : ajouter l'animal
       await animalProvider.addAnimal(animal);
 
-      // 2. CrÃƒÂ©er le mouvement correspondant
+      // 2. Créer le mouvement correspondant (uniquement pour Achat)
       Movement? movement;
 
-      // Note: Les naissances ne créent pas de mouvement car ce ne sont pas des mouvements
+      // NOTE: Birth is NOT a business movement - only Purchase creates a movement
       if (_selectedOrigin ==
           AppLocalizations.of(context).translate(AppStrings.purchase)) {
         movement = Movement(
@@ -375,8 +376,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
       }
 
       if (movement != null) {
-        // Note: Les mouvements sont gÃƒÂ©rÃƒÂ©s via MovementProvider
-        // Pour l'instant, on les ignore dans cet ÃƒÂ©cran simplifiÃƒÂ©
+        final movementProvider = context.read<MovementProvider>();
+        await movementProvider.addMovement(movement);
       }
 
       // 3. IncrÃƒÂ©menter les donnÃƒÂ©es en attente de sync
