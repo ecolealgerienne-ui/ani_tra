@@ -671,53 +671,8 @@ class _LotCard extends StatelessWidget {
               ),
             ],
 
-            // ignore: deprecated_member_use
-            if (lot.type == LotType.sale && lot.buyerName != null) ...[
-              const SizedBox(height: AppConstants.spacingSmall),
-              Row(
-                children: [
-                  const Icon(Icons.person,
-                      size: AppConstants.iconSizeSmall,
-                      color: AppConstants.successGreen),
-                  const SizedBox(width: AppConstants.spacingTiny),
-                  // ignore: deprecated_member_use
-                  Text(
-                    lot.buyerName!,
-                    style: const TextStyle(
-                        fontSize: AppConstants.fontSizeSubtitle),
-                  ),
-                  if (lot.totalPrice != null) ...[
-                    const SizedBox(width: AppConstants.spacingSmall),
-                    Text(
-                      '${lot.totalPrice!.toStringAsFixed(2)}€',
-                      style: const TextStyle(
-                        fontSize: AppConstants.fontSizeSubtitle,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ],
-
-            // ignore: deprecated_member_use
-            if (lot.type == LotType.slaughter &&
-                lot.slaughterhouseName != null) ...[
-              const SizedBox(height: AppConstants.spacingSmall),
-              Row(
-                children: [
-                  const Icon(Icons.factory,
-                      size: AppConstants.iconSizeSmall, color: Colors.grey),
-                  const SizedBox(width: AppConstants.spacingTiny),
-                  // ignore: deprecated_member_use
-                  Text(
-                    lot.slaughterhouseName!,
-                    style: const TextStyle(
-                        fontSize: AppConstants.fontSizeSubtitle),
-                  ),
-                ],
-              ),
-            ],
+            // TODO: Afficher les informations de vente/abattage depuis Movement
+            // Les données sont stockées dans Movement.lotId == lot.id
 
             const SizedBox(height: AppConstants.spacingSmall),
 

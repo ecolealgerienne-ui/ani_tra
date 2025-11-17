@@ -7,7 +7,6 @@ import '../models/animal.dart';
 import '../models/treatment.dart';
 import '../models/movement.dart';
 import '../repositories/lot_repository.dart';
-import '../utils/constants.dart';
 import 'auth_provider.dart';
 
 const uuid = Uuid();
@@ -308,6 +307,7 @@ class LotProvider extends ChangeNotifier {
   // ==================== Finalisation ====================
 
   /// PHASE 1: MODIFY - Use status=closed instead of completed=true
+  /// PHASE 2: Removed deprecated sale/slaughter parameters (now stored in Movement)
   Future<bool> finalizeLot(
     String lotId, {
     LotType? type,
@@ -317,14 +317,6 @@ class LotProvider extends ChangeNotifier {
     DateTime? withdrawalEndDate,
     String? veterinarianId,
     String? veterinarianName,
-    String? buyerName,
-    String? buyerFarmId,
-    double? totalPrice,
-    double? pricePerAnimal,
-    DateTime? saleDate,
-    String? slaughterhouseName,
-    String? slaughterhouseId,
-    DateTime? slaughterDate,
     String? notes,
   }) async {
     final lot = getLotById(lotId);
@@ -341,14 +333,6 @@ class LotProvider extends ChangeNotifier {
       withdrawalEndDate: withdrawalEndDate,
       veterinarianId: veterinarianId,
       veterinarianName: veterinarianName,
-      buyerName: buyerName,
-      buyerFarmId: buyerFarmId,
-      totalPrice: totalPrice,
-      pricePerAnimal: pricePerAnimal,
-      saleDate: saleDate,
-      slaughterhouseName: slaughterhouseName,
-      slaughterhouseId: slaughterhouseId,
-      slaughterDate: slaughterDate,
       notes: notes,
     );
 
@@ -401,14 +385,6 @@ class LotProvider extends ChangeNotifier {
           : null,
       veterinarianId: keepType ? sourceLot.veterinarianId : null,
       veterinarianName: keepType ? sourceLot.veterinarianName : null,
-      buyerName: keepType ? sourceLot.buyerName : null,
-      buyerFarmId: keepType ? sourceLot.buyerFarmId : null,
-      pricePerAnimal: keepType ? sourceLot.pricePerAnimal : null,
-      totalPrice: null,
-      saleDate: keepType ? DateTime.now() : null,
-      slaughterhouseName: keepType ? sourceLot.slaughterhouseName : null,
-      slaughterhouseId: keepType ? sourceLot.slaughterhouseId : null,
-      slaughterDate: keepType ? DateTime.now() : null,
       notes: keepType ? sourceLot.notes : null,
       farmId: _authProvider.currentFarmId,
     );
@@ -479,72 +455,30 @@ class LotProvider extends ChangeNotifier {
     }).toList();
   }
 
-  /// PHASE 3: Utilise les champs structurés de Movement (buyerName, buyerFarmId, buyerType)
-  /// au lieu de stocker les données dans notes (deprecated)
+  /// DEPRECATED: Cette méthode n'est plus utilisée depuis la suppression des champs sale du Lot
   ///
-  /// NOTE: Lecture légitime des champs Lot dépréciés pour migration vers Movement
+  /// Les Movement de vente doivent maintenant être créés LORS de la finalisation du lot
+  /// avec les données passées directement, pas extraites du Lot.
+  ///
+  /// TODO: Refactoriser pour accepter les données de vente en paramètres
+  @Deprecated('Sale data no longer stored in Lot. Create Movement directly with sale data.')
   List<Movement> expandLotToSaleMovements(Lot lot) {
-    if (lot.type != LotType.sale) return [];
-
-    // Détermine le type d'acheteur : 'farm' si buyerFarmId existe, sinon 'individual'
-    String? buyerType;
-    // ignore: deprecated_member_use
-    if (lot.buyerFarmId != null && lot.buyerFarmId!.isNotEmpty) {
-      buyerType = 'farm'; // BuyerTypeConstants.farm
-      // ignore: deprecated_member_use
-    } else if (lot.buyerName != null && lot.buyerName!.isNotEmpty) {
-      buyerType = 'individual'; // BuyerTypeConstants.individual
-    }
-
-    return lot.animalIds.map((animalId) {
-      return Movement(
-        id: uuid.v4(),
-        animalId: animalId,
-        type: MovementType.sale,
-        movementDate: lot.saleDate ?? DateTime.now(),
-        // ignore: deprecated_member_use
-        toFarmId: lot.buyerFarmId,
-        price: lot.pricePerAnimal,
-        // PHASE 3: Utilise les champs structurés au lieu de notes
-        // ignore: deprecated_member_use
-        buyerName: lot.buyerName,
-        // ignore: deprecated_member_use
-        buyerFarmId: lot.buyerFarmId,
-        buyerType: buyerType,
-        // Notes peuvent rester pour infos supplémentaires, mais pas pour données structurées
-        notes: null,
-        synced: false,
-        createdAt: DateTime.now(),
-        farmId: lot.farmId,
-      );
-    }).toList();
+    // Cette méthode retourne maintenant une liste vide
+    // Les Movement doivent être créés différemment
+    return [];
   }
 
-  /// PHASE 3: Utilise les champs structurés de Movement (slaughterhouseName, slaughterhouseId)
-  /// au lieu de stocker les données dans notes (deprecated)
+  /// DEPRECATED: Cette méthode n'est plus utilisée depuis la suppression des champs slaughter du Lot
   ///
-  /// NOTE: Lecture légitime des champs Lot dépréciés pour migration vers Movement
+  /// Les Movement d'abattage doivent maintenant être créés LORS de la finalisation du lot
+  /// avec les données passées directement, pas extraites du Lot.
+  ///
+  /// TODO: Refactoriser pour accepter les données d'abattage en paramètres
+  @Deprecated('Slaughter data no longer stored in Lot. Create Movement directly with slaughter data.')
   List<Movement> expandLotToSlaughterMovements(Lot lot) {
-    if (lot.type != LotType.slaughter) return [];
-
-    return lot.animalIds.map((animalId) {
-      return Movement(
-        id: uuid.v4(),
-        animalId: animalId,
-        type: MovementType.slaughter,
-        movementDate: lot.slaughterDate ?? DateTime.now(),
-        // PHASE 3: Utilise les champs structurés au lieu de notes
-        // ignore: deprecated_member_use
-        slaughterhouseName: lot.slaughterhouseName,
-        // ignore: deprecated_member_use
-        slaughterhouseId: lot.slaughterhouseId,
-        // Notes peuvent rester pour infos supplémentaires, mais pas pour données structurées
-        notes: null,
-        synced: false,
-        createdAt: DateTime.now(),
-        farmId: lot.farmId,
-      );
-    }).toList();
+    // Cette méthode retourne maintenant une liste vide
+    // Les Movement doivent être créés différemment
+    return [];
   }
 
   // ==================== Migration depuis Campaign ====================
