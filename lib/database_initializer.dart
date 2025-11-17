@@ -835,7 +835,78 @@ class DatabaseInitializer {
           ['adult_005', 'adult_006'],
         );
 
-        print('$_tag   ✅ Created 3 lots');
+        // CLOSED LOTS (finalisés avec mouvements) - 2 lots
+        await db.lotDao.insertLot(LotsTableCompanion.insert(
+          id: 'lot_closed_sale_001',
+          farmId: 'farm_default',
+          name: 'Vente Lot Été 2024',
+          type: const Value('sale'),
+          status: const Value('closed'),
+          completed: const Value(true),
+          completedAt: Value(now.subtract(const Duration(days: 15))),
+          priceTotal: const Value(1500.0),
+          buyerName: const Value('Coopérative Agricole du Sud'),
+          synced: const Value(false),
+          createdAt: now.subtract(const Duration(days: 20)),
+          updatedAt: now.subtract(const Duration(days: 15)),
+        ));
+        await db.lotAnimalDao.addAnimalsToLot(
+          'lot_closed_sale_001',
+          ['young_006', 'young_007', 'young_008'],
+        );
+        // Créer les mouvements de vente pour chaque animal du lot
+        for (final animalId in ['young_006', 'young_007', 'young_008']) {
+          await db.movementDao.insertItem(MovementsTableCompanion.insert(
+            id: 'mov_lot_sale_$animalId',
+            farmId: 'farm_default',
+            animalId: animalId,
+            lotId: const Value('lot_closed_sale_001'),
+            type: 'sale',
+            status: 'ongoing',
+            movementDate: now.subtract(const Duration(days: 15)),
+            buyerName: const Value('Coopérative Agricole du Sud'),
+            buyerType: const Value('cooperative'),
+            synced: const Value(false),
+            createdAt: now.subtract(const Duration(days: 15)),
+            updatedAt: now.subtract(const Duration(days: 15)),
+          ));
+        }
+
+        await db.lotDao.insertLot(LotsTableCompanion.insert(
+          id: 'lot_closed_slaughter_001',
+          farmId: 'farm_default',
+          name: 'Abattage Lot Printemps',
+          type: const Value('slaughter'),
+          status: const Value('closed'),
+          completed: const Value(true),
+          completedAt: Value(now.subtract(const Duration(days: 30))),
+          synced: const Value(false),
+          createdAt: now.subtract(const Duration(days: 35)),
+          updatedAt: now.subtract(const Duration(days: 30)),
+        ));
+        await db.lotAnimalDao.addAnimalsToLot(
+          'lot_closed_slaughter_001',
+          ['young_009', 'young_010'],
+        );
+        // Créer les mouvements d'abattage pour chaque animal du lot
+        for (final animalId in ['young_009', 'young_010']) {
+          await db.movementDao.insertItem(MovementsTableCompanion.insert(
+            id: 'mov_lot_slaughter_$animalId',
+            farmId: 'farm_default',
+            animalId: animalId,
+            lotId: const Value('lot_closed_slaughter_001'),
+            type: 'slaughter',
+            status: 'closed',
+            movementDate: now.subtract(const Duration(days: 30)),
+            slaughterhouseName: const Value('Abattoir Régional'),
+            slaughterhouseId: const Value('ABT-001'),
+            synced: const Value(false),
+            createdAt: now.subtract(const Duration(days: 30)),
+            updatedAt: now.subtract(const Duration(days: 30)),
+          ));
+        }
+
+        print('$_tag   ✅ Created 5 lots (3 open, 2 closed with movements)');
       } catch (e) {
         print('$_tag   ❌ Error creating lots: $e');
       }
@@ -1231,8 +1302,8 @@ class DatabaseInitializer {
       print('$_tag   - 3 Veterinarians');
       print('$_tag   - 5 Medical Products');
       print('$_tag   - 65 Animals (varied ages, statuses, species)');
-      print('$_tag   - 29 Movements (all types with enriched data)');
-      print('$_tag   - 3 Lots (open)');
+      print('$_tag   - 34 Movements (29 individual + 5 in lots)');
+      print('$_tag   - 5 Lots (3 open, 2 closed with movements)');
       print('$_tag   - 15 Treatments (active/expired withdrawal)');
       print('$_tag   - 11 Vaccinations (recent/batch/old)');
       print('$_tag   - 35 Weight Records (growth tracking)');
