@@ -180,6 +180,96 @@ class MovementRepository {
     return sales - purchases;
   }
 
+  // === PHASE 2: STRUCTURED SALE/SLAUGHTER QUERIES ===
+
+  /// Récupère les ventes par nom d'acheteur
+  ///
+  /// Recherche partielle sur le nom (insensible à la casse)
+  Future<List<Movement>> getSalesByBuyer(
+    String farmId,
+    String buyerName,
+  ) async {
+    final items = await _db.movementDao.findSalesByBuyer(farmId, buyerName);
+    return items.map((data) => _mapToModel(data)).toList();
+  }
+
+  /// Récupère les ventes à une ferme spécifique
+  ///
+  /// Filtre exact par buyerFarmId (ventes B2B)
+  Future<List<Movement>> getSalesByBuyerFarmId(
+    String farmId,
+    String buyerFarmId,
+  ) async {
+    final items =
+        await _db.movementDao.findSalesByBuyerFarmId(farmId, buyerFarmId);
+    return items.map((data) => _mapToModel(data)).toList();
+  }
+
+  /// Récupère les abattages par établissement
+  ///
+  /// Filtre par slaughterhouseId pour traçabilité
+  Future<List<Movement>> getSlaughtersByFacility(
+    String farmId,
+    String slaughterhouseId,
+  ) async {
+    final items = await _db.movementDao
+        .findSlaughtersByFacility(farmId, slaughterhouseId);
+    return items.map((data) => _mapToModel(data)).toList();
+  }
+
+  /// Calcule le total des ventes à un acheteur
+  ///
+  /// Agrégation financière par acheteur sur une période
+  Future<double> calculateTotalSalesByBuyer(
+    String farmId,
+    String buyerFarmId,
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
+    return await _db.movementDao
+        .calculateTotalSalesByBuyer(farmId, buyerFarmId, startDate, endDate);
+  }
+
+  // === PHASE 2: TEMPORARY MOVEMENT QUERIES ===
+
+  /// Récupère les mouvements temporaires actifs (non retournés)
+  ///
+  /// Tri par date de retour prévue (les plus urgents d'abord)
+  Future<List<Movement>> getActiveTemporaryMovements(String farmId) async {
+    final items = await _db.movementDao.findActiveTemporaryMovements(farmId);
+    return items.map((data) => _mapToModel(data)).toList();
+  }
+
+  /// Récupère les mouvements temporaires en retard
+  ///
+  /// Animaux qui auraient dû être retournés
+  Future<List<Movement>> getOverdueTemporaryMovements(String farmId) async {
+    final items = await _db.movementDao.findOverdueTemporaryMovements(farmId);
+    return items.map((data) => _mapToModel(data)).toList();
+  }
+
+  /// Récupère les mouvements temporaires par type
+  ///
+  /// Filtre par sous-type (loan, transhumance, boarding, etc.)
+  Future<List<Movement>> getTemporaryMovementsByType(
+    String farmId,
+    String temporaryMovementType,
+  ) async {
+    final items = await _db.movementDao
+        .findTemporaryMovementsByType(farmId, temporaryMovementType);
+    return items.map((data) => _mapToModel(data)).toList();
+  }
+
+  /// Compte les mouvements temporaires actifs
+  Future<int> countActiveTemporaryMovements(String farmId) async {
+    return await _db.movementDao.countActiveTemporaryMovements(farmId);
+  }
+
+  /// Compte les mouvements temporaires en retard
+  Future<int> countOverdueTemporaryMovements(String farmId) async {
+    return await _db.movementDao.countOverdueTemporaryMovements(farmId);
+  }
+
   // === SYNC OPERATIONS (Phase 2 ready) ===
 
   /// Récupère les mouvements non synchronisés
@@ -212,8 +302,20 @@ class MovementRepository {
       price: data.price,
       notes: data.notes,
       buyerQrSignature: data.buyerQrSignature,
-      returnDate: data.returnDate,
-      returnNotes: data.returnNotes,
+      // Phase 2: Structured Sale/Slaughter Data
+      buyerName: data.buyerName,
+      buyerFarmId: data.buyerFarmId,
+      buyerType: data.buyerType,
+      slaughterhouseName: data.slaughterhouseName,
+      slaughterhouseId: data.slaughterhouseId,
+      // Phase 2: Temporary Movements
+      isTemporary: data.isTemporary,
+      temporaryMovementType: data.temporaryMovementType,
+      expectedReturnDate: data.expectedReturnDate,
+      relatedMovementId: data.relatedMovementId,
+      // Status
+      status: _parseMovementStatus(data.status),
+      // Sync
       synced: data.synced,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
@@ -248,12 +350,36 @@ class MovementRepository {
       buyerQrSignature: movement.buyerQrSignature != null
           ? Value(movement.buyerQrSignature!)
           : const Value.absent(),
-      returnDate: movement.returnDate != null
-          ? Value(movement.returnDate!)
+      // Phase 2: Structured Sale/Slaughter Data
+      buyerName: movement.buyerName != null
+          ? Value(movement.buyerName!)
           : const Value.absent(),
-      returnNotes: movement.returnNotes != null
-          ? Value(movement.returnNotes!)
+      buyerFarmId: movement.buyerFarmId != null
+          ? Value(movement.buyerFarmId!)
           : const Value.absent(),
+      buyerType: movement.buyerType != null
+          ? Value(movement.buyerType!)
+          : const Value.absent(),
+      slaughterhouseName: movement.slaughterhouseName != null
+          ? Value(movement.slaughterhouseName!)
+          : const Value.absent(),
+      slaughterhouseId: movement.slaughterhouseId != null
+          ? Value(movement.slaughterhouseId!)
+          : const Value.absent(),
+      // Phase 2: Temporary Movements
+      isTemporary: Value(movement.isTemporary),
+      temporaryMovementType: movement.temporaryMovementType != null
+          ? Value(movement.temporaryMovementType!)
+          : const Value.absent(),
+      expectedReturnDate: movement.expectedReturnDate != null
+          ? Value(movement.expectedReturnDate!)
+          : const Value.absent(),
+      relatedMovementId: movement.relatedMovementId != null
+          ? Value(movement.relatedMovementId!)
+          : const Value.absent(),
+      // Status (required field)
+      status: Value(movement.status.name),
+      // Sync
       synced: Value(movement.synced),
       lastSyncedAt: movement.lastSyncedAt != null
           ? Value(movement.lastSyncedAt!)
@@ -273,7 +399,15 @@ class MovementRepository {
   MovementType _parseMovementType(String type) {
     return MovementType.values.firstWhere(
       (e) => e.name == type,
-      orElse: () => MovementType.purchase,
+      orElse: () => MovementType.birth,
+    );
+  }
+
+  /// Parse une string en MovementStatus enum
+  MovementStatus _parseMovementStatus(String status) {
+    return MovementStatus.values.firstWhere(
+      (e) => e.name == status,
+      orElse: () => MovementStatus.ongoing,
     );
   }
 }
