@@ -223,19 +223,11 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
               return;
             }
 
-            final totalPrice =
-                pricePerAnimal != null ? pricePerAnimal * lot.animalCount : 0.0;
-
+            // Les données de vente (acheteur, prix, date) sont stockées dans Movement
+            // et ont déjà été créées par SaleScreen
             final success = await lotProvider.finalizeLot(
               widget.lotId,
               type: LotType.sale,
-              buyerName: _buyerNameController.text,
-              buyerFarmId: _buyerFarmIdController.text.isEmpty
-                  ? null
-                  : _buyerFarmIdController.text,
-              pricePerAnimal: pricePerAnimal,
-              totalPrice: totalPrice,
-              saleDate: _saleDate,
               notes:
                   _notesController.text.isEmpty ? null : _notesController.text,
             );
@@ -294,14 +286,11 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
             final lotProvider = context.read<LotProvider>();
             final syncProvider = context.read<SyncProvider>();
 
+            // Les données d'abattage (abattoir, date) sont stockées dans Movement
+            // et ont déjà été créées par SlaughterScreen
             final success = await lotProvider.finalizeLot(
               widget.lotId,
               type: LotType.slaughter,
-              slaughterhouseName: _slaughterhouseNameController.text,
-              slaughterhouseId: _slaughterhouseIdController.text.isEmpty
-                  ? null
-                  : _slaughterhouseIdController.text,
-              slaughterDate: _slaughterDate,
               notes:
                   _notesController.text.isEmpty ? null : _notesController.text,
             );
