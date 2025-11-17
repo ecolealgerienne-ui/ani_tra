@@ -125,6 +125,8 @@ class _CreateTemporaryMovementScreenState
         notes: _notesController.text.trim().isNotEmpty
             ? _notesController.text.trim()
             : null,
+        isTemporary: true, // Mark as temporary movement
+        status: MovementStatus.ongoing, // Temporary out movements start as ongoing
         synced: false,
         createdAt: DateTime.now(),
       );
