@@ -39,7 +39,12 @@ class _MovementListScreenState extends State<MovementListScreen> {
               setState(() {
                 _selectedTypeFilter = type;
               });
-              context.read<MovementProvider>().setTypeFilter(type);
+              // Si null (Tous), on efface tous les filtres
+              if (type == null) {
+                context.read<MovementProvider>().clearFilters();
+              } else {
+                context.read<MovementProvider>().setTypeFilter(type);
+              }
             },
             itemBuilder: (context) => [
               PopupMenuItem<MovementType?>(
