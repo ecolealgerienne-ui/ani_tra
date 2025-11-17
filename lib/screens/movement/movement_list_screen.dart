@@ -48,7 +48,9 @@ class _MovementListScreenState extends State<MovementListScreen> {
                   children: [
                     const Icon(Icons.clear_all),
                     const SizedBox(width: AppConstants.spacingSmall),
-                    Text(l10n.translate(AppStrings.all)),
+                    Expanded(child: Text(l10n.translate(AppStrings.all))),
+                    if (_selectedTypeFilter == null)
+                      const Icon(Icons.check, color: Colors.green),
                   ],
                 ),
               ),
@@ -59,7 +61,9 @@ class _MovementListScreenState extends State<MovementListScreen> {
                   children: [
                     const Icon(Icons.shopping_cart, color: Colors.blue),
                     const SizedBox(width: AppConstants.spacingSmall),
-                    Text(l10n.translate(AppStrings.purchases)),
+                    Expanded(child: Text(l10n.translate(AppStrings.purchases))),
+                    if (_selectedTypeFilter == MovementType.purchase)
+                      const Icon(Icons.check, color: Colors.green),
                   ],
                 ),
               ),
@@ -69,7 +73,9 @@ class _MovementListScreenState extends State<MovementListScreen> {
                   children: [
                     const Icon(Icons.sell, color: Colors.orange),
                     const SizedBox(width: AppConstants.spacingSmall),
-                    Text(l10n.translate(AppStrings.sales)),
+                    Expanded(child: Text(l10n.translate(AppStrings.sales))),
+                    if (_selectedTypeFilter == MovementType.sale)
+                      const Icon(Icons.check, color: Colors.green),
                   ],
                 ),
               ),
@@ -79,7 +85,9 @@ class _MovementListScreenState extends State<MovementListScreen> {
                   children: [
                     const Icon(Icons.dangerous, color: Colors.red),
                     const SizedBox(width: AppConstants.spacingSmall),
-                    Text(l10n.translate(AppStrings.deaths)),
+                    Expanded(child: Text(l10n.translate(AppStrings.deaths))),
+                    if (_selectedTypeFilter == MovementType.death)
+                      const Icon(Icons.check, color: Colors.green),
                   ],
                 ),
               ),
@@ -89,7 +97,9 @@ class _MovementListScreenState extends State<MovementListScreen> {
                   children: [
                     const Icon(Icons.content_cut, color: Colors.purple),
                     const SizedBox(width: AppConstants.spacingSmall),
-                    Text(l10n.translate(AppStrings.slaughters)),
+                    Expanded(child: Text(l10n.translate(AppStrings.slaughters))),
+                    if (_selectedTypeFilter == MovementType.slaughter)
+                      const Icon(Icons.check, color: Colors.green),
                   ],
                 ),
               ),
@@ -99,7 +109,9 @@ class _MovementListScreenState extends State<MovementListScreen> {
                   children: [
                     const Icon(Icons.exit_to_app, color: Colors.teal),
                     const SizedBox(width: AppConstants.spacingSmall),
-                    Text(l10n.translate(AppStrings.temporaryOuts)),
+                    Expanded(child: Text(l10n.translate(AppStrings.temporaryOuts))),
+                    if (_selectedTypeFilter == MovementType.temporaryOut)
+                      const Icon(Icons.check, color: Colors.green),
                   ],
                 ),
               ),
