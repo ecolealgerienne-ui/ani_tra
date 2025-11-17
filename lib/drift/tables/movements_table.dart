@@ -22,6 +22,11 @@ class MovementsTable extends Table {
   // === Foreign Key ===
   TextColumn get animalId => text().named('animal_id')();
 
+  /// ID du lot source (si mouvement créé via finalisation de lot)
+  /// NULL = mouvement individuel
+  /// NON-NULL = mouvement issu d'un lot
+  TextColumn get lotId => text().nullable().named('lot_id')();
+
   // === Données métier ===
   /// Type: "birth", "purchase", "sale", "death", "slaughter" (MovementType enum)
   TextColumn get type => text()();
@@ -45,11 +50,62 @@ class MovementsTable extends Table {
   TextColumn get buyerQrSignature =>
       text().nullable().named('buyer_qr_signature')();
 
-  /// Date de retour (pour temporaryOut)
-  DateTimeColumn get returnDate => dateTime().nullable().named('return_date')();
+  // === Sale/Slaughter Structured Data ===
 
-  /// Notes de retour (pour temporaryOut)
-  TextColumn get returnNotes => text().nullable().named('return_notes')();
+  /// Nom de l'acheteur (particulier ou ferme)
+  /// Utilisé pour type='sale'
+  TextColumn get buyerName => text().nullable().named('buyer_name')();
+
+  /// ID de la ferme acheteuse (si applicable)
+  /// Utilisé pour type='sale' avec buyerType='farm'
+  TextColumn get buyerFarmId => text().nullable().named('buyer_farm_id')();
+
+  /// Type d'acheteur
+  /// Valeurs: 'individual', 'farm', 'trader', 'cooperative'
+  /// Utilisé pour type='sale'
+  TextColumn get buyerType => text().nullable().named('buyer_type')();
+
+  /// Nom de l'abattoir
+  /// Utilisé pour type='slaughter'
+  TextColumn get slaughterhouseName =>
+      text().nullable().named('slaughterhouse_name')();
+
+  /// Identifiant de l'abattoir (numéro agrément, etc.)
+  /// Utilisé pour type='slaughter'
+  TextColumn get slaughterhouseId =>
+      text().nullable().named('slaughterhouse_id')();
+
+  // === Temporary Movements (loan, transhumance, boarding, etc.) ===
+
+  /// Indique si le mouvement est temporaire (animal doit revenir)
+  /// true pour type='temporary_out', false après 'temporary_return'
+  BoolColumn get isTemporary =>
+      boolean().withDefault(const Constant(false))();
+
+  /// Sous-type de mouvement temporaire
+  /// Valeurs: 'loan', 'transhumance', 'boarding', 'quarantine', 'exhibition', etc.
+  /// Obligatoire si type='temporary_out' ou 'temporary_return'
+  TextColumn get temporaryMovementType =>
+      text().nullable().named('temporary_movement_type')();
+
+  /// Date de retour prévue (obligatoire pour temporary_out)
+  DateTimeColumn get expectedReturnDate =>
+      dateTime().nullable().named('expected_return_date')();
+
+  /// ID du mouvement associé (lien bidirectionnel)
+  /// Pour temporary_out: rempli quand le retour est créé
+  /// Pour temporary_return: pointe vers le temporary_out original
+  TextColumn get relatedMovementId =>
+      text().nullable().named('related_movement_id')();
+
+  // === Status ===
+
+  /// Statut du mouvement
+  /// Valeurs: "ongoing", "closed", "archived" (MovementStatus enum)
+  /// - ongoing: Mouvement actif, pas encore finalisé (ventes/achats en attente, départs temporaires)
+  /// - closed: Mouvement complété et validé (ventes/achats validés, retours effectués, événements ponctuels)
+  /// - archived: Mouvement ancien pour historique
+  TextColumn get status => text()();
 
   // === Sync fields (Phase 2 ready) ===
   BoolColumn get synced => boolean().withDefault(const Constant(false))();
