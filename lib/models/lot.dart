@@ -110,58 +110,6 @@ class Lot implements SyncableEntity {
   /// Nom du vétérinaire
   final String? veterinarianName;
 
-  // ==================== DONNÉES VENTE ====================
-
-  /// Nom de l'acheteur
-  /// @deprecated Utiliser Movement.buyerName à la place (v2.0+)
-  /// Conservé pour compatibilité ascendante pendant phase transition
-  @Deprecated('Use Movement.buyerName instead')
-  final String? buyerName;
-
-  /// ID de la ferme de l'acheteur
-  /// @deprecated Utiliser Movement.buyerFarmId à la place (v2.0+)
-  /// Conservé pour compatibilité ascendante pendant phase transition
-  @Deprecated('Use Movement.buyerFarmId instead')
-  final String? buyerFarmId;
-
-  /// Prix total de la vente
-  /// @deprecated Calculer depuis Movement.price (v2.0+)
-  /// Conservé pour compatibilité ascendante pendant phase transition
-  @Deprecated('Calculate from Movement.price instead')
-  final double? totalPrice;
-
-  /// Prix par animal
-  /// @deprecated Utiliser Movement.price à la place (v2.0+)
-  /// Conservé pour compatibilité ascendante pendant phase transition
-  @Deprecated('Use Movement.price instead')
-  final double? pricePerAnimal;
-
-  /// Date de la vente
-  /// @deprecated Utiliser Movement.movementDate à la place (v2.0+)
-  /// Conservé pour compatibilité ascendante pendant phase transition
-  @Deprecated('Use Movement.movementDate instead')
-  final DateTime? saleDate;
-
-  // ==================== DONNÉES ABATTAGE ====================
-
-  /// Nom de l'abattoir
-  /// @deprecated Utiliser Movement.slaughterhouseName à la place (v2.0+)
-  /// Conservé pour compatibilité ascendante pendant phase transition
-  @Deprecated('Use Movement.slaughterhouseName instead')
-  final String? slaughterhouseName;
-
-  /// ID de l'abattoir
-  /// @deprecated Utiliser Movement.slaughterhouseId à la place (v2.0+)
-  /// Conservé pour compatibilité ascendante pendant phase transition
-  @Deprecated('Use Movement.slaughterhouseId instead')
-  final String? slaughterhouseId;
-
-  /// Date d'abattage
-  /// @deprecated Utiliser Movement.movementDate à la place (v2.0+)
-  /// Conservé pour compatibilité ascendante pendant phase transition
-  @Deprecated('Use Movement.movementDate instead')
-  final DateTime? slaughterDate;
-
   // ==================== NOTES ====================
 
   /// Notes additionnelles
@@ -207,16 +155,6 @@ class Lot implements SyncableEntity {
     this.withdrawalEndDate,
     this.veterinarianId,
     this.veterinarianName,
-    // Vente
-    this.buyerName,
-    this.buyerFarmId,
-    this.totalPrice,
-    this.pricePerAnimal,
-    this.saleDate,
-    // Abattage
-    this.slaughterhouseName,
-    this.slaughterhouseId,
-    this.slaughterDate,
     // Notes
     this.notes,
     // Sync
@@ -270,16 +208,6 @@ class Lot implements SyncableEntity {
     DateTime? withdrawalEndDate,
     String? veterinarianId,
     String? veterinarianName,
-    // Vente
-    String? buyerName,
-    String? buyerFarmId,
-    double? totalPrice,
-    double? pricePerAnimal,
-    DateTime? saleDate,
-    // Abattage
-    String? slaughterhouseName,
-    String? slaughterhouseId,
-    DateTime? slaughterDate,
     // Notes
     String? notes,
     // Sync
@@ -305,16 +233,6 @@ class Lot implements SyncableEntity {
       withdrawalEndDate: withdrawalEndDate ?? this.withdrawalEndDate,
       veterinarianId: veterinarianId ?? this.veterinarianId,
       veterinarianName: veterinarianName ?? this.veterinarianName,
-      // Vente
-      buyerName: buyerName ?? this.buyerName,
-      buyerFarmId: buyerFarmId ?? this.buyerFarmId,
-      totalPrice: totalPrice ?? this.totalPrice,
-      pricePerAnimal: pricePerAnimal ?? this.pricePerAnimal,
-      saleDate: saleDate ?? this.saleDate,
-      // Abattage
-      slaughterhouseName: slaughterhouseName ?? this.slaughterhouseName,
-      slaughterhouseId: slaughterhouseId ?? this.slaughterhouseId,
-      slaughterDate: slaughterDate ?? this.slaughterDate,
       // Notes
       notes: notes ?? this.notes,
       // Sync
@@ -394,16 +312,6 @@ class Lot implements SyncableEntity {
       'withdrawalEndDate': withdrawalEndDate?.toIso8601String(),
       'veterinarianId': veterinarianId,
       'veterinarianName': veterinarianName,
-      // Vente
-      'buyerName': buyerName,
-      'buyerFarmId': buyerFarmId,
-      'totalPrice': totalPrice,
-      'pricePerAnimal': pricePerAnimal,
-      'saleDate': saleDate?.toIso8601String(),
-      // Abattage
-      'slaughterhouseName': slaughterhouseName,
-      'slaughterhouseId': slaughterhouseId,
-      'slaughterDate': slaughterDate?.toIso8601String(),
       // Notes
       'notes': notes,
       // Sync
@@ -452,25 +360,6 @@ class Lot implements SyncableEntity {
           : null,
       veterinarianId: json['veterinarianId'] ?? json['veterinarian_id'],
       veterinarianName: json['veterinarianName'] ?? json['veterinarian_name'],
-      // Vente
-      buyerName: json['buyerName'] ?? json['buyer_name'],
-      buyerFarmId: json['buyerFarmId'] ?? json['buyer_farm_id'],
-      totalPrice:
-          (json['totalPrice'] ?? json['total_price'] as num?)?.toDouble(),
-      pricePerAnimal:
-          (json['pricePerAnimal'] ?? json['price_per_animal'] as num?)
-              ?.toDouble(),
-      saleDate: json['saleDate'] != null || json['sale_date'] != null
-          ? DateTime.parse(json['saleDate'] ?? json['sale_date'])
-          : null,
-      // Abattage
-      slaughterhouseName:
-          json['slaughterhouseName'] ?? json['slaughterhouse_name'],
-      slaughterhouseId: json['slaughterhouseId'] ?? json['slaughterhouse_id'],
-      slaughterDate:
-          json['slaughterDate'] != null || json['slaughter_date'] != null
-              ? DateTime.parse(json['slaughterDate'] ?? json['slaughter_date'])
-              : null,
       // Notes
       notes: json['notes'],
       // Sync

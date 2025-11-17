@@ -40,22 +40,6 @@ class LotsTable extends Table {
   TextColumn get veterinarianName =>
       text().nullable().named('veterinarian_name')();
 
-  // ==================== SALE FIELDS ====================
-  TextColumn get buyerName => text().nullable().named('buyer_name')();
-  TextColumn get buyerFarmId => text().nullable().named('buyer_farm_id')();
-  RealColumn get totalPrice => real().nullable().named('total_price')();
-  RealColumn get pricePerAnimal =>
-      real().nullable().named('price_per_animal')();
-  DateTimeColumn get saleDate => dateTime().nullable().named('sale_date')();
-
-  // ==================== SLAUGHTER FIELDS ====================
-  TextColumn get slaughterhouseName =>
-      text().nullable().named('slaughterhouse_name')();
-  TextColumn get slaughterhouseId =>
-      text().nullable().named('slaughterhouse_id')();
-  DateTimeColumn get slaughterDate =>
-      dateTime().nullable().named('slaughter_date')();
-
   // ==================== NOTES ====================
   TextColumn get notes => text().nullable()();
 
