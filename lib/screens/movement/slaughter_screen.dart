@@ -87,8 +87,8 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
         ),
       );
 
-      // Return after update is complete
-      Navigator.pop(context);
+      // Return true to indicate successful slaughter recording
+      Navigator.pop(context, true);
     } catch (e) {
       if (!mounted) return;
 
