@@ -335,7 +335,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       iconColor: Colors.teal,
                       title: AppLocalizations.of(context)
                           .translate(AppStrings.movements),
-                      subtitle: 'Naissances, achats, ventes, décès',
+                      subtitle: 'Achats, ventes, décès, abattage',
                       onTap: () {
                         Navigator.push(
                           context,

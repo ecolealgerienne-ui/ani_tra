@@ -241,18 +241,8 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
             );
 
             if (success) {
-              // Créer les mouvements de vente
-              final movements = lotProvider.expandLotToSaleMovements(
-                lotProvider.getLotById(widget.lotId)!,
-              );
-              for (final movement in movements) {
-                context.read<AnimalProvider>().addMovement(movement);
-                // Mettre à jour le statut de l'animal
-                context
-                    .read<AnimalProvider>()
-                    .updateAnimalStatus(movement.animalId, AnimalStatus.sold);
-              }
-              syncProvider.addPendingData(movements.length + 1);
+              // Les mouvements ont déjà été créés par SaleScreen
+              syncProvider.incrementPendingData();
 
               if (mounted) {
                 Navigator.pop(context);
@@ -317,17 +307,8 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
             );
 
             if (success) {
-              // Créer les mouvements d'abattage
-              final movements = lotProvider.expandLotToSlaughterMovements(
-                lotProvider.getLotById(widget.lotId)!,
-              );
-              for (final movement in movements) {
-                context.read<AnimalProvider>().addMovement(movement);
-                // Mettre à jour le statut de l'animal
-                context.read<AnimalProvider>().updateAnimalStatus(
-                    movement.animalId, AnimalStatus.slaughtered);
-              }
-              syncProvider.addPendingData(movements.length + 1);
+              // Les mouvements ont déjà été créés par SlaughterScreen
+              syncProvider.incrementPendingData();
 
               if (mounted) {
                 Navigator.pop(context);

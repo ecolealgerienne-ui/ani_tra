@@ -45,6 +45,7 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
   List<Animal> _selectedAnimals = [];
   String _searchQuery = '';
   StreamSubscription<String>? _rfidSubscription;
+  RFIDScannerProvider? _rfidProvider;
 
   @override
   void initState() {
@@ -53,12 +54,17 @@ class _AnimalFinderScreenState extends State<AnimalFinderScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _rfidProvider ??= context.read<RFIDScannerProvider>();
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
     _rfidSubscription?.cancel();
-    // Arrêter le scanner RFID quand on quitte l'écran
-    final rfidProvider = context.read<RFIDScannerProvider>();
-    rfidProvider.stopScanning();
+    // Arrêter le scanner RFID sans notifier (car le widget tree est verrouillé)
+    _rfidProvider?.stopScanning(notify: false);
     super.dispose();
   }
 
