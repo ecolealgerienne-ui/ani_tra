@@ -1216,26 +1216,9 @@ class DatabaseInitializer {
           updatedAt: now,
         ));
 
-        // Batch to Finalize Alert Config
-        await db.alertConfigurationDao
-            .insertItem(AlertConfigurationsTableCompanion.insert(
-          id: 'config_batch_finalize_1',
-          farmId: 'farm_default',
-          evaluationType: 'batchToFinalize',
-          type: 'routine',
-          category: 'batch',
-          titleKey: 'alertBatchFinalizeTitle',
-          messageKey: 'alertBatchFinalizeMsg',
-          severity: 1,
-          iconName: 'check_circle',
-          colorHex: '#388E3C',
-          enabled: const Value(true),
-          synced: const Value(false),
-          createdAt: now,
-          updatedAt: now,
-        ));
+        // Note: Configuration alerte "Batch to Finalize" supprimée (batches supprimés)
 
-        print('$_tag   ✅ Created 7 alert configurations');
+        print('$_tag   ✅ Created 6 alert configurations');
       } catch (e) {
         print('$_tag   ❌ Error creating alert configs: $e');
       }
@@ -1253,8 +1236,7 @@ class DatabaseInitializer {
       print('$_tag   - 15 Treatments (active/expired withdrawal)');
       print('$_tag   - 11 Vaccinations (recent/batch/old)');
       print('$_tag   - 35 Weight Records (growth tracking)');
-      print('$_tag   - 3 Batches');
-      print('$_tag   - 7 Alert Configurations');
+      print('$_tag   - 6 Alert Configurations');
       print('');
     } catch (e) {
       print('$_tag ❌ Fatal error during seeding: $e');
