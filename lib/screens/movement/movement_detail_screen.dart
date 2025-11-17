@@ -142,7 +142,7 @@ class _MovementDetailScreenState extends State<MovementDetailScreen> {
             const SizedBox(height: AppConstants.spacingLarge),
 
             // Bouton "Enregistrer le retour" (si mouvement temporaire non retourné)
-            if (movement.isTemporaryOut && !movement.isReturned) ...[
+            if (movement.isTemporaryOut && movement.status == MovementStatus.ongoing) ...[
               ElevatedButton.icon(
                 onPressed: _isRecordingReturn ? null : () => _recordReturn(context, movement),
                 icon: _isRecordingReturn
@@ -402,8 +402,10 @@ class _MovementTypeHeader extends StatelessWidget {
         return Colors.red;
       case MovementType.slaughter:
         return Colors.purple;
-      default:
-        return Colors.grey;
+      case MovementType.temporaryOut:
+        return Colors.teal;
+      case MovementType.temporaryReturn:
+        return Colors.cyan;
     }
   }
 
@@ -419,8 +421,10 @@ class _MovementTypeHeader extends StatelessWidget {
         return Icons.dangerous;
       case MovementType.slaughter:
         return Icons.content_cut;
-      default:
-        return Icons.sync_alt;
+      case MovementType.temporaryOut:
+        return Icons.exit_to_app;
+      case MovementType.temporaryReturn:
+        return Icons.keyboard_return;
     }
   }
 
@@ -437,8 +441,10 @@ class _MovementTypeHeader extends StatelessWidget {
         return l10n.translate(AppStrings.death);
       case MovementType.slaughter:
         return l10n.translate(AppStrings.slaughter);
-      default:
-        return 'Mouvement';
+      case MovementType.temporaryOut:
+        return l10n.translate(AppStrings.temporaryOut);
+      case MovementType.temporaryReturn:
+        return l10n.translate(AppStrings.temporaryReturn);
     }
   }
 }
