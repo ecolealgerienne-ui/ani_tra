@@ -743,6 +743,8 @@ class _LotCard extends StatelessWidget {
     switch (lot.type) {
       case LotType.treatment:
         return AppConstants.primaryBlue;
+      case LotType.purchase:
+        return Colors.blue.shade700;
       case LotType.sale:
         return AppConstants.successGreen;
       case LotType.slaughter:

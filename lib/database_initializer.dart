@@ -791,37 +791,49 @@ class DatabaseInitializer {
           id: 'lot_open_treatment_001',
           farmId: 'farm_default',
           name: 'Traitement Antiparasitaire Printemps',
-          animalIdsJson: '["young_001","young_002","young_003"]',
           status: const Value('open'),
           completed: const Value(false),
           synced: const Value(false),
           createdAt: now.subtract(const Duration(days: 5)),
           updatedAt: now,
         ));
+        // Ajouter les animaux via lot_animals
+        await db.lotAnimalDao.addAnimalsToLot(
+          'lot_open_treatment_001',
+          ['young_001', 'young_002', 'young_003'],
+        );
 
         await db.lotDao.insertLot(LotsTableCompanion.insert(
           id: 'lot_open_sale_001',
           farmId: 'farm_default',
           name: 'Lot de Vente Automne 2024',
-          animalIdsJson: '["adult_001","adult_002","adult_003","adult_004"]',
           status: const Value('open'),
           completed: const Value(false),
           synced: const Value(false),
           createdAt: now.subtract(const Duration(days: 2)),
           updatedAt: now,
         ));
+        // Ajouter les animaux via lot_animals
+        await db.lotAnimalDao.addAnimalsToLot(
+          'lot_open_sale_001',
+          ['adult_001', 'adult_002', 'adult_003', 'adult_004'],
+        );
 
         await db.lotDao.insertLot(LotsTableCompanion.insert(
           id: 'lot_open_slaughter_001',
           farmId: 'farm_default',
           name: 'Lot Abattage Décembre',
-          animalIdsJson: '["adult_005","adult_006"]',
           status: const Value('open'),
           completed: const Value(false),
           synced: const Value(false),
           createdAt: now.subtract(const Duration(days: 1)),
           updatedAt: now,
         ));
+        // Ajouter les animaux via lot_animals
+        await db.lotAnimalDao.addAnimalsToLot(
+          'lot_open_slaughter_001',
+          ['adult_005', 'adult_006'],
+        );
 
         print('$_tag   ✅ Created 3 lots');
       } catch (e) {
