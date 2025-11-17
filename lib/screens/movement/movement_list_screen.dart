@@ -14,6 +14,7 @@ import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
 import 'movement_detail_screen.dart';
 import 'create_temporary_movement_screen.dart';
+import '../lot/lot_detail_screen.dart';
 
 class MovementListScreen extends StatefulWidget {
   const MovementListScreen({super.key});
@@ -448,7 +449,12 @@ class _MovementListScreenState extends State<MovementListScreen> {
               lotId: lotId,
               movements: lotMovementsList,
               onTap: () {
-                // TODO: Naviguer vers détails du lot
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LotDetailScreen(lotId: lotId),
+                  ),
+                );
               },
             );
           }).toList(),
