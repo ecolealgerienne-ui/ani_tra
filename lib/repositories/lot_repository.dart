@@ -310,16 +310,6 @@ class LotRepository {
       withdrawalEndDate: data.withdrawalEndDate,
       veterinarianId: data.veterinarianId,
       veterinarianName: data.veterinarianName,
-      // Sale fields
-      buyerName: data.buyerName,
-      buyerFarmId: data.buyerFarmId,
-      totalPrice: data.totalPrice,
-      pricePerAnimal: data.pricePerAnimal,
-      saleDate: data.saleDate,
-      // Slaughter fields
-      slaughterhouseName: data.slaughterhouseName,
-      slaughterhouseId: data.slaughterhouseId,
-      slaughterDate: data.slaughterDate,
       // Notes
       notes: data.notes,
       // Sync fields
@@ -355,20 +345,6 @@ class LotRepository {
       withdrawalEndDate: drift.Value(lot.withdrawalEndDate),
       veterinarianId: drift.Value(lot.veterinarianId),
       veterinarianName: drift.Value(lot.veterinarianName),
-      // Sale fields (deprecated fields maintained during transition period)
-      // ignore: deprecated_member_use
-      buyerName: drift.Value(lot.buyerName),
-      // ignore: deprecated_member_use
-      buyerFarmId: drift.Value(lot.buyerFarmId),
-      totalPrice: drift.Value(lot.totalPrice),
-      pricePerAnimal: drift.Value(lot.pricePerAnimal),
-      saleDate: drift.Value(lot.saleDate),
-      // Slaughter fields (deprecated fields maintained during transition period)
-      // ignore: deprecated_member_use
-      slaughterhouseName: drift.Value(lot.slaughterhouseName),
-      // ignore: deprecated_member_use
-      slaughterhouseId: drift.Value(lot.slaughterhouseId),
-      slaughterDate: drift.Value(lot.slaughterDate),
       // Notes
       notes: drift.Value(lot.notes),
       // Sync fields

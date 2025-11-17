@@ -343,54 +343,10 @@ class LotDetailScreen extends StatelessWidget {
                 ],
               ],
 
-              // Vente
-              if (lot.type == LotType.sale) ...[
-                // ignore: deprecated_member_use
-                if (lot.buyerName != null)
-                  // ignore: deprecated_member_use
-                  _buildInfoRow(
-                      AppLocalizations.of(context).translate(AppStrings.buyer),
-                      lot.buyerName!,
-                      Icons.person),
-                if (lot.totalPrice != null) ...[
-                  const SizedBox(height: AppConstants.spacingSmall),
-                  _buildInfoRow(
-                    AppLocalizations.of(context)
-                        .translate(AppStrings.totalPrice),
-                    '${lot.totalPrice!.toStringAsFixed(2)}€',
-                    Icons.euro,
-                  ),
-                ],
-                if (lot.pricePerAnimal != null) ...[
-                  const SizedBox(height: AppConstants.spacingSmall),
-                  _buildInfoRow(
-                    AppLocalizations.of(context)
-                        .translate(AppStrings.pricePerAnimal),
-                    '${lot.pricePerAnimal!.toStringAsFixed(2)}€',
-                    Icons.attach_money,
-                  ),
-                ],
-              ],
-
-              // Abattage
-              // ignore: deprecated_member_use
-              if (lot.type == LotType.slaughter &&
-                  lot.slaughterhouseName != null) ...[
-                // ignore: deprecated_member_use
-                _buildInfoRow(
-                    AppLocalizations.of(context)
-                        .translate(AppStrings.slaughterhouse),
-                    lot.slaughterhouseName!,
-                    Icons.factory),
-                if (lot.slaughterDate != null) ...[
-                  const SizedBox(height: AppConstants.spacingSmall),
-                  _buildInfoRow(
-                    AppLocalizations.of(context).translate(AppStrings.date),
-                    DateFormat('dd/MM/yyyy').format(lot.slaughterDate!),
-                    Icons.calendar_today,
-                  ),
-                ],
-              ],
+              // TODO: Récupérer et afficher les informations de vente/abattage depuis Movement
+              // Les données de vente (acheteur, prix) et d'abattage (abattoir, date) sont maintenant
+              // stockées dans les objets Movement liés au lot via Movement.lotId == lot.id
+              // Implémenter la récupération et l'affichage de ces données
 
               // Notes
               if (lot.notes != null && lot.notes!.isNotEmpty) ...[
