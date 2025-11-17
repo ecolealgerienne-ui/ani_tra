@@ -102,8 +102,8 @@ class _SaleScreenState extends State<SaleScreen> {
         ),
       );
 
-      // Return after update is complete
-      Navigator.pop(context);
+      // Return true to indicate successful sale
+      Navigator.pop(context, true);
     } catch (e) {
       if (!mounted) return;
 
