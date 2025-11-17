@@ -689,7 +689,6 @@ class _LotMovementCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final movementType = movements.isNotEmpty ? movements.first.type : null;
     final movementStatus = movements.isNotEmpty ? movements.first.status : null;
 
     return Card(
@@ -744,7 +743,7 @@ class _LotMovementCard extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: _getStatusColor(movementStatus).withOpacity(0.2),
+                        color: _getStatusColor(movementStatus).withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
                       ),
                       child: Text(
@@ -768,7 +767,7 @@ class _LotMovementCard extends StatelessWidget {
                     size: AppConstants.iconSizeRegular,
                     color: Colors.grey[600],
                   ),
-                  const SizedBox(width: AppConstants.spacingXSmall),
+                  const SizedBox(width: AppConstants.spacingSmall),
                   Text(
                     '${movements.length} animaux',
                     style: TextStyle(
@@ -783,7 +782,7 @@ class _LotMovementCard extends StatelessWidget {
                       size: AppConstants.iconSizeRegular,
                       color: Colors.green[700],
                     ),
-                    const SizedBox(width: AppConstants.spacingXSmall),
+                    const SizedBox(width: AppConstants.spacingSmall),
                     Text(
                       '${lot!.priceTotal!.toStringAsFixed(2)}€',
                       style: TextStyle(
@@ -806,7 +805,7 @@ class _LotMovementCard extends StatelessWidget {
                       size: AppConstants.iconSizeSmall,
                       color: Colors.grey[600],
                     ),
-                    const SizedBox(width: AppConstants.spacingXSmall),
+                    const SizedBox(width: AppConstants.spacingSmall),
                     Text(
                       DateFormat('dd/MM/yyyy').format(lot!.completedAt!),
                       style: TextStyle(

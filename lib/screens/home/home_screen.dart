@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/animal_provider.dart';
-import '../../providers/batch_provider.dart';
 import '../../../providers/sync_provider.dart';
 import '../../providers/alert_provider.dart';
 import '../../providers/auth_provider.dart';
@@ -551,16 +550,14 @@ class _HomeScreenState extends State<HomeScreen> {
   /// Widget : Cartes de statistiques (3 cartes compactes)
   /// 🆕 Utilise maintenant AlertProvider pour les alertes
   Widget _buildStatsCards(BuildContext context) {
-    return Consumer4<AnimalProvider, SyncProvider, BatchProvider,
-        AlertProvider>(
-      builder: (context, animalProvider, syncProvider, batchProvider,
-          alertProvider, child) {
+    return Consumer3<AnimalProvider, SyncProvider, AlertProvider>(
+      builder: (context, animalProvider, syncProvider, alertProvider, child) {
         final aliveAnimals = animalProvider.animals
             .where((a) => a.status == AnimalStatus.alive)
             .length;
 
-        // Compter les lots actifs
-        final activeLots = batchProvider.batches.length;
+        // Note: Statistiques lots supprimées (batches merger avec lots)
+        final activeLots = 0;
 
         // 🆕 Utiliser AlertProvider pour les alertes urgentes
         final urgentAlerts = alertProvider.urgentAlertCount;
