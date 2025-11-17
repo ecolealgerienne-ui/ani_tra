@@ -878,7 +878,6 @@ class AppStrings {
   static const String recordWeight = 'recordWeight';
   static const String declareDeath = 'declareDeath';
   static const String death = 'death';
-  static const String temporaryOut = 'temporaryOut';
   static const String noActiveAlert = 'noActiveAlert';
   static const String vaccinations = 'vaccinations';
   static const String noVaccination = 'noVaccination';
@@ -988,6 +987,7 @@ class AppStrings {
   static const String deadStatus = 'deadStatus';
   static const String soldStatus = 'soldStatus';
   static const String slaughteredStatus = 'slaughteredStatus';
+  static const String statusOnTemporaryMovement = 'statusOnTemporaryMovement';
   
   // ============ DRAFT ALERTS & ACTIONS ============
   static const String draftAlertWarning = 'draftAlertWarning';
@@ -1119,10 +1119,13 @@ class AppStrings {
   static const String noMovements = 'noMovements';
   static const String noMovementsSubtitle = 'noMovementsSubtitle';
   static const String filterByType = 'filterByType';
+  static const String births = 'births';
   static const String purchases = 'purchases';
   static const String sales = 'sales';
   static const String deaths = 'deaths';
   static const String slaughters = 'slaughters';
+  static const String temporaryOut = 'temporaryOut';
+  static const String temporaryReturn = 'temporaryReturn';
   static const String temporaryOuts = 'temporaryOuts';
   static const String financialInfo = 'financialInfo';
   static const String syncInfo = 'syncInfo';
