@@ -6,17 +6,14 @@ import 'package:intl/intl.dart';
 
 import '../../providers/movement_provider.dart';
 import '../../providers/animal_provider.dart';
-import '../../providers/batch_provider.dart';
 import '../../models/movement.dart';
 import '../../models/animal.dart';
-import '../../models/batch.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
 import '../animal/animal_detail_screen.dart';
-import 'return_animal_form_screen.dart';
 
-class MovementDetailScreen extends StatelessWidget {
+class MovementDetailScreen extends StatefulWidget {
   final String movementId;
 
   const MovementDetailScreen({
@@ -25,10 +22,17 @@ class MovementDetailScreen extends StatelessWidget {
   });
 
   @override
+  State<MovementDetailScreen> createState() => _MovementDetailScreenState();
+}
+
+class _MovementDetailScreenState extends State<MovementDetailScreen> {
+  bool _isRecordingReturn = false;
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final movementProvider = context.watch<MovementProvider>();
-    final movement = movementProvider.getMovementById(movementId);
+    final movement = movementProvider.getMovementById(widget.movementId);
 
     if (movement == null) {
       return Scaffold(
@@ -58,38 +62,21 @@ class MovementDetailScreen extends StatelessWidget {
       );
     }
 
-    // Déterminer s'il s'agit d'un lot ou d'un animal individuel
-    final isBatch = movement.animalId.startsWith('batch_');
     final animalProvider = context.watch<AnimalProvider>();
-    final batchProvider = context.watch<BatchProvider>();
-    final animal = !isBatch ? animalProvider.getAnimalById(movement.animalId) : null;
-    final batch = isBatch ? batchProvider.getBatchById(movement.animalId) : null;
+    final animal = animalProvider.getAnimalById(movement.animalId);
 
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.translate(AppStrings.movementDetails)),
-        actions: movement.type == MovementType.temporaryOut && !movement.isCompleted
-            ? [
-                IconButton(
-                  onPressed: () async {
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ReturnAnimalFormScreen(
-                          movement: movement,
-                        ),
-                      ),
-                    );
-                    // Rafraîchir les données si le retour a été enregistré
-                    if (result == true) {
-                      movementProvider.refresh();
-                    }
-                  },
-                  icon: const Icon(Icons.home_filled),
-                  tooltip: 'Retour à la ferme',
-                ),
-              ]
-            : null,
+        // TODO: Ajouter bouton d'édition si nécessaire
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.edit),
+        //     onPressed: () {
+        //       // Navigation vers écran d'édition
+        //     },
+        //   ),
+        // ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppConstants.spacingMedium),
@@ -101,20 +88,14 @@ class MovementDetailScreen extends StatelessWidget {
 
             const SizedBox(height: AppConstants.spacingMediumLarge),
 
-            // Section Animal ou Lot
+            // Section Animal
             _SectionCard(
-              title: isBatch
-                  ? l10n.translate(AppStrings.batch)
-                  : l10n.translate(AppStrings.animal),
-              icon: isBatch ? Icons.workspaces : Icons.pets,
+              title: l10n.translate(AppStrings.animal),
+              icon: Icons.pets,
               color: Colors.blue,
-              child: isBatch
-                  ? (batch != null
-                      ? _BatchInfoSection(batch: batch)
-                      : _UnknownBatchSection(batchId: movement.animalId))
-                  : (animal != null
-                      ? _AnimalInfoSection(animal: animal)
-                      : _UnknownAnimalSection(animalId: movement.animalId)),
+              child: animal != null
+                  ? _AnimalInfoSection(animal: animal)
+                  : _UnknownAnimalSection(animalId: movement.animalId),
             ),
 
             const SizedBox(height: AppConstants.spacingMedium),
@@ -149,17 +130,6 @@ class MovementDetailScreen extends StatelessWidget {
               ),
             ],
 
-            // Section Retour (si mouvement temporaire complété)
-            if (movement.type == MovementType.temporaryOut && movement.isCompleted) ...[
-              const SizedBox(height: AppConstants.spacingMedium),
-              _SectionCard(
-                title: 'Retour à la ferme',
-                icon: Icons.home,
-                color: Colors.green,
-                child: _ReturnInfoSection(movement: movement),
-              ),
-            ],
-
             // Section Synchronisation
             const SizedBox(height: AppConstants.spacingMedium),
             _SectionCard(
@@ -170,6 +140,50 @@ class MovementDetailScreen extends StatelessWidget {
             ),
 
             const SizedBox(height: AppConstants.spacingLarge),
+
+            // Bouton "Enregistrer le retour" (si mouvement temporaire non retourné)
+            if (movement.isTemporaryOut && movement.status == MovementStatus.ongoing) ...[
+              ElevatedButton.icon(
+                onPressed: _isRecordingReturn ? null : () => _recordReturn(context, movement),
+                icon: _isRecordingReturn
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : const Icon(Icons.keyboard_return),
+                label: Text(_isRecordingReturn ? 'Enregistrement...' : 'Enregistrer le retour'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppConstants.spacingMedium,
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppConstants.spacingMedium),
+            ],
+
+            // Bouton "Valider le mouvement" (pour ventes et achats en cours)
+            if ((movement.isSale || movement.type == MovementType.purchase) &&
+                movement.status == MovementStatus.ongoing) ...[
+              ElevatedButton.icon(
+                onPressed: () => _validateMovement(context, movement),
+                icon: const Icon(Icons.check_circle),
+                label: const Text('Valider le mouvement'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppConstants.spacingMedium,
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppConstants.spacingMedium),
+            ],
 
             // Bouton retour (optionnel, car déjà présent dans l'AppBar)
             // Mais peut être utile pour une meilleure UX
@@ -187,6 +201,137 @@ class MovementDetailScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// Enregistre le retour d'un mouvement temporaire
+  Future<void> _recordReturn(BuildContext context, Movement outMovement) async {
+    final l10n = AppLocalizations.of(context);
+
+    // Ouvrir le dialog pour saisir la date et les notes
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (context) => _ReturnDateDialog(
+        outMovement: outMovement,
+      ),
+    );
+
+    if (result == null) return; // Utilisateur a annulé
+
+    setState(() => _isRecordingReturn = true);
+
+    try {
+      final movementProvider = context.read<MovementProvider>();
+      final animalProvider = context.read<AnimalProvider>();
+
+      final DateTime returnDate = result['returnDate'];
+      final String? userNotes = result['notes'];
+
+      // Construire les notes avec la date de retour
+      final String existingNotes = outMovement.notes ?? '';
+      final String returnInfo = '\n\n📅 Retour le ${DateFormat('dd/MM/yyyy').format(returnDate)}';
+      final String additionalNotes = userNotes != null && userNotes.isNotEmpty
+          ? '\n📝 $userNotes'
+          : '';
+      final String updatedNotes = existingNotes + returnInfo + additionalNotes;
+
+      // Mettre à jour le mouvement sortant avec les notes de retour ET le statut "closed"
+      final updatedOutMovement = outMovement.copyWith(
+        notes: updatedNotes,
+        status: MovementStatus.closed,
+      );
+      await movementProvider.updateMovement(updatedOutMovement);
+
+      // Mettre à jour le statut de l'animal (retour à "alive")
+      final animal = animalProvider.getAnimalById(outMovement.animalId);
+      if (animal != null) {
+        final updatedAnimal = animal.copyWith(status: AnimalStatus.alive);
+        await animalProvider.updateAnimal(updatedAnimal);
+      }
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✅ Retour enregistré avec succès'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('❌ Erreur: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isRecordingReturn = false);
+      }
+    }
+  }
+
+  /// Valide un mouvement (passe de ongoing à closed)
+  Future<void> _validateMovement(BuildContext context, Movement movement) async {
+    // Demander confirmation
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirmer la validation'),
+        content: Text(
+          movement.isSale
+              ? 'Confirmer la validation de cette vente ?\nLe mouvement sera marqué comme clos et ne pourra plus être modifié facilement.'
+              : 'Confirmer la validation de cet achat ?\nLe mouvement sera marqué comme clos et ne pourra plus être modifié facilement.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Annuler'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Valider'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    try {
+      final movementProvider = context.read<MovementProvider>();
+
+      // Mettre à jour le statut du mouvement
+      final updatedMovement = movement.copyWith(
+        status: MovementStatus.closed,
+      );
+      await movementProvider.updateMovement(updatedMovement);
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✅ Mouvement validé avec succès'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('❌ Erreur: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }
 
@@ -240,34 +385,6 @@ class _MovementTypeHeader extends StatelessWidget {
               color: Colors.white.withValues(alpha: 0.9),
             ),
           ),
-          // Badge de statut pour les mouvements temporaires
-          if (movement.type == MovementType.temporaryOut) ...[
-            const SizedBox(height: AppConstants.spacingSmall),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 6,
-              ),
-              decoration: BoxDecoration(
-                color: movement.isCompleted
-                    ? Colors.white.withValues(alpha: 0.3)
-                    : Colors.orange.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: Colors.white,
-                  width: 2,
-                ),
-              ),
-              child: Text(
-                movement.isCompleted ? 'Complété' : 'En cours',
-                style: const TextStyle(
-                  fontSize: AppConstants.fontSizeSmall,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ],
         ],
       ),
     );
@@ -275,6 +392,8 @@ class _MovementTypeHeader extends StatelessWidget {
 
   Color _getMovementTypeColor(MovementType type) {
     switch (type) {
+      case MovementType.birth:
+        return Colors.green;
       case MovementType.purchase:
         return Colors.blue;
       case MovementType.sale:
@@ -285,11 +404,15 @@ class _MovementTypeHeader extends StatelessWidget {
         return Colors.purple;
       case MovementType.temporaryOut:
         return Colors.teal;
+      case MovementType.temporaryReturn:
+        return Colors.cyan;
     }
   }
 
   IconData _getMovementTypeIcon(MovementType type) {
     switch (type) {
+      case MovementType.birth:
+        return Icons.child_care;
       case MovementType.purchase:
         return Icons.shopping_cart;
       case MovementType.sale:
@@ -300,12 +423,16 @@ class _MovementTypeHeader extends StatelessWidget {
         return Icons.content_cut;
       case MovementType.temporaryOut:
         return Icons.exit_to_app;
+      case MovementType.temporaryReturn:
+        return Icons.keyboard_return;
     }
   }
 
   String _getMovementTypeLabel(BuildContext context, MovementType type) {
     final l10n = AppLocalizations.of(context);
     switch (type) {
+      case MovementType.birth:
+        return l10n.translate(AppStrings.birth);
       case MovementType.purchase:
         return l10n.translate(AppStrings.purchase);
       case MovementType.sale:
@@ -316,6 +443,8 @@ class _MovementTypeHeader extends StatelessWidget {
         return l10n.translate(AppStrings.slaughter);
       case MovementType.temporaryOut:
         return l10n.translate(AppStrings.temporaryOut);
+      case MovementType.temporaryReturn:
+        return l10n.translate(AppStrings.temporaryReturn);
     }
   }
 }
@@ -475,6 +604,8 @@ class _AnimalInfoSection extends StatelessWidget {
         return l10n.translate(AppStrings.deadStatus);
       case AnimalStatus.slaughtered:
         return l10n.translate(AppStrings.slaughteredStatus);
+      case AnimalStatus.onTemporaryMovement:
+        return l10n.translate(AppStrings.statusOnTemporaryMovement);
     }
   }
 }
@@ -702,140 +833,136 @@ class _InfoRow extends StatelessWidget {
   }
 }
 
-/// Widget : Section pour afficher les informations d'un lot
-class _BatchInfoSection extends StatelessWidget {
-  final Batch batch;
+/// Dialog pour saisir la date de retour et les notes
+class _ReturnDateDialog extends StatefulWidget {
+  final Movement outMovement;
 
-  const _BatchInfoSection({required this.batch});
+  const _ReturnDateDialog({required this.outMovement});
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppConstants.spacingSmall),
-      decoration: BoxDecoration(
-        color: Colors.blue.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
-        border: Border.all(
-          color: Colors.blue.withValues(alpha: 0.2),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.workspaces,
-                color: Colors.blue,
-                size: AppConstants.iconSizeMedium,
-              ),
-              const SizedBox(width: AppConstants.spacingSmall),
-              Expanded(
-                child: Text(
-                  batch.name,
-                  style: const TextStyle(
-                    fontSize: AppConstants.fontSizeLarge,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppConstants.spacingSmall),
-          Text(
-            'Objectif: ${batch.purpose}',
-            style: TextStyle(
-              fontSize: AppConstants.fontSizeBody,
-              color: Colors.grey[700],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  State<_ReturnDateDialog> createState() => _ReturnDateDialogState();
 }
 
-/// Widget : Section pour lot inconnu
-class _UnknownBatchSection extends StatelessWidget {
-  final String batchId;
-
-  const _UnknownBatchSection({required this.batchId});
+class _ReturnDateDialogState extends State<_ReturnDateDialog> {
+  late DateTime _returnDate;
+  final _notesController = TextEditingController();
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppConstants.spacingMedium),
-      decoration: BoxDecoration(
-        color: Colors.grey.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
-        border: Border.all(
-          color: Colors.grey.withValues(alpha: 0.3),
-        ),
-      ),
-      child: Row(
-        children: [
-          const Icon(
-            Icons.warning_amber_rounded,
-            color: Colors.orange,
-            size: AppConstants.iconSizeMedium,
-          ),
-          const SizedBox(width: AppConstants.spacingSmall),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Lot introuvable',
-                  style: TextStyle(
-                    fontSize: AppConstants.fontSizeLarge,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: AppConstants.spacingTiny),
-                Text(
-                  'ID: $batchId',
-                  style: TextStyle(
-                    fontSize: AppConstants.fontSizeSmall,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+  void initState() {
+    super.initState();
+    _returnDate = DateTime.now();
   }
-}
 
-/// Widget : Section d'informations de retour
-class _ReturnInfoSection extends StatelessWidget {
-  final Movement movement;
+  @override
+  void dispose() {
+    _notesController.dispose();
+    super.dispose();
+  }
 
-  const _ReturnInfoSection({required this.movement});
+  Future<void> _selectDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _returnDate,
+      firstDate: widget.outMovement.movementDate,
+      lastDate: DateTime.now().add(const Duration(days: 1)),
+      locale: const Locale('fr', 'FR'),
+    );
+    if (picked != null) {
+      setState(() => _returnDate = picked);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _InfoRow(
-          icon: Icons.event,
-          label: 'Date de retour',
-          value: movement.returnDate != null
-              ? DateFormat('dd/MM/yyyy').format(movement.returnDate!)
-              : 'N/A',
+    final l10n = AppLocalizations.of(context);
+
+    return AlertDialog(
+      title: const Text('Enregistrer le retour'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Date de retour
+            Text(
+              'Date de retour *',
+              style: TextStyle(
+                fontSize: AppConstants.fontSizeSmall,
+                color: Colors.grey[700],
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: AppConstants.spacingSmall),
+            InkWell(
+              onTap: _selectDate,
+              child: Container(
+                padding: const EdgeInsets.all(AppConstants.spacingMedium),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey[300]!),
+                  borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.calendar_today, size: 20),
+                    const SizedBox(width: AppConstants.spacingSmall),
+                    Text(
+                      DateFormat('dd/MM/yyyy').format(_returnDate),
+                      style: const TextStyle(fontSize: AppConstants.fontSizeBody),
+                    ),
+                    const Spacer(),
+                    Icon(Icons.arrow_drop_down, color: Colors.grey[600]),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: AppConstants.spacingMediumLarge),
+
+            // Notes (optionnel)
+            Text(
+              'Notes (optionnel)',
+              style: TextStyle(
+                fontSize: AppConstants.fontSizeSmall,
+                color: Colors.grey[700],
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: AppConstants.spacingSmall),
+            TextField(
+              controller: _notesController,
+              maxLines: 3,
+              maxLength: 500,
+              decoration: InputDecoration(
+                hintText: 'Ex: Animal en bonne santé, aucun problème constaté',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppConstants.badgeBorderRadius),
+                ),
+                contentPadding: const EdgeInsets.all(AppConstants.spacingMedium),
+              ),
+            ),
+          ],
         ),
-        if (movement.returnNotes != null && movement.returnNotes!.isNotEmpty) ...[
-          const SizedBox(height: AppConstants.spacingSmall),
-          const Divider(),
-          const SizedBox(height: AppConstants.spacingSmall),
-          _InfoRow(
-            icon: Icons.notes,
-            label: 'Notes de retour',
-            value: movement.returnNotes!,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.translate(AppStrings.cancel)),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.pop(context, {
+              'returnDate': _returnDate,
+              'notes': _notesController.text.trim().isEmpty
+                  ? null
+                  : _notesController.text.trim(),
+            });
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.teal,
+            foregroundColor: Colors.white,
           ),
-        ],
+          child: const Text('Valider'),
+        ),
       ],
     );
   }
