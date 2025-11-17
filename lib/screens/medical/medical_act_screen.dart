@@ -15,6 +15,7 @@ import '../../providers/weight_provider.dart';
 import '../../providers/reminder_provider.dart';
 import '../../providers/vaccination_provider.dart';
 import '../../providers/treatment_provider.dart';
+import '../../providers/medical_product_provider.dart';
 //import '../../providers/lot_provider.dart';
 //import '../../providers/sync_provider.dart';
 import '../../providers/veterinarian_provider.dart';
@@ -158,7 +159,9 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
 
   /// Obtenir les produits filtrés
   List<MedicalProduct> _getFilteredProducts() {
-    final allProducts = <MedicalProduct>[];
+    // Charger les produits depuis le provider
+    final productProvider = context.read<MedicalProductProvider>();
+    final allProducts = productProvider.activeProducts;
 
     // Filtrer par type
     var filtered = allProducts.where((p) => p.type == _selectedType).toList();
