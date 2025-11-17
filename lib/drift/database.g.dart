@@ -6832,6 +6832,18 @@ class $MovementsTableTable extends MovementsTable
   late final GeneratedColumn<DateTime> expectedReturnDate =
       GeneratedColumn<DateTime>('expected_return_date', aliasedName, true,
           type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _returnDateMeta =
+      const VerificationMeta('returnDate');
+  @override
+  late final GeneratedColumn<DateTime> returnDate = GeneratedColumn<DateTime>(
+      'return_date', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _returnNotesMeta =
+      const VerificationMeta('returnNotes');
+  @override
+  late final GeneratedColumn<String> returnNotes = GeneratedColumn<String>(
+      'return_notes', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _relatedMovementIdMeta =
       const VerificationMeta('relatedMovementId');
   @override
@@ -6903,6 +6915,8 @@ class $MovementsTableTable extends MovementsTable
         isTemporary,
         temporaryMovementType,
         expectedReturnDate,
+        returnDate,
+        returnNotes,
         relatedMovementId,
         status,
         synced,
@@ -7025,6 +7039,18 @@ class $MovementsTableTable extends MovementsTable
           expectedReturnDate.isAcceptableOrUnknown(
               data['expected_return_date']!, _expectedReturnDateMeta));
     }
+    if (data.containsKey('return_date')) {
+      context.handle(
+          _returnDateMeta,
+          returnDate.isAcceptableOrUnknown(
+              data['return_date']!, _returnDateMeta));
+    }
+    if (data.containsKey('return_notes')) {
+      context.handle(
+          _returnNotesMeta,
+          returnNotes.isAcceptableOrUnknown(
+              data['return_notes']!, _returnNotesMeta));
+    }
     if (data.containsKey('related_movement_id')) {
       context.handle(
           _relatedMovementIdMeta,
@@ -7118,6 +7144,10 @@ class $MovementsTableTable extends MovementsTable
       expectedReturnDate: attachedDatabase.typeMapping.read(
           DriftSqlType.dateTime,
           data['${effectivePrefix}expected_return_date']),
+      returnDate: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}return_date']),
+      returnNotes: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}return_notes']),
       relatedMovementId: attachedDatabase.typeMapping.read(
           DriftSqlType.string, data['${effectivePrefix}related_movement_id']),
       status: attachedDatabase.typeMapping
@@ -7208,6 +7238,12 @@ class MovementsTableData extends DataClass
   /// Date de retour prévue (obligatoire pour temporary_out)
   final DateTime? expectedReturnDate;
 
+  /// Date de retour réelle (remplie quand l'animal revient)
+  final DateTime? returnDate;
+
+  /// Notes sur le retour
+  final String? returnNotes;
+
   /// ID du mouvement associé (lien bidirectionnel)
   /// Pour temporary_out: rempli quand le retour est créé
   /// Pour temporary_return: pointe vers le temporary_out original
@@ -7245,6 +7281,8 @@ class MovementsTableData extends DataClass
       required this.isTemporary,
       this.temporaryMovementType,
       this.expectedReturnDate,
+      this.returnDate,
+      this.returnNotes,
       this.relatedMovementId,
       required this.status,
       required this.synced,
@@ -7300,6 +7338,12 @@ class MovementsTableData extends DataClass
     }
     if (!nullToAbsent || expectedReturnDate != null) {
       map['expected_return_date'] = Variable<DateTime>(expectedReturnDate);
+    }
+    if (!nullToAbsent || returnDate != null) {
+      map['return_date'] = Variable<DateTime>(returnDate);
+    }
+    if (!nullToAbsent || returnNotes != null) {
+      map['return_notes'] = Variable<String>(returnNotes);
     }
     if (!nullToAbsent || relatedMovementId != null) {
       map['related_movement_id'] = Variable<String>(relatedMovementId);
@@ -7364,6 +7408,12 @@ class MovementsTableData extends DataClass
       expectedReturnDate: expectedReturnDate == null && nullToAbsent
           ? const Value.absent()
           : Value(expectedReturnDate),
+      returnDate: returnDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(returnDate),
+      returnNotes: returnNotes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(returnNotes),
       relatedMovementId: relatedMovementId == null && nullToAbsent
           ? const Value.absent()
           : Value(relatedMovementId),
@@ -7409,6 +7459,8 @@ class MovementsTableData extends DataClass
           serializer.fromJson<String?>(json['temporaryMovementType']),
       expectedReturnDate:
           serializer.fromJson<DateTime?>(json['expectedReturnDate']),
+      returnDate: serializer.fromJson<DateTime?>(json['returnDate']),
+      returnNotes: serializer.fromJson<String?>(json['returnNotes']),
       relatedMovementId:
           serializer.fromJson<String?>(json['relatedMovementId']),
       status: serializer.fromJson<String>(json['status']),
@@ -7444,6 +7496,8 @@ class MovementsTableData extends DataClass
       'temporaryMovementType':
           serializer.toJson<String?>(temporaryMovementType),
       'expectedReturnDate': serializer.toJson<DateTime?>(expectedReturnDate),
+      'returnDate': serializer.toJson<DateTime?>(returnDate),
+      'returnNotes': serializer.toJson<String?>(returnNotes),
       'relatedMovementId': serializer.toJson<String?>(relatedMovementId),
       'status': serializer.toJson<String>(status),
       'synced': serializer.toJson<bool>(synced),
@@ -7475,6 +7529,8 @@ class MovementsTableData extends DataClass
           bool? isTemporary,
           Value<String?> temporaryMovementType = const Value.absent(),
           Value<DateTime?> expectedReturnDate = const Value.absent(),
+          Value<DateTime?> returnDate = const Value.absent(),
+          Value<String?> returnNotes = const Value.absent(),
           Value<String?> relatedMovementId = const Value.absent(),
           String? status,
           bool? synced,
@@ -7513,6 +7569,8 @@ class MovementsTableData extends DataClass
         expectedReturnDate: expectedReturnDate.present
             ? expectedReturnDate.value
             : this.expectedReturnDate,
+        returnDate: returnDate.present ? returnDate.value : this.returnDate,
+        returnNotes: returnNotes.present ? returnNotes.value : this.returnNotes,
         relatedMovementId: relatedMovementId.present
             ? relatedMovementId.value
             : this.relatedMovementId,
@@ -7562,6 +7620,10 @@ class MovementsTableData extends DataClass
       expectedReturnDate: data.expectedReturnDate.present
           ? data.expectedReturnDate.value
           : this.expectedReturnDate,
+      returnDate:
+          data.returnDate.present ? data.returnDate.value : this.returnDate,
+      returnNotes:
+          data.returnNotes.present ? data.returnNotes.value : this.returnNotes,
       relatedMovementId: data.relatedMovementId.present
           ? data.relatedMovementId.value
           : this.relatedMovementId,
@@ -7601,6 +7663,8 @@ class MovementsTableData extends DataClass
           ..write('isTemporary: $isTemporary, ')
           ..write('temporaryMovementType: $temporaryMovementType, ')
           ..write('expectedReturnDate: $expectedReturnDate, ')
+          ..write('returnDate: $returnDate, ')
+          ..write('returnNotes: $returnNotes, ')
           ..write('relatedMovementId: $relatedMovementId, ')
           ..write('status: $status, ')
           ..write('synced: $synced, ')
@@ -7634,6 +7698,8 @@ class MovementsTableData extends DataClass
         isTemporary,
         temporaryMovementType,
         expectedReturnDate,
+        returnDate,
+        returnNotes,
         relatedMovementId,
         status,
         synced,
@@ -7666,6 +7732,8 @@ class MovementsTableData extends DataClass
           other.isTemporary == this.isTemporary &&
           other.temporaryMovementType == this.temporaryMovementType &&
           other.expectedReturnDate == this.expectedReturnDate &&
+          other.returnDate == this.returnDate &&
+          other.returnNotes == this.returnNotes &&
           other.relatedMovementId == this.relatedMovementId &&
           other.status == this.status &&
           other.synced == this.synced &&
@@ -7696,6 +7764,8 @@ class MovementsTableCompanion extends UpdateCompanion<MovementsTableData> {
   final Value<bool> isTemporary;
   final Value<String?> temporaryMovementType;
   final Value<DateTime?> expectedReturnDate;
+  final Value<DateTime?> returnDate;
+  final Value<String?> returnNotes;
   final Value<String?> relatedMovementId;
   final Value<String> status;
   final Value<bool> synced;
@@ -7725,6 +7795,8 @@ class MovementsTableCompanion extends UpdateCompanion<MovementsTableData> {
     this.isTemporary = const Value.absent(),
     this.temporaryMovementType = const Value.absent(),
     this.expectedReturnDate = const Value.absent(),
+    this.returnDate = const Value.absent(),
+    this.returnNotes = const Value.absent(),
     this.relatedMovementId = const Value.absent(),
     this.status = const Value.absent(),
     this.synced = const Value.absent(),
@@ -7755,6 +7827,8 @@ class MovementsTableCompanion extends UpdateCompanion<MovementsTableData> {
     this.isTemporary = const Value.absent(),
     this.temporaryMovementType = const Value.absent(),
     this.expectedReturnDate = const Value.absent(),
+    this.returnDate = const Value.absent(),
+    this.returnNotes = const Value.absent(),
     this.relatedMovementId = const Value.absent(),
     required String status,
     this.synced = const Value.absent(),
@@ -7792,6 +7866,8 @@ class MovementsTableCompanion extends UpdateCompanion<MovementsTableData> {
     Expression<bool>? isTemporary,
     Expression<String>? temporaryMovementType,
     Expression<DateTime>? expectedReturnDate,
+    Expression<DateTime>? returnDate,
+    Expression<String>? returnNotes,
     Expression<String>? relatedMovementId,
     Expression<String>? status,
     Expression<bool>? synced,
@@ -7824,6 +7900,8 @@ class MovementsTableCompanion extends UpdateCompanion<MovementsTableData> {
         'temporary_movement_type': temporaryMovementType,
       if (expectedReturnDate != null)
         'expected_return_date': expectedReturnDate,
+      if (returnDate != null) 'return_date': returnDate,
+      if (returnNotes != null) 'return_notes': returnNotes,
       if (relatedMovementId != null) 'related_movement_id': relatedMovementId,
       if (status != null) 'status': status,
       if (synced != null) 'synced': synced,
@@ -7856,6 +7934,8 @@ class MovementsTableCompanion extends UpdateCompanion<MovementsTableData> {
       Value<bool>? isTemporary,
       Value<String?>? temporaryMovementType,
       Value<DateTime?>? expectedReturnDate,
+      Value<DateTime?>? returnDate,
+      Value<String?>? returnNotes,
       Value<String?>? relatedMovementId,
       Value<String>? status,
       Value<bool>? synced,
@@ -7886,6 +7966,8 @@ class MovementsTableCompanion extends UpdateCompanion<MovementsTableData> {
       temporaryMovementType:
           temporaryMovementType ?? this.temporaryMovementType,
       expectedReturnDate: expectedReturnDate ?? this.expectedReturnDate,
+      returnDate: returnDate ?? this.returnDate,
+      returnNotes: returnNotes ?? this.returnNotes,
       relatedMovementId: relatedMovementId ?? this.relatedMovementId,
       status: status ?? this.status,
       synced: synced ?? this.synced,
@@ -7960,6 +8042,12 @@ class MovementsTableCompanion extends UpdateCompanion<MovementsTableData> {
       map['expected_return_date'] =
           Variable<DateTime>(expectedReturnDate.value);
     }
+    if (returnDate.present) {
+      map['return_date'] = Variable<DateTime>(returnDate.value);
+    }
+    if (returnNotes.present) {
+      map['return_notes'] = Variable<String>(returnNotes.value);
+    }
     if (relatedMovementId.present) {
       map['related_movement_id'] = Variable<String>(relatedMovementId.value);
     }
@@ -8012,6 +8100,8 @@ class MovementsTableCompanion extends UpdateCompanion<MovementsTableData> {
           ..write('isTemporary: $isTemporary, ')
           ..write('temporaryMovementType: $temporaryMovementType, ')
           ..write('expectedReturnDate: $expectedReturnDate, ')
+          ..write('returnDate: $returnDate, ')
+          ..write('returnNotes: $returnNotes, ')
           ..write('relatedMovementId: $relatedMovementId, ')
           ..write('status: $status, ')
           ..write('synced: $synced, ')
@@ -13880,54 +13970,6 @@ class $LotsTableTable extends LotsTable
   late final GeneratedColumn<String> veterinarianName = GeneratedColumn<String>(
       'veterinarian_name', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _buyerNameMeta =
-      const VerificationMeta('buyerName');
-  @override
-  late final GeneratedColumn<String> buyerName = GeneratedColumn<String>(
-      'buyer_name', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _buyerFarmIdMeta =
-      const VerificationMeta('buyerFarmId');
-  @override
-  late final GeneratedColumn<String> buyerFarmId = GeneratedColumn<String>(
-      'buyer_farm_id', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _totalPriceMeta =
-      const VerificationMeta('totalPrice');
-  @override
-  late final GeneratedColumn<double> totalPrice = GeneratedColumn<double>(
-      'total_price', aliasedName, true,
-      type: DriftSqlType.double, requiredDuringInsert: false);
-  static const VerificationMeta _pricePerAnimalMeta =
-      const VerificationMeta('pricePerAnimal');
-  @override
-  late final GeneratedColumn<double> pricePerAnimal = GeneratedColumn<double>(
-      'price_per_animal', aliasedName, true,
-      type: DriftSqlType.double, requiredDuringInsert: false);
-  static const VerificationMeta _saleDateMeta =
-      const VerificationMeta('saleDate');
-  @override
-  late final GeneratedColumn<DateTime> saleDate = GeneratedColumn<DateTime>(
-      'sale_date', aliasedName, true,
-      type: DriftSqlType.dateTime, requiredDuringInsert: false);
-  static const VerificationMeta _slaughterhouseNameMeta =
-      const VerificationMeta('slaughterhouseName');
-  @override
-  late final GeneratedColumn<String> slaughterhouseName =
-      GeneratedColumn<String>('slaughterhouse_name', aliasedName, true,
-          type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _slaughterhouseIdMeta =
-      const VerificationMeta('slaughterhouseId');
-  @override
-  late final GeneratedColumn<String> slaughterhouseId = GeneratedColumn<String>(
-      'slaughterhouse_id', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _slaughterDateMeta =
-      const VerificationMeta('slaughterDate');
-  @override
-  late final GeneratedColumn<DateTime> slaughterDate =
-      GeneratedColumn<DateTime>('slaughter_date', aliasedName, true,
-          type: DriftSqlType.dateTime, requiredDuringInsert: false);
   static const VerificationMeta _notesMeta = const VerificationMeta('notes');
   @override
   late final GeneratedColumn<String> notes = GeneratedColumn<String>(
@@ -13982,14 +14024,6 @@ class $LotsTableTable extends LotsTable
         withdrawalEndDate,
         veterinarianId,
         veterinarianName,
-        buyerName,
-        buyerFarmId,
-        totalPrice,
-        pricePerAnimal,
-        saleDate,
-        slaughterhouseName,
-        slaughterhouseId,
-        slaughterDate,
         notes,
         synced,
         createdAt,
@@ -14084,50 +14118,6 @@ class $LotsTableTable extends LotsTable
           veterinarianName.isAcceptableOrUnknown(
               data['veterinarian_name']!, _veterinarianNameMeta));
     }
-    if (data.containsKey('buyer_name')) {
-      context.handle(_buyerNameMeta,
-          buyerName.isAcceptableOrUnknown(data['buyer_name']!, _buyerNameMeta));
-    }
-    if (data.containsKey('buyer_farm_id')) {
-      context.handle(
-          _buyerFarmIdMeta,
-          buyerFarmId.isAcceptableOrUnknown(
-              data['buyer_farm_id']!, _buyerFarmIdMeta));
-    }
-    if (data.containsKey('total_price')) {
-      context.handle(
-          _totalPriceMeta,
-          totalPrice.isAcceptableOrUnknown(
-              data['total_price']!, _totalPriceMeta));
-    }
-    if (data.containsKey('price_per_animal')) {
-      context.handle(
-          _pricePerAnimalMeta,
-          pricePerAnimal.isAcceptableOrUnknown(
-              data['price_per_animal']!, _pricePerAnimalMeta));
-    }
-    if (data.containsKey('sale_date')) {
-      context.handle(_saleDateMeta,
-          saleDate.isAcceptableOrUnknown(data['sale_date']!, _saleDateMeta));
-    }
-    if (data.containsKey('slaughterhouse_name')) {
-      context.handle(
-          _slaughterhouseNameMeta,
-          slaughterhouseName.isAcceptableOrUnknown(
-              data['slaughterhouse_name']!, _slaughterhouseNameMeta));
-    }
-    if (data.containsKey('slaughterhouse_id')) {
-      context.handle(
-          _slaughterhouseIdMeta,
-          slaughterhouseId.isAcceptableOrUnknown(
-              data['slaughterhouse_id']!, _slaughterhouseIdMeta));
-    }
-    if (data.containsKey('slaughter_date')) {
-      context.handle(
-          _slaughterDateMeta,
-          slaughterDate.isAcceptableOrUnknown(
-              data['slaughter_date']!, _slaughterDateMeta));
-    }
     if (data.containsKey('notes')) {
       context.handle(
           _notesMeta, notes.isAcceptableOrUnknown(data['notes']!, _notesMeta));
@@ -14197,22 +14187,6 @@ class $LotsTableTable extends LotsTable
           .read(DriftSqlType.string, data['${effectivePrefix}veterinarian_id']),
       veterinarianName: attachedDatabase.typeMapping.read(
           DriftSqlType.string, data['${effectivePrefix}veterinarian_name']),
-      buyerName: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}buyer_name']),
-      buyerFarmId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}buyer_farm_id']),
-      totalPrice: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}total_price']),
-      pricePerAnimal: attachedDatabase.typeMapping.read(
-          DriftSqlType.double, data['${effectivePrefix}price_per_animal']),
-      saleDate: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}sale_date']),
-      slaughterhouseName: attachedDatabase.typeMapping.read(
-          DriftSqlType.string, data['${effectivePrefix}slaughterhouse_name']),
-      slaughterhouseId: attachedDatabase.typeMapping.read(
-          DriftSqlType.string, data['${effectivePrefix}slaughterhouse_id']),
-      slaughterDate: attachedDatabase.typeMapping.read(
-          DriftSqlType.dateTime, data['${effectivePrefix}slaughter_date']),
       notes: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}notes']),
       synced: attachedDatabase.typeMapping
@@ -14249,14 +14223,6 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
   final DateTime? withdrawalEndDate;
   final String? veterinarianId;
   final String? veterinarianName;
-  final String? buyerName;
-  final String? buyerFarmId;
-  final double? totalPrice;
-  final double? pricePerAnimal;
-  final DateTime? saleDate;
-  final String? slaughterhouseName;
-  final String? slaughterhouseId;
-  final DateTime? slaughterDate;
   final String? notes;
   final bool synced;
   final DateTime createdAt;
@@ -14278,14 +14244,6 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
       this.withdrawalEndDate,
       this.veterinarianId,
       this.veterinarianName,
-      this.buyerName,
-      this.buyerFarmId,
-      this.totalPrice,
-      this.pricePerAnimal,
-      this.saleDate,
-      this.slaughterhouseName,
-      this.slaughterhouseId,
-      this.slaughterDate,
       this.notes,
       required this.synced,
       required this.createdAt,
@@ -14326,30 +14284,6 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
     }
     if (!nullToAbsent || veterinarianName != null) {
       map['veterinarian_name'] = Variable<String>(veterinarianName);
-    }
-    if (!nullToAbsent || buyerName != null) {
-      map['buyer_name'] = Variable<String>(buyerName);
-    }
-    if (!nullToAbsent || buyerFarmId != null) {
-      map['buyer_farm_id'] = Variable<String>(buyerFarmId);
-    }
-    if (!nullToAbsent || totalPrice != null) {
-      map['total_price'] = Variable<double>(totalPrice);
-    }
-    if (!nullToAbsent || pricePerAnimal != null) {
-      map['price_per_animal'] = Variable<double>(pricePerAnimal);
-    }
-    if (!nullToAbsent || saleDate != null) {
-      map['sale_date'] = Variable<DateTime>(saleDate);
-    }
-    if (!nullToAbsent || slaughterhouseName != null) {
-      map['slaughterhouse_name'] = Variable<String>(slaughterhouseName);
-    }
-    if (!nullToAbsent || slaughterhouseId != null) {
-      map['slaughterhouse_id'] = Variable<String>(slaughterhouseId);
-    }
-    if (!nullToAbsent || slaughterDate != null) {
-      map['slaughter_date'] = Variable<DateTime>(slaughterDate);
     }
     if (!nullToAbsent || notes != null) {
       map['notes'] = Variable<String>(notes);
@@ -14397,30 +14331,6 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
       veterinarianName: veterinarianName == null && nullToAbsent
           ? const Value.absent()
           : Value(veterinarianName),
-      buyerName: buyerName == null && nullToAbsent
-          ? const Value.absent()
-          : Value(buyerName),
-      buyerFarmId: buyerFarmId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(buyerFarmId),
-      totalPrice: totalPrice == null && nullToAbsent
-          ? const Value.absent()
-          : Value(totalPrice),
-      pricePerAnimal: pricePerAnimal == null && nullToAbsent
-          ? const Value.absent()
-          : Value(pricePerAnimal),
-      saleDate: saleDate == null && nullToAbsent
-          ? const Value.absent()
-          : Value(saleDate),
-      slaughterhouseName: slaughterhouseName == null && nullToAbsent
-          ? const Value.absent()
-          : Value(slaughterhouseName),
-      slaughterhouseId: slaughterhouseId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(slaughterhouseId),
-      slaughterDate: slaughterDate == null && nullToAbsent
-          ? const Value.absent()
-          : Value(slaughterDate),
       notes:
           notes == null && nullToAbsent ? const Value.absent() : Value(notes),
       synced: Value(synced),
@@ -14454,15 +14364,6 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
           serializer.fromJson<DateTime?>(json['withdrawalEndDate']),
       veterinarianId: serializer.fromJson<String?>(json['veterinarianId']),
       veterinarianName: serializer.fromJson<String?>(json['veterinarianName']),
-      buyerName: serializer.fromJson<String?>(json['buyerName']),
-      buyerFarmId: serializer.fromJson<String?>(json['buyerFarmId']),
-      totalPrice: serializer.fromJson<double?>(json['totalPrice']),
-      pricePerAnimal: serializer.fromJson<double?>(json['pricePerAnimal']),
-      saleDate: serializer.fromJson<DateTime?>(json['saleDate']),
-      slaughterhouseName:
-          serializer.fromJson<String?>(json['slaughterhouseName']),
-      slaughterhouseId: serializer.fromJson<String?>(json['slaughterhouseId']),
-      slaughterDate: serializer.fromJson<DateTime?>(json['slaughterDate']),
       notes: serializer.fromJson<String?>(json['notes']),
       synced: serializer.fromJson<bool>(json['synced']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -14489,14 +14390,6 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
       'withdrawalEndDate': serializer.toJson<DateTime?>(withdrawalEndDate),
       'veterinarianId': serializer.toJson<String?>(veterinarianId),
       'veterinarianName': serializer.toJson<String?>(veterinarianName),
-      'buyerName': serializer.toJson<String?>(buyerName),
-      'buyerFarmId': serializer.toJson<String?>(buyerFarmId),
-      'totalPrice': serializer.toJson<double?>(totalPrice),
-      'pricePerAnimal': serializer.toJson<double?>(pricePerAnimal),
-      'saleDate': serializer.toJson<DateTime?>(saleDate),
-      'slaughterhouseName': serializer.toJson<String?>(slaughterhouseName),
-      'slaughterhouseId': serializer.toJson<String?>(slaughterhouseId),
-      'slaughterDate': serializer.toJson<DateTime?>(slaughterDate),
       'notes': serializer.toJson<String?>(notes),
       'synced': serializer.toJson<bool>(synced),
       'createdAt': serializer.toJson<DateTime>(createdAt),
@@ -14521,14 +14414,6 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
           Value<DateTime?> withdrawalEndDate = const Value.absent(),
           Value<String?> veterinarianId = const Value.absent(),
           Value<String?> veterinarianName = const Value.absent(),
-          Value<String?> buyerName = const Value.absent(),
-          Value<String?> buyerFarmId = const Value.absent(),
-          Value<double?> totalPrice = const Value.absent(),
-          Value<double?> pricePerAnimal = const Value.absent(),
-          Value<DateTime?> saleDate = const Value.absent(),
-          Value<String?> slaughterhouseName = const Value.absent(),
-          Value<String?> slaughterhouseId = const Value.absent(),
-          Value<DateTime?> slaughterDate = const Value.absent(),
           Value<String?> notes = const Value.absent(),
           bool? synced,
           DateTime? createdAt,
@@ -14556,20 +14441,6 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
         veterinarianName: veterinarianName.present
             ? veterinarianName.value
             : this.veterinarianName,
-        buyerName: buyerName.present ? buyerName.value : this.buyerName,
-        buyerFarmId: buyerFarmId.present ? buyerFarmId.value : this.buyerFarmId,
-        totalPrice: totalPrice.present ? totalPrice.value : this.totalPrice,
-        pricePerAnimal:
-            pricePerAnimal.present ? pricePerAnimal.value : this.pricePerAnimal,
-        saleDate: saleDate.present ? saleDate.value : this.saleDate,
-        slaughterhouseName: slaughterhouseName.present
-            ? slaughterhouseName.value
-            : this.slaughterhouseName,
-        slaughterhouseId: slaughterhouseId.present
-            ? slaughterhouseId.value
-            : this.slaughterhouseId,
-        slaughterDate:
-            slaughterDate.present ? slaughterDate.value : this.slaughterDate,
         notes: notes.present ? notes.value : this.notes,
         synced: synced ?? this.synced,
         createdAt: createdAt ?? this.createdAt,
@@ -14607,24 +14478,6 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
       veterinarianName: data.veterinarianName.present
           ? data.veterinarianName.value
           : this.veterinarianName,
-      buyerName: data.buyerName.present ? data.buyerName.value : this.buyerName,
-      buyerFarmId:
-          data.buyerFarmId.present ? data.buyerFarmId.value : this.buyerFarmId,
-      totalPrice:
-          data.totalPrice.present ? data.totalPrice.value : this.totalPrice,
-      pricePerAnimal: data.pricePerAnimal.present
-          ? data.pricePerAnimal.value
-          : this.pricePerAnimal,
-      saleDate: data.saleDate.present ? data.saleDate.value : this.saleDate,
-      slaughterhouseName: data.slaughterhouseName.present
-          ? data.slaughterhouseName.value
-          : this.slaughterhouseName,
-      slaughterhouseId: data.slaughterhouseId.present
-          ? data.slaughterhouseId.value
-          : this.slaughterhouseId,
-      slaughterDate: data.slaughterDate.present
-          ? data.slaughterDate.value
-          : this.slaughterDate,
       notes: data.notes.present ? data.notes.value : this.notes,
       synced: data.synced.present ? data.synced.value : this.synced,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -14655,14 +14508,6 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
           ..write('withdrawalEndDate: $withdrawalEndDate, ')
           ..write('veterinarianId: $veterinarianId, ')
           ..write('veterinarianName: $veterinarianName, ')
-          ..write('buyerName: $buyerName, ')
-          ..write('buyerFarmId: $buyerFarmId, ')
-          ..write('totalPrice: $totalPrice, ')
-          ..write('pricePerAnimal: $pricePerAnimal, ')
-          ..write('saleDate: $saleDate, ')
-          ..write('slaughterhouseName: $slaughterhouseName, ')
-          ..write('slaughterhouseId: $slaughterhouseId, ')
-          ..write('slaughterDate: $slaughterDate, ')
           ..write('notes: $notes, ')
           ..write('synced: $synced, ')
           ..write('createdAt: $createdAt, ')
@@ -14674,36 +14519,27 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
   }
 
   @override
-  int get hashCode => Object.hashAll([
-        id,
-        farmId,
-        name,
-        type,
-        animalIdsJson,
-        status,
-        completed,
-        completedAt,
-        productId,
-        productName,
-        treatmentDate,
-        withdrawalEndDate,
-        veterinarianId,
-        veterinarianName,
-        buyerName,
-        buyerFarmId,
-        totalPrice,
-        pricePerAnimal,
-        saleDate,
-        slaughterhouseName,
-        slaughterhouseId,
-        slaughterDate,
-        notes,
-        synced,
-        createdAt,
-        updatedAt,
-        lastSyncedAt,
-        serverVersion
-      ]);
+  int get hashCode => Object.hash(
+      id,
+      farmId,
+      name,
+      type,
+      animalIdsJson,
+      status,
+      completed,
+      completedAt,
+      productId,
+      productName,
+      treatmentDate,
+      withdrawalEndDate,
+      veterinarianId,
+      veterinarianName,
+      notes,
+      synced,
+      createdAt,
+      updatedAt,
+      lastSyncedAt,
+      serverVersion);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -14722,14 +14558,6 @@ class LotsTableData extends DataClass implements Insertable<LotsTableData> {
           other.withdrawalEndDate == this.withdrawalEndDate &&
           other.veterinarianId == this.veterinarianId &&
           other.veterinarianName == this.veterinarianName &&
-          other.buyerName == this.buyerName &&
-          other.buyerFarmId == this.buyerFarmId &&
-          other.totalPrice == this.totalPrice &&
-          other.pricePerAnimal == this.pricePerAnimal &&
-          other.saleDate == this.saleDate &&
-          other.slaughterhouseName == this.slaughterhouseName &&
-          other.slaughterhouseId == this.slaughterhouseId &&
-          other.slaughterDate == this.slaughterDate &&
           other.notes == this.notes &&
           other.synced == this.synced &&
           other.createdAt == this.createdAt &&
@@ -14753,14 +14581,6 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
   final Value<DateTime?> withdrawalEndDate;
   final Value<String?> veterinarianId;
   final Value<String?> veterinarianName;
-  final Value<String?> buyerName;
-  final Value<String?> buyerFarmId;
-  final Value<double?> totalPrice;
-  final Value<double?> pricePerAnimal;
-  final Value<DateTime?> saleDate;
-  final Value<String?> slaughterhouseName;
-  final Value<String?> slaughterhouseId;
-  final Value<DateTime?> slaughterDate;
   final Value<String?> notes;
   final Value<bool> synced;
   final Value<DateTime> createdAt;
@@ -14783,14 +14603,6 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
     this.withdrawalEndDate = const Value.absent(),
     this.veterinarianId = const Value.absent(),
     this.veterinarianName = const Value.absent(),
-    this.buyerName = const Value.absent(),
-    this.buyerFarmId = const Value.absent(),
-    this.totalPrice = const Value.absent(),
-    this.pricePerAnimal = const Value.absent(),
-    this.saleDate = const Value.absent(),
-    this.slaughterhouseName = const Value.absent(),
-    this.slaughterhouseId = const Value.absent(),
-    this.slaughterDate = const Value.absent(),
     this.notes = const Value.absent(),
     this.synced = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -14814,14 +14626,6 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
     this.withdrawalEndDate = const Value.absent(),
     this.veterinarianId = const Value.absent(),
     this.veterinarianName = const Value.absent(),
-    this.buyerName = const Value.absent(),
-    this.buyerFarmId = const Value.absent(),
-    this.totalPrice = const Value.absent(),
-    this.pricePerAnimal = const Value.absent(),
-    this.saleDate = const Value.absent(),
-    this.slaughterhouseName = const Value.absent(),
-    this.slaughterhouseId = const Value.absent(),
-    this.slaughterDate = const Value.absent(),
     this.notes = const Value.absent(),
     this.synced = const Value.absent(),
     required DateTime createdAt,
@@ -14850,14 +14654,6 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
     Expression<DateTime>? withdrawalEndDate,
     Expression<String>? veterinarianId,
     Expression<String>? veterinarianName,
-    Expression<String>? buyerName,
-    Expression<String>? buyerFarmId,
-    Expression<double>? totalPrice,
-    Expression<double>? pricePerAnimal,
-    Expression<DateTime>? saleDate,
-    Expression<String>? slaughterhouseName,
-    Expression<String>? slaughterhouseId,
-    Expression<DateTime>? slaughterDate,
     Expression<String>? notes,
     Expression<bool>? synced,
     Expression<DateTime>? createdAt,
@@ -14881,14 +14677,6 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
       if (withdrawalEndDate != null) 'withdrawal_end_date': withdrawalEndDate,
       if (veterinarianId != null) 'veterinarian_id': veterinarianId,
       if (veterinarianName != null) 'veterinarian_name': veterinarianName,
-      if (buyerName != null) 'buyer_name': buyerName,
-      if (buyerFarmId != null) 'buyer_farm_id': buyerFarmId,
-      if (totalPrice != null) 'total_price': totalPrice,
-      if (pricePerAnimal != null) 'price_per_animal': pricePerAnimal,
-      if (saleDate != null) 'sale_date': saleDate,
-      if (slaughterhouseName != null) 'slaughterhouse_name': slaughterhouseName,
-      if (slaughterhouseId != null) 'slaughterhouse_id': slaughterhouseId,
-      if (slaughterDate != null) 'slaughter_date': slaughterDate,
       if (notes != null) 'notes': notes,
       if (synced != null) 'synced': synced,
       if (createdAt != null) 'created_at': createdAt,
@@ -14914,14 +14702,6 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
       Value<DateTime?>? withdrawalEndDate,
       Value<String?>? veterinarianId,
       Value<String?>? veterinarianName,
-      Value<String?>? buyerName,
-      Value<String?>? buyerFarmId,
-      Value<double?>? totalPrice,
-      Value<double?>? pricePerAnimal,
-      Value<DateTime?>? saleDate,
-      Value<String?>? slaughterhouseName,
-      Value<String?>? slaughterhouseId,
-      Value<DateTime?>? slaughterDate,
       Value<String?>? notes,
       Value<bool>? synced,
       Value<DateTime>? createdAt,
@@ -14944,14 +14724,6 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
       withdrawalEndDate: withdrawalEndDate ?? this.withdrawalEndDate,
       veterinarianId: veterinarianId ?? this.veterinarianId,
       veterinarianName: veterinarianName ?? this.veterinarianName,
-      buyerName: buyerName ?? this.buyerName,
-      buyerFarmId: buyerFarmId ?? this.buyerFarmId,
-      totalPrice: totalPrice ?? this.totalPrice,
-      pricePerAnimal: pricePerAnimal ?? this.pricePerAnimal,
-      saleDate: saleDate ?? this.saleDate,
-      slaughterhouseName: slaughterhouseName ?? this.slaughterhouseName,
-      slaughterhouseId: slaughterhouseId ?? this.slaughterhouseId,
-      slaughterDate: slaughterDate ?? this.slaughterDate,
       notes: notes ?? this.notes,
       synced: synced ?? this.synced,
       createdAt: createdAt ?? this.createdAt,
@@ -15007,30 +14779,6 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
     if (veterinarianName.present) {
       map['veterinarian_name'] = Variable<String>(veterinarianName.value);
     }
-    if (buyerName.present) {
-      map['buyer_name'] = Variable<String>(buyerName.value);
-    }
-    if (buyerFarmId.present) {
-      map['buyer_farm_id'] = Variable<String>(buyerFarmId.value);
-    }
-    if (totalPrice.present) {
-      map['total_price'] = Variable<double>(totalPrice.value);
-    }
-    if (pricePerAnimal.present) {
-      map['price_per_animal'] = Variable<double>(pricePerAnimal.value);
-    }
-    if (saleDate.present) {
-      map['sale_date'] = Variable<DateTime>(saleDate.value);
-    }
-    if (slaughterhouseName.present) {
-      map['slaughterhouse_name'] = Variable<String>(slaughterhouseName.value);
-    }
-    if (slaughterhouseId.present) {
-      map['slaughterhouse_id'] = Variable<String>(slaughterhouseId.value);
-    }
-    if (slaughterDate.present) {
-      map['slaughter_date'] = Variable<DateTime>(slaughterDate.value);
-    }
     if (notes.present) {
       map['notes'] = Variable<String>(notes.value);
     }
@@ -15072,14 +14820,6 @@ class LotsTableCompanion extends UpdateCompanion<LotsTableData> {
           ..write('withdrawalEndDate: $withdrawalEndDate, ')
           ..write('veterinarianId: $veterinarianId, ')
           ..write('veterinarianName: $veterinarianName, ')
-          ..write('buyerName: $buyerName, ')
-          ..write('buyerFarmId: $buyerFarmId, ')
-          ..write('totalPrice: $totalPrice, ')
-          ..write('pricePerAnimal: $pricePerAnimal, ')
-          ..write('saleDate: $saleDate, ')
-          ..write('slaughterhouseName: $slaughterhouseName, ')
-          ..write('slaughterhouseId: $slaughterhouseId, ')
-          ..write('slaughterDate: $slaughterDate, ')
           ..write('notes: $notes, ')
           ..write('synced: $synced, ')
           ..write('createdAt: $createdAt, ')
@@ -19786,6 +19526,8 @@ typedef $$MovementsTableTableCreateCompanionBuilder = MovementsTableCompanion
   Value<bool> isTemporary,
   Value<String?> temporaryMovementType,
   Value<DateTime?> expectedReturnDate,
+  Value<DateTime?> returnDate,
+  Value<String?> returnNotes,
   Value<String?> relatedMovementId,
   required String status,
   Value<bool> synced,
@@ -19817,6 +19559,8 @@ typedef $$MovementsTableTableUpdateCompanionBuilder = MovementsTableCompanion
   Value<bool> isTemporary,
   Value<String?> temporaryMovementType,
   Value<DateTime?> expectedReturnDate,
+  Value<DateTime?> returnDate,
+  Value<String?> returnNotes,
   Value<String?> relatedMovementId,
   Value<String> status,
   Value<bool> synced,
@@ -19898,6 +19642,12 @@ class $$MovementsTableTableFilterComposer
   ColumnFilters<DateTime> get expectedReturnDate => $composableBuilder(
       column: $table.expectedReturnDate,
       builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get returnDate => $composableBuilder(
+      column: $table.returnDate, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get returnNotes => $composableBuilder(
+      column: $table.returnNotes, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get relatedMovementId => $composableBuilder(
       column: $table.relatedMovementId,
@@ -19997,6 +19747,12 @@ class $$MovementsTableTableOrderingComposer
       column: $table.expectedReturnDate,
       builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<DateTime> get returnDate => $composableBuilder(
+      column: $table.returnDate, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get returnNotes => $composableBuilder(
+      column: $table.returnNotes, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<String> get relatedMovementId => $composableBuilder(
       column: $table.relatedMovementId,
       builder: (column) => ColumnOrderings(column));
@@ -20091,6 +19847,12 @@ class $$MovementsTableTableAnnotationComposer
   GeneratedColumn<DateTime> get expectedReturnDate => $composableBuilder(
       column: $table.expectedReturnDate, builder: (column) => column);
 
+  GeneratedColumn<DateTime> get returnDate => $composableBuilder(
+      column: $table.returnDate, builder: (column) => column);
+
+  GeneratedColumn<String> get returnNotes => $composableBuilder(
+      column: $table.returnNotes, builder: (column) => column);
+
   GeneratedColumn<String> get relatedMovementId => $composableBuilder(
       column: $table.relatedMovementId, builder: (column) => column);
 
@@ -20162,6 +19924,8 @@ class $$MovementsTableTableTableManager extends RootTableManager<
             Value<bool> isTemporary = const Value.absent(),
             Value<String?> temporaryMovementType = const Value.absent(),
             Value<DateTime?> expectedReturnDate = const Value.absent(),
+            Value<DateTime?> returnDate = const Value.absent(),
+            Value<String?> returnNotes = const Value.absent(),
             Value<String?> relatedMovementId = const Value.absent(),
             Value<String> status = const Value.absent(),
             Value<bool> synced = const Value.absent(),
@@ -20192,6 +19956,8 @@ class $$MovementsTableTableTableManager extends RootTableManager<
             isTemporary: isTemporary,
             temporaryMovementType: temporaryMovementType,
             expectedReturnDate: expectedReturnDate,
+            returnDate: returnDate,
+            returnNotes: returnNotes,
             relatedMovementId: relatedMovementId,
             status: status,
             synced: synced,
@@ -20222,6 +19988,8 @@ class $$MovementsTableTableTableManager extends RootTableManager<
             Value<bool> isTemporary = const Value.absent(),
             Value<String?> temporaryMovementType = const Value.absent(),
             Value<DateTime?> expectedReturnDate = const Value.absent(),
+            Value<DateTime?> returnDate = const Value.absent(),
+            Value<String?> returnNotes = const Value.absent(),
             Value<String?> relatedMovementId = const Value.absent(),
             required String status,
             Value<bool> synced = const Value.absent(),
@@ -20252,6 +20020,8 @@ class $$MovementsTableTableTableManager extends RootTableManager<
             isTemporary: isTemporary,
             temporaryMovementType: temporaryMovementType,
             expectedReturnDate: expectedReturnDate,
+            returnDate: returnDate,
+            returnNotes: returnNotes,
             relatedMovementId: relatedMovementId,
             status: status,
             synced: synced,
@@ -22775,14 +22545,6 @@ typedef $$LotsTableTableCreateCompanionBuilder = LotsTableCompanion Function({
   Value<DateTime?> withdrawalEndDate,
   Value<String?> veterinarianId,
   Value<String?> veterinarianName,
-  Value<String?> buyerName,
-  Value<String?> buyerFarmId,
-  Value<double?> totalPrice,
-  Value<double?> pricePerAnimal,
-  Value<DateTime?> saleDate,
-  Value<String?> slaughterhouseName,
-  Value<String?> slaughterhouseId,
-  Value<DateTime?> slaughterDate,
   Value<String?> notes,
   Value<bool> synced,
   required DateTime createdAt,
@@ -22806,14 +22568,6 @@ typedef $$LotsTableTableUpdateCompanionBuilder = LotsTableCompanion Function({
   Value<DateTime?> withdrawalEndDate,
   Value<String?> veterinarianId,
   Value<String?> veterinarianName,
-  Value<String?> buyerName,
-  Value<String?> buyerFarmId,
-  Value<double?> totalPrice,
-  Value<double?> pricePerAnimal,
-  Value<DateTime?> saleDate,
-  Value<String?> slaughterhouseName,
-  Value<String?> slaughterhouseId,
-  Value<DateTime?> slaughterDate,
   Value<String?> notes,
   Value<bool> synced,
   Value<DateTime> createdAt,
@@ -22876,33 +22630,6 @@ class $$LotsTableTableFilterComposer
   ColumnFilters<String> get veterinarianName => $composableBuilder(
       column: $table.veterinarianName,
       builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get buyerName => $composableBuilder(
-      column: $table.buyerName, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get buyerFarmId => $composableBuilder(
-      column: $table.buyerFarmId, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<double> get totalPrice => $composableBuilder(
-      column: $table.totalPrice, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<double> get pricePerAnimal => $composableBuilder(
-      column: $table.pricePerAnimal,
-      builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<DateTime> get saleDate => $composableBuilder(
-      column: $table.saleDate, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get slaughterhouseName => $composableBuilder(
-      column: $table.slaughterhouseName,
-      builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get slaughterhouseId => $composableBuilder(
-      column: $table.slaughterhouseId,
-      builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<DateTime> get slaughterDate => $composableBuilder(
-      column: $table.slaughterDate, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get notes => $composableBuilder(
       column: $table.notes, builder: (column) => ColumnFilters(column));
@@ -22979,34 +22706,6 @@ class $$LotsTableTableOrderingComposer
       column: $table.veterinarianName,
       builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get buyerName => $composableBuilder(
-      column: $table.buyerName, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get buyerFarmId => $composableBuilder(
-      column: $table.buyerFarmId, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<double> get totalPrice => $composableBuilder(
-      column: $table.totalPrice, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<double> get pricePerAnimal => $composableBuilder(
-      column: $table.pricePerAnimal,
-      builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<DateTime> get saleDate => $composableBuilder(
-      column: $table.saleDate, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get slaughterhouseName => $composableBuilder(
-      column: $table.slaughterhouseName,
-      builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get slaughterhouseId => $composableBuilder(
-      column: $table.slaughterhouseId,
-      builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<DateTime> get slaughterDate => $composableBuilder(
-      column: $table.slaughterDate,
-      builder: (column) => ColumnOrderings(column));
-
   ColumnOrderings<String> get notes => $composableBuilder(
       column: $table.notes, builder: (column) => ColumnOrderings(column));
 
@@ -23079,30 +22778,6 @@ class $$LotsTableTableAnnotationComposer
   GeneratedColumn<String> get veterinarianName => $composableBuilder(
       column: $table.veterinarianName, builder: (column) => column);
 
-  GeneratedColumn<String> get buyerName =>
-      $composableBuilder(column: $table.buyerName, builder: (column) => column);
-
-  GeneratedColumn<String> get buyerFarmId => $composableBuilder(
-      column: $table.buyerFarmId, builder: (column) => column);
-
-  GeneratedColumn<double> get totalPrice => $composableBuilder(
-      column: $table.totalPrice, builder: (column) => column);
-
-  GeneratedColumn<double> get pricePerAnimal => $composableBuilder(
-      column: $table.pricePerAnimal, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get saleDate =>
-      $composableBuilder(column: $table.saleDate, builder: (column) => column);
-
-  GeneratedColumn<String> get slaughterhouseName => $composableBuilder(
-      column: $table.slaughterhouseName, builder: (column) => column);
-
-  GeneratedColumn<String> get slaughterhouseId => $composableBuilder(
-      column: $table.slaughterhouseId, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get slaughterDate => $composableBuilder(
-      column: $table.slaughterDate, builder: (column) => column);
-
   GeneratedColumn<String> get notes =>
       $composableBuilder(column: $table.notes, builder: (column) => column);
 
@@ -23162,14 +22837,6 @@ class $$LotsTableTableTableManager extends RootTableManager<
             Value<DateTime?> withdrawalEndDate = const Value.absent(),
             Value<String?> veterinarianId = const Value.absent(),
             Value<String?> veterinarianName = const Value.absent(),
-            Value<String?> buyerName = const Value.absent(),
-            Value<String?> buyerFarmId = const Value.absent(),
-            Value<double?> totalPrice = const Value.absent(),
-            Value<double?> pricePerAnimal = const Value.absent(),
-            Value<DateTime?> saleDate = const Value.absent(),
-            Value<String?> slaughterhouseName = const Value.absent(),
-            Value<String?> slaughterhouseId = const Value.absent(),
-            Value<DateTime?> slaughterDate = const Value.absent(),
             Value<String?> notes = const Value.absent(),
             Value<bool> synced = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
@@ -23193,14 +22860,6 @@ class $$LotsTableTableTableManager extends RootTableManager<
             withdrawalEndDate: withdrawalEndDate,
             veterinarianId: veterinarianId,
             veterinarianName: veterinarianName,
-            buyerName: buyerName,
-            buyerFarmId: buyerFarmId,
-            totalPrice: totalPrice,
-            pricePerAnimal: pricePerAnimal,
-            saleDate: saleDate,
-            slaughterhouseName: slaughterhouseName,
-            slaughterhouseId: slaughterhouseId,
-            slaughterDate: slaughterDate,
             notes: notes,
             synced: synced,
             createdAt: createdAt,
@@ -23224,14 +22883,6 @@ class $$LotsTableTableTableManager extends RootTableManager<
             Value<DateTime?> withdrawalEndDate = const Value.absent(),
             Value<String?> veterinarianId = const Value.absent(),
             Value<String?> veterinarianName = const Value.absent(),
-            Value<String?> buyerName = const Value.absent(),
-            Value<String?> buyerFarmId = const Value.absent(),
-            Value<double?> totalPrice = const Value.absent(),
-            Value<double?> pricePerAnimal = const Value.absent(),
-            Value<DateTime?> saleDate = const Value.absent(),
-            Value<String?> slaughterhouseName = const Value.absent(),
-            Value<String?> slaughterhouseId = const Value.absent(),
-            Value<DateTime?> slaughterDate = const Value.absent(),
             Value<String?> notes = const Value.absent(),
             Value<bool> synced = const Value.absent(),
             required DateTime createdAt,
@@ -23255,14 +22906,6 @@ class $$LotsTableTableTableManager extends RootTableManager<
             withdrawalEndDate: withdrawalEndDate,
             veterinarianId: veterinarianId,
             veterinarianName: veterinarianName,
-            buyerName: buyerName,
-            buyerFarmId: buyerFarmId,
-            totalPrice: totalPrice,
-            pricePerAnimal: pricePerAnimal,
-            saleDate: saleDate,
-            slaughterhouseName: slaughterhouseName,
-            slaughterhouseId: slaughterhouseId,
-            slaughterDate: slaughterDate,
             notes: notes,
             synced: synced,
             createdAt: createdAt,
