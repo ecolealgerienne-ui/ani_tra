@@ -46,6 +46,9 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
   Future<void> _confirmSlaughter() async {
     if (!_formKey.currentState!.validate()) return;
 
+    final animal = widget.animal;
+    if (animal == null) return;
+
     setState(() => _isConfirming = true);
 
     final animalProvider = context.read<AnimalProvider>();
@@ -56,53 +59,23 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
       // Build notes with slaughterhouse info
       final notesText = 'Abattoir: ${_slaughterhouseNameController.text}${_slaughterhouseIdController.text.isNotEmpty ? ' (N°${_slaughterhouseIdController.text})' : ''}';
 
-      // Déterminer si c'est un animal individuel ou un lot
-      List<Animal> animalsToSlaughter = [];
+      // Create slaughter movement
+      final movement = Movement(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        animalId: animal.id,
+        type: MovementType.slaughter,
+        movementDate: _slaughterDate,
+        notes: notesText,
+        createdAt: DateTime.now(),
+      );
 
-      if (widget.animal != null) {
-        // Cas individuel
-        animalsToSlaughter = [widget.animal!];
-      } else if (widget.animalIds != null) {
-        // Cas lot : récupérer tous les animaux vivants du lot
-        for (final animalId in widget.animalIds!) {
-          final animal = animalProvider.getAnimalById(animalId);
-          if (animal != null && animal.status == AnimalStatus.alive) {
-            animalsToSlaughter.add(animal);
-          }
-        }
-      }
+      await movementProvider.addMovement(movement);
 
-      if (animalsToSlaughter.isEmpty) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Aucun animal à abattre'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        setState(() => _isConfirming = false);
-        return;
-      }
+      // Update animal status to slaughtered
+      final updatedAnimal = animal.copyWith(status: AnimalStatus.slaughtered);
+      await animalProvider.updateAnimal(updatedAnimal);
 
-      // Créer un mouvement d'abattage pour chaque animal
-      for (final animal in animalsToSlaughter) {
-        final movement = Movement(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          animalId: animal.id,
-          type: MovementType.slaughter,
-          movementDate: _slaughterDate,
-          notes: notesText,
-          createdAt: DateTime.now(),
-        );
-
-        await movementProvider.addMovement(movement);
-
-        // Update animal status to slaughtered
-        final updatedAnimal = animal.copyWith(status: AnimalStatus.slaughtered);
-        await animalProvider.updateAnimal(updatedAnimal);
-      }
-
-      syncProvider.addPendingData(animalsToSlaughter.length);
+      syncProvider.incrementPendingData();
 
       if (!mounted) return;
 
