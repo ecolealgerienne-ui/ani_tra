@@ -224,26 +224,19 @@ class _MovementDetailScreenState extends State<MovementDetailScreen> {
       final animalProvider = context.read<AnimalProvider>();
 
       final DateTime returnDate = result['returnDate'];
-      final String? notes = result['notes'];
+      final String? userNotes = result['notes'];
 
-      // Créer le mouvement de retour
-      final returnMovement = Movement(
-        farmId: outMovement.farmId,
-        animalId: outMovement.animalId,
-        type: MovementType.temporaryReturn,
-        movementDate: returnDate,
-        fromFarmId: outMovement.toFarmId,
-        toFarmId: outMovement.fromFarmId,
-        notes: notes ?? 'Retour du mouvement temporaire du ${DateFormat('dd/MM/yyyy').format(outMovement.movementDate)}',
-        relatedMovementId: outMovement.id,
-      );
+      // Construire les notes avec la date de retour
+      final String existingNotes = outMovement.notes ?? '';
+      final String returnInfo = '\n\n📅 Retour le ${DateFormat('dd/MM/yyyy').format(returnDate)}';
+      final String additionalNotes = userNotes != null && userNotes.isNotEmpty
+          ? '\n📝 $userNotes'
+          : '';
+      final String updatedNotes = existingNotes + returnInfo + additionalNotes;
 
-      // Sauvegarder le mouvement de retour
-      await movementProvider.addMovement(returnMovement);
-
-      // Mettre à jour le mouvement sortant avec le lien vers le retour ET le statut "closed"
+      // Mettre à jour le mouvement sortant avec les notes de retour ET le statut "closed"
       final updatedOutMovement = outMovement.copyWith(
-        relatedMovementId: returnMovement.id,
+        notes: updatedNotes,
         status: MovementStatus.closed,
       );
       await movementProvider.updateMovement(updatedOutMovement);

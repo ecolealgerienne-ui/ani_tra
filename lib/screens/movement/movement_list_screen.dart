@@ -102,6 +102,16 @@ class _MovementListScreenState extends State<MovementListScreen> {
                   ],
                 ),
               ),
+              PopupMenuItem<MovementType>(
+                value: MovementType.temporaryOut,
+                child: Row(
+                  children: [
+                    const Icon(Icons.exit_to_app, color: Colors.teal),
+                    const SizedBox(width: AppConstants.spacingSmall),
+                    Text(l10n.translate(AppStrings.temporaryOuts)),
+                  ],
+                ),
+              ),
             ],
           ),
         ],
@@ -227,6 +237,20 @@ class _MovementListScreenState extends State<MovementListScreen> {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          // TODO: Navigate to CreateTemporaryMovementScreen when ready
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.translate(AppStrings.temporaryOut)),
+              backgroundColor: Colors.teal,
+            ),
+          );
+        },
+        icon: const Icon(Icons.exit_to_app),
+        label: Text(l10n.translate(AppStrings.temporaryOut)),
+        backgroundColor: Colors.teal,
+      ),
     );
   }
 
@@ -243,8 +267,10 @@ class _MovementListScreenState extends State<MovementListScreen> {
         return Colors.red;
       case MovementType.slaughter:
         return Colors.purple;
-      default:
-        return Colors.grey;
+      case MovementType.temporaryOut:
+        return Colors.teal;
+      case MovementType.temporaryReturn:
+        return Colors.cyan;
     }
   }
 
@@ -261,8 +287,10 @@ class _MovementListScreenState extends State<MovementListScreen> {
         return Icons.dangerous;
       case MovementType.slaughter:
         return Icons.content_cut;
-      default:
-        return Icons.sync_alt;
+      case MovementType.temporaryOut:
+        return Icons.exit_to_app;
+      case MovementType.temporaryReturn:
+        return Icons.keyboard_return;
     }
   }
 
@@ -280,8 +308,10 @@ class _MovementListScreenState extends State<MovementListScreen> {
         return l10n.translate(AppStrings.death);
       case MovementType.slaughter:
         return l10n.translate(AppStrings.slaughter);
-      default:
-        return 'Mouvement';
+      case MovementType.temporaryOut:
+        return l10n.translate(AppStrings.temporaryOut);
+      case MovementType.temporaryReturn:
+        return l10n.translate(AppStrings.temporaryReturn);
     }
   }
 }
@@ -473,8 +503,10 @@ class _MovementCard extends StatelessWidget {
         return Colors.red;
       case MovementType.slaughter:
         return Colors.purple;
-      default:
-        return Colors.grey;
+      case MovementType.temporaryOut:
+        return Colors.teal;
+      case MovementType.temporaryReturn:
+        return Colors.cyan;
     }
   }
 
@@ -491,8 +523,10 @@ class _MovementCard extends StatelessWidget {
         return Icons.dangerous;
       case MovementType.slaughter:
         return Icons.content_cut;
-      default:
-        return Icons.sync_alt;
+      case MovementType.temporaryOut:
+        return Icons.exit_to_app;
+      case MovementType.temporaryReturn:
+        return Icons.keyboard_return;
     }
   }
 
@@ -510,8 +544,10 @@ class _MovementCard extends StatelessWidget {
         return l10n.translate(AppStrings.death);
       case MovementType.slaughter:
         return l10n.translate(AppStrings.slaughter);
-      default:
-        return 'Mouvement';
+      case MovementType.temporaryOut:
+        return l10n.translate(AppStrings.temporaryOut);
+      case MovementType.temporaryReturn:
+        return l10n.translate(AppStrings.temporaryReturn);
     }
   }
 }

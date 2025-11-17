@@ -771,6 +771,8 @@ const Map<String, String> stringsAr = {
   'originRequired': 'المنشأ *',
   'birth': 'ولادة',
   'purchase': 'شراء',
+  'temporaryOut': 'خروج',
+  'temporaryReturn': 'عودة',
   'provenance': 'المصدر',
   'farmOrBreederName': 'اسم المزرعة أو المربّي',
   'purchasePrice': 'سعر الشراء',

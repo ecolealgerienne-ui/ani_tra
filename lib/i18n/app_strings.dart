@@ -1124,6 +1124,7 @@ class AppStrings {
   static const String sales = 'sales';
   static const String deaths = 'deaths';
   static const String slaughters = 'slaughters';
+  static const String temporaryOuts = 'temporaryOuts';
   static const String financialInfo = 'financialInfo';
   static const String syncInfo = 'syncInfo';
   static const String fromFarm = 'fromFarm';

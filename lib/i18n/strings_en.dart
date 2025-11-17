@@ -773,6 +773,8 @@ const Map<String, String> stringsEn = {
   'originRequired': 'Origin *',
   'birth': 'Birth',
   'purchase': 'Purchase',
+  'temporaryOut': 'Exit',
+  'temporaryReturn': 'Return',
   'provenance': 'Provenance',
   'farmOrBreederName': 'Farm or breeder name',
   'purchasePrice': 'Purchase price',
