@@ -328,15 +328,50 @@ class _MovementListScreenState extends State<MovementListScreen> {
     }
   }
 
-  /// Vue individuelle: Liste de tous les mouvements
+  /// Vue individuelle: Liste des mouvements sans lotId (vraiment individuels)
   Widget _buildIndividualView(List<Movement> movements, AppLocalizations l10n) {
+    // Filtrer uniquement les mouvements sans lotId (individuels)
+    final individualMovements = movements.where((m) => m.lotId == null).toList();
+
+    if (individualMovements.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.sync_alt,
+              size: 80,
+              color: Colors.grey[400],
+            ),
+            const SizedBox(height: AppConstants.spacingMedium),
+            Text(
+              l10n.translate(AppStrings.noMovements),
+              style: TextStyle(
+                fontSize: AppConstants.fontSizeLarge,
+                color: Colors.grey[600],
+              ),
+            ),
+            const SizedBox(height: AppConstants.spacingSmall),
+            Text(
+              'Les mouvements individuels apparaîtront ici',
+              style: TextStyle(
+                fontSize: AppConstants.fontSizeBody,
+                color: Colors.grey[500],
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
     return ListView.separated(
       padding: const EdgeInsets.all(AppConstants.spacingMedium),
-      itemCount: movements.length,
+      itemCount: individualMovements.length,
       separatorBuilder: (context, index) =>
           const SizedBox(height: AppConstants.spacingSmall),
       itemBuilder: (context, index) {
-        final movement = movements[index];
+        final movement = individualMovements[index];
         return _MovementCard(
           movement: movement,
           onTap: () {
