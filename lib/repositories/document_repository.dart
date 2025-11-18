@@ -113,9 +113,13 @@ class DocumentRepository {
   /// Supprime tous les documents d'un animal
   Future<void> deleteAllForAnimal(String farmId, String animalId) async {
     final docs = await getByAnimal(farmId, animalId);
-    for (final doc in docs) {
-      await delete(doc.id, farmId);
-    }
+
+    // TRANSACTION ATOMIQUE: suppression batch
+    await _db.transaction(() async {
+      for (final doc in docs) {
+        await delete(doc.id, farmId);
+      }
+    });
   }
 
   // === STATISTICS ===

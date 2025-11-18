@@ -8,9 +8,12 @@ import 'package:drift/drift.dart' as drift;
 /// Repository pour gérer la persistance des campagnes
 /// Phase 1C: Avec security checks farmId
 class CampaignRepository {
+  final AppDatabase _database;
   final CampaignDao _dao;
 
-  CampaignRepository(AppDatabase database) : _dao = database.campaignDao;
+  CampaignRepository(AppDatabase database)
+      : _database = database,
+        _dao = database.campaignDao;
 
   // ==================== CRUD Operations ====================
 
@@ -182,22 +185,32 @@ class CampaignRepository {
 
   /// Insérer plusieurs campagnes (pour migration) avec validation farmId
   Future<void> insertAll(List<Campaign> campaigns, String farmId) async {
+    // Validation préalable
     for (final campaign in campaigns) {
-      // Vérifier que toutes les campagnes appartiennent à cette ferme
       if (campaign.farmId != farmId) {
         throw Exception(
             'Farm ID mismatch in campaign ${campaign.id} - Security violation');
       }
-      await create(campaign, farmId);
     }
+
+    // TRANSACTION ATOMIQUE: insertion batch
+    await _database.transaction(() async {
+      for (final campaign in campaigns) {
+        await create(campaign, farmId);
+      }
+    });
   }
 
   /// Supprimer toutes les campagnes d'une ferme
   Future<void> deleteAllByFarm(String farmId) async {
     final campaigns = await findAllByFarm(farmId);
-    for (final campaign in campaigns) {
-      await delete(campaign.id, farmId);
-    }
+
+    // TRANSACTION ATOMIQUE: suppression batch
+    await _database.transaction(() async {
+      for (final campaign in campaigns) {
+        await delete(campaign.id, farmId);
+      }
+    });
   }
 
   // ==================== Conversion Methods ====================
