@@ -4,6 +4,8 @@ import 'package:drift/drift.dart';
 import '../drift/database.dart';
 //import '../drift/tables/movements_table.dart';
 import '../models/movement.dart';
+import '../utils/constants.dart';
+import 'sync_queue_repository.dart';
 
 /// Repository pour la gestion des mouvements d'animaux
 ///
@@ -16,8 +18,11 @@ import '../models/movement.dart';
 /// - Calculs financiers (ventes/achats)
 class MovementRepository {
   final AppDatabase _db;
+  late final SyncQueueRepository _syncQueue;
 
-  MovementRepository(this._db);
+  MovementRepository(this._db) {
+    _syncQueue = SyncQueueRepository(_db);
+  }
 
   // === CRUD OPERATIONS ===
 
@@ -41,12 +46,19 @@ class MovementRepository {
   }
 
   /// Crée un nouveau mouvement
+  /// STEP4: Transaction + enqueue sync
   Future<void> create(Movement movement, String farmId) async {
-    final companion = _mapToCompanion(movement, farmId);
-    await _db.movementDao.insertItem(companion);
+    await _db.transaction(() async {
+      final companion = _mapToCompanion(movement, farmId);
+      await _db.movementDao.insertItem(companion);
+
+      // Enqueue pour sync
+      await _syncQueue.enqueueMovement(farmId, movement, SyncAction.insert);
+    });
   }
 
   /// Met à jour un mouvement existant
+  /// STEP4: Transaction + enqueue sync
   Future<void> update(Movement movement, String farmId) async {
     // Security check
     final existing = await _db.movementDao.findById(movement.id, farmId);
@@ -54,13 +66,31 @@ class MovementRepository {
       throw Exception('Movement not found or farm mismatch');
     }
 
-    final companion = _mapToCompanion(movement, farmId);
-    await _db.movementDao.updateItem(companion, farmId);
+    await _db.transaction(() async {
+      final companion = _mapToCompanion(movement, farmId);
+      await _db.movementDao.updateItem(companion, farmId);
+
+      // Enqueue pour sync
+      await _syncQueue.enqueueMovement(farmId, movement, SyncAction.update);
+    });
   }
 
   /// Supprime un mouvement (soft-delete)
+  /// STEP4: Transaction + enqueue sync
   Future<void> delete(String id, String farmId) async {
-    await _db.movementDao.softDelete(id, farmId);
+    // Get movement before delete for sync queue
+    final existing = await _db.movementDao.findById(id, farmId);
+    if (existing == null) {
+      throw Exception('Movement not found');
+    }
+
+    await _db.transaction(() async {
+      await _db.movementDao.softDelete(id, farmId);
+
+      // Enqueue pour sync
+      final movement = _mapToModel(existing);
+      await _syncQueue.enqueueMovement(farmId, movement, SyncAction.delete);
+    });
   }
 
   // === BUSINESS QUERIES ===

@@ -4,6 +4,8 @@ import 'package:drift/drift.dart';
 import '../drift/database.dart';
 //import '../drift/tables/weights_table.dart';
 import '../models/weight_record.dart';
+import '../utils/constants.dart';
+import 'sync_queue_repository.dart';
 
 /// Repository pour la gestion des pesées
 ///
@@ -16,8 +18,11 @@ import '../models/weight_record.dart';
 /// - Statistiques de croissance
 class WeightRepository {
   final AppDatabase _db;
+  late final SyncQueueRepository _syncQueue;
 
-  WeightRepository(this._db);
+  WeightRepository(this._db) {
+    _syncQueue = SyncQueueRepository(_db);
+  }
 
   // === CRUD OPERATIONS ===
 
@@ -41,12 +46,19 @@ class WeightRepository {
   }
 
   /// Crée une nouvelle pesée
+  /// STEP4: Transaction + enqueue sync
   Future<void> create(WeightRecord weight, String farmId) async {
-    final companion = _mapToCompanion(weight, farmId);
-    await _db.weightDao.insertItem(companion);
+    await _db.transaction(() async {
+      final companion = _mapToCompanion(weight, farmId);
+      await _db.weightDao.insertItem(companion);
+
+      // Enqueue pour sync
+      await _syncQueue.enqueueWeight(farmId, weight, SyncAction.insert);
+    });
   }
 
   /// Met à jour une pesée existante
+  /// STEP4: Transaction + enqueue sync
   Future<void> update(WeightRecord weight, String farmId) async {
     // Security check
     final existing = await _db.weightDao.findById(weight.id, farmId);
@@ -54,13 +66,31 @@ class WeightRepository {
       throw Exception('Weight record not found or farm mismatch');
     }
 
-    final companion = _mapToCompanion(weight, farmId);
-    await _db.weightDao.updateItem(companion, farmId);
+    await _db.transaction(() async {
+      final companion = _mapToCompanion(weight, farmId);
+      await _db.weightDao.updateItem(companion, farmId);
+
+      // Enqueue pour sync
+      await _syncQueue.enqueueWeight(farmId, weight, SyncAction.update);
+    });
   }
 
   /// Supprime une pesée (soft-delete)
+  /// STEP4: Transaction + enqueue sync
   Future<void> delete(String id, String farmId) async {
-    await _db.weightDao.softDelete(id, farmId);
+    // Get weight before delete for sync queue
+    final existing = await _db.weightDao.findById(id, farmId);
+    if (existing == null) {
+      throw Exception('Weight record not found');
+    }
+
+    await _db.transaction(() async {
+      await _db.weightDao.softDelete(id, farmId);
+
+      // Enqueue pour sync
+      final weight = _mapToModel(existing);
+      await _syncQueue.enqueueWeight(farmId, weight, SyncAction.delete);
+    });
   }
 
   // === BUSINESS QUERIES ===

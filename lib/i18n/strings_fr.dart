@@ -616,6 +616,44 @@ const Map<String, String> stringsFr = {
   'requiresConnection': '(Nécessite connexion)',
   'allDataSynchronized': 'Toutes les données sont synchronisées',
   'syncError': 'Erreur de synchronisation',
+
+  // ==================== SYNC DEBUG UI (STEP 4) ====================
+  'syncQueueDebug': 'Debug Sync Queue',
+  'syncQueueTitle': 'Queue de synchronisation',
+  'clearQueue': 'Vider la queue',
+  'clearQueueConfirm': 'Êtes-vous sûr de vouloir vider toute la queue?',
+  'queueCleared': 'Queue vidée',
+  'queueItems': '{count} élément(s) en attente',
+  'noItemsInQueue': 'Aucun élément dans la queue',
+  'entityType': 'Type',
+  'entityId': 'ID',
+  'action': 'Action',
+  'retryCount': 'Tentatives',
+  'createdAt': 'Créé le',
+  'errorMessage': 'Erreur',
+  'pending': 'En attente',
+  'synced': 'Synchronisé',
+  'stalled': 'En échec',
+  'syncDisabled': 'Synchronisation désactivée',
+  'syncEnabled': 'Synchronisation activée',
+
+  // Validation sync
+  'officialNumberRequired': 'Numéro officiel requis pour synchroniser',
+  'atLeastOneIdentifierRequired': 'Au moins un identifiant requis (EID, officiel ou visuel)',
+  'animalIdEmpty': 'ID animal vide',
+  'farmIdEmpty': 'ID ferme vide',
+  'syncValidationFailed': 'Validation échouée',
+
+  // Actions sync
+  'insert': 'Création',
+  'update': 'Modification',
+  'delete': 'Suppression',
+
+  // Stats
+  'pendingItems': 'En attente',
+  'stalledItems': 'En échec',
+  'totalItems': 'Total',
+
   'localDataSummary': 'Résumé des données locales',
   'treatments': 'Traitements',
   'campaigns': 'Campagnes',

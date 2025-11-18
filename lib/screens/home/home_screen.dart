@@ -25,6 +25,7 @@ import '../settings/app_settings_screen.dart';
 import '../alert/alerts_screen.dart';
 import '../services/export_registry_screen.dart'; // 🆕 PART3
 import '../movement/movement_list_screen.dart';
+import '../debug_sync_screen.dart'; // STEP4: Debug sync queue
 import '../../drift/database.dart';
 import '../../database_initializer.dart';
 
@@ -368,6 +369,20 @@ class _HomeScreenState extends State<HomeScreen> {
           },
         ),
         actions: [
+          // STEP4: Debug sync queue button (controlled by constant)
+          if (DebugConstants.kShowSyncDebugButton)
+            IconButton(
+              icon: const Icon(Icons.sync),
+              tooltip: l10n.translate('syncQueueDebug'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DebugSyncScreen(),
+                  ),
+                );
+              },
+            ),
           IconButton(
             icon: const Icon(Icons.settings),
             tooltip: l10n.translate(AppStrings.settings),

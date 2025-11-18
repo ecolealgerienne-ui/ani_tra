@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'package:drift/drift.dart';
 import '../drift/database.dart';
 import '../models/vaccination.dart';
+import '../utils/constants.dart';
+import 'sync_queue_repository.dart';
 
 /// Repository pour la gestion des vaccinations
 ///
@@ -16,8 +18,11 @@ import '../models/vaccination.dart';
 /// - Conversion JSON pour animalIds (vaccination de groupe)
 class VaccinationRepository {
   final AppDatabase _db;
+  late final SyncQueueRepository _syncQueue;
 
-  VaccinationRepository(this._db);
+  VaccinationRepository(this._db) {
+    _syncQueue = SyncQueueRepository(_db);
+  }
 
   // === CRUD OPERATIONS ===
 
@@ -41,12 +46,19 @@ class VaccinationRepository {
   }
 
   /// Crée une nouvelle vaccination
+  /// STEP4: Transaction + enqueue sync
   Future<void> create(Vaccination vaccination, String farmId) async {
-    final companion = _mapToCompanion(vaccination, farmId);
-    await _db.vaccinationDao.insertItem(companion);
+    await _db.transaction(() async {
+      final companion = _mapToCompanion(vaccination, farmId);
+      await _db.vaccinationDao.insertItem(companion);
+
+      // Enqueue pour sync
+      await _syncQueue.enqueueVaccination(farmId, vaccination, SyncAction.insert);
+    });
   }
 
   /// Met à jour une vaccination existante
+  /// STEP4: Transaction + enqueue sync
   Future<void> update(Vaccination vaccination, String farmId) async {
     // Security check
     final existing = await _db.vaccinationDao.findById(vaccination.id, farmId);
@@ -54,13 +66,31 @@ class VaccinationRepository {
       throw Exception('Vaccination not found or farm mismatch');
     }
 
-    final companion = _mapToCompanion(vaccination, farmId);
-    await _db.vaccinationDao.updateItem(companion);
+    await _db.transaction(() async {
+      final companion = _mapToCompanion(vaccination, farmId);
+      await _db.vaccinationDao.updateItem(companion);
+
+      // Enqueue pour sync
+      await _syncQueue.enqueueVaccination(farmId, vaccination, SyncAction.update);
+    });
   }
 
   /// Supprime une vaccination (soft-delete)
+  /// STEP4: Transaction + enqueue sync
   Future<void> delete(String id, String farmId) async {
-    await _db.vaccinationDao.softDelete(id, farmId);
+    // Get vaccination before delete for sync queue
+    final existing = await _db.vaccinationDao.findById(id, farmId);
+    if (existing == null) {
+      throw Exception('Vaccination not found');
+    }
+
+    await _db.transaction(() async {
+      await _db.vaccinationDao.softDelete(id, farmId);
+
+      // Enqueue pour sync
+      final vaccination = _mapToModel(existing);
+      await _syncQueue.enqueueVaccination(farmId, vaccination, SyncAction.delete);
+    });
   }
 
   // === BUSINESS QUERIES ===

@@ -5,11 +5,16 @@ import 'package:flutter/foundation.dart';
 import '../drift/database.dart';
 import '../models/animal.dart';
 import '../models/eid_change.dart';
+import '../utils/constants.dart';
+import 'sync_queue_repository.dart';
 
 class AnimalRepository {
   final AppDatabase _db;
+  late final SyncQueueRepository _syncQueue;
 
-  AnimalRepository(this._db);
+  AnimalRepository(this._db) {
+    _syncQueue = SyncQueueRepository(_db);
+  }
 
   // ==================== MÉTHODES OBLIGATOIRES ====================
 
@@ -33,14 +38,21 @@ class AnimalRepository {
   }
 
   /// 3. create - Créer avec farmId (A6: avec logging)
+  /// STEP4: Transaction + enqueue sync
   Future<void> create(Animal animal, String farmId) async {
-    final companion = _mapToCompanion(animal, farmId);
-    await _db.animalDao.insertItem(companion);
+    await _db.transaction(() async {
+      final companion = _mapToCompanion(animal, farmId);
+      await _db.animalDao.insertItem(companion);
+
+      // Enqueue pour sync (validation interne)
+      await _syncQueue.enqueueAnimal(farmId, animal, SyncAction.insert);
+    });
     debugPrint('🐑 Animal créé: ${animal.id} dans farm $farmId');
   }
 
   /// 4. update - Vérifier farmId (A6: avec logging)
   /// ⚡ B1 FIX: Pass farmId to updateItem() for mandatory security check
+  /// STEP4: Transaction + enqueue sync
   Future<void> update(Animal animal, String farmId) async {
     // Security check
     final existing = await _db.animalDao.findById(animal.id, farmId);
@@ -48,17 +60,35 @@ class AnimalRepository {
       throw Exception('Animal not found or farm mismatch');
     }
 
-    final companion = _mapToCompanion(animal, farmId);
-    final result = await _db.animalDao.updateItem(companion, farmId);
-    if (result == 0) {
-      throw Exception('Animal update failed - no rows affected');
-    }
+    await _db.transaction(() async {
+      final companion = _mapToCompanion(animal, farmId);
+      final result = await _db.animalDao.updateItem(companion, farmId);
+      if (result == 0) {
+        throw Exception('Animal update failed - no rows affected');
+      }
+
+      // Enqueue pour sync (validation interne)
+      await _syncQueue.enqueueAnimal(farmId, animal, SyncAction.update);
+    });
     debugPrint('🐑 Animal mis à jour: ${animal.id} dans farm $farmId');
   }
 
   /// 5. delete - Soft-delete (A6: avec logging)
+  /// STEP4: Transaction + enqueue sync
   Future<void> delete(String id, String farmId) async {
-    await _db.animalDao.softDelete(id, farmId);
+    // Get animal before delete for sync queue
+    final existing = await _db.animalDao.findById(id, farmId);
+    if (existing == null) {
+      throw Exception('Animal not found');
+    }
+
+    await _db.transaction(() async {
+      await _db.animalDao.softDelete(id, farmId);
+
+      // Enqueue pour sync (pas de validation pour delete)
+      final animal = _mapToModel(existing);
+      await _syncQueue.enqueueAnimal(farmId, animal, SyncAction.delete);
+    });
     debugPrint('🐑 Animal supprimé (soft): $id dans farm $farmId');
   }
 

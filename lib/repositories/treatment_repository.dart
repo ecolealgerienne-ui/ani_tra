@@ -3,6 +3,8 @@
 import 'package:drift/drift.dart';
 import '../drift/database.dart';
 import '../models/treatment.dart';
+import '../utils/constants.dart';
+import 'sync_queue_repository.dart';
 
 /// Repository pour la gestion des traitements
 ///
@@ -14,8 +16,11 @@ import '../models/treatment.dart';
 /// - Gestion des délais d'attente
 class TreatmentRepository {
   final AppDatabase _db;
+  late final SyncQueueRepository _syncQueue;
 
-  TreatmentRepository(this._db);
+  TreatmentRepository(this._db) {
+    _syncQueue = SyncQueueRepository(_db);
+  }
 
   // === CRUD OPERATIONS ===
 
@@ -39,12 +44,19 @@ class TreatmentRepository {
   }
 
   /// Crée un nouveau traitement
+  /// STEP4: Transaction + enqueue sync
   Future<void> create(Treatment treatment, String farmId) async {
-    final companion = _mapToCompanion(treatment, farmId);
-    await _db.treatmentDao.insertItem(companion);
+    await _db.transaction(() async {
+      final companion = _mapToCompanion(treatment, farmId);
+      await _db.treatmentDao.insertItem(companion);
+
+      // Enqueue pour sync
+      await _syncQueue.enqueueTreatment(farmId, treatment, SyncAction.insert);
+    });
   }
 
   /// Met à jour un traitement existant
+  /// STEP4: Transaction + enqueue sync
   Future<void> update(Treatment treatment, String farmId) async {
     // Security check
     final existing = await _db.treatmentDao.findById(treatment.id, farmId);
@@ -52,13 +64,31 @@ class TreatmentRepository {
       throw Exception('Treatment not found or farm mismatch');
     }
 
-    final companion = _mapToCompanion(treatment, farmId);
-    await _db.treatmentDao.updateItem(companion);
+    await _db.transaction(() async {
+      final companion = _mapToCompanion(treatment, farmId);
+      await _db.treatmentDao.updateItem(companion);
+
+      // Enqueue pour sync
+      await _syncQueue.enqueueTreatment(farmId, treatment, SyncAction.update);
+    });
   }
 
   /// Supprime un traitement (soft-delete)
+  /// STEP4: Transaction + enqueue sync
   Future<void> delete(String id, String farmId) async {
-    await _db.treatmentDao.softDelete(id, farmId);
+    // Get treatment before delete for sync queue
+    final existing = await _db.treatmentDao.findById(id, farmId);
+    if (existing == null) {
+      throw Exception('Treatment not found');
+    }
+
+    await _db.transaction(() async {
+      await _db.treatmentDao.softDelete(id, farmId);
+
+      // Enqueue pour sync
+      final treatment = _mapToModel(existing);
+      await _syncQueue.enqueueTreatment(farmId, treatment, SyncAction.delete);
+    });
   }
 
   // === BUSINESS QUERIES ===

@@ -3,6 +3,8 @@ import '../models/lot.dart';
 import '../drift/database.dart';
 import '../drift/daos/lot_dao.dart';
 import '../drift/daos/lot_animal_dao.dart';
+import '../utils/constants.dart';
+import 'sync_queue_repository.dart';
 import 'package:drift/drift.dart' as drift;
 
 /// Repository pour gérer la persistance des lots
@@ -12,11 +14,14 @@ class LotRepository {
   final AppDatabase _database;
   final LotDao _dao;
   final LotAnimalDao _lotAnimalDao;
+  late final SyncQueueRepository _syncQueue;
 
   LotRepository(AppDatabase database)
       : _database = database,
         _dao = database.lotDao,
-        _lotAnimalDao = database.lotAnimalDao;
+        _lotAnimalDao = database.lotAnimalDao {
+    _syncQueue = SyncQueueRepository(database);
+  }
 
   // ==================== CRUD Operations ====================
 
@@ -105,13 +110,14 @@ class LotRepository {
   }
 
   /// Créer un nouveau lot avec validation farmId
+  /// STEP4: Transaction + enqueue sync
   Future<Lot> create(Lot lot, String farmId) async {
     // Security check: vérifier que le lot appartient à cette ferme
     if (lot.farmId != farmId) {
       throw Exception('Farm ID mismatch - Security violation');
     }
 
-    // TRANSACTION ATOMIQUE: création lot + ajout animaux
+    // TRANSACTION ATOMIQUE: création lot + ajout animaux + sync
     await _database.transaction(() async {
       final companion = _toCompanion(lot, isUpdate: false);
       await _dao.insertLot(companion);
@@ -120,12 +126,16 @@ class LotRepository {
       if (lot.animalIds.isNotEmpty) {
         await _lotAnimalDao.addAnimalsToLot(lot.id, lot.animalIds);
       }
+
+      // Enqueue pour sync
+      await _syncQueue.enqueueLot(farmId, lot, SyncAction.insert);
     });
 
     return lot;
   }
 
   /// Mettre à jour un lot avec security check
+  /// STEP4: Transaction + enqueue sync
   Future<Lot> update(Lot lot, String farmId) async {
     // Security check: vérifier l'ownership
     final existing = await _dao.findById(lot.id, farmId);
@@ -138,16 +148,22 @@ class LotRepository {
       throw Exception('Farm ID mismatch - Security violation');
     }
 
-    final companion = _toCompanion(lot, isUpdate: true);
-    await _dao.updateLot(companion, farmId);
+    await _database.transaction(() async {
+      final companion = _toCompanion(lot, isUpdate: true);
+      await _dao.updateLot(companion, farmId);
 
-    // Mettre à jour les animalIds dans lot_animals (remplacer tous)
-    await _lotAnimalDao.replaceAnimalsInLot(lot.id, lot.animalIds);
+      // Mettre à jour les animalIds dans lot_animals (remplacer tous)
+      await _lotAnimalDao.replaceAnimalsInLot(lot.id, lot.animalIds);
+
+      // Enqueue pour sync
+      await _syncQueue.enqueueLot(farmId, lot, SyncAction.update);
+    });
 
     return lot;
   }
 
   /// Supprimer un lot avec security check
+  /// STEP4: Transaction + enqueue sync
   Future<void> delete(String id, String farmId) async {
     // Security check: vérifier l'ownership
     final existing = await _dao.findById(id, farmId);
@@ -155,7 +171,13 @@ class LotRepository {
       throw Exception('Lot not found or farm mismatch - Security violation');
     }
 
-    await _dao.deleteLot(id);
+    await _database.transaction(() async {
+      await _dao.deleteLot(id);
+
+      // Enqueue pour sync
+      final lot = await _toLotWithAnimals(existing);
+      await _syncQueue.enqueueLot(farmId, lot, SyncAction.delete);
+    });
   }
 
   // ==================== Business Logic ====================

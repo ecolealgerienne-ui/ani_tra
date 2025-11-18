@@ -4,12 +4,17 @@ import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import '../drift/database.dart';
 import '../models/document.dart';
+import '../utils/constants.dart';
+import 'sync_queue_repository.dart';
 
 /// Repository pour la gestion des documents
 class DocumentRepository {
   final AppDatabase _db;
+  late final SyncQueueRepository _syncQueue;
 
-  DocumentRepository(this._db);
+  DocumentRepository(this._db) {
+    _syncQueue = SyncQueueRepository(_db);
+  }
 
   // === CRUD OPERATIONS ===
 
@@ -33,13 +38,20 @@ class DocumentRepository {
   }
 
   /// Crée un nouveau document
+  /// STEP4: Transaction + enqueue sync
   Future<void> create(Document document, String farmId) async {
-    final companion = _mapToCompanion(document, farmId);
-    await _db.documentDao.insertItem(companion);
+    await _db.transaction(() async {
+      final companion = _mapToCompanion(document, farmId);
+      await _db.documentDao.insertItem(companion);
+
+      // Enqueue pour sync
+      await _syncQueue.enqueueDocument(farmId, document, SyncAction.insert);
+    });
     debugPrint('✅ DOCUMENT créé: ${document.id} dans farm $farmId');
   }
 
   /// Met à jour un document existant
+  /// STEP4: Transaction + enqueue sync
   Future<void> update(Document document, String farmId) async {
     // Security check
     final existing = await _db.documentDao.findById(document.id, farmId);
@@ -47,17 +59,35 @@ class DocumentRepository {
       throw Exception('Document not found or farm mismatch');
     }
 
-    final companion = _mapToCompanion(document, farmId);
-    final result = await _db.documentDao.updateItem(companion, farmId);
-    if (result == 0) {
-      throw Exception('DOCUMENT update failed - no rows affected');
-    }
+    await _db.transaction(() async {
+      final companion = _mapToCompanion(document, farmId);
+      final result = await _db.documentDao.updateItem(companion, farmId);
+      if (result == 0) {
+        throw Exception('DOCUMENT update failed - no rows affected');
+      }
+
+      // Enqueue pour sync
+      await _syncQueue.enqueueDocument(farmId, document, SyncAction.update);
+    });
     debugPrint('✅ DOCUMENT mis à jour: ${document.id} dans farm $farmId');
   }
 
   /// Supprime un document (soft-delete)
+  /// STEP4: Transaction + enqueue sync
   Future<void> delete(String id, String farmId) async {
-    await _db.documentDao.softDelete(id, farmId);
+    // Get document before delete for sync queue
+    final existing = await _db.documentDao.findById(id, farmId);
+    if (existing == null) {
+      throw Exception('Document not found');
+    }
+
+    await _db.transaction(() async {
+      await _db.documentDao.softDelete(id, farmId);
+
+      // Enqueue pour sync
+      final document = _mapToModel(existing);
+      await _syncQueue.enqueueDocument(farmId, document, SyncAction.delete);
+    });
     debugPrint('✅ DOCUMENT supprimé (soft): $id dans farm $farmId');
   }
 

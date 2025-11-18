@@ -3,12 +3,17 @@
 import 'package:drift/drift.dart';
 import '../drift/database.dart';
 import '../models/breeding.dart';
+import '../utils/constants.dart';
+import 'sync_queue_repository.dart';
 
 /// Repository pour la gestion des reproductions
 class BreedingRepository {
   final AppDatabase _db;
+  late final SyncQueueRepository _syncQueue;
 
-  BreedingRepository(this._db);
+  BreedingRepository(this._db) {
+    _syncQueue = SyncQueueRepository(_db);
+  }
 
   // === CRUD OPERATIONS ===
 
@@ -32,12 +37,19 @@ class BreedingRepository {
   }
 
   /// Crée une nouvelle reproduction
+  /// STEP4: Transaction + enqueue sync
   Future<void> create(Breeding breeding, String farmId) async {
-    final companion = _mapToCompanion(breeding, farmId);
-    await _db.breedingDao.insertItem(companion);
+    await _db.transaction(() async {
+      final companion = _mapToCompanion(breeding, farmId);
+      await _db.breedingDao.insertItem(companion);
+
+      // Enqueue pour sync
+      await _syncQueue.enqueueBreeding(farmId, breeding, SyncAction.insert);
+    });
   }
 
   /// Met à jour une reproduction existante
+  /// STEP4: Transaction + enqueue sync
   Future<void> update(Breeding breeding, String farmId) async {
     // Security check
     final existing = await _db.breedingDao.findById(breeding.id, farmId);
@@ -45,13 +57,31 @@ class BreedingRepository {
       throw Exception('Breeding not found or farm mismatch');
     }
 
-    final companion = _mapToCompanion(breeding, farmId);
-    await _db.breedingDao.updateItem(companion);
+    await _db.transaction(() async {
+      final companion = _mapToCompanion(breeding, farmId);
+      await _db.breedingDao.updateItem(companion);
+
+      // Enqueue pour sync
+      await _syncQueue.enqueueBreeding(farmId, breeding, SyncAction.update);
+    });
   }
 
   /// Supprime une reproduction (soft-delete)
+  /// STEP4: Transaction + enqueue sync
   Future<void> delete(String id, String farmId) async {
-    await _db.breedingDao.softDelete(id, farmId);
+    // Get breeding before delete for sync queue
+    final existing = await _db.breedingDao.findById(id, farmId);
+    if (existing == null) {
+      throw Exception('Breeding not found');
+    }
+
+    await _db.transaction(() async {
+      await _db.breedingDao.softDelete(id, farmId);
+
+      // Enqueue pour sync
+      final breeding = _mapToModel(existing);
+      await _syncQueue.enqueueBreeding(farmId, breeding, SyncAction.delete);
+    });
   }
 
   // === BUSINESS QUERIES ===

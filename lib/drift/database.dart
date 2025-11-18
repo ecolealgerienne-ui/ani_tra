@@ -39,8 +39,8 @@ import 'tables/campaigns_table.dart';
 // Alert Configuration Table (Phase 1B)
 import 'tables/alert_configurations_table.dart';
 
-// Sync Table (Phase 2)
-// import 'tables/sync_queue_table.dart';
+// Sync Table (STEP 4)
+import 'tables/sync_queue_table.dart';
 
 // ═══════════════════════════════════════════════════════════
 // IMPORTS - DAOs
@@ -74,8 +74,8 @@ import 'daos/campaign_dao.dart';
 // Alert Configuration DAO (Phase 1B)
 import 'daos/alert_configuration_dao.dart';
 
-// Sync DAO (Phase 2)
-// import 'daos/sync_queue_dao.dart';
+// Sync DAO (STEP 4)
+import 'daos/sync_queue_dao.dart';
 
 // ═══════════════════════════════════════════════════════════
 // GENERATED FILE
@@ -128,9 +128,9 @@ part 'database.g.dart';
     AlertConfigurationsTable,
 
     // ────────────────────────────────────────────────────────
-    // SYNC TABLE (Phase 2)
+    // SYNC TABLE (STEP 4)
     // ────────────────────────────────────────────────────────
-    // SyncQueueTable,
+    SyncQueueTable,
   ],
   daos: [
     // ────────────────────────────────────────────────────────
@@ -174,9 +174,9 @@ part 'database.g.dart';
     AlertConfigurationDao,
 
     // ────────────────────────────────────────────────────────
-    // SYNC DAO (Phase 2)
+    // SYNC DAO (STEP 4)
     // ────────────────────────────────────────────────────────
-    // SyncQueueDao,
+    SyncQueueDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -240,9 +240,9 @@ class AppDatabase extends _$AppDatabase {
           await _createAlertConfigurationsIndexes();
 
           // ───────────────────────────────────────────────────
-          // INDEXES - SYNC TABLE (Phase 2)
+          // INDEXES - SYNC TABLE (STEP 4)
           // ───────────────────────────────────────────────────
-          // await _createSyncQueueIndexes();
+          await _createSyncQueueIndexes();
         },
         onUpgrade: (Migrator m, int from, int to) async {
           // ───────────────────────────────────────────────────
@@ -1185,6 +1185,47 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
+  // ───────────────────────────────────────────────────────────
+  // SYNC QUEUE INDEXES (STEP 4)
+  // ───────────────────────────────────────────────────────────
+  Future<void> _createSyncQueueIndexes() async {
+    // Index principal: farmId (multi-tenancy)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_sync_queue_farm_id '
+      'ON sync_queue(farm_id);',
+    );
+
+    // Index: syncedAt (distinguer pending vs synced)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_sync_queue_synced_at '
+      'ON sync_queue(synced_at);',
+    );
+
+    // Index: entityType (filtrer par type)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_sync_queue_entity_type '
+      'ON sync_queue(entity_type);',
+    );
+
+    // Index composite: farmId + syncedAt (requête principale)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_sync_queue_farm_synced '
+      'ON sync_queue(farm_id, synced_at);',
+    );
+
+    // Index: retryCount (identifier items en échec)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_sync_queue_retry_count '
+      'ON sync_queue(retry_count);',
+    );
+
+    // Index: createdAt (tri chronologique)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_sync_queue_created_at '
+      'ON sync_queue(created_at);',
+    );
+  }
+
   // ═══════════════════════════════════════════════════════════
   // MIGRATION HELPERS
   // ═══════════════════════════════════════════════════════════
@@ -1546,9 +1587,10 @@ class AppDatabase extends _$AppDatabase {
       AlertConfigurationDao(this);
 
   // ───────────────────────────────────────────────────────────
-  // SYNC DAO (Phase 2)
+  // SYNC DAO (STEP 4)
   // ───────────────────────────────────────────────────────────
-  // SyncQueueDao get syncQueueDao => SyncQueueDao(this);
+  @override
+  SyncQueueDao get syncQueueDao => SyncQueueDao(this);
 }
 
 // ═══════════════════════════════════════════════════════════

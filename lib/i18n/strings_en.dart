@@ -572,6 +572,44 @@ const Map<String, String> stringsEn = {
   'requiresConnection': '(Requires connection)',
   'allDataSynchronized': 'All data is synchronized',
   'syncError': 'Synchronization error',
+
+  // ==================== SYNC DEBUG UI (STEP 4) ====================
+  'syncQueueDebug': 'Debug Sync Queue',
+  'syncQueueTitle': 'Sync Queue',
+  'clearQueue': 'Clear queue',
+  'clearQueueConfirm': 'Are you sure you want to clear the entire queue?',
+  'queueCleared': 'Queue cleared',
+  'queueItems': '{count} item(s) pending',
+  'noItemsInQueue': 'No items in queue',
+  'entityType': 'Type',
+  'entityId': 'ID',
+  'action': 'Action',
+  'retryCount': 'Retries',
+  'createdAt': 'Created',
+  'errorMessage': 'Error',
+  'pending': 'Pending',
+  'synced': 'Synced',
+  'stalled': 'Failed',
+  'syncDisabled': 'Sync disabled',
+  'syncEnabled': 'Sync enabled',
+
+  // Sync validation
+  'officialNumberRequired': 'Official number required for sync',
+  'atLeastOneIdentifierRequired': 'At least one identifier required (EID, official or visual)',
+  'animalIdEmpty': 'Animal ID empty',
+  'farmIdEmpty': 'Farm ID empty',
+  'syncValidationFailed': 'Validation failed',
+
+  // Sync actions
+  'insert': 'Create',
+  'update': 'Update',
+  'delete': 'Delete',
+
+  // Stats
+  'pendingItems': 'Pending',
+  'stalledItems': 'Failed',
+  'totalItems': 'Total',
+
   'localDataSummary': 'Summary of local data',
   'treatments': 'Treatments',
   'campaigns': 'Campaigns',
