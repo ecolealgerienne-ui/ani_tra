@@ -19,10 +19,10 @@ import '../../providers/medical_product_provider.dart';
 //import '../../providers/lot_provider.dart';
 //import '../../providers/sync_provider.dart';
 import '../../providers/veterinarian_provider.dart';
+import '../../drift/database.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
-import '../../services/atomic_operation_service.dart';
 
 /// Mode de l'acte médical
 enum MedicalActMode {
@@ -346,7 +346,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
 
     final uuid = const Uuid();
     final treatmentProvider = context.read<TreatmentProvider>();
-    final atomicService = context.read<AtomicOperationService>();
+    final db = context.read<AppDatabase>();
 
     // Sauvegarder selon le type d'acte
     if (_selectedType == ProductType.treatment) {
@@ -356,17 +356,10 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
               ? [_animal!.id]
               : _batchAnimals?.map((a) => a.id).toList() ?? [];
 
-      // TRANSACTION ATOMIQUE: Créer tous les traitements
-      // Si une erreur survient, tous les traitements sont annulés (rollback)
-      await atomicService.executeInTransaction(() async {
-        String? firstTreatmentId;
-
+      // TRANSACTION ATOMIQUE: création des traitements batch
+      await db.transaction(() async {
         for (final animalId in targetIds) {
           final treatmentId = uuid.v4();
-          if (firstTreatmentId == null) {
-            firstTreatmentId = treatmentId;
-          }
-
           final withdrawalEndDate = _selectedDate.add(
             Duration(days: _selectedProduct!.withdrawalPeriodMeat),
           );
@@ -384,23 +377,22 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
           );
 
           await treatmentProvider.addTreatment(treatment);
-        }
 
-        // Créer des rappels si activés (uniquement pour le premier animal)
-        if (_enableReminders &&
-            targetIds.isNotEmpty &&
-            firstTreatmentId != null &&
-            _selectedProduct!.standardCureDays != null &&
-            _selectedProduct!.standardCureDays! > 1) {
-          final reminderProvider = context.read<ReminderProvider>();
-          await reminderProvider.createTreatmentReminders(
-            treatmentId: firstTreatmentId,
-            animalId: targetIds.first,
-            productName: _selectedProduct!.displayName,
-            startDate: _selectedDate,
-            cureDays: _selectedProduct!.standardCureDays!,
-            reminderTime: _reminderTime,
-          );
+          // Créer des rappels si activés (uniquement pour le premier animal)
+          if (_enableReminders &&
+              targetIds.first == animalId &&
+              _selectedProduct!.standardCureDays != null &&
+              _selectedProduct!.standardCureDays! > 1) {
+            final reminderProvider = context.read<ReminderProvider>();
+            await reminderProvider.createTreatmentReminders(
+              treatmentId: treatmentId,
+              animalId: animalId,
+              productName: _selectedProduct!.displayName,
+              startDate: _selectedDate,
+              cureDays: _selectedProduct!.standardCureDays!,
+              reminderTime: _reminderTime,
+            );
+          }
         }
       });
     } else {
