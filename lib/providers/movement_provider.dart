@@ -41,8 +41,12 @@ class MovementProvider with ChangeNotifier {
 
   // ==================== Getters ====================
 
-  List<Movement> get movements => List.unmodifiable(
-      _allMovements.where((m) => m.farmId == _authProvider.currentFarmId));
+  /// Tous les mouvements triés par date décroissante (plus récent en premier)
+  List<Movement> get movements {
+    final filtered = _allMovements.where((m) => m.farmId == _authProvider.currentFarmId).toList();
+    filtered.sort((a, b) => b.movementDate.compareTo(a.movementDate));
+    return List.unmodifiable(filtered);
+  }
 
   bool get isLoading => _isLoading;
   MovementType? get typeFilter => _typeFilter;
