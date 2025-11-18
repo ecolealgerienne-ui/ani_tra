@@ -457,6 +457,40 @@ class AppConstants {
 
   /// Taille du sous-titre de section Farm Settings
   static const double farmSettingsSectionSubtitleSize = 13.0;
+
+  // ==================== PERFORMANCE BENCHMARK ====================
+  /// Flag pour afficher le bouton de benchmark dans Home
+  static const bool kShowBenchmarkButton = true;
+
+  /// Flag pour mode léger (1000 animaux) vs complet (5000 animaux)
+  static const bool kBenchmarkLightMode = true;
+
+  // Seed data quantities - Light mode (1000 animals)
+  static const int benchmarkLightAnimals = 1000;
+  static const int benchmarkLightMovements = 3000;
+  static const int benchmarkLightLots = 100;
+  static const int benchmarkLightTreatments = 600;
+  static const int benchmarkLightVaccinations = 1000;
+  static const int benchmarkLightWeights = 5000;
+
+  // Seed data quantities - Full mode (5000 animals)
+  static const int benchmarkFullAnimals = 5000;
+  static const int benchmarkFullMovements = 15000;
+  static const int benchmarkFullLots = 500;
+  static const int benchmarkFullTreatments = 3000;
+  static const int benchmarkFullVaccinations = 5000;
+  static const int benchmarkFullWeights = 25000;
+
+  // Benchmark targets (ms) - Emulator tolerances
+  static const int benchmarkTargetLoadAnimals = 2000;
+  static const int benchmarkTargetLoadMovements = 3000;
+  static const int benchmarkTargetLoadLots = 1500;
+  static const int benchmarkTargetLoadWeights = 4000;
+  static const int benchmarkTargetGenerateAlerts = 500;
+  static const int benchmarkTargetFindByEID = 100;
+  static const int benchmarkTargetFindLotsByAnimal = 200;
+  static const int benchmarkTargetCountStats = 100;
+  static const int benchmarkTargetBatchCreate = 3000;
 }
 
 // ==================== MOVEMENT TYPES ====================
