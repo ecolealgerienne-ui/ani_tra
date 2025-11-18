@@ -331,6 +331,9 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
               visualId: _visualIdController.text.trim().isNotEmpty
                   ? _visualIdController.text.trim()
                   : null,
+              notes: _notesController.text.trim().isNotEmpty
+                  ? _notesController.text.trim()
+                  : null,
             );
 
       // Mode édition : mettre à jour l'animal
@@ -375,6 +378,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
             validatedAt: animal.validatedAt,
             speciesId: animal.speciesId,
             breedId: animal.breedId,
+            notes: animal.notes,
             createdAt: animal.createdAt,
             updatedAt: animal.updatedAt,
           );

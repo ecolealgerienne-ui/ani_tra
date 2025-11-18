@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'dart:math';
 import '../../providers/animal_provider.dart';
+import '../../providers/movement_provider.dart';
 import '../../providers/sync_provider.dart';
 import '../../services/atomic_operation_service.dart';
 import '../../models/animal.dart';
@@ -93,6 +94,7 @@ class _DeathScreenState extends State<DeathScreen> {
     setState(() => _isConfirming = true);
 
     final animalProvider = context.read<AnimalProvider>();
+    final movementProvider = context.read<MovementProvider>();
     final syncProvider = context.read<SyncProvider>();
     final atomicService = context.read<AtomicOperationService>();
 
@@ -115,6 +117,7 @@ class _DeathScreenState extends State<DeathScreen> {
 
       // Rafraîchir les providers pour refléter les changements
       await animalProvider.refresh(forceRefresh: true);
+      await movementProvider.refresh();
 
       if (!mounted) return;
 

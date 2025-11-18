@@ -7,6 +7,7 @@ import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
 import '../../models/animal.dart';
 import '../../providers/animal_provider.dart';
+import '../../providers/movement_provider.dart';
 import '../../providers/sync_provider.dart';
 import '../../services/atomic_operation_service.dart';
 
@@ -50,6 +51,7 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
     setState(() => _isConfirming = true);
 
     final animalProvider = context.read<AnimalProvider>();
+    final movementProvider = context.read<MovementProvider>();
     final syncProvider = context.read<SyncProvider>();
     final atomicService = context.read<AtomicOperationService>();
 
@@ -106,6 +108,7 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
 
       // Rafraîchir les providers pour refléter les changements
       await animalProvider.refresh(forceRefresh: true);
+      await movementProvider.refresh();
 
       if (!mounted) return;
 
