@@ -1662,7 +1662,19 @@ class DatabaseInitializer {
       _logTestResult('Find Lots by Animal', results['findLotsByAnimal']!);
     }
 
-    // Test 7: Count stats (alive animals)
+    // Test 7: Filter lot movements
+    stopwatch = Stopwatch()..start();
+    final lotMovements = movements.where((m) => m.lotId != null).toList();
+    stopwatch.stop();
+    results['filterLotMovements'] = {
+      'time': stopwatch.elapsedMilliseconds,
+      'target': AppConstants.benchmarkTargetCountStats,
+      'passed': stopwatch.elapsedMilliseconds <= AppConstants.benchmarkTargetCountStats,
+      'count': lotMovements.length,
+    };
+    _logTestResult('Filter Lot Movements', results['filterLotMovements']!);
+
+    // Test 8: Count stats (alive animals)
     stopwatch = Stopwatch()..start();
     final aliveCount = animals.where((a) => a.status == AnimalStatus.alive.name).length;
     stopwatch.stop();
@@ -1674,7 +1686,7 @@ class DatabaseInitializer {
     };
     _logTestResult('Count Stats', results['countStats']!);
 
-    // Test 8: Batch create (10 animals)
+    // Test 9: Batch create (10 animals)
     stopwatch = Stopwatch()..start();
     final batchIds = <String>[];
     for (int i = 0; i < 10; i++) {
