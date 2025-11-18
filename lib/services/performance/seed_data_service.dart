@@ -7,7 +7,7 @@ import '../../models/movement.dart';
 import '../../models/lot.dart';
 import '../../models/treatment.dart';
 import '../../models/vaccination.dart';
-import '../../models/weight.dart';
+import '../../models/weight_record.dart';
 import '../../repositories/animal_repository.dart';
 import '../../repositories/movement_repository.dart';
 import '../../repositories/lot_repository.dart';
@@ -223,10 +223,10 @@ class SeedDataService {
   ) async {
     final movementIds = <String>[];
     final movementTypes = [
-      MovementConstants.birth,
-      MovementConstants.purchase,
-      MovementConstants.sale,
-      MovementConstants.death,
+      MovementType.birth,
+      MovementType.purchase,
+      MovementType.sale,
+      MovementType.death,
     ];
 
     for (int i = 0; i < count; i++) {
@@ -240,7 +240,7 @@ class SeedDataService {
         animalId: animalId,
         type: type,
         movementDate: DateTime.now().subtract(Duration(days: _random.nextInt(365))),
-        price: type == MovementConstants.sale || type == MovementConstants.purchase
+        price: type == MovementType.sale || type == MovementType.purchase
             ? (_random.nextDouble() * 500 + 100)
             : null,
         notes: 'Benchmark movement #${i + 1}',
@@ -269,28 +269,30 @@ class SeedDataService {
   ) async {
     final treatmentIds = <String>[];
     final products = [
-      'Ivermectine',
-      'Oxytétracycline',
-      'Pénicilline',
-      'Flunixine',
-      'Dexaméthasone',
+      ('prod_ivermectine', 'Ivermectine'),
+      ('prod_oxytetracycline', 'Oxytétracycline'),
+      ('prod_penicilline', 'Pénicilline'),
+      ('prod_flunixine', 'Flunixine'),
+      ('prod_dexamethasone', 'Dexaméthasone'),
     ];
 
     for (int i = 0; i < count; i++) {
       final id = _uuid.v4();
       final animalId = animalIds[_random.nextInt(animalIds.length)];
-      final productName = products[_random.nextInt(products.length)];
+      final product = products[_random.nextInt(products.length)];
       final treatmentDate =
           DateTime.now().subtract(Duration(days: _random.nextInt(90)));
+      final withdrawalDays = _random.nextInt(21) + 7;
 
       final treatment = Treatment(
         id: id,
         farmId: farmId,
         animalId: animalId,
-        productName: productName,
-        dosage: '${_random.nextInt(10) + 1} ml',
+        productId: product.$1,
+        productName: product.$2,
+        dose: (_random.nextInt(10) + 1).toDouble(),
         treatmentDate: treatmentDate,
-        withdrawalDays: _random.nextInt(21) + 7,
+        withdrawalEndDate: treatmentDate.add(Duration(days: withdrawalDays)),
         veterinarianName: 'Dr. Benchmark #${_random.nextInt(10)}',
         notes: 'Benchmark treatment #${i + 1}',
         synced: false,
@@ -318,17 +320,19 @@ class SeedDataService {
   ) async {
     final vaccinationIds = <String>[];
     final vaccines = [
-      'Fièvre aphteuse',
-      'Charbon bactéridien',
-      'Entérotoxémie',
-      'Pasteurellose',
-      'Rage',
+      ('Fièvre aphteuse', 'Fièvre aphteuse'),
+      ('Charbon bactéridien', 'Charbon'),
+      ('Entérotoxémie', 'Entérotoxémie'),
+      ('Pasteurellose', 'Pasteurellose'),
+      ('Rage', 'Rage'),
     ];
+    final routes = ['IM', 'SC', 'IV'];
+    final types = VaccinationType.values;
 
     for (int i = 0; i < count; i++) {
       final id = _uuid.v4();
       final animalId = animalIds[_random.nextInt(animalIds.length)];
-      final vaccineName = vaccines[_random.nextInt(vaccines.length)];
+      final vaccine = vaccines[_random.nextInt(vaccines.length)];
       final vaccinationDate =
           DateTime.now().subtract(Duration(days: _random.nextInt(180)));
 
@@ -336,7 +340,11 @@ class SeedDataService {
         id: id,
         farmId: farmId,
         animalId: animalId,
-        vaccineName: vaccineName,
+        vaccineName: vaccine.$1,
+        disease: vaccine.$2,
+        type: types[_random.nextInt(types.length)],
+        dose: '${_random.nextInt(5) + 1} ml',
+        administrationRoute: routes[_random.nextInt(routes.length)],
         vaccinationDate: vaccinationDate,
         nextDueDate: vaccinationDate.add(Duration(days: _random.nextInt(180) + 90)),
         veterinarianName: 'Dr. Vaccine #${_random.nextInt(10)}',
@@ -371,19 +379,20 @@ class SeedDataService {
       final id = _uuid.v4();
       final animalId = animalIds[_random.nextInt(animalIds.length)];
 
-      final weight = Weight(
+      final weightRecord = WeightRecord(
         id: id,
         farmId: farmId,
         animalId: animalId,
         weight: _random.nextDouble() * 150 + 20, // 20-170 kg
         recordedAt: DateTime.now().subtract(Duration(days: _random.nextInt(365))),
+        source: WeightSource.manual,
         notes: 'Benchmark weight #${i + 1}',
         synced: false,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
 
-      await _weightRepository.create(weight, farmId);
+      await _weightRepository.create(weightRecord, farmId);
       weightIds.add(id);
 
       // Progress log every 1000 weights
@@ -393,19 +402,5 @@ class SeedDataService {
     }
 
     return weightIds;
-  }
-
-  /// Supprime toutes les données de test d'une ferme
-  Future<void> clearAllData(String farmId) async {
-    print('Clearing all benchmark data for farm: $farmId');
-
-    await _weightRepository.deleteAllByFarm(farmId);
-    await _vaccinationRepository.deleteAllByFarm(farmId);
-    await _treatmentRepository.deleteAllByFarm(farmId);
-    await _movementRepository.deleteAllByFarm(farmId);
-    await _lotRepository.deleteAllByFarm(farmId);
-    await _animalRepository.deleteAllByFarm(farmId);
-
-    print('✓ All benchmark data cleared');
   }
 }
