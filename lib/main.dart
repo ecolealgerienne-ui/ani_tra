@@ -58,6 +58,7 @@ import 'repositories/farm_repository.dart';
 import 'repositories/farm_preferences_repository.dart';
 import 'repositories/movement_repository.dart';
 import 'database_initializer.dart';
+import 'services/atomic_operation_service.dart';
 
 AppDatabase? _appDatabase;
 bool _dbInitialized = false;
@@ -208,6 +209,11 @@ class MyApp extends StatelessWidget {
         Provider<FarmPreferencesRepository>.value(
             value: farmPreferencesRepository),
         Provider<MovementRepository>.value(value: movementRepository),
+
+        // === Atomic Operation Service (transactions database) ===
+        Provider<AtomicOperationService>(
+          create: (context) => AtomicOperationService(database),
+        ),
 
         // === AuthProvider EN PREMIER ===
         ChangeNotifierProvider(create: (_) => AuthProvider()),

@@ -22,6 +22,7 @@ import '../../providers/veterinarian_provider.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
+import '../../services/atomic_operation_service.dart';
 
 /// Mode de l'acte médical
 enum MedicalActMode {
@@ -320,6 +321,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
 
     final uuid = const Uuid();
     final treatmentProvider = context.read<TreatmentProvider>();
+    final atomicService = context.read<AtomicOperationService>();
 
     // Sauvegarder selon le type d'acte
     if (_selectedType == ProductType.treatment) {
@@ -329,42 +331,53 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
               ? [_animal!.id]
               : _batchAnimals?.map((a) => a.id).toList() ?? [];
 
-      for (final animalId in targetIds) {
-        final treatmentId = uuid.v4();
-        final withdrawalEndDate = _selectedDate.add(
-          Duration(days: _selectedProduct!.withdrawalPeriodMeat),
-        );
+      // TRANSACTION ATOMIQUE: Créer tous les traitements
+      // Si une erreur survient, tous les traitements sont annulés (rollback)
+      await atomicService.executeInTransaction(() async {
+        String? firstTreatmentId;
 
-        final treatment = Treatment(
-          id: treatmentId,
-          animalId: animalId,
-          productId: _selectedProduct!.id,
-          productName: _selectedProduct!.displayName,
-          dose: dose,
-          treatmentDate: _selectedDate,
-          withdrawalEndDate: withdrawalEndDate,
-          notes:
-              _notesController.text.isNotEmpty ? _notesController.text : null,
-        );
+        for (final animalId in targetIds) {
+          final treatmentId = uuid.v4();
+          if (firstTreatmentId == null) {
+            firstTreatmentId = treatmentId;
+          }
 
-        await treatmentProvider.addTreatment(treatment);
+          final withdrawalEndDate = _selectedDate.add(
+            Duration(days: _selectedProduct!.withdrawalPeriodMeat),
+          );
+
+          final treatment = Treatment(
+            id: treatmentId,
+            animalId: animalId,
+            productId: _selectedProduct!.id,
+            productName: _selectedProduct!.displayName,
+            dose: dose,
+            treatmentDate: _selectedDate,
+            withdrawalEndDate: withdrawalEndDate,
+            notes:
+                _notesController.text.isNotEmpty ? _notesController.text : null,
+          );
+
+          await treatmentProvider.addTreatment(treatment);
+        }
 
         // Créer des rappels si activés (uniquement pour le premier animal)
         if (_enableReminders &&
-            targetIds.first == animalId &&
+            targetIds.isNotEmpty &&
+            firstTreatmentId != null &&
             _selectedProduct!.standardCureDays != null &&
             _selectedProduct!.standardCureDays! > 1) {
           final reminderProvider = context.read<ReminderProvider>();
           await reminderProvider.createTreatmentReminders(
-            treatmentId: treatmentId,
-            animalId: animalId,
+            treatmentId: firstTreatmentId,
+            animalId: targetIds.first,
             productName: _selectedProduct!.displayName,
             startDate: _selectedDate,
             cureDays: _selectedProduct!.standardCureDays!,
             reminderTime: _reminderTime,
           );
         }
-      }
+      });
     } else {
       // Vaccination
       final vaccinationProvider = context.read<VaccinationProvider>();

@@ -7,6 +7,7 @@ import 'dart:math';
 import '../../providers/animal_provider.dart';
 import '../../providers/movement_provider.dart';
 import '../../providers/sync_provider.dart';
+import '../../services/atomic_operation_service.dart';
 import '../../models/animal.dart';
 import '../../models/movement.dart';
 import '../../i18n/app_localizations.dart';
@@ -94,33 +95,28 @@ class _DeathScreenState extends State<DeathScreen> {
     setState(() => _isConfirming = true);
 
     final animalProvider = context.read<AnimalProvider>();
-    final movementProvider = context.read<MovementProvider>();
     final syncProvider = context.read<SyncProvider>();
+    final atomicService = context.read<AtomicOperationService>();
 
     try {
-      // Create death movement
-      final movement = Movement(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
+      // TRANSACTION ATOMIQUE: Enregistrer la mort
+      // Si une erreur survient, toutes les opérations sont annulées (rollback)
+      await atomicService.executeDeathRegistration(
+        farmId: animal.farmId,
         animalId: animal.id,
-        type: MovementType.death,
-        movementDate: _deathDate,
+        deathDate: _deathDate,
         notes: _notesController.text.isEmpty
             ? AppLocalizations.of(context)
                 .translate(AppStrings.causeNotSpecified)
             : _notesController.text,
-        createdAt: DateTime.now(),
       );
 
-      await movementProvider.addMovement(movement);
-
-      // ✅ Mettre à jour le statut de l'animal à "mort"
-      // IMPORTANT: Attendre l'update (await) pour que le provider notifie les listeners
-      final updatedAnimal = animal.copyWith(status: AnimalStatus.dead);
-      await animalProvider.updateAnimal(updatedAnimal);
-
-      debugPrint('✅ Animal ${animal.id} marked as dead in DB and provider');
+      debugPrint('✅ Animal ${animal.id} marked as dead in DB (atomic transaction)');
 
       syncProvider.incrementPendingData();
+
+      // Rafraîchir les providers pour refléter les changements
+      await animalProvider.refresh(forceRefresh: true);
 
       if (!mounted) return;
 

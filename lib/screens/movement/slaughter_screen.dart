@@ -10,6 +10,7 @@ import '../../models/movement.dart';
 import '../../providers/animal_provider.dart';
 import '../../providers/movement_provider.dart';
 import '../../providers/sync_provider.dart';
+import '../../services/atomic_operation_service.dart';
 
 class SlaughterScreen extends StatefulWidget {
   final String? lotId;
@@ -51,73 +52,62 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
     setState(() => _isConfirming = true);
 
     final animalProvider = context.read<AnimalProvider>();
-    final movementProvider = context.read<MovementProvider>();
     final syncProvider = context.read<SyncProvider>();
+    final atomicService = context.read<AtomicOperationService>();
 
     try {
       // Utiliser les notes saisies par l'utilisateur
       final notesText = _notesController.text.isNotEmpty ? _notesController.text : null;
 
+      // Récupérer le farmId depuis le premier animal disponible
+      String? farmId;
+      List<String> animalIdsToProcess = [];
+
       // Cas 1 : Un seul animal passé directement
       if (widget.animal != null) {
-        final animal = widget.animal!;
-
-        // Create slaughter movement
-        final movement = Movement(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          animalId: animal.id,
-          lotId: widget.lotId, // Lien avec le lot (null si abattage individuel)
-          type: MovementType.slaughter,
-          status: MovementStatus.closed,
-          movementDate: _slaughterDate,
-          slaughterhouseName: _slaughterhouseNameController.text,
-          slaughterhouseId: _slaughterhouseIdController.text.isNotEmpty ? _slaughterhouseIdController.text : null,
-          notes: notesText,
-          createdAt: DateTime.now(),
-        );
-
-        await movementProvider.addMovement(movement);
-
-        // Update animal status to slaughtered
-        final updatedAnimal = animal.copyWith(status: AnimalStatus.slaughtered);
-        await animalProvider.updateAnimal(updatedAnimal);
-
-        syncProvider.incrementPendingData();
+        farmId = widget.animal!.farmId;
+        animalIdsToProcess = [widget.animal!.id];
       }
       // Cas 2 : Plusieurs animaux depuis un lot
       else if (widget.animalIds != null && widget.animalIds!.isNotEmpty) {
+        // Filtrer les IDs valides et récupérer le farmId
         for (final animalId in widget.animalIds!) {
           final animal = animalProvider.getAnimalById(animalId);
-          if (animal == null) continue;
-
-          // Create slaughter movement for each animal
-          final movement = Movement(
-            id: '${DateTime.now().millisecondsSinceEpoch}_$animalId',
-            animalId: animal.id,
-            lotId: widget.lotId, // Lien avec le lot (null si abattage individuel)
-            type: MovementType.slaughter,
-            status: MovementStatus.closed,
-            movementDate: _slaughterDate,
-            slaughterhouseName: _slaughterhouseNameController.text,
-            slaughterhouseId: _slaughterhouseIdController.text.isNotEmpty ? _slaughterhouseIdController.text : null,
-            notes: notesText,
-            createdAt: DateTime.now(),
-          );
-
-          await movementProvider.addMovement(movement);
-
-          // Update animal status to slaughtered
-          final updatedAnimal = animal.copyWith(status: AnimalStatus.slaughtered);
-          await animalProvider.updateAnimal(updatedAnimal);
-
-          syncProvider.incrementPendingData();
+          if (animal != null) {
+            farmId ??= animal.farmId;
+            animalIdsToProcess.add(animalId);
+          }
         }
-      } else {
+      }
+
+      if (animalIdsToProcess.isEmpty || farmId == null) {
         // Aucun animal à traiter
         if (!mounted) return;
         setState(() => _isConfirming = false);
         return;
       }
+
+      // TRANSACTION ATOMIQUE: Exécuter l'abattage batch
+      // Si une erreur survient, toutes les opérations sont annulées (rollback)
+      final processedCount = await atomicService.executeBatchSlaughter(
+        farmId: farmId,
+        animalIds: animalIdsToProcess,
+        slaughterDate: _slaughterDate,
+        slaughterhouseName: _slaughterhouseNameController.text,
+        slaughterhouseId: _slaughterhouseIdController.text.isNotEmpty
+            ? _slaughterhouseIdController.text
+            : null,
+        lotId: widget.lotId,
+        notes: notesText,
+      );
+
+      // Incrémenter le compteur de sync pour chaque animal traité
+      for (int i = 0; i < processedCount; i++) {
+        syncProvider.incrementPendingData();
+      }
+
+      // Rafraîchir les providers pour refléter les changements
+      await animalProvider.refresh(forceRefresh: true);
 
       if (!mounted) return;
 

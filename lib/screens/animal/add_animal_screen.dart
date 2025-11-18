@@ -19,6 +19,8 @@ import '../../providers/farm_preferences_provider.dart';
 import '../../providers/species_provider.dart';
 //import 'universal_scanner_screen.dart';
 import 'animal_finder_screen.dart';
+import '../../services/atomic_operation_service.dart';
+import '../../providers/auth_provider.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
@@ -347,37 +349,62 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
         return; // Ne pas créer de mouvement en édition
       }
 
-      // Mode création : ajouter l'animal
-      await animalProvider.addAnimal(animal);
-
-      // 2. Créer le mouvement correspondant (uniquement pour Achat)
-      Movement? movement;
-
+      // 2. Créer l'animal (et mouvement pour Achat)
       // NOTE: Birth is NOT a business movement - only Purchase creates a movement
-      if (_selectedOrigin ==
-          AppLocalizations.of(context).translate(AppStrings.purchase)) {
-        movement = Movement(
-          id: _generateId(),
-          type: MovementType.purchase,
-          animalId: animal.id,
-          movementDate: DateTime.now(),
-          fromFarmId: _provenanceController.text.trim().isNotEmpty
-              ? _provenanceController.text.trim()
-              : null,
-          price: _priceController.text.trim().isNotEmpty
-              ? double.tryParse(_priceController.text.trim())
-              : null,
-          notes: _notesController.text.trim().isNotEmpty
-              ? _notesController.text.trim()
-              : null,
-          synced: false,
-          createdAt: DateTime.now(),
-        );
-      }
+      final isPurchase = _selectedOrigin ==
+          AppLocalizations.of(context).translate(AppStrings.purchase);
 
-      if (movement != null) {
-        final movementProvider = context.read<MovementProvider>();
-        await movementProvider.addMovement(movement);
+      if (isPurchase) {
+        // TRANSACTION ATOMIQUE: Créer l'animal ET le mouvement d'achat
+        // Si une erreur survient, les deux opérations sont annulées (rollback)
+        final atomicService = context.read<AtomicOperationService>();
+        final authProvider = context.read<AuthProvider>();
+
+        await atomicService.executeInTransaction(() async {
+          // Ajouter l'animal avec le bon farmId
+          final animalWithFarmId = Animal(
+            id: animal.id,
+            farmId: authProvider.currentFarmId,
+            currentEid: animal.currentEid,
+            officialNumber: animal.officialNumber,
+            visualId: animal.visualId,
+            birthDate: animal.birthDate,
+            sex: animal.sex,
+            motherId: animal.motherId,
+            status: animal.status,
+            validatedAt: animal.validatedAt,
+            speciesId: animal.speciesId,
+            breedId: animal.breedId,
+            createdAt: animal.createdAt,
+            updatedAt: animal.updatedAt,
+          );
+          await animalProvider.addAnimal(animalWithFarmId);
+
+          // Créer le mouvement d'achat
+          final movement = Movement(
+            id: _generateId(),
+            type: MovementType.purchase,
+            animalId: animal.id,
+            movementDate: DateTime.now(),
+            fromFarmId: _provenanceController.text.trim().isNotEmpty
+                ? _provenanceController.text.trim()
+                : null,
+            price: _priceController.text.trim().isNotEmpty
+                ? double.tryParse(_priceController.text.trim())
+                : null,
+            notes: _notesController.text.trim().isNotEmpty
+                ? _notesController.text.trim()
+                : null,
+            synced: false,
+            createdAt: DateTime.now(),
+          );
+
+          final movementProvider = context.read<MovementProvider>();
+          await movementProvider.addMovement(movement);
+        });
+      } else {
+        // Mode création simple (naissance) : ajouter l'animal uniquement
+        await animalProvider.addAnimal(animal);
       }
 
       // 3. IncrÃƒÂ©menter les donnÃƒÂ©es en attente de sync
