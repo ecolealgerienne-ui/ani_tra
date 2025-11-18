@@ -67,8 +67,34 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase>
   }
 
   /// Mettre à jour un item existant (upsert)
-  Future<int> upsertItem(SyncQueueTableCompanion item) {
-    return into(syncQueueTable).insertOnConflictUpdate(item);
+  ///
+  /// Gère le conflit sur la contrainte UNIQUE (farm_id, entity_id, action).
+  /// Si un item avec la même combinaison existe déjà, met à jour le payload.
+  Future<void> upsertItem(SyncQueueTableCompanion item) async {
+    await customStatement(
+      '''
+      INSERT INTO sync_queue (id, farm_id, entity_type, entity_id, action, payload, retry_count, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(farm_id, entity_id, action)
+      DO UPDATE SET
+        payload = excluded.payload,
+        updated_at = excluded.updated_at,
+        retry_count = 0,
+        error_message = NULL,
+        last_retry_at = NULL
+      ''',
+      [
+        item.id.value,
+        item.farmId.value,
+        item.entityType.value,
+        item.entityId.value,
+        item.action.value,
+        item.payload.value,
+        item.retryCount.value,
+        item.createdAt.value.millisecondsSinceEpoch,
+        item.updatedAt.value?.millisecondsSinceEpoch,
+      ],
+    );
   }
 
   /// Marquer un item comme synchronisé
