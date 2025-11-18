@@ -465,32 +465,6 @@ class LotProvider extends ChangeNotifier {
     }).toList();
   }
 
-  /// DEPRECATED: Cette méthode n'est plus utilisée depuis la suppression des champs sale du Lot
-  ///
-  /// Les Movement de vente doivent maintenant être créés LORS de la finalisation du lot
-  /// avec les données passées directement, pas extraites du Lot.
-  ///
-  /// TODO: Refactoriser pour accepter les données de vente en paramètres
-  @Deprecated('Sale data no longer stored in Lot. Create Movement directly with sale data.')
-  List<Movement> expandLotToSaleMovements(Lot lot) {
-    // Cette méthode retourne maintenant une liste vide
-    // Les Movement doivent être créés différemment
-    return [];
-  }
-
-  /// DEPRECATED: Cette méthode n'est plus utilisée depuis la suppression des champs slaughter du Lot
-  ///
-  /// Les Movement d'abattage doivent maintenant être créés LORS de la finalisation du lot
-  /// avec les données passées directement, pas extraites du Lot.
-  ///
-  /// TODO: Refactoriser pour accepter les données d'abattage en paramètres
-  @Deprecated('Slaughter data no longer stored in Lot. Create Movement directly with slaughter data.')
-  List<Movement> expandLotToSlaughterMovements(Lot lot) {
-    // Cette méthode retourne maintenant une liste vide
-    // Les Movement doivent être créés différemment
-    return [];
-  }
-
   // ==================== Migration depuis Campaign ====================
 
   Future<void> importCampaignAsLot({
