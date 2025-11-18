@@ -6,7 +6,6 @@ import 'package:drift/drift.dart' as drift;
 import 'package:uuid/uuid.dart';
 
 import '../drift/database.dart';
-import '../drift/tables/sync_queue_table.dart';
 import '../models/animal.dart';
 import '../models/treatment.dart';
 import '../models/vaccination.dart';

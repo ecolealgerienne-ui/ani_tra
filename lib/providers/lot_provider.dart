@@ -5,7 +5,6 @@ import 'package:uuid/uuid.dart';
 import '../models/lot.dart';
 import '../models/animal.dart';
 import '../models/treatment.dart';
-import '../models/movement.dart';
 import '../repositories/lot_repository.dart';
 import 'auth_provider.dart';
 

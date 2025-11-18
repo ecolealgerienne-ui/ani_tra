@@ -409,7 +409,7 @@ class _DebugSyncScreenState extends State<DebugSyncScreen> {
   ) {
     return ListTile(
       leading: CircleAvatar(
-        backgroundColor: color.withOpacity(0.2),
+        backgroundColor: color.withValues(alpha: 0.2),
         child: Text(
           item.entityType.substring(0, 1).toUpperCase(),
           style: TextStyle(color: color),
