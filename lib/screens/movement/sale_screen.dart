@@ -82,7 +82,9 @@ class _SaleScreenState extends State<SaleScreen> {
           type: MovementType.sale,
           status: MovementStatus.ongoing,
           movementDate: _saleDate,
-          price: widget.lotId != null ? null : price, // Prix null si lot (géré au niveau lot), sinon prix individuel
+          price: price,
+          buyerName: _buyerNameController.text,
+          buyerFarmId: _buyerFarmIdController.text.isNotEmpty ? _buyerFarmIdController.text : null,
           notes: notesText,
           createdAt: DateTime.now(),
         );
@@ -109,7 +111,9 @@ class _SaleScreenState extends State<SaleScreen> {
             type: MovementType.sale,
             status: MovementStatus.ongoing,
             movementDate: _saleDate,
-            price: widget.lotId != null ? null : price, // Prix null si lot (géré au niveau lot), sinon prix individuel
+            price: price,
+            buyerName: _buyerNameController.text,
+            buyerFarmId: _buyerFarmIdController.text.isNotEmpty ? _buyerFarmIdController.text : null,
             notes: notesText,
             createdAt: DateTime.now(),
           );

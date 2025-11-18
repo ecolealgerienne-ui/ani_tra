@@ -68,6 +68,8 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
           type: MovementType.slaughter,
           status: MovementStatus.closed,
           movementDate: _slaughterDate,
+          slaughterhouseName: _slaughterhouseNameController.text,
+          slaughterhouseId: _slaughterhouseIdController.text.isNotEmpty ? _slaughterhouseIdController.text : null,
           notes: notesText,
           createdAt: DateTime.now(),
         );
@@ -94,6 +96,8 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
             type: MovementType.slaughter,
             status: MovementStatus.closed,
             movementDate: _slaughterDate,
+            slaughterhouseName: _slaughterhouseNameController.text,
+            slaughterhouseId: _slaughterhouseIdController.text.isNotEmpty ? _slaughterhouseIdController.text : null,
             notes: notesText,
             createdAt: DateTime.now(),
           );
