@@ -183,7 +183,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   // ═══════════════════════════════════════════════════════════
   // MIGRATION STRATEGY
@@ -270,7 +270,14 @@ class AppDatabase extends _$AppDatabase {
           // MIGRATION v4 → v5: Performance indexes for large farms + Phase 2 sync
           // ───────────────────────────────────────────────────
           if (from < 5) {
-            await _migrateToV5PerformanceIndexes();
+            await _migrateToV5PerformanceIndexes(m);
+          }
+
+          // ───────────────────────────────────────────────────
+          // MIGRATION v5 → v6: Create sync_queue table (STEP 4 fix)
+          // ───────────────────────────────────────────────────
+          if (from < 6) {
+            await _migrateToV6SyncQueueTable();
           }
         },
       );
@@ -1459,12 +1466,36 @@ class AppDatabase extends _$AppDatabase {
 
   /// Migration v4 → v5: Performance indexes for large farms + Phase 2 sync
   ///
-  /// Cette migration ajoute 14 nouveaux indexes pour:
-  /// - Filtrage par status (movements, lots)
-  /// - Support sync Phase 2 (farm_synced indexes)
-  /// - Alertes mouvements temporaires
-  /// - Filtres par âge (birth_date)
-  Future<void> _migrateToV5PerformanceIndexes() async {
+  /// Cette migration:
+  /// - Crée la table sync_queue pour STEP 4
+  /// - Ajoute 14 nouveaux indexes pour:
+  ///   - Filtrage par status (movements, lots)
+  ///   - Support sync Phase 2 (farm_synced indexes)
+  ///   - Alertes mouvements temporaires
+  ///   - Filtres par âge (birth_date)
+  Future<void> _migrateToV5PerformanceIndexes(Migrator m) async {
+    // ─────────────────────────────────────────────────────────
+    // SYNC QUEUE TABLE - STEP 4
+    // ─────────────────────────────────────────────────────────
+    // Use IF NOT EXISTS to be safe in case migration ran partially
+    await customStatement('''
+      CREATE TABLE IF NOT EXISTS sync_queue (
+        id TEXT NOT NULL PRIMARY KEY,
+        farm_id TEXT NOT NULL,
+        entity_type TEXT NOT NULL,
+        entity_id TEXT NOT NULL,
+        action TEXT NOT NULL,
+        payload BLOB NOT NULL,
+        retry_count INTEGER NOT NULL DEFAULT 0,
+        error_message TEXT,
+        last_retry_at INTEGER,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER,
+        synced_at INTEGER,
+        UNIQUE (farm_id, entity_id, action)
+      )
+    ''');
+    await _createSyncQueueIndexes();
     // ─────────────────────────────────────────────────────────
     // ANIMALS - Performance + Sync indexes
     // ─────────────────────────────────────────────────────────
@@ -1519,6 +1550,34 @@ class AppDatabase extends _$AppDatabase {
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_weights_farm_synced ON weights(farm_id, synced)',
     );
+  }
+
+  /// Migration v5 → v6: Create sync_queue table (STEP 4 fix)
+  ///
+  /// Cette migration corrige la migration v5 qui n'avait pas créé la table sync_queue.
+  /// Crée la table avec IF NOT EXISTS pour être safe.
+  Future<void> _migrateToV6SyncQueueTable() async {
+    // Create table with IF NOT EXISTS to be safe
+    await customStatement('''
+      CREATE TABLE IF NOT EXISTS sync_queue (
+        id TEXT NOT NULL PRIMARY KEY,
+        farm_id TEXT NOT NULL,
+        entity_type TEXT NOT NULL,
+        entity_id TEXT NOT NULL,
+        action TEXT NOT NULL,
+        payload BLOB NOT NULL,
+        retry_count INTEGER NOT NULL DEFAULT 0,
+        error_message TEXT,
+        last_retry_at INTEGER,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER,
+        synced_at INTEGER,
+        UNIQUE (farm_id, entity_id, action)
+      )
+    ''');
+
+    // Create indexes
+    await _createSyncQueueIndexes();
   }
 
   // ═══════════════════════════════════════════════════════════
