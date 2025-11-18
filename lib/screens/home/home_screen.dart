@@ -166,28 +166,102 @@ class _HomeScreenState extends State<HomeScreen> {
       final database = context.read<AppDatabase>();
 
       // Générer les données de benchmark
-      final results = await DatabaseInitializer.seedBenchmarkData(database, farmId);
+      final seedResults = await DatabaseInitializer.seedBenchmarkData(database, farmId);
+
+      if (!mounted) return;
+
+      // Mettre à jour le dialog pour les tests
+      Navigator.pop(context);
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: AppConstants.spacingMedium),
+              Text('Exécution des tests de performance...'),
+            ],
+          ),
+        ),
+      );
+
+      // Exécuter les tests de timing
+      final testResults = await DatabaseInitializer.runBenchmarkTests(database, farmId);
 
       if (!mounted) return;
 
       // Fermer le dialog de chargement
       Navigator.pop(context);
 
+      // Calculer le résumé
+      final passed = testResults.values.where((r) => r['passed'] == true).length;
+      final total = testResults.length;
+
+      // Construire le texte des résultats
+      final resultLines = <String>[];
+      testResults.forEach((name, result) {
+        final time = result['time'] as int;
+        final target = result['target'] as int;
+        final isPassed = result['passed'] as bool;
+        final status = isPassed ? '✓' : '✗';
+        resultLines.add('$status $name: ${time}ms/${target}ms');
+      });
+
       // Dialog de fin
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Données générées'),
-          content: Text(
-            'Données de benchmark créées:\n\n'
-            '- ${results['animals']} animaux\n'
-            '- ${results['lots']} lots\n'
-            '- ${results['movements']} mouvements\n'
-            '- ${results['treatments']} traitements\n'
-            '- ${results['vaccinations']} vaccinations\n'
-            '- ${results['weights']} pesées\n\n'
-            'Voir les logs pour le détail.\n'
-            'Réinstallez l\'app pour supprimer les données.',
+          title: Row(
+            children: [
+              Icon(
+                passed == total ? Icons.check_circle : Icons.warning,
+                color: passed == total ? Colors.green : Colors.orange,
+              ),
+              const SizedBox(width: 8),
+              Text('Benchmark: $passed/$total'),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Données créées:',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text('- ${seedResults['animals']} animaux'),
+                Text('- ${seedResults['lots']} lots'),
+                Text('- ${seedResults['movements']} mouvements'),
+                Text('- ${seedResults['treatments']} traitements'),
+                Text('- ${seedResults['vaccinations']} vaccinations'),
+                Text('- ${seedResults['weights']} pesées'),
+                const SizedBox(height: 12),
+                Text(
+                  'Tests de performance:',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                ...resultLines.map((line) => Text(
+                  line,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: line.startsWith('✓') ? Colors.green : Colors.red,
+                  ),
+                )),
+                const SizedBox(height: 12),
+                Text(
+                  'Voir les logs pour le détail complet.',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey[600],
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ),
           ),
           actions: [
             ElevatedButton(
