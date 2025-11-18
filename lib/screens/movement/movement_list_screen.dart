@@ -392,38 +392,19 @@ class _MovementListScreenState extends State<MovementListScreen> {
   /// Vue regroupée: Mouvements groupés par lot
   Widget _buildGroupedView(
       List<Movement> movements, LotProvider lotProvider, AppLocalizations l10n) {
-    // DEBUG: Log movements and lots
-    print('🔍 [GroupedView] ========== DEBUG START ==========');
-    print('🔍 [GroupedView] Total movements: ${movements.length}');
-    print('🔍 [GroupedView] Available lots in provider: ${lotProvider.lots.length}');
-    for (final lot in lotProvider.lots) {
-      print('🔍 [GroupedView] Lot: ${lot.id} - ${lot.name} (status: ${lot.status})');
-    }
-    print('🔍 [GroupedView] Movement details:');
-    for (final m in movements) {
-      print('  - Movement ${m.id}: animalId=${m.animalId}, lotId=${m.lotId ?? "NULL"}, type=${m.type}');
-    }
-
     // Filtrer uniquement les mouvements de lots
     final lotMovements =
         movements.where((m) => m.lotId != null).toList();
-
-    print('🔍 [GroupedView] Movements with lotId: ${lotMovements.length}');
 
     // Grouper par lotId
     final Map<String, List<Movement>> groupedByLot = {};
     for (final movement in lotMovements) {
       final lotId = movement.lotId!;
-      print('🔍 [GroupedView] Found movement with lotId: $lotId');
       if (!groupedByLot.containsKey(lotId)) {
         groupedByLot[lotId] = [];
       }
       groupedByLot[lotId]!.add(movement);
     }
-
-    print('🔍 [GroupedView] Number of lot groups: ${groupedByLot.length}');
-    print('🔍 [GroupedView] Lot IDs found: ${groupedByLot.keys.toList()}');
-    print('🔍 [GroupedView] ========== DEBUG END ==========');
 
     return ListView(
       padding: const EdgeInsets.all(AppConstants.spacingMedium),
