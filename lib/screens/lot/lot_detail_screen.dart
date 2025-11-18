@@ -383,11 +383,11 @@ class LotDetailScreen extends StatelessWidget {
                     Icons.category,
                   ),
                 ],
-                if (lot.priceTotal != null) ...[
+                if (firstMovement?.price != null) ...[
                   const SizedBox(height: AppConstants.spacingSmall),
                   _buildInfoRow(
-                    AppLocalizations.of(context).translate(AppStrings.totalPrice),
-                    '${lot.priceTotal!.toStringAsFixed(2)}€',
+                    AppLocalizations.of(context).translate(AppStrings.pricePerAnimal),
+                    '${firstMovement!.price!.toStringAsFixed(2)}€',
                     Icons.euro,
                   ),
                 ],
