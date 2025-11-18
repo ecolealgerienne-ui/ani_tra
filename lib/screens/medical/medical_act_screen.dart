@@ -211,8 +211,33 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
   void _onProductSelected(MedicalProduct product) {
     setState(() {
       _selectedProduct = product;
-      _selectedRoute = product.defaultAdministrationRoute;
-      _selectedSite = product.defaultInjectionSite;
+
+      // Valider que la route par défaut est dans la liste des options valides
+      final validRoutes = [
+        'IM',
+        'SC',
+        'IV',
+        'ID',
+        AppLocalizations.of(context).translate(AppStrings.oral),
+        AppLocalizations.of(context).translate(AppStrings.topical)
+      ];
+      final defaultRoute = product.defaultAdministrationRoute;
+      _selectedRoute = (defaultRoute != null && validRoutes.contains(defaultRoute))
+          ? defaultRoute
+          : null;
+
+      // Valider que le site par défaut est dans la liste des options valides
+      final validSites = [
+        AppLocalizations.of(context).translate(AppStrings.neck),
+        AppLocalizations.of(context).translate(AppStrings.thigh),
+        AppLocalizations.of(context).translate(AppStrings.flank),
+        AppLocalizations.of(context).translate(AppStrings.hindQuarter),
+        AppLocalizations.of(context).translate(AppStrings.jugularVein)
+      ];
+      final defaultSite = product.defaultInjectionSite;
+      _selectedSite = (defaultSite != null && validSites.contains(defaultSite))
+          ? defaultSite
+          : null;
 
       // Calculer le dosage si animal unitaire avec poids disponible
       if (widget.mode == MedicalActMode.singleAnimal &&
