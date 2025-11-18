@@ -619,19 +619,19 @@ class LotDetailScreen extends StatelessWidget {
                       final lotProvider = context.read<LotProvider>();
                       lotProvider.setActiveLot(lot);
 
-                      for (final animal in result) {
-                        if (!lot.animalIds.contains(animal.id)) {
-                          lotProvider.addAnimalToActiveLot(animal.id);
-                        }
-                      }
+                      // Utiliser la méthode batch pour une opération atomique
+                      final animalIds = result.map((a) => a.id).toList();
+                      final addedCount = await lotProvider.addAnimalsToActiveLot(animalIds);
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                              '${result.length} ${AppLocalizations.of(context).translate(AppStrings.animalsAdded)}'),
-                          backgroundColor: AppConstants.successGreen,
-                        ),
-                      );
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                '$addedCount ${AppLocalizations.of(context).translate(AppStrings.animalsAdded)}'),
+                            backgroundColor: AppConstants.successGreen,
+                          ),
+                        );
+                      }
                     }
                   },
                   icon: const Icon(Icons.qr_code_scanner,

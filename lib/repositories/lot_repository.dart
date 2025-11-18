@@ -259,22 +259,32 @@ class LotRepository {
 
   /// Insérer plusieurs lots (pour migration) avec validation farmId
   Future<void> insertAll(List<Lot> lots, String farmId) async {
+    // Validation préalable
     for (final lot in lots) {
-      // Vérifier que tous les lots appartiennent à cette ferme
       if (lot.farmId != farmId) {
         throw Exception(
             'Farm ID mismatch in lot ${lot.id} - Security violation');
       }
-      await create(lot, farmId);
     }
+
+    // TRANSACTION ATOMIQUE: insertion batch
+    await _database.transaction(() async {
+      for (final lot in lots) {
+        await create(lot, farmId);
+      }
+    });
   }
 
   /// Supprimer tous les lots d'une ferme
   Future<void> deleteAllByFarm(String farmId) async {
     final lots = await findAllByFarm(farmId);
-    for (final lot in lots) {
-      await delete(lot.id, farmId);
-    }
+
+    // TRANSACTION ATOMIQUE: suppression batch
+    await _database.transaction(() async {
+      for (final lot in lots) {
+        await delete(lot.id, farmId);
+      }
+    });
   }
 
   // PHASE 2: ADD - Migration helper (run once to populate status from completed)

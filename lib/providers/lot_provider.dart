@@ -224,6 +224,34 @@ class LotProvider extends ChangeNotifier {
     }
   }
 
+  /// Ajouter plusieurs animaux au lot actif en une seule opération atomique
+  Future<int> addAnimalsToActiveLot(List<String> animalIds) async {
+    final lot = _activeLot;
+    if (lot == null || lot.status != LotStatus.open) return 0;
+
+    // Filtrer les animaux déjà dans le lot
+    final newIds = animalIds.where((id) => !lot.animalIds.contains(id)).toList();
+    if (newIds.isEmpty) return 0;
+
+    final updatedIds = [...lot.animalIds, ...newIds];
+    final updated = lot.copyWith(animalIds: updatedIds);
+
+    // ✅ ÉTAPE 1: Mettre à jour _activeLot IMMÉDIATEMENT
+    _activeLot = updated;
+    notifyListeners();
+
+    // ✅ ÉTAPE 2: Sauvegarder en DB (opération atomique via repository)
+    try {
+      await updateLot(updated);
+      return newIds.length;
+    } catch (e) {
+      // ✅ ÉTAPE 3: Si la sauvegarde échoue, rollback à l'état précédent
+      _activeLot = lot;
+      notifyListeners();
+      return 0;
+    }
+  }
+
   Future<bool> removeAnimalFromActiveLot(String animalId) async {
     final lot = _activeLot;
     if (lot == null || lot.status != LotStatus.open) return false;
