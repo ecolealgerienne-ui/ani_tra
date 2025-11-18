@@ -383,13 +383,19 @@ class LotDetailScreen extends StatelessWidget {
                     Icons.category,
                   ),
                 ],
-                if (firstMovement?.price != null) ...[
+                // Calculer le prix total du lot (somme des prix de tous les mouvements)
+                if (lotMovements.any((m) => m.price != null)) ...[
                   const SizedBox(height: AppConstants.spacingSmall),
-                  _buildInfoRow(
-                    AppLocalizations.of(context).translate(AppStrings.pricePerAnimal),
-                    '${firstMovement!.price!.toStringAsFixed(2)}€',
-                    Icons.euro,
-                  ),
+                  Builder(builder: (context) {
+                    final totalPrice = lotMovements
+                        .where((m) => m.price != null)
+                        .fold<double>(0.0, (sum, m) => sum + m.price!);
+                    return _buildInfoRow(
+                      AppLocalizations.of(context).translate(AppStrings.totalPrice),
+                      '${totalPrice.toStringAsFixed(2)}€',
+                      Icons.euro,
+                    );
+                  }),
                 ],
                 if (lot.completedAt != null) ...[
                   const SizedBox(height: AppConstants.spacingSmall),
