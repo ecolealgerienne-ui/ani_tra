@@ -1,7 +1,9 @@
 // lib/database_initializer.dart
+import 'dart:math';
 import 'package:drift/drift.dart';
 import 'package:animal_trace/drift/database.dart';
 import 'package:animal_trace/models/animal.dart';
+import 'package:animal_trace/utils/constants.dart';
 
 class DatabaseInitializer {
   static const String _tag = '🗄️ DatabaseInitializer';
@@ -1314,5 +1316,255 @@ class DatabaseInitializer {
     } catch (e) {
       print('$_tag ❌ Fatal error during seeding: $e');
     }
+  }
+
+  /// Génère des données de benchmark pour tester les performances
+  ///
+  /// Utilise les constantes de AppConstants pour déterminer les quantités:
+  /// - Light mode: 1000 animaux
+  /// - Full mode: 5000 animaux
+  static Future<Map<String, int>> seedBenchmarkData(AppDatabase db, String farmId) async {
+    final random = Random();
+    final now = DateTime.now();
+    final isLightMode = AppConstants.kBenchmarkLightMode;
+
+    final animalCount = isLightMode
+        ? AppConstants.benchmarkLightAnimals
+        : AppConstants.benchmarkFullAnimals;
+    final movementCount = isLightMode
+        ? AppConstants.benchmarkLightMovements
+        : AppConstants.benchmarkFullMovements;
+    final lotCount = isLightMode
+        ? AppConstants.benchmarkLightLots
+        : AppConstants.benchmarkFullLots;
+    final treatmentCount = isLightMode
+        ? AppConstants.benchmarkLightTreatments
+        : AppConstants.benchmarkFullTreatments;
+    final vaccinationCount = isLightMode
+        ? AppConstants.benchmarkLightVaccinations
+        : AppConstants.benchmarkFullVaccinations;
+    final weightCount = isLightMode
+        ? AppConstants.benchmarkLightWeights
+        : AppConstants.benchmarkFullWeights;
+
+    print('$_tag ═══════════════════════════════════════');
+    print('$_tag BENCHMARK DATA GENERATION - ${isLightMode ? "LIGHT" : "FULL"} MODE');
+    print('$_tag ═══════════════════════════════════════');
+
+    final animalIds = <String>[];
+    final species = ['sheep', 'cattle', 'goat'];
+    final breeds = {
+      'sheep': ['merinos', 'suffolk', 'lacaune'],
+      'cattle': ['holstein', 'charolais', 'limousin'],
+      'goat': ['alpine', 'saanen', 'angora'],
+    };
+
+    // 1. Générer les animaux
+    print('$_tag Generating $animalCount animals...');
+    for (int i = 0; i < animalCount; i++) {
+      final id = 'bench_animal_${i.toString().padLeft(6, '0')}';
+      final speciesId = species[random.nextInt(species.length)];
+      final breedList = breeds[speciesId]!;
+      final breedId = breedList[random.nextInt(breedList.length)];
+
+      await db.animalDao.insertItem(AnimalsTableCompanion.insert(
+        id: id,
+        farmId: farmId,
+        currentEid: Value('BENCH_${i.toString().padLeft(6, '0')}'),
+        officialNumber: Value('FR${random.nextInt(999999999).toString().padLeft(9, '0')}'),
+        birthDate: now.subtract(Duration(days: random.nextInt(1825) + 30)),
+        sex: random.nextBool() ? AnimalSex.male.name : AnimalSex.female.name,
+        status: AnimalStatus.alive.name,
+        speciesId: Value(speciesId),
+        breedId: Value(breedId),
+        visualId: Value('V${i.toString().padLeft(4, '0')}'),
+        synced: const Value(false),
+        createdAt: now,
+        updatedAt: now,
+      ));
+      animalIds.add(id);
+
+      if ((i + 1) % 100 == 0) {
+        print('$_tag   Animals: ${i + 1}/$animalCount');
+      }
+    }
+    print('$_tag ✓ Animals generated: ${animalIds.length}');
+
+    // 2. Générer les lots
+    print('$_tag Generating $lotCount lots...');
+    for (int i = 0; i < lotCount; i++) {
+      final id = 'bench_lot_${i.toString().padLeft(4, '0')}';
+
+      await db.lotDao.insertLot(LotsTableCompanion.insert(
+        id: id,
+        farmId: farmId,
+        name: 'Benchmark Lot #${i + 1}',
+        status: Value(random.nextInt(10) < 8 ? 'open' : 'closed'),
+        completed: const Value(false),
+        synced: const Value(false),
+        createdAt: now.subtract(Duration(days: random.nextInt(365))),
+        updatedAt: now,
+      ));
+
+      // Assigner 5-20 animaux par lot
+      final lotAnimalCount = random.nextInt(16) + 5;
+      final lotAnimalIds = <String>[];
+      for (int j = 0; j < lotAnimalCount && j < animalIds.length; j++) {
+        final randomIndex = random.nextInt(animalIds.length);
+        if (!lotAnimalIds.contains(animalIds[randomIndex])) {
+          lotAnimalIds.add(animalIds[randomIndex]);
+        }
+      }
+      if (lotAnimalIds.isNotEmpty) {
+        await db.lotAnimalDao.addAnimalsToLot(id, lotAnimalIds);
+      }
+
+      if ((i + 1) % 50 == 0) {
+        print('$_tag   Lots: ${i + 1}/$lotCount');
+      }
+    }
+    print('$_tag ✓ Lots generated: $lotCount');
+
+    // 3. Générer les mouvements
+    print('$_tag Generating $movementCount movements...');
+    final movementTypes = ['birth', 'purchase', 'sale', 'death'];
+    for (int i = 0; i < movementCount; i++) {
+      final id = 'bench_mov_${i.toString().padLeft(6, '0')}';
+      final animalId = animalIds[random.nextInt(animalIds.length)];
+      final type = movementTypes[random.nextInt(movementTypes.length)];
+
+      await db.movementDao.insertItem(MovementsTableCompanion.insert(
+        id: id,
+        farmId: farmId,
+        animalId: animalId,
+        type: type,
+        movementDate: now.subtract(Duration(days: random.nextInt(365))),
+        status: type == 'death' || type == 'birth' ? 'closed' : 'ongoing',
+        price: Value(type == 'sale' || type == 'purchase'
+            ? (random.nextDouble() * 500 + 100)
+            : null),
+        notes: Value('Benchmark movement #${i + 1}'),
+        synced: const Value(false),
+        createdAt: now,
+        updatedAt: now,
+      ));
+
+      if ((i + 1) % 500 == 0) {
+        print('$_tag   Movements: ${i + 1}/$movementCount');
+      }
+    }
+    print('$_tag ✓ Movements generated: $movementCount');
+
+    // 4. Générer les traitements
+    print('$_tag Generating $treatmentCount treatments...');
+    final products = [
+      ('prod_treat_001', 'Amoxicilline 500mg'),
+      ('prod_treat_002', 'Ivermectine 1%'),
+      ('prod_treat_003', 'Anti-inflammatoire'),
+    ];
+    for (int i = 0; i < treatmentCount; i++) {
+      final id = 'bench_treat_${i.toString().padLeft(5, '0')}';
+      final animalId = animalIds[random.nextInt(animalIds.length)];
+      final product = products[random.nextInt(products.length)];
+      final treatmentDate = now.subtract(Duration(days: random.nextInt(90)));
+      final withdrawalDays = random.nextInt(21) + 7;
+
+      await db.treatmentDao.insertItem(TreatmentsTableCompanion.insert(
+        id: id,
+        farmId: farmId,
+        animalId: animalId,
+        productId: product.$1,
+        productName: product.$2,
+        treatmentDate: treatmentDate,
+        dose: (random.nextInt(10) + 1).toDouble(),
+        withdrawalEndDate: treatmentDate.add(Duration(days: withdrawalDays)),
+        notes: Value('Benchmark treatment #${i + 1}'),
+        synced: const Value(false),
+        createdAt: now,
+        updatedAt: now,
+      ));
+
+      if ((i + 1) % 200 == 0) {
+        print('$_tag   Treatments: ${i + 1}/$treatmentCount');
+      }
+    }
+    print('$_tag ✓ Treatments generated: $treatmentCount');
+
+    // 5. Générer les vaccinations
+    print('$_tag Generating $vaccinationCount vaccinations...');
+    final vaccines = [
+      ('Vaccin Entérotoxémie', 'Entérotoxémie'),
+      ('Vaccin Pasteurellose', 'Pasteurellose'),
+      ('Vaccin Ectima', 'Ectima Contagieux'),
+    ];
+    final routes = ['sous-cutanée', 'intramusculaire', 'intradermique'];
+    final types = ['obligatoire', 'recommandee', 'optionnelle'];
+    for (int i = 0; i < vaccinationCount; i++) {
+      final id = 'bench_vacc_${i.toString().padLeft(5, '0')}';
+      final animalId = animalIds[random.nextInt(animalIds.length)];
+      final vaccine = vaccines[random.nextInt(vaccines.length)];
+      final vaccinationDate = now.subtract(Duration(days: random.nextInt(180)));
+
+      await db.vaccinationDao.insertItem(VaccinationsTableCompanion.insert(
+        id: id,
+        farmId: farmId,
+        animalIds: '["$animalId"]',
+        vaccineName: vaccine.$1,
+        type: types[random.nextInt(types.length)],
+        disease: vaccine.$2,
+        vaccinationDate: vaccinationDate,
+        dose: '${random.nextInt(5) + 1} ml',
+        administrationRoute: routes[random.nextInt(routes.length)],
+        withdrawalPeriodDays: 0,
+        notes: Value('Benchmark vaccination #${i + 1}'),
+        synced: const Value(false),
+        createdAt: now,
+        updatedAt: now,
+      ));
+
+      if ((i + 1) % 200 == 0) {
+        print('$_tag   Vaccinations: ${i + 1}/$vaccinationCount');
+      }
+    }
+    print('$_tag ✓ Vaccinations generated: $vaccinationCount');
+
+    // 6. Générer les pesées
+    print('$_tag Generating $weightCount weights...');
+    final weightSources = ['scale', 'manual', 'estimation'];
+    for (int i = 0; i < weightCount; i++) {
+      final id = 'bench_weight_${i.toString().padLeft(6, '0')}';
+      final animalId = animalIds[random.nextInt(animalIds.length)];
+
+      await db.weightDao.insertItem(WeightsTableCompanion.insert(
+        id: id,
+        farmId: farmId,
+        animalId: animalId,
+        recordedAt: now.subtract(Duration(days: random.nextInt(365))),
+        weight: random.nextDouble() * 150 + 20,
+        source: weightSources[random.nextInt(weightSources.length)],
+        notes: Value('Benchmark weight #${i + 1}'),
+        synced: const Value(false),
+        createdAt: now,
+        updatedAt: now,
+      ));
+
+      if ((i + 1) % 1000 == 0) {
+        print('$_tag   Weights: ${i + 1}/$weightCount');
+      }
+    }
+    print('$_tag ✓ Weights generated: $weightCount');
+
+    print('$_tag ═══════════════════════════════════════');
+    print('$_tag BENCHMARK DATA COMPLETE');
+    print('$_tag ═══════════════════════════════════════');
+
+    return {
+      'animals': animalIds.length,
+      'lots': lotCount,
+      'movements': movementCount,
+      'treatments': treatmentCount,
+      'vaccinations': vaccinationCount,
+      'weights': weightCount,
+    };
   }
 }
