@@ -55,7 +55,7 @@ class SyncApiClient {
   Future<SyncItemResponse> syncItem(SyncBatchItem item) async {
     final token = await _authService.getValidToken();
     if (token == null) {
-      return SyncItemResponse.authError('Not authenticated');
+      return SyncItemResponse.authError(item.entityId, 'Not authenticated');
     }
 
     try {

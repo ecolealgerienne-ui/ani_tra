@@ -72,8 +72,9 @@ class SyncService {
 
     try {
       // Vérifier la connectivité
-      final connectivityResult = await _connectivity.checkConnectivity();
-      if (connectivityResult == ConnectivityResult.none) {
+      final connectivityResults = await _connectivity.checkConnectivity();
+      if (connectivityResults.contains(ConnectivityResult.none) ||
+          connectivityResults.isEmpty) {
         SyncConfig.log('No network connectivity');
         _lastStatus = SyncStatus.noNetwork;
         return SyncResult.noNetwork();
