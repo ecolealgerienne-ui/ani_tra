@@ -19,8 +19,7 @@ import '../../providers/farm_preferences_provider.dart';
 import '../../providers/species_provider.dart';
 //import 'universal_scanner_screen.dart';
 import 'animal_finder_screen.dart';
-import '../../services/atomic_operation_service.dart';
-import '../../providers/auth_provider.dart';
+import '../../drift/database.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
@@ -291,6 +290,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
     try {
       final animalProvider = context.read<AnimalProvider>();
       final syncProvider = context.read<SyncProvider>();
+      final db = context.read<AppDatabase>();
 
       // 1. CrÃƒÂ©er ou éditer l'animal
       final animal = _isEditMode
@@ -331,9 +331,6 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
               visualId: _visualIdController.text.trim().isNotEmpty
                   ? _visualIdController.text.trim()
                   : null,
-              notes: _notesController.text.trim().isNotEmpty
-                  ? _notesController.text.trim()
-                  : null,
             );
 
       // Mode édition : mettre à jour l'animal
@@ -352,39 +349,16 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
         return; // Ne pas créer de mouvement en édition
       }
 
-      // 2. Créer l'animal (et mouvement pour Achat)
+      // Mode création : ajouter l'animal
       // NOTE: Birth is NOT a business movement - only Purchase creates a movement
       final isPurchase = _selectedOrigin ==
           AppLocalizations.of(context).translate(AppStrings.purchase);
 
       if (isPurchase) {
-        // TRANSACTION ATOMIQUE: Créer l'animal ET le mouvement d'achat
-        // Si une erreur survient, les deux opérations sont annulées (rollback)
-        final atomicService = context.read<AtomicOperationService>();
-        final authProvider = context.read<AuthProvider>();
+        // TRANSACTION ATOMIQUE: création animal + mouvement achat
+        await db.transaction(() async {
+          await animalProvider.addAnimal(animal);
 
-        await atomicService.executeInTransaction(() async {
-          // Ajouter l'animal avec le bon farmId
-          final animalWithFarmId = Animal(
-            id: animal.id,
-            farmId: authProvider.currentFarmId,
-            currentEid: animal.currentEid,
-            officialNumber: animal.officialNumber,
-            visualId: animal.visualId,
-            birthDate: animal.birthDate,
-            sex: animal.sex,
-            motherId: animal.motherId,
-            status: animal.status,
-            validatedAt: animal.validatedAt,
-            speciesId: animal.speciesId,
-            breedId: animal.breedId,
-            notes: animal.notes,
-            createdAt: animal.createdAt,
-            updatedAt: animal.updatedAt,
-          );
-          await animalProvider.addAnimal(animalWithFarmId);
-
-          // Créer le mouvement d'achat
           final movement = Movement(
             id: _generateId(),
             type: MovementType.purchase,
@@ -407,7 +381,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
           await movementProvider.addMovement(movement);
         });
       } else {
-        // Mode création simple (naissance) : ajouter l'animal uniquement
+        // Naissance simple : pas de mouvement
         await animalProvider.addAnimal(animal);
       }
 

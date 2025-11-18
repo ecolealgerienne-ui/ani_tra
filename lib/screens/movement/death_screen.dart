@@ -7,8 +7,9 @@ import 'dart:math';
 import '../../providers/animal_provider.dart';
 import '../../providers/movement_provider.dart';
 import '../../providers/sync_provider.dart';
-import '../../services/atomic_operation_service.dart';
+import '../../drift/database.dart';
 import '../../models/animal.dart';
+import '../../models/movement.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
@@ -96,28 +97,34 @@ class _DeathScreenState extends State<DeathScreen> {
     final animalProvider = context.read<AnimalProvider>();
     final movementProvider = context.read<MovementProvider>();
     final syncProvider = context.read<SyncProvider>();
-    final atomicService = context.read<AtomicOperationService>();
+    final db = context.read<AppDatabase>();
 
     try {
-      // TRANSACTION ATOMIQUE: Enregistrer la mort
-      // Si une erreur survient, toutes les opérations sont annulées (rollback)
-      await atomicService.executeDeathRegistration(
-        farmId: animal.farmId,
-        animalId: animal.id,
-        deathDate: _deathDate,
-        notes: _notesController.text.isEmpty
-            ? AppLocalizations.of(context)
-                .translate(AppStrings.causeNotSpecified)
-            : _notesController.text,
-      );
+      // TRANSACTION ATOMIQUE: enregistrement mort
+      await db.transaction(() async {
+        // Create death movement
+        final movement = Movement(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          animalId: animal.id,
+          type: MovementType.death,
+          movementDate: _deathDate,
+          notes: _notesController.text.isEmpty
+              ? AppLocalizations.of(context)
+                  .translate(AppStrings.causeNotSpecified)
+              : _notesController.text,
+          createdAt: DateTime.now(),
+        );
 
-      debugPrint('✅ Animal ${animal.id} marked as dead in DB (atomic transaction)');
+        await movementProvider.addMovement(movement);
+
+        // Mettre à jour le statut de l'animal à "mort"
+        final updatedAnimal = animal.copyWith(status: AnimalStatus.dead);
+        await animalProvider.updateAnimal(updatedAnimal);
+      });
+
+      debugPrint('✅ Animal ${animal.id} marked as dead in DB and provider');
 
       syncProvider.incrementPendingData();
-
-      // Rafraîchir les providers pour refléter les changements
-      await animalProvider.refresh(forceRefresh: true);
-      await movementProvider.refresh();
 
       if (!mounted) return;
 
