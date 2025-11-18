@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 import '../models/alert_configuration.dart';
 import '../repositories/alert_configuration_repository.dart';
+import '../drift/database.dart';
 import 'auth_provider.dart';
 import '../i18n/app_strings.dart';
 
@@ -12,6 +13,7 @@ import '../i18n/app_strings.dart';
 class AlertConfigurationProvider with ChangeNotifier {
   final AuthProvider _authProvider;
   final AlertConfigurationRepository _repository;
+  final AppDatabase _database;
   String _currentFarmId;
 
   // Données principales (cache local)
@@ -20,7 +22,7 @@ class AlertConfigurationProvider with ChangeNotifier {
   // Loading state
   bool _isLoading = false;
 
-  AlertConfigurationProvider(this._authProvider, this._repository)
+  AlertConfigurationProvider(this._authProvider, this._repository, this._database)
       : _currentFarmId = _authProvider.currentFarmId {
     _authProvider.addListener(_onFarmChanged);
     _loadConfigurationsFromRepository();
@@ -156,9 +158,12 @@ class AlertConfigurationProvider with ChangeNotifier {
   /// Active toutes les configurations de la ferme
   Future<void> enableAll() async {
     try {
-      for (final config in configurations.where((c) => !c.enabled)) {
-        await toggleEnabled(config.id, true);
-      }
+      // TRANSACTION ATOMIQUE: activation batch
+      await _database.transaction(() async {
+        for (final config in configurations.where((c) => !c.enabled)) {
+          await toggleEnabled(config.id, true);
+        }
+      });
     } catch (e) {
       rethrow;
     }
@@ -167,9 +172,12 @@ class AlertConfigurationProvider with ChangeNotifier {
   /// Désactive toutes les configurations de la ferme
   Future<void> disableAll() async {
     try {
-      for (final config in configurations.where((c) => c.enabled)) {
-        await toggleEnabled(config.id, false);
-      }
+      // TRANSACTION ATOMIQUE: désactivation batch
+      await _database.transaction(() async {
+        for (final config in configurations.where((c) => c.enabled)) {
+          await toggleEnabled(config.id, false);
+        }
+      });
     } catch (e) {
       rethrow;
     }

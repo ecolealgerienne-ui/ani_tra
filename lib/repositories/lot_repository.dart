@@ -9,11 +9,13 @@ import 'package:drift/drift.dart' as drift;
 /// Phase 1C: Avec security checks farmId + Phase 1B: LotStatus support
 /// Phase 1D: Utilise lot_animals table de liaison
 class LotRepository {
+  final AppDatabase _database;
   final LotDao _dao;
   final LotAnimalDao _lotAnimalDao;
 
   LotRepository(AppDatabase database)
-      : _dao = database.lotDao,
+      : _database = database,
+        _dao = database.lotDao,
         _lotAnimalDao = database.lotAnimalDao;
 
   // ==================== CRUD Operations ====================
@@ -108,13 +110,16 @@ class LotRepository {
       throw Exception('Farm ID mismatch - Security violation');
     }
 
-    final companion = _toCompanion(lot, isUpdate: false);
-    await _dao.insertLot(companion);
+    // TRANSACTION ATOMIQUE: création lot + ajout animaux
+    await _database.transaction(() async {
+      final companion = _toCompanion(lot, isUpdate: false);
+      await _dao.insertLot(companion);
 
-    // Sauvegarder les animalIds dans lot_animals
-    if (lot.animalIds.isNotEmpty) {
-      await _lotAnimalDao.addAnimalsToLot(lot.id, lot.animalIds);
-    }
+      // Sauvegarder les animalIds dans lot_animals
+      if (lot.animalIds.isNotEmpty) {
+        await _lotAnimalDao.addAnimalsToLot(lot.id, lot.animalIds);
+      }
+    });
 
     return lot;
   }

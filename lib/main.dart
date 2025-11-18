@@ -262,11 +262,13 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProxyProvider<AuthProvider, AlertConfigurationProvider>(
           create: (context) => AlertConfigurationProvider(
               context.read<AuthProvider>(),
-              context.read<AlertConfigurationRepository>()),
+              context.read<AlertConfigurationRepository>(),
+              context.read<AppDatabase>()),
           update: (context, auth, previous) =>
               previous ??
               AlertConfigurationProvider(
-                  auth, context.read<AlertConfigurationRepository>()),
+                  auth, context.read<AlertConfigurationRepository>(),
+                  context.read<AppDatabase>()),
         ),
 
         // === AnimalProvider (charge depuis DB) ===
