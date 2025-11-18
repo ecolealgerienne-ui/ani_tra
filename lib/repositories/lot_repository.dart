@@ -216,6 +216,7 @@ class LotRepository {
   }
 
   /// Ajouter un animal au lot avec security check
+  /// STEP4: Déclenche sync du lot avec liste d'animaux mise à jour
   Future<void> addAnimalToLot(
       String lotId, String animalId, String farmId) async {
     // Security check
@@ -224,10 +225,17 @@ class LotRepository {
       throw Exception('Lot not found or farm mismatch - Security violation');
     }
 
-    await _lotAnimalDao.addAnimalToLot(lotId, animalId);
+    await _database.transaction(() async {
+      await _lotAnimalDao.addAnimalToLot(lotId, animalId);
+
+      // STEP4: Enqueue lot update avec nouvelle liste d'animaux
+      final updatedLot = await _toLotWithAnimals(existing);
+      await _syncQueue.enqueueLot(farmId, updatedLot, SyncAction.update);
+    });
   }
 
   /// Retirer un animal du lot avec security check
+  /// STEP4: Déclenche sync du lot avec liste d'animaux mise à jour
   Future<void> removeAnimalFromLot(
       String lotId, String animalId, String farmId) async {
     // Security check
@@ -236,7 +244,13 @@ class LotRepository {
       throw Exception('Lot not found or farm mismatch - Security violation');
     }
 
-    await _lotAnimalDao.removeAnimalFromLot(lotId, animalId);
+    await _database.transaction(() async {
+      await _lotAnimalDao.removeAnimalFromLot(lotId, animalId);
+
+      // STEP4: Enqueue lot update avec nouvelle liste d'animaux
+      final updatedLot = await _toLotWithAnimals(existing);
+      await _syncQueue.enqueueLot(farmId, updatedLot, SyncAction.update);
+    });
   }
 
   /// Définir le type du lot avec security check

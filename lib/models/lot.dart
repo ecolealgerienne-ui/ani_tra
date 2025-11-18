@@ -325,7 +325,7 @@ class Lot implements SyncableEntity {
   // ==================== Sérialisation ====================
 
   /// Convertir en JSON
-  /// NOTE: animalIds n'est PAS inclus car géré via table lot_animals
+  /// STEP4: animalIds inclus pour sync (liste des IDs d'animaux du lot)
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -335,6 +335,8 @@ class Lot implements SyncableEntity {
       'status': status?.name,
       'completed': completed,
       'completedAt': completedAt?.toIso8601String(),
+      // Animals - STEP4: Inclus pour sync
+      'animalIds': animalIds,
       // Traitement
       'productId': productId,
       'productName': productName,
@@ -368,7 +370,9 @@ class Lot implements SyncableEntity {
       type: json['type'] != null
           ? LotType.values.firstWhere((e) => e.name == json['type'])
           : null,
-      animalIds: const [], // NOTE: Chargé séparément via LotRepository depuis lot_animals
+      animalIds: json['animalIds'] != null
+          ? List<String>.from(json['animalIds'])
+          : const [], // STEP4: Chargé depuis JSON ou via LotRepository
       status: json['status'] != null
           ? LotStatus.values.firstWhere((e) => e.name == json['status'],
               orElse: () => (json['completed'] ?? false)
