@@ -1170,131 +1170,12 @@ class DatabaseInitializer {
       }
 
       // ════════════════════════════════════════════════════════════
-      // ALERT CONFIGURATIONS (Keep existing)
+      // ALERT CONFIGURATIONS
       // ════════════════════════════════════════════════════════════
-
-      print('$_tag   🔔 Creating alert configurations...');
-      try {
-        // Remanence Alert Config
-        await db.alertConfigurationDao
-            .insertItem(AlertConfigurationsTableCompanion.insert(
-          id: 'config_remanence_1',
-          farmId: 'farm_default',
-          evaluationType: 'remanence',
-          type: 'important',
-          category: 'remanence',
-          titleKey: 'alertRemanenceTitle',
-          messageKey: 'alertRemanenceMsg',
-          severity: 2,
-          iconName: 'pill',
-          colorHex: '#F57C00',
-          enabled: const Value(true),
-          synced: const Value(false),
-          createdAt: now,
-          updatedAt: now,
-        ));
-
-        // Weighing Alert Config
-        await db.alertConfigurationDao
-            .insertItem(AlertConfigurationsTableCompanion.insert(
-          id: 'config_weighing_1',
-          farmId: 'farm_default',
-          evaluationType: 'weighing',
-          type: 'routine',
-          category: 'weighing',
-          titleKey: 'alertWeighingTitle',
-          messageKey: 'alertWeighingMsg',
-          severity: 1,
-          iconName: 'scale',
-          colorHex: '#1976D2',
-          enabled: const Value(true),
-          synced: const Value(false),
-          createdAt: now,
-          updatedAt: now,
-        ));
-
-        // Vaccination Alert Config
-        await db.alertConfigurationDao
-            .insertItem(AlertConfigurationsTableCompanion.insert(
-          id: 'config_vaccination_1',
-          farmId: 'farm_default',
-          evaluationType: 'vaccination',
-          type: 'important',
-          category: 'treatment',
-          titleKey: 'alertVaccinationTitle',
-          messageKey: 'alertVaccinationMsg',
-          severity: 2,
-          iconName: 'syringe',
-          colorHex: '#D32F2F',
-          enabled: const Value(true),
-          synced: const Value(false),
-          createdAt: now,
-          updatedAt: now,
-        ));
-
-        // Identification Alert Config
-        await db.alertConfigurationDao
-            .insertItem(AlertConfigurationsTableCompanion.insert(
-          id: 'config_identification_1',
-          farmId: 'farm_default',
-          evaluationType: 'identification',
-          type: 'urgent',
-          category: 'identification',
-          titleKey: 'alertIdentificationTitle',
-          messageKey: 'alertIdentificationMsg',
-          severity: 3,
-          iconName: 'tag',
-          colorHex: '#E53935',
-          enabled: const Value(true),
-          synced: const Value(false),
-          createdAt: now,
-          updatedAt: now,
-        ));
-
-        // Sync Required Alert Config
-        await db.alertConfigurationDao
-            .insertItem(AlertConfigurationsTableCompanion.insert(
-          id: 'config_sync_1',
-          farmId: 'farm_default',
-          evaluationType: 'syncRequired',
-          type: 'routine',
-          category: 'sync',
-          titleKey: 'alertSyncTitle',
-          messageKey: 'alertSyncMsg',
-          severity: 1,
-          iconName: 'cloud_upload',
-          colorHex: '#0288D1',
-          enabled: const Value(true),
-          synced: const Value(false),
-          createdAt: now,
-          updatedAt: now,
-        ));
-
-        // Treatment Renewal Alert Config
-        await db.alertConfigurationDao
-            .insertItem(AlertConfigurationsTableCompanion.insert(
-          id: 'config_treatment_renewal_1',
-          farmId: 'farm_default',
-          evaluationType: 'treatmentRenewal',
-          type: 'routine',
-          category: 'treatment',
-          titleKey: 'alertTreatmentRenewalTitle',
-          messageKey: 'alertTreatmentRenewalMsg',
-          severity: 1,
-          iconName: 'medication',
-          colorHex: '#0097A7',
-          enabled: const Value(true),
-          synced: const Value(false),
-          createdAt: now,
-          updatedAt: now,
-        ));
-
-        // Note: Configuration alerte "Batch to Finalize" supprimée (batches supprimés)
-
-        print('$_tag   ✅ Created 6 alert configurations');
-      } catch (e) {
-        print('$_tag   ❌ Error creating alert configs: $e');
-      }
+      // Note: Les configurations d'alertes sont maintenant créées automatiquement
+      // par AlertConfigurationRepository.ensureDefaultConfigs() lors du premier
+      // accès à chaque ferme. Cela garantit que toutes les fermes ont leurs
+      // 8 configurations d'alertes par défaut.
 
       print('$_tag ✅ Comprehensive test data seeding complete!');
       print('');
@@ -1309,7 +1190,7 @@ class DatabaseInitializer {
       print('$_tag   - 15 Treatments (active/expired withdrawal)');
       print('$_tag   - 11 Vaccinations (recent/batch/old)');
       print('$_tag   - 35 Weight Records (growth tracking)');
-      print('$_tag   - 6 Alert Configurations');
+      print('$_tag   - Alert Configurations (created dynamically per farm)');
       print('');
     } catch (e) {
       print('$_tag ❌ Fatal error during seeding: $e');
