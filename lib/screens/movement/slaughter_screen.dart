@@ -33,6 +33,7 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _slaughterhouseNameController = TextEditingController();
   final _slaughterhouseIdController = TextEditingController();
+  final _notesController = TextEditingController();
   DateTime _slaughterDate = DateTime.now();
   bool _isConfirming = false;
 
@@ -40,6 +41,7 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
   void dispose() {
     _slaughterhouseNameController.dispose();
     _slaughterhouseIdController.dispose();
+    _notesController.dispose();
     super.dispose();
   }
 
@@ -53,8 +55,8 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
     final syncProvider = context.read<SyncProvider>();
 
     try {
-      // Build notes with slaughterhouse info
-      final notesText = 'Abattoir: ${_slaughterhouseNameController.text}${_slaughterhouseIdController.text.isNotEmpty ? ' (N°${_slaughterhouseIdController.text})' : ''}';
+      // Utiliser les notes saisies par l'utilisateur
+      final notesText = _notesController.text.isNotEmpty ? _notesController.text : null;
 
       // Cas 1 : Un seul animal passé directement
       if (widget.animal != null) {
@@ -241,6 +243,21 @@ class _SlaughterScreenState extends State<SlaughterScreen> {
                   setState(() => _slaughterDate = date);
                 }
               },
+            ),
+            const SizedBox(height: AppConstants.spacingMedium),
+
+            // Notes (optionnel)
+            TextField(
+              controller: _notesController,
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)
+                    .translate(AppStrings.notes),
+                hintText: '(${AppLocalizations.of(context).translate(AppStrings.optional).toLowerCase()})',
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.note),
+                alignLabelWithHint: true,
+              ),
             ),
 
             const SizedBox(height: AppConstants.spacingLarge),

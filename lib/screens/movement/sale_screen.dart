@@ -34,6 +34,7 @@ class _SaleScreenState extends State<SaleScreen> {
   final _buyerNameController = TextEditingController();
   final _buyerFarmIdController = TextEditingController();
   final _pricePerAnimalController = TextEditingController();
+  final _notesController = TextEditingController();
   DateTime _saleDate = DateTime.now();
   bool _isConfirming = false;
 
@@ -42,6 +43,7 @@ class _SaleScreenState extends State<SaleScreen> {
     _buyerNameController.dispose();
     _buyerFarmIdController.dispose();
     _pricePerAnimalController.dispose();
+    _notesController.dispose();
     super.dispose();
   }
 
@@ -61,14 +63,8 @@ class _SaleScreenState extends State<SaleScreen> {
         price = double.tryParse(_pricePerAnimalController.text);
       }
 
-      // Build notes with buyer info
-      String notesText = 'Acheteur: ${_buyerNameController.text}';
-      if (_buyerFarmIdController.text.isNotEmpty) {
-        notesText += ' (N°${_buyerFarmIdController.text})';
-      }
-      if (price != null) {
-        notesText += ' - Prix: ${price.toStringAsFixed(2)}€';
-      }
+      // Utiliser les notes saisies par l'utilisateur
+      final notesText = _notesController.text.isNotEmpty ? _notesController.text : null;
 
       // Cas 1 : Un seul animal passé directement
       if (widget.animal != null) {
@@ -284,6 +280,21 @@ class _SaleScreenState extends State<SaleScreen> {
                   setState(() => _saleDate = date);
                 }
               },
+            ),
+            const SizedBox(height: AppConstants.spacingMedium),
+
+            // Notes (optionnel)
+            TextField(
+              controller: _notesController,
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)
+                    .translate(AppStrings.notes),
+                hintText: '(${AppLocalizations.of(context).translate(AppStrings.optional).toLowerCase()})',
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.note),
+                alignLabelWithHint: true,
+              ),
             ),
 
             const SizedBox(height: AppConstants.spacingLarge),
