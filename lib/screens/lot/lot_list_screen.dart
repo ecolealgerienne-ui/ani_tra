@@ -5,7 +5,9 @@ import 'package:intl/intl.dart';
 
 import '../../providers/lot_provider.dart';
 import '../../providers/animal_provider.dart';
+import '../../providers/movement_provider.dart';
 import '../../models/lot.dart';
+import '../../models/movement.dart';
 import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
@@ -435,8 +437,8 @@ class _LotListScreenState extends State<LotListScreen> {
         tooltip: AppLocalizations.of(context).translate(AppStrings.createLot),
         child: const Icon(Icons.add),
       ),
-      body: Consumer<LotProvider>(
-        builder: (context, lotProvider, _) {
+      body: Consumer2<LotProvider, MovementProvider>(
+        builder: (context, lotProvider, movementProvider, _) {
           // PHASE 1B: Get lots based on selected status
           final lots = _selectedStatus == LotStatus.open
               ? lotProvider.openLots
@@ -444,13 +446,13 @@ class _LotListScreenState extends State<LotListScreen> {
                   ? lotProvider.closedLots
                   : lotProvider.archivedLots;
 
-          return _buildLotList(context, lots);
+          return _buildLotList(context, lots, movementProvider.movements);
         },
       ),
     );
   }
 
-  Widget _buildLotList(BuildContext context, List<Lot> lots) {
+  Widget _buildLotList(BuildContext context, List<Lot> lots, List<Movement> allMovements) {
     if (lots.isEmpty) {
       return Center(
         child: Column(
@@ -488,9 +490,14 @@ class _LotListScreenState extends State<LotListScreen> {
         // PHASE 1B: Calculate animal count display based on lot status
         final animalCountDisplay = _buildAnimalCountDisplay(context, lot);
 
+        // Récupérer le premier mouvement du lot pour les infos vente/abattage
+        final lotMovements = allMovements.where((m) => m.lotId == lot.id).toList();
+        final firstMovement = lotMovements.isNotEmpty ? lotMovements.first : null;
+
         return _LotCard(
           lot: lot,
           animalCountDisplay: animalCountDisplay,
+          firstMovement: firstMovement,
           onTap: () {
             Navigator.push(
               context,
@@ -519,6 +526,7 @@ class _LotCard extends StatelessWidget {
   final VoidCallback? onArchive;
   final bool isViewOnly;
   final String animalCountDisplay;
+  final Movement? firstMovement;
 
   const _LotCard({
     required this.lot,
@@ -528,6 +536,7 @@ class _LotCard extends StatelessWidget {
     this.onArchive,
     this.isViewOnly = false,
     required this.animalCountDisplay,
+    this.firstMovement,
   });
 
   @override
@@ -671,8 +680,47 @@ class _LotCard extends StatelessWidget {
               ),
             ],
 
-            // TODO: Afficher les informations de vente/abattage depuis Movement
-            // Les données sont stockées dans Movement.lotId == lot.id
+            // Infos spécifiques VENTE (depuis Movement)
+            if (lot.type == LotType.sale && firstMovement?.buyerName != null) ...[
+              const SizedBox(height: AppConstants.spacingSmall),
+              Row(
+                children: [
+                  const Icon(Icons.person,
+                      size: AppConstants.iconSizeSmall,
+                      color: AppConstants.successGreen),
+                  const SizedBox(width: AppConstants.spacingTiny),
+                  Expanded(
+                    child: Text(
+                      firstMovement!.buyerName!,
+                      style: const TextStyle(
+                          fontSize: AppConstants.fontSizeSubtitle),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+
+            // Infos spécifiques ABATTAGE (depuis Movement)
+            if (lot.type == LotType.slaughter && firstMovement?.slaughterhouseName != null) ...[
+              const SizedBox(height: AppConstants.spacingSmall),
+              Row(
+                children: [
+                  const Icon(Icons.business,
+                      size: AppConstants.iconSizeSmall,
+                      color: AppConstants.statusGrey),
+                  const SizedBox(width: AppConstants.spacingTiny),
+                  Expanded(
+                    child: Text(
+                      firstMovement!.slaughterhouseName!,
+                      style: const TextStyle(
+                          fontSize: AppConstants.fontSizeSubtitle),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ],
 
             const SizedBox(height: AppConstants.spacingSmall),
 
