@@ -455,8 +455,9 @@ class LotDetailScreen extends StatelessWidget {
                 ],
               ],
 
-              // Notes
-              if (lot.notes != null && lot.notes!.isNotEmpty) ...[
+              // Notes (lot ou mouvement)
+              if ((lot.notes != null && lot.notes!.isNotEmpty) ||
+                  (firstMovement?.notes != null && firstMovement!.notes!.isNotEmpty)) ...[
                 const Divider(height: AppConstants.spacingLarge),
                 Text(
                   AppLocalizations.of(context).translate(AppStrings.notes),
@@ -467,7 +468,17 @@ class LotDetailScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: AppConstants.spacingTiny),
-                Text(lot.notes!),
+                // Afficher notes du lot si présentes
+                if (lot.notes != null && lot.notes!.isNotEmpty)
+                  Text(lot.notes!),
+                // Afficher notes du mouvement si présentes et différentes
+                if (firstMovement?.notes != null &&
+                    firstMovement!.notes!.isNotEmpty &&
+                    firstMovement.notes != lot.notes) ...[
+                  if (lot.notes != null && lot.notes!.isNotEmpty)
+                    const SizedBox(height: AppConstants.spacingSmall),
+                  Text(firstMovement.notes!),
+                ],
               ],
             ],
           ),
