@@ -148,17 +148,28 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
             final lotProvider = context.read<LotProvider>();
             final syncProvider = context.read<SyncProvider>();
 
-            // Récupérer le nom et type du produit
+            // Récupérer les données du produit et vétérinaire
             final productName = validationResult['productName'] as String?;
             final productType = validationResult['productType'] as String?;
+            final veterinarianId = validationResult['veterinarianId'] as String?;
+            final veterinarianName = validationResult['veterinarianName'] as String?;
+            final medicalNotes = validationResult['notes'] as String?;
+
+            // Combiner les notes : préfixe type + notes médicales + notes lot
+            String? finalNotes;
+            final List<String> notesParts = [];
+            if (productType != null) notesParts.add('[$productType]');
+            if (medicalNotes != null && medicalNotes.isNotEmpty) notesParts.add(medicalNotes);
+            if (_notesController.text.isNotEmpty) notesParts.add(_notesController.text);
+            if (notesParts.isNotEmpty) finalNotes = notesParts.join(' ');
 
             final success = await lotProvider.finalizeLot(
               widget.lotId,
               type: LotType.treatment,
               productName: productName,
-              notes: productType != null
-                  ? '[$productType]${_notesController.text.isEmpty ? '' : ' ${_notesController.text}'}'
-                  : (_notesController.text.isEmpty ? null : _notesController.text),
+              veterinarianId: veterinarianId,
+              veterinarianName: veterinarianName,
+              notes: finalNotes,
             );
 
             if (success) {

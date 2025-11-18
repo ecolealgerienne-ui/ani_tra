@@ -462,30 +462,48 @@ class LotDetailScreen extends StatelessWidget {
               ],
 
               // Notes (lot ou mouvement)
-              if ((lot.notes != null && lot.notes!.isNotEmpty) ||
-                  (firstMovement?.notes != null && firstMovement!.notes!.isNotEmpty)) ...[
-                const Divider(height: AppConstants.spacingLarge),
-                Text(
-                  AppLocalizations.of(context).translate(AppStrings.notes),
-                  style: TextStyle(
-                    fontSize: AppConstants.fontSizeSmall,
-                    color: Colors.grey.shade700,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: AppConstants.spacingTiny),
-                // Afficher notes du lot si présentes
-                if (lot.notes != null && lot.notes!.isNotEmpty)
-                  Text(lot.notes!),
-                // Afficher notes du mouvement si présentes et différentes
-                if (firstMovement?.notes != null &&
-                    firstMovement!.notes!.isNotEmpty &&
-                    firstMovement.notes != lot.notes) ...[
-                  if (lot.notes != null && lot.notes!.isNotEmpty)
-                    const SizedBox(height: AppConstants.spacingSmall),
-                  Text(firstMovement.notes!),
-                ],
-              ],
+              Builder(builder: (context) {
+                // Nettoyer les notes du lot en retirant le préfixe [vaccine] ou [treatment]
+                String? cleanedLotNotes;
+                if (lot.notes != null && lot.notes!.isNotEmpty) {
+                  cleanedLotNotes = lot.notes!
+                      .replaceFirst(RegExp(r'^\[vaccine\]\s*'), '')
+                      .replaceFirst(RegExp(r'^\[treatment\]\s*'), '')
+                      .trim();
+                  if (cleanedLotNotes.isEmpty) cleanedLotNotes = null;
+                }
+
+                if ((cleanedLotNotes != null && cleanedLotNotes.isNotEmpty) ||
+                    (firstMovement?.notes != null && firstMovement!.notes!.isNotEmpty)) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Divider(height: AppConstants.spacingLarge),
+                      Text(
+                        AppLocalizations.of(context).translate(AppStrings.notes),
+                        style: TextStyle(
+                          fontSize: AppConstants.fontSizeSmall,
+                          color: Colors.grey.shade700,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: AppConstants.spacingTiny),
+                      // Afficher notes du lot si présentes
+                      if (cleanedLotNotes != null && cleanedLotNotes.isNotEmpty)
+                        Text(cleanedLotNotes),
+                      // Afficher notes du mouvement si présentes et différentes
+                      if (firstMovement?.notes != null &&
+                          firstMovement!.notes!.isNotEmpty &&
+                          firstMovement.notes != cleanedLotNotes) ...[
+                        if (cleanedLotNotes != null && cleanedLotNotes.isNotEmpty)
+                          const SizedBox(height: AppConstants.spacingSmall),
+                        Text(firstMovement.notes!),
+                      ],
+                    ],
+                  );
+                }
+                return const SizedBox.shrink();
+              }),
             ],
           ),
         ),

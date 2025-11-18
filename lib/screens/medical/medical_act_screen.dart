@@ -435,6 +435,9 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
         'success': true,
         'productName': _selectedProduct!.displayName,
         'productType': _selectedType == ProductType.treatment ? 'treatment' : 'vaccine',
+        'veterinarianId': _selectedVetId,
+        'veterinarianName': _selectedVetName,
+        'notes': _notesController.text.isNotEmpty ? _notesController.text : null,
       };
       Navigator.of(context).pop(result);
       return result;
