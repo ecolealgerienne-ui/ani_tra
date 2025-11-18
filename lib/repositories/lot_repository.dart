@@ -77,17 +77,18 @@ class LotRepository {
   }
 
   /// Récupérer les lots contenant un animal spécifique
+  /// ✅ PERF FIX: Utilise batch query au lieu de N+1
   Future<List<Lot>> findByAnimalId(String animalId, String farmId) async {
     // Utiliser lot_animal_dao pour trouver les lots
     final lotIds = await _lotAnimalDao.getLotIdsForAnimal(animalId);
-    final lots = <Lot>[];
-    for (final lotId in lotIds) {
-      final lot = await findById(lotId, farmId);
-      if (lot != null) {
-        lots.add(lot);
-      }
-    }
-    return lots;
+    if (lotIds.isEmpty) return [];
+
+    // ✅ PERF FIX: Charger tous les lots en une seule query
+    final allLots = await _dao.findAllByFarm(farmId);
+    final lotIdSet = lotIds.toSet();
+    final matchingData = allLots.where((lot) => lotIdSet.contains(lot.id)).toList();
+
+    return _toLotsWithAnimals(matchingData);
   }
 
   /// Récupérer les lots de traitement par produit
@@ -295,12 +296,13 @@ class LotRepository {
   // ==================== Conversion Methods ====================
 
   /// Helper: Convertir une liste de lots avec chargement des animaux
+  /// ✅ PERF FIX: Parallélise les appels avec Future.wait au lieu de séquentiel
   Future<List<Lot>> _toLotsWithAnimals(List<LotsTableData> dataList) async {
-    final lots = <Lot>[];
-    for (final data in dataList) {
-      lots.add(await _toLotWithAnimals(data));
-    }
-    return lots;
+    if (dataList.isEmpty) return [];
+
+    // ✅ PERF FIX: Charger tous les animalIds en parallèle
+    final futures = dataList.map((data) => _toLotWithAnimals(data));
+    return Future.wait(futures);
   }
 
   /// Helper: Convertir un lot avec chargement des animaux depuis lot_animals
