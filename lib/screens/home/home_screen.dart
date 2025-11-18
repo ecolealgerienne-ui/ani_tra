@@ -25,20 +25,8 @@ import '../settings/app_settings_screen.dart';
 import '../alert/alerts_screen.dart';
 import '../services/export_registry_screen.dart'; // 🆕 PART3
 import '../movement/movement_list_screen.dart';
-import '../../services/performance/seed_data_service.dart';
-import '../../services/performance/benchmark_service.dart';
 import '../../drift/database.dart';
-import '../../repositories/animal_repository.dart';
-import '../../repositories/movement_repository.dart';
-import '../../repositories/lot_repository.dart';
-import '../../repositories/treatment_repository.dart';
-import '../../repositories/vaccination_repository.dart';
-import '../../repositories/weight_repository.dart';
-import '../../providers/movement_provider.dart';
-import '../../providers/lot_provider.dart';
-import '../../providers/treatment_provider.dart';
-import '../../providers/vaccination_provider.dart';
-import '../../providers/weight_provider.dart';
+import '../../database_initializer.dart';
 
 /// Écran d'accueil simplifié
 ///
@@ -132,12 +120,13 @@ class _HomeScreenState extends State<HomeScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Performance Benchmark'),
+        title: const Text('Générer données de test'),
         content: Text(
-          'Cette opération va:\n\n'
-          '1. Générer $animalCount animaux de test\n'
-          '2. Exécuter 9 tests de performance\n'
-          '3. Afficher les résultats dans les logs\n\n'
+          'Cette opération va générer:\n\n'
+          '- $animalCount animaux\n'
+          '- ${animalCount * 3} mouvements\n'
+          '- ${animalCount ~/ 10} lots\n'
+          '- et traitements, vaccinations, pesées...\n\n'
           'Cela peut prendre plusieurs minutes.\n'
           'Continuer?',
         ),
@@ -175,51 +164,9 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       // Utiliser la database existante via Provider
       final database = context.read<AppDatabase>();
-      final animalRepository = AnimalRepository(database);
-      final movementRepository = MovementRepository(database);
-      final lotRepository = LotRepository(database);
-      final treatmentRepository = TreatmentRepository(database);
-      final vaccinationRepository = VaccinationRepository(database);
-      final weightRepository = WeightRepository(database);
 
-      final seedService = SeedDataService(
-        animalRepository: animalRepository,
-        movementRepository: movementRepository,
-        lotRepository: lotRepository,
-        treatmentRepository: treatmentRepository,
-        vaccinationRepository: vaccinationRepository,
-        weightRepository: weightRepository,
-      );
-
-      // Générer les données
-      await seedService.generateAllData(farmId);
-
-      if (!mounted) return;
-
-      // Recharger les providers
-      final animalProvider = context.read<AnimalProvider>();
-      final movementProvider = context.read<MovementProvider>();
-      final lotProvider = context.read<LotProvider>();
-      final treatmentProvider = context.read<TreatmentProvider>();
-      final vaccinationProvider = context.read<VaccinationProvider>();
-      final weightProvider = context.read<WeightProvider>();
-      final alertProvider = context.read<AlertProvider>();
-
-      // Créer le service de benchmark
-      final benchmarkService = BenchmarkService(
-        animalProvider: animalProvider,
-        movementProvider: movementProvider,
-        lotProvider: lotProvider,
-        treatmentProvider: treatmentProvider,
-        vaccinationProvider: vaccinationProvider,
-        weightProvider: weightProvider,
-        alertProvider: alertProvider,
-        animalRepository: animalRepository,
-        lotRepository: lotRepository,
-      );
-
-      // Exécuter les benchmarks
-      await benchmarkService.runAllBenchmarks(farmId);
+      // Générer les données de benchmark
+      final results = await DatabaseInitializer.seedBenchmarkData(database, farmId);
 
       if (!mounted) return;
 
@@ -230,11 +177,17 @@ class _HomeScreenState extends State<HomeScreen> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Benchmark terminé'),
-          content: const Text(
-            'Les résultats sont disponibles dans les logs.\n\n'
-            'Note: Les données de test restent en base.\n'
-            'Réinstallez l\'app pour les supprimer.',
+          title: const Text('Données générées'),
+          content: Text(
+            'Données de benchmark créées:\n\n'
+            '- ${results['animals']} animaux\n'
+            '- ${results['lots']} lots\n'
+            '- ${results['movements']} mouvements\n'
+            '- ${results['treatments']} traitements\n'
+            '- ${results['vaccinations']} vaccinations\n'
+            '- ${results['weights']} pesées\n\n'
+            'Voir les logs pour le détail.\n'
+            'Réinstallez l\'app pour supprimer les données.',
           ),
           actions: [
             ElevatedButton(
@@ -499,17 +452,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
 
-                    // DEV: Bouton Benchmark (conditionnel)
+                    // DEV: Bouton génération données test (conditionnel)
                     if (AppConstants.kShowBenchmarkButton) ...[
                       const SizedBox(height: AppConstants.spacingMedium),
                       _buildMainActionCard(
                         context: context,
-                        icon: Icons.speed,
+                        icon: Icons.data_array,
                         iconColor: Colors.grey,
-                        title: 'Performance Benchmark',
+                        title: 'Générer données test',
                         subtitle: AppConstants.kBenchmarkLightMode
-                            ? 'Test avec 1000 animaux'
-                            : 'Test avec 5000 animaux',
+                            ? 'Générer 1000 animaux'
+                            : 'Générer 5000 animaux',
                         onTap: _runBenchmarks,
                       ),
                     ],
