@@ -589,9 +589,7 @@ class _LotCard extends StatelessWidget {
                         BorderRadius.circular(AppConstants.borderRadiusSmall),
                   ),
                   child: Text(
-                    lot.type?.label ??
-                        AppLocalizations.of(context)
-                            .translate(AppStrings.typeNotDefined),
+                    _getTypeLabel(context),
                     style: const TextStyle(
                       fontSize: AppConstants.fontSizeTiny,
                       color: Colors.white,
@@ -785,6 +783,24 @@ class _LotCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// Obtenir le label du type de lot
+  /// Pour les traitements, vérifie si c'est une vaccination via les notes
+  String _getTypeLabel(BuildContext context) {
+    if (lot.type == null) {
+      return AppLocalizations.of(context).translate(AppStrings.typeNotDefined);
+    }
+
+    // Pour les lots de type treatment, vérifier si c'est une vaccination
+    if (lot.type == LotType.treatment && lot.notes != null) {
+      if (lot.notes!.startsWith('[vaccine]')) {
+        return AppLocalizations.of(context).translate(AppStrings.vaccination);
+      }
+    }
+
+    // Sinon utiliser le label par défaut du type
+    return lot.type!.label;
   }
 
   Color _getTypeColor() {

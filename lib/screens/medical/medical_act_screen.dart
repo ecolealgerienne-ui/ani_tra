@@ -285,7 +285,8 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
   }
 
   /// Sauvegarder l'acte médical
-  Future<bool> _saveAct() async {
+  /// Retourne une Map avec 'success', 'productName' et 'productType' ou null si échec
+  Future<Map<String, dynamic>?> _saveAct() async {
     if (_selectedProduct == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -294,7 +295,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
           backgroundColor: Colors.red,
         ),
       );
-      return false;
+      return null;
     }
 
     // Valider le dosage uniquement pour les animaux individuels
@@ -309,7 +310,7 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
             backgroundColor: Colors.red,
           ),
         );
-        return false;
+        return null;
       }
       dose = parsedDose;
     } else {
@@ -428,10 +429,17 @@ class _MedicalActScreenState extends State<MedicalActScreen> {
           backgroundColor: Colors.green,
         ),
       );
-      Navigator.of(context).pop(true);
-      return true;
+
+      // Retourner les informations sur l'acte médical
+      final result = {
+        'success': true,
+        'productName': _selectedProduct!.displayName,
+        'productType': _selectedType == ProductType.treatment ? 'treatment' : 'vaccine',
+      };
+      Navigator.of(context).pop(result);
+      return result;
     }
-    return false;
+    return null;
   }
 
   @override

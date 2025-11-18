@@ -124,8 +124,8 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
               .translate(AppStrings.groupedHealthTreatment),
           color: AppConstants.primaryBlue,
           onTap: () async {
-            /// Capturer le retour de MedicalActScreen (true = validé, false/null = annulé)
-            final validationResult = await Navigator.push<bool?>(
+            /// Capturer le retour de MedicalActScreen (Map avec productName et productType)
+            final validationResult = await Navigator.push<Map<String, dynamic>?>(
               context,
               MaterialPageRoute(
                 builder: (_) => MedicalActScreen(
@@ -138,7 +138,7 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
             );
 
             /// ✅ Vérifier que l'acte médical a été VALIDÉ (pas annulé)
-            if (validationResult != true) {
+            if (validationResult == null || validationResult['success'] != true) {
               // L'utilisateur a annulé ou il y a eu une erreur
               return;
             }
@@ -148,11 +148,17 @@ class _LotFinalizeScreenState extends State<LotFinalizeScreen> {
             final lotProvider = context.read<LotProvider>();
             final syncProvider = context.read<SyncProvider>();
 
+            // Récupérer le nom et type du produit
+            final productName = validationResult['productName'] as String?;
+            final productType = validationResult['productType'] as String?;
+
             final success = await lotProvider.finalizeLot(
               widget.lotId,
               type: LotType.treatment,
-              notes:
-                  _notesController.text.isEmpty ? null : _notesController.text,
+              productName: productName,
+              notes: productType != null
+                  ? '[$productType]${_notesController.text.isEmpty ? '' : ' ${_notesController.text}'}'
+                  : (_notesController.text.isEmpty ? null : _notesController.text),
             );
 
             if (success) {
