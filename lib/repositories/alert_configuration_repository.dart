@@ -186,8 +186,32 @@ class AlertConfigurationRepository {
     }
 
     // Créer les configurations par défaut
+    // Couleurs harmonisées par sévérité:
+    // - Critique (3): Rouge #D32F2F
+    // - Important (2): Orange #F57C00
+    // - Routine (1): Bleu #1976D2
     final now = DateTime.now();
     final defaultConfigs = [
+      // ═══════ CRITIQUE (severity 3) - Rouge ═══════
+      // Identification
+      AlertConfigurationsTableCompanion.insert(
+        id: '${farmId}_config_identification',
+        farmId: farmId,
+        evaluationType: 'identification',
+        type: 'urgent',
+        category: 'identification',
+        titleKey: 'alertIdentificationTitle',
+        messageKey: 'alertIdentificationMsg',
+        severity: 3,
+        iconName: 'tag',
+        colorHex: '#D32F2F',
+        enabled: const Value(true),
+        synced: const Value(false),
+        createdAt: now,
+        updatedAt: now,
+      ),
+
+      // ═══════ IMPORTANT (severity 2) - Orange ═══════
       // Rémanence
       AlertConfigurationsTableCompanion.insert(
         id: '${farmId}_config_remanence',
@@ -205,6 +229,42 @@ class AlertConfigurationRepository {
         createdAt: now,
         updatedAt: now,
       ),
+      // Vaccination
+      AlertConfigurationsTableCompanion.insert(
+        id: '${farmId}_config_vaccination',
+        farmId: farmId,
+        evaluationType: 'vaccination',
+        type: 'important',
+        category: 'treatment',
+        titleKey: 'alertVaccinationTitle',
+        messageKey: 'alertVaccinationMsg',
+        severity: 2,
+        iconName: 'syringe',
+        colorHex: '#F57C00',
+        enabled: const Value(true),
+        synced: const Value(false),
+        createdAt: now,
+        updatedAt: now,
+      ),
+      // Animaux en brouillon
+      AlertConfigurationsTableCompanion.insert(
+        id: '${farmId}_config_draft_animals',
+        farmId: farmId,
+        evaluationType: 'draftAnimals',
+        type: 'important',
+        category: 'identification',
+        titleKey: 'alertDraftAnimalsTitle',
+        messageKey: 'alertDraftAnimalsMsg',
+        severity: 2,
+        iconName: 'edit_note',
+        colorHex: '#F57C00',
+        enabled: const Value(true),
+        synced: const Value(false),
+        createdAt: now,
+        updatedAt: now,
+      ),
+
+      // ═══════ ROUTINE (severity 1) - Bleu ═══════
       // Pesée
       AlertConfigurationsTableCompanion.insert(
         id: '${farmId}_config_weighing',
@@ -222,40 +282,6 @@ class AlertConfigurationRepository {
         createdAt: now,
         updatedAt: now,
       ),
-      // Vaccination
-      AlertConfigurationsTableCompanion.insert(
-        id: '${farmId}_config_vaccination',
-        farmId: farmId,
-        evaluationType: 'vaccination',
-        type: 'important',
-        category: 'treatment',
-        titleKey: 'alertVaccinationTitle',
-        messageKey: 'alertVaccinationMsg',
-        severity: 2,
-        iconName: 'syringe',
-        colorHex: '#D32F2F',
-        enabled: const Value(true),
-        synced: const Value(false),
-        createdAt: now,
-        updatedAt: now,
-      ),
-      // Identification
-      AlertConfigurationsTableCompanion.insert(
-        id: '${farmId}_config_identification',
-        farmId: farmId,
-        evaluationType: 'identification',
-        type: 'urgent',
-        category: 'identification',
-        titleKey: 'alertIdentificationTitle',
-        messageKey: 'alertIdentificationMsg',
-        severity: 3,
-        iconName: 'tag',
-        colorHex: '#E53935',
-        enabled: const Value(true),
-        synced: const Value(false),
-        createdAt: now,
-        updatedAt: now,
-      ),
       // Synchronisation
       AlertConfigurationsTableCompanion.insert(
         id: '${farmId}_config_sync',
@@ -267,7 +293,7 @@ class AlertConfigurationRepository {
         messageKey: 'alertSyncMsg',
         severity: 1,
         iconName: 'cloud_upload',
-        colorHex: '#0288D1',
+        colorHex: '#1976D2',
         enabled: const Value(true),
         synced: const Value(false),
         createdAt: now,
@@ -284,7 +310,7 @@ class AlertConfigurationRepository {
         messageKey: 'alertTreatmentRenewalMsg',
         severity: 1,
         iconName: 'medication',
-        colorHex: '#0097A7',
+        colorHex: '#1976D2',
         enabled: const Value(true),
         synced: const Value(false),
         createdAt: now,
@@ -301,24 +327,7 @@ class AlertConfigurationRepository {
         messageKey: 'alertBatchFinalizeMsg',
         severity: 1,
         iconName: 'inventory',
-        colorHex: '#7B1FA2',
-        enabled: const Value(true),
-        synced: const Value(false),
-        createdAt: now,
-        updatedAt: now,
-      ),
-      // Animaux en brouillon
-      AlertConfigurationsTableCompanion.insert(
-        id: '${farmId}_config_draft_animals',
-        farmId: farmId,
-        evaluationType: 'draftAnimals',
-        type: 'routine',
-        category: 'identification',
-        titleKey: 'alertDraftAnimalsTitle',
-        messageKey: 'alertDraftAnimalsMsg',
-        severity: 1,
-        iconName: 'edit_note',
-        colorHex: '#FF8F00',
+        colorHex: '#1976D2',
         enabled: const Value(true),
         synced: const Value(false),
         createdAt: now,

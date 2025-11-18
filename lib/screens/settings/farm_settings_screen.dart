@@ -971,7 +971,9 @@ class _AlertSettingsSection extends StatelessWidget {
             ),
           )
         else
-          ...configs.map((config) => _AlertConfigItem(config: config)),
+          // Trier par sévérité décroissante (critique → important → routine)
+          ...(configs.toList()..sort((a, b) => b.severity.compareTo(a.severity)))
+              .map((config) => _AlertConfigItem(config: config)),
       ],
     );
   }
@@ -1009,6 +1011,22 @@ class _AlertConfigItem extends StatelessWidget {
     }
   }
 
+  /// Obtenir la couleur selon la sévérité
+  /// - Critique (3): Rouge
+  /// - Important (2): Orange
+  /// - Routine (1): Bleu
+  Color _getColorFromSeverity(int severity) {
+    switch (severity) {
+      case 3:
+        return const Color(0xFFD32F2F); // Rouge - Critique
+      case 2:
+        return const Color(0xFFF57C00); // Orange - Important
+      case 1:
+      default:
+        return const Color(0xFF1976D2); // Bleu - Routine
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -1017,8 +1035,8 @@ class _AlertConfigItem extends StatelessWidget {
     // Get title from i18n
     final title = l10n.translate(config.titleKey);
 
-    // Parse color from hex
-    final color = Color(int.parse(config.colorHex.replaceFirst('#', '0xFF')));
+    // Couleur basée sur la sévérité (harmonisée)
+    final color = _getColorFromSeverity(config.severity);
 
     return Padding(
       padding: const EdgeInsets.symmetric(
