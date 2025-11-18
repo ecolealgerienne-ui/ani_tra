@@ -175,6 +175,114 @@ class AlertConfigurationRepository {
     return await _db.alertConfigurationDao.countEnabled(farmId);
   }
 
+  /// Assure que les configurations par défaut existent pour une ferme
+  /// Crée les configs manquantes si nécessaire
+  /// Retourne true si des configs ont été créées
+  Future<bool> ensureDefaultConfigs(String farmId) async {
+    // Vérifier si la ferme a déjà des configurations
+    final existing = await getAll(farmId);
+    if (existing.isNotEmpty) {
+      return false; // Déjà configuré
+    }
+
+    // Créer les configurations par défaut
+    final now = DateTime.now();
+    final defaultConfigs = [
+      // Rémanence
+      AlertConfigurationsTableCompanion.insert(
+        id: '${farmId}_config_remanence',
+        farmId: farmId,
+        evaluationType: 'remanence',
+        type: 'important',
+        category: 'remanence',
+        titleKey: 'alertRemanenceTitle',
+        messageKey: 'alertRemanenceMsg',
+        severity: 2,
+        iconName: 'pill',
+        colorHex: '#F57C00',
+        enabled: const Value(true),
+        synced: const Value(false),
+        createdAt: now,
+        updatedAt: now,
+      ),
+      // Pesée
+      AlertConfigurationsTableCompanion.insert(
+        id: '${farmId}_config_weighing',
+        farmId: farmId,
+        evaluationType: 'weighing',
+        type: 'routine',
+        category: 'weighing',
+        titleKey: 'alertWeighingTitle',
+        messageKey: 'alertWeighingMsg',
+        severity: 1,
+        iconName: 'scale',
+        colorHex: '#1976D2',
+        enabled: const Value(true),
+        synced: const Value(false),
+        createdAt: now,
+        updatedAt: now,
+      ),
+      // Vaccination
+      AlertConfigurationsTableCompanion.insert(
+        id: '${farmId}_config_vaccination',
+        farmId: farmId,
+        evaluationType: 'vaccination',
+        type: 'important',
+        category: 'treatment',
+        titleKey: 'alertVaccinationTitle',
+        messageKey: 'alertVaccinationMsg',
+        severity: 2,
+        iconName: 'syringe',
+        colorHex: '#D32F2F',
+        enabled: const Value(true),
+        synced: const Value(false),
+        createdAt: now,
+        updatedAt: now,
+      ),
+      // Identification
+      AlertConfigurationsTableCompanion.insert(
+        id: '${farmId}_config_identification',
+        farmId: farmId,
+        evaluationType: 'identification',
+        type: 'urgent',
+        category: 'identification',
+        titleKey: 'alertIdentificationTitle',
+        messageKey: 'alertIdentificationMsg',
+        severity: 3,
+        iconName: 'tag',
+        colorHex: '#E53935',
+        enabled: const Value(true),
+        synced: const Value(false),
+        createdAt: now,
+        updatedAt: now,
+      ),
+      // Synchronisation
+      AlertConfigurationsTableCompanion.insert(
+        id: '${farmId}_config_sync',
+        farmId: farmId,
+        evaluationType: 'syncRequired',
+        type: 'routine',
+        category: 'sync',
+        titleKey: 'alertSyncTitle',
+        messageKey: 'alertSyncMsg',
+        severity: 1,
+        iconName: 'sync',
+        colorHex: '#757575',
+        enabled: const Value(true),
+        synced: const Value(false),
+        createdAt: now,
+        updatedAt: now,
+      ),
+    ];
+
+    // Insérer toutes les configurations
+    for (final config in defaultConfigs) {
+      await _db.alertConfigurationDao.insertItem(config);
+    }
+
+    return true;
+  }
+
   // ========== MAPPERS ==========
 
   /// Mappe AlertConfigurationData (DB) → AlertConfiguration (Model)

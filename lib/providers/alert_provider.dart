@@ -206,7 +206,10 @@ class AlertProvider extends ChangeNotifier {
         return;
       }
 
-      // 1. Charger configurations activées depuis BD
+      // 1. S'assurer que les configurations par défaut existent pour cette ferme
+      await _alertConfigRepository.ensureDefaultConfigs(farmId);
+
+      // 2. Charger configurations activées depuis BD
       final configs = await _alertConfigRepository.getEnabled(farmId);
 
       // 2. Pour chaque configuration, évaluer le type
