@@ -983,6 +983,32 @@ class _AlertConfigItem extends StatelessWidget {
 
   const _AlertConfigItem({required this.config});
 
+  /// Mapper iconName vers IconData
+  IconData _getIconFromName(String iconName) {
+    switch (iconName) {
+      case 'pill':
+        return Icons.medication_rounded;
+      case 'scale':
+        return Icons.monitor_weight_rounded;
+      case 'syringe':
+        return Icons.vaccines_rounded;
+      case 'tag':
+        return Icons.sell_rounded;
+      case 'cloud_upload':
+        return Icons.cloud_sync_rounded;
+      case 'sync':
+        return Icons.sync_rounded;
+      case 'medication':
+        return Icons.healing_rounded;
+      case 'inventory':
+        return Icons.inventory_2_rounded;
+      case 'edit_note':
+        return Icons.edit_note_rounded;
+      default:
+        return Icons.notifications_rounded;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -1015,9 +1041,10 @@ class _AlertConfigItem extends StatelessWidget {
               color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
             ),
-            child: Text(
-              config.iconName,
-              style: const TextStyle(fontSize: 24),
+            child: Icon(
+              _getIconFromName(config.iconName),
+              color: color,
+              size: 24,
             ),
           ),
           title: Row(
