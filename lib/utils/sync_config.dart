@@ -41,10 +41,10 @@ class SyncConfig {
   static String apiBaseUrl = 'https://api.example.com';
 
   /// Version de l'API
-  static String apiVersion = 'v1';
+  static String apiVersion = SyncApiConstants.defaultApiVersion;
 
   /// Timeout des requêtes HTTP (secondes)
-  static int httpTimeoutSeconds = 30;
+  static int httpTimeoutSeconds = SyncApiConstants.httpTimeoutSeconds;
 
   /// Activer le certificate pinning (recommandé en production)
   static bool enableCertificatePinning = !isDevelopmentMode;
@@ -100,7 +100,7 @@ class SyncConfig {
   // ==================== BATCH SYNC ====================
 
   /// Nombre max d'items par batch
-  static int batchSize = 50;
+  static int batchSize = SyncApiConstants.batchSize;
 
   /// Sync automatique au démarrage de l'app
   static bool autoSyncOnStartup = false;

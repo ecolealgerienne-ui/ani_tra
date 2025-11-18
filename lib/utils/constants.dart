@@ -604,6 +604,21 @@ class SyncRetryPolicy {
   static const int maxDelayMs = 60000;
 }
 
+/// Configuration API pour sync (STEP 5)
+class SyncApiConstants {
+  /// Timeout des requêtes HTTP (secondes)
+  static const int httpTimeoutSeconds = 30;
+
+  /// Nombre max d'items par batch
+  static const int batchSize = 50;
+
+  /// Version par défaut de l'API
+  static const String defaultApiVersion = 'v1';
+
+  /// Délai de vérification de connectivité (secondes)
+  static const int connectivityCheckTimeout = 5;
+}
+
 // ==================== DEBUG UI (STEP 4) ====================
 class DebugConstants {
   /// Afficher le bouton debug sync sur Home

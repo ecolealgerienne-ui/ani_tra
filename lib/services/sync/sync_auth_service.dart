@@ -1,7 +1,6 @@
 // lib/services/sync/sync_auth_service.dart
 
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import '../../utils/sync_config.dart';
@@ -254,7 +253,7 @@ class SyncAuthService {
       final decoded = utf8.decode(base64Url.decode(normalized));
       return jsonDecode(decoded) as Map<String, dynamic>;
     } catch (e) {
-      debugPrint('Error decoding JWT: $e');
+      SyncConfig.log('Error decoding JWT: $e');
       return null;
     }
   }

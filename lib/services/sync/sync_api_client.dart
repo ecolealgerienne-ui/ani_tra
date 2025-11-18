@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../../utils/constants.dart';
 import '../../utils/sync_config.dart';
 import 'sync_auth_service.dart';
 
@@ -187,7 +188,7 @@ class SyncApiClient {
       final response = await _httpClient.get(
         Uri.parse('${SyncConfig.apiBaseUrl}/health'),
       ).timeout(
-        const Duration(seconds: 5),
+        Duration(seconds: SyncApiConstants.connectivityCheckTimeout),
       );
       return response.statusCode == 200;
     } catch (e) {

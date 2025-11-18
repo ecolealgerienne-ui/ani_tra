@@ -107,8 +107,10 @@ class SyncService {
       return result;
 
     } catch (e, stackTrace) {
-      debugPrint('❌ [SYNC] Error processing queue: $e');
-      debugPrint('❌ [SYNC] StackTrace: $stackTrace');
+      SyncConfig.log('Error processing queue: $e');
+      if (SyncConfig.debugLogging) {
+        debugPrint('❌ [SYNC] StackTrace: $stackTrace');
+      }
       _lastStatus = SyncStatus.error;
       return SyncResult.error('Sync error: $e');
     } finally {

@@ -71,8 +71,10 @@ class SyncQueueRepository {
       await _db.syncQueueDao.upsertItem(item);
       SyncConfig.log('Enqueued: $entityType:$entityId ($action)');
     } catch (e, stackTrace) {
-      debugPrint('❌ [SYNC] Error enqueueing $entityType:$entityId: $e');
-      debugPrint('❌ [SYNC] StackTrace: $stackTrace');
+      SyncConfig.log('Error enqueueing $entityType:$entityId: $e');
+      if (SyncConfig.debugLogging) {
+        debugPrint('❌ [SYNC] StackTrace: $stackTrace');
+      }
       // Re-throw pour que la transaction soit rollback
       rethrow;
     }
@@ -92,8 +94,8 @@ class SyncQueueRepository {
     if (action != SyncAction.delete) {
       final validation = SyncValidator.validateAnimal(animal);
       if (!validation.isValid) {
-        debugPrint('⚠️ [SYNC] Animal validation failed for ${animal.id}: ${validation.errorMessage}');
-        debugPrint('⚠️ [SYNC] Error codes: ${validation.errors}');
+        SyncConfig.log('Animal validation failed for ${animal.id}: ${validation.errorMessage}');
+        SyncConfig.log('Error codes: ${validation.errors}');
         throw SyncBlockedException(
           'Animal validation failed: ${validation.errorMessage}',
           errorCodes: validation.errors,
@@ -306,8 +308,10 @@ class SyncQueueRepository {
         byEntityType: byType,
       );
     } catch (e, stackTrace) {
-      debugPrint('❌ [SYNC] Error getting stats for farm $farmId: $e');
-      debugPrint('❌ [SYNC] StackTrace: $stackTrace');
+      SyncConfig.log('Error getting stats for farm $farmId: $e');
+      if (SyncConfig.debugLogging) {
+        debugPrint('❌ [SYNC] StackTrace: $stackTrace');
+      }
       // Retourner des stats vides en cas d'erreur
       return SyncQueueStats(
         pendingCount: 0,
