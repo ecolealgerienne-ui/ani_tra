@@ -173,8 +173,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     try {
-      // Créer les services
-      final database = AppDatabase();
+      // Utiliser la database existante via Provider
+      final database = context.read<AppDatabase>();
       final animalRepository = AnimalRepository(database);
       final movementRepository = MovementRepository(database);
       final lotRepository = LotRepository(database);
