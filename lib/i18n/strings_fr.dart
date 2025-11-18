@@ -1038,6 +1038,15 @@ const Map<String, String> stringsFr = {
   'alertDraftTitle': 'Animaux en brouillon',
   'alertDraftMsg': 'Animaux non validés à finaliser',
 
+  'alertTreatmentRenewalTitle': 'Traitement à renouveler',
+  'alertTreatmentRenewalMsg': '{animalName}: {treatmentName} expire dans {daysRemaining}j',
+
+  'alertBatchFinalizeTitle': 'Lot à finaliser',
+  'alertBatchFinalizeMsg': '{batchName}: {animalCount} animal(aux) en attente',
+
+  'alertDraftAnimalsTitle': 'Animaux en brouillon',
+  'alertDraftAnimalsMsg': '{count} animal(aux) non validé(s) depuis plus de 24h',
+
   // ========== BREEDING NOTES ==========
   'breedingFailedNote': 'Échec:',
   'breedingAbortedNote': 'Avortement:',

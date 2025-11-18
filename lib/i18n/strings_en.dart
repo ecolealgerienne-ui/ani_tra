@@ -905,6 +905,40 @@ const Map<String, String> stringsEn = {
   'alertEnabled': 'Alert enabled: {title}',
   'alertDisabled': 'Alert disabled: {title}',
 
+  // ============ ALERT CONFIGURATIONS ============
+  'alertRemanenceTitle': 'Withdrawal period',
+  'alertRemanenceMsg': '{animalName}: {daysRemaining}d remaining before slaughter',
+
+  'alertWeighingTitle': 'Weighing needed',
+  'alertWeighingMsg': '{animalName}: not weighed for {daysSince}d',
+
+  'alertVaccinationTitle': 'Vaccination due',
+  'alertVaccinationMsg': '{animalName}: {vaccineName} due in {daysRemaining}d',
+
+  'alertIdentificationTitle': 'Identification missing',
+  'alertIdentificationMsg': '{animalName}: EID not registered',
+
+  'alertSyncTitle': 'Synchronization needed',
+  'alertSyncMsg': 'Last sync {daysSince}d ago • {pending} item(s) pending',
+
+  'alertTreatmentTitle': 'Treatment to renew',
+  'alertTreatmentMsg': '{animalName}: {treatmentName} (in {daysRemaining}d)',
+
+  'alertTreatmentRenewalTitle': 'Treatment to renew',
+  'alertTreatmentRenewalMsg': '{animalName}: {treatmentName} expires in {daysRemaining}d',
+
+  'alertBatchTitle': 'Batch to finalize',
+  'alertBatchMsg': '{batchName}: {animalCount} animal(s)',
+
+  'alertBatchFinalizeTitle': 'Batch to finalize',
+  'alertBatchFinalizeMsg': '{batchName}: {animalCount} animal(s) pending',
+
+  'alertDraftTitle': 'Draft animals',
+  'alertDraftMsg': 'Unvalidated animals to finalize',
+
+  'alertDraftAnimalsTitle': 'Draft animals',
+  'alertDraftAnimalsMsg': '{count} animal(s) not validated for over 24h',
+
   // ============ MOVEMENTS ============
   'movements': 'Movements',
   'movementType': 'Movement type',

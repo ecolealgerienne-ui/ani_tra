@@ -1029,11 +1029,20 @@ class AppStrings {
   static const String alertTreatmentTitle = 'alertTreatmentTitle';
   static const String alertTreatmentMsg = 'alertTreatmentMsg';
 
+  static const String alertTreatmentRenewalTitle = 'alertTreatmentRenewalTitle';
+  static const String alertTreatmentRenewalMsg = 'alertTreatmentRenewalMsg';
+
   static const String alertBatchTitle = 'alertBatchTitle';
   static const String alertBatchMsg = 'alertBatchMsg';
 
+  static const String alertBatchFinalizeTitle = 'alertBatchFinalizeTitle';
+  static const String alertBatchFinalizeMsg = 'alertBatchFinalizeMsg';
+
   static const String alertDraftTitle = 'alertDraftTitle';
   static const String alertDraftMsg = 'alertDraftMsg';
+
+  static const String alertDraftAnimalsTitle = 'alertDraftAnimalsTitle';
+  static const String alertDraftAnimalsMsg = 'alertDraftAnimalsMsg';
 
   // ============ BREEDING NOTES ============
   static const String breedingFailedNote = 'breedingFailedNote';

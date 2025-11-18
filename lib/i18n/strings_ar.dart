@@ -902,6 +902,40 @@ const Map<String, String> stringsAr = {
   'alertEnabled': 'التنبيه مُفعّل: {title}',
   'alertDisabled': 'التنبيه مُعطّل: {title}',
 
+  // ============ تكوينات التنبيهات ============
+  'alertRemanenceTitle': 'فترة السحب',
+  'alertRemanenceMsg': '{animalName}: {daysRemaining} يوم متبقي قبل الذبح',
+
+  'alertWeighingTitle': 'الوزن مطلوب',
+  'alertWeighingMsg': '{animalName}: لم يتم وزنه منذ {daysSince} يوم',
+
+  'alertVaccinationTitle': 'تطعيم مستحق',
+  'alertVaccinationMsg': '{animalName}: {vaccineName} مستحق في {daysRemaining} يوم',
+
+  'alertIdentificationTitle': 'التعريف مفقود',
+  'alertIdentificationMsg': '{animalName}: معرف EID غير مسجل',
+
+  'alertSyncTitle': 'المزامنة مطلوبة',
+  'alertSyncMsg': 'آخر مزامنة منذ {daysSince} يوم • {pending} عنصر(عناصر) معلقة',
+
+  'alertTreatmentTitle': 'علاج للتجديد',
+  'alertTreatmentMsg': '{animalName}: {treatmentName} (في {daysRemaining} يوم)',
+
+  'alertTreatmentRenewalTitle': 'علاج للتجديد',
+  'alertTreatmentRenewalMsg': '{animalName}: {treatmentName} ينتهي في {daysRemaining} يوم',
+
+  'alertBatchTitle': 'دفعة للإنهاء',
+  'alertBatchMsg': '{batchName}: {animalCount} حيوان(ات)',
+
+  'alertBatchFinalizeTitle': 'دفعة للإنهاء',
+  'alertBatchFinalizeMsg': '{batchName}: {animalCount} حيوان(ات) معلق',
+
+  'alertDraftTitle': 'حيوانات مسودة',
+  'alertDraftMsg': 'حيوانات غير مصادق عليها للإنهاء',
+
+  'alertDraftAnimalsTitle': 'حيوانات مسودة',
+  'alertDraftAnimalsMsg': '{count} حيوان(ات) غير مصادق عليها منذ أكثر من 24 ساعة',
+
   // ============ الحركات ============
   'movements': 'الحركات',
   'movementType': 'نوع الحركة',
