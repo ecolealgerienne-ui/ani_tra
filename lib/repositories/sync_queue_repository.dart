@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:drift/drift.dart' as drift;
+import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 
 import '../drift/database.dart';
@@ -50,24 +51,31 @@ class SyncQueueRepository {
       return;
     }
 
-    final id = _uuid.v4();
-    final now = DateTime.now();
-    final payloadBytes = Uint8List.fromList(utf8.encode(jsonEncode(payload)));
+    try {
+      final id = _uuid.v4();
+      final now = DateTime.now();
+      final payloadBytes = Uint8List.fromList(utf8.encode(jsonEncode(payload)));
 
-    final item = SyncQueueTableCompanion(
-      id: drift.Value(id),
-      farmId: drift.Value(farmId),
-      entityType: drift.Value(entityType),
-      entityId: drift.Value(entityId),
-      action: drift.Value(action),
-      payload: drift.Value(payloadBytes),
-      retryCount: const drift.Value(0),
-      createdAt: drift.Value(now),
-      updatedAt: drift.Value(now),
-    );
+      final item = SyncQueueTableCompanion(
+        id: drift.Value(id),
+        farmId: drift.Value(farmId),
+        entityType: drift.Value(entityType),
+        entityId: drift.Value(entityId),
+        action: drift.Value(action),
+        payload: drift.Value(payloadBytes),
+        retryCount: const drift.Value(0),
+        createdAt: drift.Value(now),
+        updatedAt: drift.Value(now),
+      );
 
-    await _db.syncQueueDao.upsertItem(item);
-    SyncConfig.log('Enqueued: $entityType:$entityId ($action)');
+      await _db.syncQueueDao.upsertItem(item);
+      SyncConfig.log('Enqueued: $entityType:$entityId ($action)');
+    } catch (e, stackTrace) {
+      debugPrint('❌ [SYNC] Error enqueueing $entityType:$entityId: $e');
+      debugPrint('❌ [SYNC] StackTrace: $stackTrace');
+      // Re-throw pour que la transaction soit rollback
+      rethrow;
+    }
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -84,6 +92,8 @@ class SyncQueueRepository {
     if (action != SyncAction.delete) {
       final validation = SyncValidator.validateAnimal(animal);
       if (!validation.isValid) {
+        debugPrint('⚠️ [SYNC] Animal validation failed for ${animal.id}: ${validation.errorMessage}');
+        debugPrint('⚠️ [SYNC] Error codes: ${validation.errors}');
         throw SyncBlockedException(
           'Animal validation failed: ${validation.errorMessage}',
           errorCodes: validation.errors,
@@ -285,15 +295,26 @@ class SyncQueueRepository {
 
   /// Obtenir les statistiques complètes de la queue
   Future<SyncQueueStats> getStats(String farmId) async {
-    final pending = await countPending(farmId);
-    final stalled = await countStalled(farmId);
-    final byType = await countByEntityType(farmId);
+    try {
+      final pending = await countPending(farmId);
+      final stalled = await countStalled(farmId);
+      final byType = await countByEntityType(farmId);
 
-    return SyncQueueStats(
-      pendingCount: pending,
-      stalledCount: stalled,
-      byEntityType: byType,
-    );
+      return SyncQueueStats(
+        pendingCount: pending,
+        stalledCount: stalled,
+        byEntityType: byType,
+      );
+    } catch (e, stackTrace) {
+      debugPrint('❌ [SYNC] Error getting stats for farm $farmId: $e');
+      debugPrint('❌ [SYNC] StackTrace: $stackTrace');
+      // Retourner des stats vides en cas d'erreur
+      return SyncQueueStats(
+        pendingCount: 0,
+        stalledCount: 0,
+        byEntityType: {},
+      );
+    }
   }
 }
 

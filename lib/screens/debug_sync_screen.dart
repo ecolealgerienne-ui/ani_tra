@@ -102,12 +102,23 @@ class _DebugSyncScreenState extends State<DebugSyncScreen> {
     );
 
     if (confirm == true) {
-      await _syncQueueRepo.deleteAll(_farmId!);
-      await _loadData();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context).translate('queueCleared'))),
-        );
+      try {
+        await _syncQueueRepo.deleteAll(_farmId!);
+        await _loadData();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(AppLocalizations.of(context).translate('queueCleared'))),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error clearing queue: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     }
   }
@@ -134,14 +145,25 @@ class _DebugSyncScreenState extends State<DebugSyncScreen> {
     );
 
     if (confirm == true) {
-      for (final item in _stalledItems) {
-        await _syncQueueRepo.resetRetry(item.id, _farmId!);
-      }
-      await _loadData();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context).translate('retriesReset'))),
-        );
+      try {
+        for (final item in _stalledItems) {
+          await _syncQueueRepo.resetRetry(item.id, _farmId!);
+        }
+        await _loadData();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(AppLocalizations.of(context).translate('retriesReset'))),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error resetting retries: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     }
   }
@@ -487,12 +509,23 @@ class _DebugSyncScreenState extends State<DebugSyncScreen> {
         _showPayloadDialog(item);
         break;
       case 'retry':
-        await _syncQueueRepo.resetRetry(item.id, _farmId!);
-        await _loadData();
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.translate('itemRetryReset'))),
-          );
+        try {
+          await _syncQueueRepo.resetRetry(item.id, _farmId!);
+          await _loadData();
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(l10n.translate('itemRetryReset'))),
+            );
+          }
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Error resetting retry: $e'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
         }
         break;
       case 'delete':
@@ -514,13 +547,24 @@ class _DebugSyncScreenState extends State<DebugSyncScreen> {
           ),
         );
         if (confirm == true) {
-          final db = Provider.of<AppDatabase>(context, listen: false);
-          await db.syncQueueDao.deleteItem(item.id, _farmId!);
-          await _loadData();
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(l10n.translate('itemDeleted'))),
-            );
+          try {
+            final db = Provider.of<AppDatabase>(context, listen: false);
+            await db.syncQueueDao.deleteItem(item.id, _farmId!);
+            await _loadData();
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(l10n.translate('itemDeleted'))),
+              );
+            }
+          } catch (e) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Error deleting item: $e'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
           }
         }
         break;
