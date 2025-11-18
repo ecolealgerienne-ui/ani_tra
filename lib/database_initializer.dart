@@ -1567,4 +1567,169 @@ class DatabaseInitializer {
       'weights': weightCount,
     };
   }
+
+  /// Exécute les tests de benchmark pour mesurer les performances
+  ///
+  /// Retourne un Map avec les résultats de chaque test:
+  /// - 'testName': {'time': ms, 'passed': bool, 'target': targetMs}
+  static Future<Map<String, Map<String, dynamic>>> runBenchmarkTests(
+    AppDatabase db,
+    String farmId,
+  ) async {
+    final results = <String, Map<String, dynamic>>{};
+
+    print('$_tag ═══════════════════════════════════════');
+    print('$_tag BENCHMARK TIMING TESTS');
+    print('$_tag ═══════════════════════════════════════');
+
+    // Test 1: Load all animals
+    var stopwatch = Stopwatch()..start();
+    final animals = await db.animalDao.watchAllAnimals(farmId).first;
+    stopwatch.stop();
+    results['loadAnimals'] = {
+      'time': stopwatch.elapsedMilliseconds,
+      'target': AppConstants.benchmarkTargetLoadAnimals,
+      'passed': stopwatch.elapsedMilliseconds <= AppConstants.benchmarkTargetLoadAnimals,
+      'count': animals.length,
+    };
+    _logTestResult('Load Animals', results['loadAnimals']!);
+
+    // Test 2: Load all movements
+    stopwatch = Stopwatch()..start();
+    final movements = await db.movementDao.watchAllMovements(farmId).first;
+    stopwatch.stop();
+    results['loadMovements'] = {
+      'time': stopwatch.elapsedMilliseconds,
+      'target': AppConstants.benchmarkTargetLoadMovements,
+      'passed': stopwatch.elapsedMilliseconds <= AppConstants.benchmarkTargetLoadMovements,
+      'count': movements.length,
+    };
+    _logTestResult('Load Movements', results['loadMovements']!);
+
+    // Test 3: Load all lots
+    stopwatch = Stopwatch()..start();
+    final lots = await db.lotDao.watchAllLots(farmId).first;
+    stopwatch.stop();
+    results['loadLots'] = {
+      'time': stopwatch.elapsedMilliseconds,
+      'target': AppConstants.benchmarkTargetLoadLots,
+      'passed': stopwatch.elapsedMilliseconds <= AppConstants.benchmarkTargetLoadLots,
+      'count': lots.length,
+    };
+    _logTestResult('Load Lots', results['loadLots']!);
+
+    // Test 4: Load all weights
+    stopwatch = Stopwatch()..start();
+    final weights = await db.weightDao.watchAllWeights(farmId).first;
+    stopwatch.stop();
+    results['loadWeights'] = {
+      'time': stopwatch.elapsedMilliseconds,
+      'target': AppConstants.benchmarkTargetLoadWeights,
+      'passed': stopwatch.elapsedMilliseconds <= AppConstants.benchmarkTargetLoadWeights,
+      'count': weights.length,
+    };
+    _logTestResult('Load Weights', results['loadWeights']!);
+
+    // Test 5: Find by EID (random animal)
+    if (animals.isNotEmpty) {
+      final testAnimal = animals[animals.length ~/ 2];
+      final testEid = testAnimal.currentEid ?? 'BENCH_000500';
+
+      stopwatch = Stopwatch()..start();
+      await db.animalDao.findByEID(testEid);
+      stopwatch.stop();
+      results['findByEID'] = {
+        'time': stopwatch.elapsedMilliseconds,
+        'target': AppConstants.benchmarkTargetFindByEID,
+        'passed': stopwatch.elapsedMilliseconds <= AppConstants.benchmarkTargetFindByEID,
+        'query': testEid,
+      };
+      _logTestResult('Find by EID', results['findByEID']!);
+    }
+
+    // Test 6: Find lots by animal
+    if (animals.isNotEmpty) {
+      final testAnimalId = animals.first.id;
+
+      stopwatch = Stopwatch()..start();
+      await db.lotAnimalDao.getLotsForAnimal(testAnimalId);
+      stopwatch.stop();
+      results['findLotsByAnimal'] = {
+        'time': stopwatch.elapsedMilliseconds,
+        'target': AppConstants.benchmarkTargetFindLotsByAnimal,
+        'passed': stopwatch.elapsedMilliseconds <= AppConstants.benchmarkTargetFindLotsByAnimal,
+      };
+      _logTestResult('Find Lots by Animal', results['findLotsByAnimal']!);
+    }
+
+    // Test 7: Count stats (alive animals)
+    stopwatch = Stopwatch()..start();
+    final aliveCount = animals.where((a) => a.status == AnimalStatus.alive).length;
+    stopwatch.stop();
+    results['countStats'] = {
+      'time': stopwatch.elapsedMilliseconds,
+      'target': AppConstants.benchmarkTargetCountStats,
+      'passed': stopwatch.elapsedMilliseconds <= AppConstants.benchmarkTargetCountStats,
+      'count': aliveCount,
+    };
+    _logTestResult('Count Stats', results['countStats']!);
+
+    // Test 8: Batch create (10 animals)
+    stopwatch = Stopwatch()..start();
+    final batchIds = <String>[];
+    for (int i = 0; i < 10; i++) {
+      final id = 'bench_batch_${DateTime.now().millisecondsSinceEpoch}_$i';
+      await db.animalDao.insertItem(AnimalsTableCompanion.insert(
+        id: id,
+        farmId: farmId,
+        currentEid: Value('BATCH_${i.toString().padLeft(3, '0')}'),
+        birthDate: DateTime.now().subtract(const Duration(days: 100)),
+        sex: AnimalSex.female.name,
+        status: AnimalStatus.alive.name,
+        synced: const Value(false),
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ));
+      batchIds.add(id);
+    }
+    stopwatch.stop();
+    results['batchCreate'] = {
+      'time': stopwatch.elapsedMilliseconds,
+      'target': AppConstants.benchmarkTargetBatchCreate,
+      'passed': stopwatch.elapsedMilliseconds <= AppConstants.benchmarkTargetBatchCreate,
+      'count': 10,
+    };
+    _logTestResult('Batch Create (10)', results['batchCreate']!);
+
+    // Cleanup batch test data
+    for (final id in batchIds) {
+      await db.animalDao.deleteItem(id);
+    }
+
+    // Summary
+    final passed = results.values.where((r) => r['passed'] == true).length;
+    final total = results.length;
+
+    print('$_tag ═══════════════════════════════════════');
+    print('$_tag BENCHMARK SUMMARY: $passed/$total PASSED');
+    print('$_tag ═══════════════════════════════════════');
+
+    if (passed == total) {
+      print('$_tag ✅ ALL TESTS PASSED');
+    } else {
+      print('$_tag ⚠️  ${total - passed} TEST(S) FAILED');
+    }
+
+    return results;
+  }
+
+  /// Helper pour logger le résultat d'un test
+  static void _logTestResult(String testName, Map<String, dynamic> result) {
+    final time = result['time'] as int;
+    final target = result['target'] as int;
+    final passed = result['passed'] as bool;
+    final status = passed ? '✅ PASS' : '❌ FAIL';
+
+    print('$_tag $status $testName: ${time}ms (target: ${target}ms)');
+  }
 }
