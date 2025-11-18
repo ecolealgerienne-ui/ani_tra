@@ -168,9 +168,16 @@ class LotDetailScreen extends StatelessWidget {
     final animals = <Animal>[];
     for (final animalId in lot.animalIds) {
       final animal = provider.getAnimalById(animalId);
-      // ✅ Inclure seulement les animaux ACTIFS
-      if (animal != null && animal.status == AnimalStatus.alive) {
-        animals.add(animal);
+      if (animal != null) {
+        // Pour les lots ouverts, inclure seulement les animaux actifs
+        // Pour les lots fermés/archivés, inclure tous les animaux
+        if (lot.status == LotStatus.open) {
+          if (animal.status == AnimalStatus.alive) {
+            animals.add(animal);
+          }
+        } else {
+          animals.add(animal);
+        }
       }
     }
     return animals;
@@ -353,25 +360,33 @@ class LotDetailScreen extends StatelessWidget {
 
               // VENTE
               if (lot.type == LotType.sale) ...[
-                if (lot.buyerName != null) ...[
+                if (firstMovement?.buyerName != null) ...[
                   _buildInfoRow(
-                    'Acheteur',
-                    lot.buyerName!,
+                    AppLocalizations.of(context).translate(AppStrings.buyer),
+                    firstMovement!.buyerName!,
                     Icons.person,
+                  ),
+                ],
+                if (firstMovement?.buyerFarmId != null) ...[
+                  const SizedBox(height: AppConstants.spacingSmall),
+                  _buildInfoRow(
+                    AppLocalizations.of(context).translate(AppStrings.buyerFarmId),
+                    firstMovement!.buyerFarmId!,
+                    Icons.badge,
                   ),
                 ],
                 if (firstMovement?.buyerType != null) ...[
                   const SizedBox(height: AppConstants.spacingSmall),
                   _buildInfoRow(
-                    'Type',
-                    _getBuyerTypeLabel(firstMovement!.buyerType!),
+                    AppLocalizations.of(context).translate(AppStrings.type),
+                    _getBuyerTypeLabel(context, firstMovement!.buyerType!),
                     Icons.category,
                   ),
                 ],
                 if (lot.priceTotal != null) ...[
                   const SizedBox(height: AppConstants.spacingSmall),
                   _buildInfoRow(
-                    'Prix total',
+                    AppLocalizations.of(context).translate(AppStrings.totalPrice),
                     '${lot.priceTotal!.toStringAsFixed(2)}€',
                     Icons.euro,
                   ),
@@ -379,7 +394,7 @@ class LotDetailScreen extends StatelessWidget {
                 if (lot.completedAt != null) ...[
                   const SizedBox(height: AppConstants.spacingSmall),
                   _buildInfoRow(
-                    'Date de vente',
+                    AppLocalizations.of(context).translate(AppStrings.saleDate),
                     DateFormat('dd/MM/yyyy').format(lot.completedAt!),
                     Icons.calendar_today,
                   ),
@@ -390,7 +405,7 @@ class LotDetailScreen extends StatelessWidget {
               if (lot.type == LotType.slaughter && firstMovement != null) ...[
                 if (firstMovement.slaughterhouseName != null) ...[
                   _buildInfoRow(
-                    'Abattoir',
+                    AppLocalizations.of(context).translate(AppStrings.slaughterhouse),
                     firstMovement.slaughterhouseName!,
                     Icons.business,
                   ),
@@ -398,7 +413,7 @@ class LotDetailScreen extends StatelessWidget {
                 if (firstMovement.slaughterhouseId != null) ...[
                   const SizedBox(height: AppConstants.spacingSmall),
                   _buildInfoRow(
-                    'Agrément',
+                    AppLocalizations.of(context).translate(AppStrings.slaughterhouseId),
                     firstMovement.slaughterhouseId!,
                     Icons.badge,
                   ),
@@ -406,7 +421,7 @@ class LotDetailScreen extends StatelessWidget {
                 if (lot.completedAt != null) ...[
                   const SizedBox(height: AppConstants.spacingSmall),
                   _buildInfoRow(
-                    'Date d\'abattage',
+                    AppLocalizations.of(context).translate(AppStrings.dateSlaughter),
                     DateFormat('dd/MM/yyyy').format(lot.completedAt!),
                     Icons.calendar_today,
                   ),
@@ -417,7 +432,7 @@ class LotDetailScreen extends StatelessWidget {
               if (lot.type == LotType.purchase) ...[
                 if (lot.sellerName != null) ...[
                   _buildInfoRow(
-                    'Vendeur',
+                    AppLocalizations.of(context).translate(AppStrings.seller),
                     lot.sellerName!,
                     Icons.person_outline,
                   ),
@@ -425,7 +440,7 @@ class LotDetailScreen extends StatelessWidget {
                 if (lot.priceTotal != null) ...[
                   const SizedBox(height: AppConstants.spacingSmall),
                   _buildInfoRow(
-                    'Prix total',
+                    AppLocalizations.of(context).translate(AppStrings.totalPrice),
                     '${lot.priceTotal!.toStringAsFixed(2)}€',
                     Icons.euro,
                   ),
@@ -433,7 +448,7 @@ class LotDetailScreen extends StatelessWidget {
                 if (lot.completedAt != null) ...[
                   const SizedBox(height: AppConstants.spacingSmall),
                   _buildInfoRow(
-                    'Date d\'achat',
+                    AppLocalizations.of(context).translate(AppStrings.purchaseDate),
                     DateFormat('dd/MM/yyyy').format(lot.completedAt!),
                     Icons.calendar_today,
                   ),
@@ -461,16 +476,17 @@ class LotDetailScreen extends StatelessWidget {
     );
   }
 
-  String _getBuyerTypeLabel(String buyerType) {
+  String _getBuyerTypeLabel(BuildContext context, String buyerType) {
+    final l10n = AppLocalizations.of(context);
     switch (buyerType) {
       case 'individual':
-        return 'Particulier';
+        return l10n.translate(AppStrings.buyerTypeIndividual);
       case 'farm':
-        return 'Ferme';
+        return l10n.translate(AppStrings.buyerTypeFarm);
       case 'trader':
-        return 'Négociant';
+        return l10n.translate(AppStrings.buyerTypeTrader);
       case 'cooperative':
-        return 'Coopérative';
+        return l10n.translate(AppStrings.buyerTypeCooperative);
       default:
         return buyerType;
     }

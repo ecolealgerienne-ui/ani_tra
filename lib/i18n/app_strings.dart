@@ -778,6 +778,12 @@ class AppStrings {
   static const String buyerFarmId = 'buyerFarmId';
   static const String slaughterhouseName = 'slaughterhouseName';
   static const String slaughterhouseId = 'slaughterhouseId';
+  static const String purchaseDate = 'purchaseDate';
+  static const String seller = 'seller';
+  static const String buyerTypeIndividual = 'buyerTypeIndividual';
+  static const String buyerTypeFarm = 'buyerTypeFarm';
+  static const String buyerTypeTrader = 'buyerTypeTrader';
+  static const String buyerTypeCooperative = 'buyerTypeCooperative';
 
   // ========== Slaughter SCREENS ==========
   static const String recordSlaughter = 'recordSlaughter';

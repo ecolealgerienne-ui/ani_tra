@@ -734,6 +734,12 @@ const Map<String, String> stringsAr = {
   'buyerFarmId': 'معرّف مزرعة المشتري',
   'slaughterhouseName': 'اسم المسلخ',
   'slaughterhouseId': 'معرّف المسلخ',
+  'purchaseDate': 'تاريخ الشراء',
+  'seller': 'البائع',
+  'buyerTypeIndividual': 'فرد',
+  'buyerTypeFarm': 'مزرعة',
+  'buyerTypeTrader': 'تاجر',
+  'buyerTypeCooperative': 'تعاونية',
 
   // محدد الحيوانات
   'identifyAnimals': 'تحديد الحيوانات',

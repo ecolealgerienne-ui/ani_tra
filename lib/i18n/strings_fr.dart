@@ -778,8 +778,14 @@ const Map<String, String> stringsFr = {
   'back': 'Retour',
   'copySuffix': '(copie)',
   'buyerFarmId': 'Identifiant de la ferme acheteuse',
-  'slaughterhouseName': 'Nom de l’abattoir',
-  'slaughterhouseId': 'Identifiant de l’abattoir',
+  'slaughterhouseName': 'Nom de l'abattoir',
+  'slaughterhouseId': 'Identifiant de l'abattoir',
+  'purchaseDate': 'Date d\'achat',
+  'seller': 'Vendeur',
+  'buyerTypeIndividual': 'Particulier',
+  'buyerTypeFarm': 'Ferme',
+  'buyerTypeTrader': 'Négociant',
+  'buyerTypeCooperative': 'Coopérative',
 
   // ========== Slaughter SCREENS ==========
   'recordSlaughter': 'Enregistrer un abattage',

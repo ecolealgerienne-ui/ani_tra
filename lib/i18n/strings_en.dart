@@ -736,6 +736,12 @@ const Map<String, String> stringsEn = {
   'buyerFarmId': 'Buyer farm identifier',
   'slaughterhouseName': 'Slaughterhouse name',
   'slaughterhouseId': 'Slaughterhouse identifier',
+  'purchaseDate': 'Purchase date',
+  'seller': 'Seller',
+  'buyerTypeIndividual': 'Individual',
+  'buyerTypeFarm': 'Farm',
+  'buyerTypeTrader': 'Trader',
+  'buyerTypeCooperative': 'Cooperative',
 
   // ANIMAL FINDER
   'identifyAnimals': 'Identify animals',
