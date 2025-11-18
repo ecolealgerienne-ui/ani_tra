@@ -83,7 +83,7 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase>
   }
 
   /// Incrémenter le compteur de retry et enregistrer l'erreur
-  Future<int> incrementRetry(String id, String farmId, String errorMsg) {
+  Future<void> incrementRetry(String id, String farmId, String errorMsg) {
     return customStatement(
       'UPDATE sync_queue SET '
       'retry_count = retry_count + 1, '

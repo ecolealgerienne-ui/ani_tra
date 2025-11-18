@@ -603,7 +603,6 @@ const Map<String, String> stringsEn = {
   // Sync actions
   'insert': 'Create',
   'update': 'Update',
-  'delete': 'Delete',
 
   // Stats
   'pendingItems': 'Pending',
@@ -996,12 +995,10 @@ const Map<String, String> stringsEn = {
   'fromFarm': 'Origin',
   'toFarm': 'Destination',
   'syncStatus': 'Synchronization status',
-  'synced': 'Synchronized',
   'notSynced': 'Not synchronized',
   'lastSyncedAt': 'Last synchronized',
   'draft': 'Draft',
   'price': 'Price',
   'currency': 'DZD',
-  'createdAt': 'Created on',
   'updatedAt': 'Updated on',
 };

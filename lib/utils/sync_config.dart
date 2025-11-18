@@ -62,6 +62,14 @@ class SyncConfig {
     return syncEnabled;
   }
 
+  /// Activer ou désactiver la synchronisation
+  static void setSyncEnabled(bool value) {
+    syncEnabled = value;
+    if (debugLogging) {
+      debugPrint('[SYNC] Sync ${value ? 'enabled' : 'disabled'}');
+    }
+  }
+
   /// Peut-on syncer sans officialID?
   static bool canSyncWithoutOfficialId() {
     return isDevelopmentMode && !blockSyncIfNoOfficialId;

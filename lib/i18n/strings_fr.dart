@@ -647,7 +647,6 @@ const Map<String, String> stringsFr = {
   // Actions sync
   'insert': 'Création',
   'update': 'Modification',
-  'delete': 'Suppression',
 
   // Stats
   'pendingItems': 'En attente',
@@ -997,7 +996,6 @@ const Map<String, String> stringsFr = {
   'actualBirthDate': 'Date de mise-bas réelle',
 
   'breedingStatus': 'Statut de reproduction',
-  'pending': 'En attente',
   'completedBreeding': 'Mise-bas effectuée',
   'failedBreeding': 'Échec',
   'abortedBreeding': 'Avortement',
@@ -1185,12 +1183,10 @@ const Map<String, String> stringsFr = {
   'fromFarm': 'Provenance',
   'toFarm': 'Destination',
   'syncStatus': 'Statut de synchronisation',
-  'synced': 'Synchronisé',
   'notSynced': 'Non synchronisé',
   'lastSyncedAt': 'Dernière synchronisation',
   'draft': 'Brouillon',
   'price': 'Prix',
   'currency': 'DZD',
-  'createdAt': 'Créé le',
   'updatedAt': 'Modifié le',
 };
