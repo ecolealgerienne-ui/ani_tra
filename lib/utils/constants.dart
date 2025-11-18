@@ -466,19 +466,21 @@ class AppConstants {
   static const bool kBenchmarkLightMode = true;
 
   // Seed data quantities - Light mode (1000 animals)
+  // Ratios: 3 mov/animal, 0.5 treat/animal, 2.5 vacc/animal, 5 weight/animal
   static const int benchmarkLightAnimals = 1000;
   static const int benchmarkLightMovements = 3000;
   static const int benchmarkLightLots = 100;
-  static const int benchmarkLightTreatments = 600;
-  static const int benchmarkLightVaccinations = 1000;
+  static const int benchmarkLightTreatments = 500;      // 0.5/animal (50% malades)
+  static const int benchmarkLightVaccinations = 2500;   // 2.5/animal (2-3 vaccins/an)
   static const int benchmarkLightWeights = 5000;
 
   // Seed data quantities - Full mode (5000 animals)
+  // Mêmes ratios que light mode
   static const int benchmarkFullAnimals = 5000;
   static const int benchmarkFullMovements = 15000;
   static const int benchmarkFullLots = 500;
-  static const int benchmarkFullTreatments = 3000;
-  static const int benchmarkFullVaccinations = 5000;
+  static const int benchmarkFullTreatments = 2500;      // 0.5/animal
+  static const int benchmarkFullVaccinations = 12500;   // 2.5/animal
   static const int benchmarkFullWeights = 25000;
 
   // Benchmark targets (ms) - Emulator tolerances
