@@ -6,9 +6,7 @@ import '../../i18n/app_localizations.dart';
 import '../../i18n/app_strings.dart';
 import '../../utils/constants.dart';
 import '../../models/animal.dart';
-import '../../models/movement.dart';
 import '../../providers/animal_provider.dart';
-import '../../providers/movement_provider.dart';
 import '../../providers/sync_provider.dart';
 import '../../services/atomic_operation_service.dart';
 

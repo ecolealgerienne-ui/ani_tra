@@ -4,12 +4,6 @@
 
 import 'package:drift/drift.dart';
 import '../drift/database.dart';
-import '../drift/tables/movements_table.dart';
-import '../drift/tables/animals_table.dart';
-import '../drift/tables/treatments_table.dart';
-import '../models/movement.dart';
-import '../models/animal.dart';
-import '../models/treatment.dart';
 
 /// Service pour les opérations atomiques sur la base de données
 ///
@@ -63,7 +57,7 @@ class AtomicOperationService {
             animalId: animalId,
             lotId: Value(lotId),
             type: 'sale',
-            status: const Value('ongoing'),
+            status: 'ongoing',
             movementDate: saleDate,
             price: Value(pricePerAnimal),
             buyerName: Value(buyerName),
@@ -149,7 +143,7 @@ class AtomicOperationService {
             animalId: animalId,
             lotId: Value(lotId),
             type: 'slaughter',
-            status: const Value('closed'),
+            status: 'closed',
             movementDate: slaughterDate,
             slaughterhouseName: Value(slaughterhouseName),
             slaughterhouseId: Value(slaughterhouseId),
@@ -223,7 +217,7 @@ class AtomicOperationService {
           farmId: farmId,
           animalId: animalId,
           type: 'death',
-          status: const Value('closed'),
+          status: 'closed',
           movementDate: deathDate,
           notes: Value(notes),
           synced: const Value(false),
@@ -277,7 +271,7 @@ class AtomicOperationService {
           farmId: farmId,
           animalId: animalId,
           type: 'purchase',
-          status: const Value('closed'),
+          status: 'closed',
           movementDate: DateTime.now(),
           fromFarmId: Value(fromFarmId),
           price: Value(price),
