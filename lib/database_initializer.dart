@@ -1465,7 +1465,7 @@ class DatabaseInitializer {
 
     // Test 1: Load all animals
     var stopwatch = Stopwatch()..start();
-    final animals = await db.animalDao.watchAllAnimals(farmId).first;
+    final animals = await db.animalDao.findByFarmId(farmId);
     stopwatch.stop();
     results['loadAnimals'] = {
       'time': stopwatch.elapsedMilliseconds,
@@ -1477,7 +1477,7 @@ class DatabaseInitializer {
 
     // Test 2: Load all movements
     stopwatch = Stopwatch()..start();
-    final movements = await db.movementDao.watchAllMovements(farmId).first;
+    final movements = await db.movementDao.findByFarmId(farmId);
     stopwatch.stop();
     results['loadMovements'] = {
       'time': stopwatch.elapsedMilliseconds,
@@ -1489,7 +1489,7 @@ class DatabaseInitializer {
 
     // Test 3: Load all lots
     stopwatch = Stopwatch()..start();
-    final lots = await db.lotDao.watchAllLots(farmId).first;
+    final lots = await db.lotDao.findAllByFarm(farmId);
     stopwatch.stop();
     results['loadLots'] = {
       'time': stopwatch.elapsedMilliseconds,
@@ -1501,7 +1501,7 @@ class DatabaseInitializer {
 
     // Test 4: Load all weights
     stopwatch = Stopwatch()..start();
-    final weights = await db.weightDao.watchAllWeights(farmId).first;
+    final weights = await db.weightDao.findByFarmId(farmId);
     stopwatch.stop();
     results['loadWeights'] = {
       'time': stopwatch.elapsedMilliseconds,
@@ -1517,7 +1517,7 @@ class DatabaseInitializer {
       final testEid = testAnimal.currentEid ?? 'BENCH_000500';
 
       stopwatch = Stopwatch()..start();
-      await db.animalDao.findByEID(testEid);
+      await db.animalDao.findByEid(testEid, farmId);
       stopwatch.stop();
       results['findByEID'] = {
         'time': stopwatch.elapsedMilliseconds,
@@ -1533,7 +1533,7 @@ class DatabaseInitializer {
       final testAnimalId = animals.first.id;
 
       stopwatch = Stopwatch()..start();
-      await db.lotAnimalDao.getLotsForAnimal(testAnimalId);
+      await db.lotAnimalDao.getLotIdsForAnimal(testAnimalId);
       stopwatch.stop();
       results['findLotsByAnimal'] = {
         'time': stopwatch.elapsedMilliseconds,
@@ -1543,9 +1543,21 @@ class DatabaseInitializer {
       _logTestResult('Find Lots by Animal', results['findLotsByAnimal']!);
     }
 
-    // Test 7: Count stats (alive animals)
+    // Test 7: Filter lot movements
     stopwatch = Stopwatch()..start();
-    final aliveCount = animals.where((a) => a.status == AnimalStatus.alive).length;
+    final lotMovements = movements.where((m) => m.lotId != null).toList();
+    stopwatch.stop();
+    results['filterLotMovements'] = {
+      'time': stopwatch.elapsedMilliseconds,
+      'target': AppConstants.benchmarkTargetCountStats,
+      'passed': stopwatch.elapsedMilliseconds <= AppConstants.benchmarkTargetCountStats,
+      'count': lotMovements.length,
+    };
+    _logTestResult('Filter Lot Movements', results['filterLotMovements']!);
+
+    // Test 8: Count stats (alive animals)
+    stopwatch = Stopwatch()..start();
+    final aliveCount = animals.where((a) => a.status == AnimalStatus.alive.name).length;
     stopwatch.stop();
     results['countStats'] = {
       'time': stopwatch.elapsedMilliseconds,
@@ -1555,7 +1567,7 @@ class DatabaseInitializer {
     };
     _logTestResult('Count Stats', results['countStats']!);
 
-    // Test 8: Batch create (10 animals)
+    // Test 9: Batch create (10 animals)
     stopwatch = Stopwatch()..start();
     final batchIds = <String>[];
     for (int i = 0; i < 10; i++) {
@@ -1584,7 +1596,7 @@ class DatabaseInitializer {
 
     // Cleanup batch test data
     for (final id in batchIds) {
-      await db.animalDao.deleteItem(id);
+      await db.animalDao.softDelete(id, farmId);
     }
 
     // Summary
