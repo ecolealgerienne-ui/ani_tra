@@ -183,7 +183,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   // ═══════════════════════════════════════════════════════════
   // MIGRATION STRATEGY
@@ -264,6 +264,13 @@ class AppDatabase extends _$AppDatabase {
           // ───────────────────────────────────────────────────
           if (from < 4) {
             await _migrateToV4LotsRefactoring();
+          }
+
+          // ───────────────────────────────────────────────────
+          // MIGRATION v4 → v5: Performance indexes for large farms + Phase 2 sync
+          // ───────────────────────────────────────────────────
+          if (from < 5) {
+            await _migrateToV5PerformanceIndexes();
           }
         },
       );
@@ -371,6 +378,16 @@ class AppDatabase extends _$AppDatabase {
     // Index composite 4: farm + status + validated_at (DRAFT system)
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_animals_draft_alerts ON animals(farm_id, status, validated_at)',
+    );
+
+    // Index 8: birth_date (filtres par âge - grandes fermes)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_animals_birth_date ON animals(birth_date)',
+    );
+
+    // Index composite 5: farm + synced (Phase 2 sync queries)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_animals_farm_synced ON animals(farm_id, synced)',
     );
   }
 
@@ -593,6 +610,11 @@ class AppDatabase extends _$AppDatabase {
     );
     await customStatement(
         'CREATE INDEX IF NOT EXISTS idx_treatments_deleted_at ON treatments(deleted_at);');
+
+    // Index composite: farmId + synced (Phase 2 sync queries)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_treatments_farm_synced ON treatments(farm_id, synced)',
+    );
   }
 
   /// Crée les indexes pour la table vaccinations
@@ -667,6 +689,11 @@ class AppDatabase extends _$AppDatabase {
     );
     await customStatement(
         'CREATE INDEX IF NOT EXISTS idx_vaccinations_deleted_at ON vaccinations(deleted_at);');
+
+    // Index composite: farmId + synced (Phase 2 sync queries)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_vaccinations_farm_synced ON vaccinations(farm_id, synced)',
+    );
   }
 
   /// Crée les indexes pour la table weights
@@ -727,6 +754,11 @@ class AppDatabase extends _$AppDatabase {
     );
     await customStatement(
         'CREATE INDEX IF NOT EXISTS idx_weights_deleted_at ON weights(deleted_at);');
+
+    // Index composite: farmId + synced (Phase 2 sync queries)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_weights_farm_synced ON weights(farm_id, synced)',
+    );
   }
 
   /// Crée les indexes pour la table movements
@@ -806,6 +838,31 @@ class AppDatabase extends _$AppDatabase {
 
     await customStatement(
         'CREATE INDEX IF NOT EXISTS idx_movements_deleted_at ON movements(deleted_at);');
+
+    // Index: status (filtrage ventes en cours vs validées)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_movements_status ON movements(status)',
+    );
+
+    // Index composite: farmId + status (query très fréquente)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_movements_farm_status ON movements(farm_id, status)',
+    );
+
+    // Index: expectedReturnDate (alertes retours en retard)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_movements_expected_return ON movements(expected_return_date)',
+    );
+
+    // Index: relatedMovementId (lien temporary_out ↔ return)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_movements_related ON movements(related_movement_id)',
+    );
+
+    // Index composite: farmId + synced (Phase 2 sync queries)
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_movements_farm_synced ON movements(farm_id, synced)',
+    );
   }
 
   /// Créer les indexes pour la table lots
@@ -846,6 +903,18 @@ class AppDatabase extends _$AppDatabase {
     // PHASE 1: REMOVED - deleted_at column doesn't exist in lots table
     // await customStatement(
     //     'CREATE INDEX IF NOT EXISTS idx_lots_deleted_at ON lots(deleted_at);');
+
+    // Index: status (filtrage open/closed/archived)
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_lots_status ON lots(status);');
+
+    // Index composite: farmId + status (query la plus fréquente)
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_lots_farm_status ON lots(farm_id, status);');
+
+    // Index composite: farmId + synced (Phase 2 sync queries)
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_lots_farm_synced ON lots(farm_id, synced);');
   }
 
   /// Créer les indexes pour la table lot_animals (liaison table)
@@ -1345,6 +1414,70 @@ class AppDatabase extends _$AppDatabase {
 
     // Réactiver les foreign keys
     await customStatement('PRAGMA foreign_keys = ON;');
+  }
+
+  /// Migration v4 → v5: Performance indexes for large farms + Phase 2 sync
+  ///
+  /// Cette migration ajoute 14 nouveaux indexes pour:
+  /// - Filtrage par status (movements, lots)
+  /// - Support sync Phase 2 (farm_synced indexes)
+  /// - Alertes mouvements temporaires
+  /// - Filtres par âge (birth_date)
+  Future<void> _migrateToV5PerformanceIndexes() async {
+    // ─────────────────────────────────────────────────────────
+    // ANIMALS - Performance + Sync indexes
+    // ─────────────────────────────────────────────────────────
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_animals_birth_date ON animals(birth_date)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_animals_farm_synced ON animals(farm_id, synced)',
+    );
+
+    // ─────────────────────────────────────────────────────────
+    // MOVEMENTS - Status + Temporary + Sync indexes
+    // ─────────────────────────────────────────────────────────
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_movements_status ON movements(status)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_movements_farm_status ON movements(farm_id, status)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_movements_expected_return ON movements(expected_return_date)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_movements_related ON movements(related_movement_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_movements_farm_synced ON movements(farm_id, synced)',
+    );
+
+    // ─────────────────────────────────────────────────────────
+    // LOTS - Status + Sync indexes
+    // ─────────────────────────────────────────────────────────
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_lots_status ON lots(status)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_lots_farm_status ON lots(farm_id, status)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_lots_farm_synced ON lots(farm_id, synced)',
+    );
+
+    // ─────────────────────────────────────────────────────────
+    // TREATMENTS / VACCINATIONS / WEIGHTS - Sync indexes
+    // ─────────────────────────────────────────────────────────
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_treatments_farm_synced ON treatments(farm_id, synced)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_vaccinations_farm_synced ON vaccinations(farm_id, synced)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_weights_farm_synced ON weights(farm_id, synced)',
+    );
   }
 
   // ═══════════════════════════════════════════════════════════
