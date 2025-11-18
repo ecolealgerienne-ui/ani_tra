@@ -356,6 +356,7 @@ class AlertProvider extends ChangeNotifier {
   /// Évaluation REMANENCE (Délai abattage)
   /// Cherche les animaux avec traitement actif et délai court
   /// ✅ PHASE 4 FIX: EXCLUDE DRAFT animals
+  /// ✅ PERF FIX: Utilise Map pour lookup O(1) au lieu de firstWhere O(n)
   Future<List<Alert>> _checkAndBuildRemanence(
     AlertConfiguration config,
   ) async {
@@ -365,26 +366,15 @@ class AlertProvider extends ChangeNotifier {
     final treatmentsInWithdrawal =
         _treatmentProvider.getTreatmentsInWithdrawalPeriod();
 
+    // ✅ PERF FIX: Créer Map pour lookup O(1)
+    final animalMap = {for (var a in _animalProvider.animals) a.id: a};
+
     for (final treatment in treatmentsInWithdrawal) {
       final daysRemaining = treatment.daysUntilWithdrawalEnd;
 
-      // ✅ PHASE 4 FIX: Récupérer l'animal et vérifier son statut
-      final animal = _animalProvider.animals.firstWhere(
-        (a) => a.id == treatment.animalId,
-        orElse: () => Animal(
-          id: 'unknown',
-          farmId: _currentFarmId,
-          currentEid: 'Unknown',
-          visualId: 'Unknown',
-          officialNumber: '',
-          speciesId: '',
-          birthDate: DateTime.now(),
-          sex: AnimalSex.male,
-          status: AnimalStatus.alive,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        ),
-      );
+      // ✅ PERF FIX: Lookup O(1) via Map
+      final animal = animalMap[treatment.animalId];
+      if (animal == null) continue;
 
       // ✅ PHASE 4 FIX: SKIP si DRAFT
       if (animal.status == AnimalStatus.draft) {
@@ -427,6 +417,7 @@ class AlertProvider extends ChangeNotifier {
   }
 
   /// Évaluation WEIGHING (Pesée manquante)
+  /// ✅ PERF FIX: Pré-calcule Map des dernières pesées pour lookup O(1)
   Future<List<Alert>> _checkAndBuildWeighing(
     AlertConfiguration config,
   ) async {
@@ -435,16 +426,18 @@ class AlertProvider extends ChangeNotifier {
         .where((a) => a.status == AnimalStatus.alive)
         .toList();
 
+    // ✅ PERF FIX: Pré-calculer la dernière pesée par animal (O(n) une seule fois)
+    final lastWeightByAnimal = <String, DateTime>{};
+    for (final weight in _weightProvider.weights) {
+      final existing = lastWeightByAnimal[weight.animalId];
+      if (existing == null || weight.recordedAt.isAfter(existing)) {
+        lastWeightByAnimal[weight.animalId] = weight.recordedAt;
+      }
+    }
+
     for (final animal in animals) {
-      // ✅ PHASE 2: Chercher la dernière pesée pour cet animal
-      final lastWeight = _weightProvider.weights
-          .where((w) => w.animalId == animal.id)
-          .fold<DateTime?>(
-            null,
-            (latest, w) => latest == null || w.recordedAt.isAfter(latest)
-                ? w.recordedAt
-                : latest,
-          );
+      // ✅ PERF FIX: Lookup O(1) via Map
+      final lastWeight = lastWeightByAnimal[animal.id];
 
       if (lastWeight == null) {
         // Aucune pesée du tout - IMPORTANT si animal adulte
@@ -505,28 +498,27 @@ class AlertProvider extends ChangeNotifier {
 
   /// Évaluation VACCINATION (Vaccination due)
   /// ✅ PHASE 4 FIX: EXCLUDE DRAFT animals
+  /// ✅ PERF FIX: Utilise Map pour lookup O(1) au lieu de firstWhere O(n)
   Future<List<Alert>> _checkAndBuildVaccination(
     AlertConfiguration config,
   ) async {
     final alerts = <Alert>[];
     final vaccinations = _vaccinationProvider.getVaccinationsWithRemindersDue();
 
+    // ✅ PERF FIX: Créer Map pour lookup O(1)
+    final animalMap = {for (var a in _animalProvider.animals) a.id: a};
+
     for (final vaccination in vaccinations) {
       if (vaccination.nextDueDate == null) continue;
 
       // ✅ PHASE 4 FIX: Vérifier le statut de l'animal
       if (!vaccination.isGroupVaccination && vaccination.animalId != null) {
-        try {
-          final animal = _animalProvider.animals.firstWhere(
-            (a) => a.id == vaccination.animalId,
-          );
+        // ✅ PERF FIX: Lookup O(1) via Map
+        final animal = animalMap[vaccination.animalId];
+        if (animal == null) continue;
 
-          // SKIP si animal DRAFT
-          if (animal.status == AnimalStatus.draft) {
-            continue;
-          }
-        } catch (e) {
-          // Animal non trouvé, on continue
+        // SKIP si animal DRAFT
+        if (animal.status == AnimalStatus.draft) {
           continue;
         }
       }
@@ -542,26 +534,10 @@ class AlertProvider extends ChangeNotifier {
                 ? AlertType.important
                 : AlertType.routine;
 
+        // ✅ PERF FIX: Lookup O(1) via Map
         final entityName = vaccination.isGroupVaccination
             ? '${vaccination.animalCount} animaux'
-            : _animalProvider.animals
-                .firstWhere(
-                  (a) => a.id == vaccination.animalId,
-                  orElse: () => Animal(
-                    id: 'unknown',
-                    farmId: _currentFarmId,
-                    currentEid: 'Unknown',
-                    visualId: 'Unknown',
-                    officialNumber: '',
-                    speciesId: '',
-                    birthDate: DateTime.now(),
-                    sex: AnimalSex.male,
-                    status: AnimalStatus.alive,
-                    createdAt: DateTime.now(),
-                    updatedAt: DateTime.now(),
-                  ),
-                )
-                .displayName;
+            : animalMap[vaccination.animalId]?.displayName ?? 'Unknown';
 
         final daysOverdue = daysUntil < 0 ? -daysUntil : 0;
 
